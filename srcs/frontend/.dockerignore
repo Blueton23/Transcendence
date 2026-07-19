@@ -1,0 +1,31 @@
+# Dépendances locales
+node_modules/
+
+# Build
+dist/
+coverage/
+.vite/
+
+# Environnement
+.env
+.env.*
+*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# Git
+.git/
+.gitignore
+
+# Système
+.DS_Store
+Thumbs.db
