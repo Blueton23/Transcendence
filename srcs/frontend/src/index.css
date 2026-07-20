@@ -1,111 +1,102 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
+@import "@fontsource/archivo/400.css";
+@import "@fontsource/archivo/500.css";
+@import "@fontsource/archivo/700.css";
+@import "@fontsource/archivo/800.css";
+@import "@fontsource/jetbrains-mono/400.css";
+@import "@fontsource/jetbrains-mono/700.css";
+@import "@fontsource/caveat/500.css";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+@theme {
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* Typography tokens */
+  --font-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-accent: 'Caveat', cursive;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --text-2xs: 0.4375rem;  /* 7px — initiales avatar xs, très compact */
+  --text-xs: 0.75rem;     /* 12px — badges, labels mono */
+  --text-sm: 0.8125rem;  /* 13px - buttons*/
+  --text-md: 0.875rem;   /* 14px — corps de texte*/
+  --text-lg: 1.125rem;   /* 18px — sous-titres */
+  --text-xl: 1.375rem;   /* 22px — titres de carte/modale ("Montreux", "Épingler une idée") */
+  --text-2xl: 2rem;      /* 32px — titres de page ("Mes voyages", "Road trip Suisse") */
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.4;
+
+  /* Text color tokens */
+  --color-text: #2B2A47;            /* encre, texte par defaut */
+  --color-text-secondary: #615B6E;  /* texte de phrase courante ("a voté pour...") */
+  --color-muted: #9A8F7E;           /* labels, timestamps, hints */
+  --color-inverse: #FFFFFF;         /* texte sur fond dark */
+
+  /* Background colors tokens */
+  --color-background: #E7DECF;         /* fond de l'app */
+  --color-surface: #FCFAF3;            /* cartes */
+  --color-surface-container: #F3ECDD;  /* chips, panneaux latéraux */
+  --color-surface-soft: #F7F1E6;       /* zone pointillée "idées à placer" */
+  --color-surface-control: #FFFFFF;    /* fond des chips inactifs, inputs */
+
+  /* Brand colors */
+  --color-brand-primary: #F2664A;          /* corail, accent d'action */
+  --color-brand-primary-strong: #D8482D;   /* corail foncé pour hover, liens */
+  --color-brand-dark: var(--color-text); /* encre = aussi couleur structurelle (nav, hero) */
+
+  /* Borders */
+  --color-border: rgba(43, 42, 71, 0.08);        /* défaut*/
+  --color-border-divider: rgba(43, 42, 71, 0.16); 
+  --color-border-control: rgba(43, 42, 71, 0.12); /* contour chips inactifs, inputs */
+  --color-border-avatar: #2B2A47;
+  --color-border-success: #B9E3CC;
+  --color-border-collection: #DBCEB6;    /* bordure pointillée "idées à placer" */
+  --color-border-alert-dashed: #EFC2B3;  /* bordure pointillée "nuit à choisir" */
+
+  /* Semantic colors */
+  --color-success: #3FB477;
+  --color-success-text: #2E7D52;
+  --color-success-bg: #E4F3EA;
+
+  --color-warning: #E7A23C;
+  --color-warning-text: #9A6B16;
+  --color-warning-bg: #F8EBD3;
+
+  --color-error: #C24024;
+  --color-error-bg: #F8E6DD;
+
+  --color-alert-dashed-bg: #FBEEE7;   /* fond pointillé "nuit à choisir" */
+
+  --color-info: #6C6597;
+  --color-info-bg: #E4E1F0;
+
+  /* Overlay */
+  --color-scrim: rgba(43, 42, 71, 0.55);
+
+  /* Shadow */
+  --shadow-sm: 0 1px 3px rgba(43, 42, 71, 0.08);
+  --shadow-md: 0 10px 24px -14px rgba(43, 42, 71, 0.35);
+  --shadow-lg: 0 30px 70px -38px rgba(43, 42, 71, 0.5);
+  --shadow-brand: 0 12px 24px -10px rgba(216, 72, 45, 0.5); /* glow des boutons corail */
+
+  /* Radius */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 26px;
+  --radius-full: 9999px;  /* pills */
+
+  /* Spacing */
+  --spacing-xs: 6px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 14px;
+  --spacing-xl: 20px;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
   }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
 }
