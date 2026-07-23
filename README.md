@@ -6,3 +6,4 @@ Containerization : Docker
 Database : Postgres
 Backend framework : Django
 Frontend framework : React / vite / talwind
+nginx : server web
