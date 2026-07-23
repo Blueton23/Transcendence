@@ -1,0 +1,5 @@
+[tool.ruff.lint.per-file-ignores]
+# get_asgi_application() must run before importing websocket_urlpatterns
+# (it pulls in consumers that import Django models), so the import can't
+# move to the top of the file without breaking app startup.
+"config/asgi.py" = ["E402"]
