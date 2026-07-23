@@ -1,1 +1,21 @@
-# wait for docker to be created to implemen this file
+name: Docker Build
+
+on:
+  push:
+    branches: [main]
+    paths: ["srcs/**", "docker-compose.yml"]
+  pull_request:
+    paths: ["srcs/**", "docker-compose.yml"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare env file
+        run: cp .env.example .env
+
+      - name: Build images
+        run: docker compose build

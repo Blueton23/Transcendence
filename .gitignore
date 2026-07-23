@@ -47,6 +47,7 @@ docker-compose.override.yml
 *.ntvs*
 *.njsproj
 *.sln
+.claude
 
 # Système
 .DS_Store

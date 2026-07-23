@@ -1,29 +1,27 @@
 name: Frontend CI
 
-# Only runs once files under frontend/ exist and are touched.
-# Assumes: frontend/package.json with "lint" and "build" scripts (default for a Vite scaffold).
 on:
   push:
     branches: [main]
-    paths: ["frontend/**"]
+    paths: ["srcs/frontend/**"]
   pull_request:
-    paths: ["frontend/**"]
+    paths: ["srcs/frontend/**"]
 
 jobs:
   lint-and-build:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend
+        working-directory: srcs/frontend
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: srcs/frontend/package-lock.json
 
       - name: Install dependencies
         run: npm ci
