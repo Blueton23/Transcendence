@@ -3,9 +3,10 @@
 # Définit /app comme dossier de travail dans le conteneur
 # Copie les dépendances
 # Installe les requirements
+# Utilise le script comme point d'entrée
 # Port backend
-# runserver pour tourner en dev
-# uvicorn pour production, CMD ["python", "-m", "uvicorn", "config.asgi:application", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# uvicorn pour asgi
+# --reload est uniquement destiné au développement
 
 FROM    python:3.13-slim-bookworm
 
@@ -14,12 +15,16 @@ ENV     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-COPY    ./requirements.txt .
+COPY    requirements.txt .
 
-RUN     pip install -r requirements.txt
+RUN     pip install --no-cache-dir -r requirements.txt
 
 COPY    . .
 
+COPY    entrypoint.sh /entrypoint.sh
+
+RUN     chmod +x /entrypoint.sh
+
 EXPOSE  8000
 
-CMD     ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD     ["/entrypoint.sh"]
