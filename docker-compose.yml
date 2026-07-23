@@ -12,14 +12,26 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7.4.9-alpine
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build: ./srcs/backend
     env_file:
       - ./.env
     volumes:
       - ./srcs/backend:/app
+      - static_data:/app/staticfiles
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
 
@@ -34,10 +46,14 @@ services:
     build: ./srcs/nginx
     ports:
       - "8080:80" # changer en 443 pour la prod
+    volumes:
+      - static_data:/static:ro
     depends_on:
       - backend
       - frontend
+    restart: unless-stopped
 
 volumes:
   postgres_data:
   frontend_node_modules:
+  static_data:
