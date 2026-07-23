@@ -63,23 +63,39 @@ Navigateur
     │
     ▼
 Nginx
-    │
-    ├── /              → frontend React/Vite
-    ├── /api/          → backend Django
-    ├── /admin/        → administration Django
-    └── /static/       → fichiers statiques Django
+    ├── /api/     → Uvicorn → Django HTTP
+    ├── /admin/   → Uvicorn → Django HTTP
+    ├── /ws/      → Uvicorn → Django Channels
+    └── /         → Vite
 
-Django
+Django Channels
+    │
+    ▼
+Redis
+
+Django ORM
     │
     ▼
 PostgreSQL
+```
+
+Les volumes :
+```
+postgres_data
+└── données PostgreSQL importantes et persistantes
+
+frontend_node_modules
+└── dépendances npm du frontend
+
+static_data
+└── CSS, JavaScript et images statiques de Django
 ```
 
 ====================================================================================================
 
 ## Descriptions des outils utilisés :
 
-### Postgresql (conteneur 1) :
+### Conteneur Postgresql :
 - PostgreSQL est un système de gestion de base de données qui permet de stocker, organiser et retrouver des données
 - C'est le premier service a mettre en place dans le compose
 - La base de données reçoit  des ordres comme : SELECT, INSERT, UPDATE, DELETE
@@ -130,7 +146,7 @@ Table PostgreSQL users
 
 ====================================================================================================
 
-### Django - backend (conteneur 2) :
+### Conteneur Django - backend :
 Django est un framework complet basé sur python incluant des tables de données, un orm et plusieurs fonctionnalité a sa création
 
 Django reçoit toutes les requêtes et gère :
@@ -195,11 +211,48 @@ Une application Django représente un domaine fonctionnel comme :
 | `docker compose exec backend python manage.py startapp nom_de_l_app nom_de_l_app/dossier` | Creer une app dans le projet dans un dossier |
 
 Une fois qu'une app est crée, elle doit etre ajouter dans settings.py sous INSTALLED_APPS, exemple : "users"
-Chaque aura ses propres fichiers .py, ils seront a connecter
+Chaque app aura ses propres fichiers .py, ils seront a connecter
+
+#### Server ASGI :
+- Point d’entrée pour les serveurs Web compatibles aSGI pour déployer le projet
+- Django peut servir les requêtes HTTP classiques et les WebSockets depuis la même application ASGI
+
+ASGI peut traiter :
+- HTTP classique
+- WebSockets
+- connexions longues
+- communications temps réel
+
+Requirements a installer :
+- Django Channels : pour ajouter la gestion des WebSockets à Django
+- Uvicorn comme serveur ASGI en développement
+- Redis : comme couche de communication entre les connexions WebSocket
+- Gunicorn + uvicorn-worker : pour superviser plusieurs workers ASGI en production
 
 ====================================================================================================
 
-### Frontend - react + vite (container 3) :
+### Conteneur Redis
+- Redis sera utilisé par Django Channels pour transmettre les événements entre les connexions WebSocket
+- L’application channels fournit les commandes et l’intégration nécessaires à Django Channels
+
+Redis pourra etre utilisé pour :
+- Chat en direct
+- Notifications instantanées
+- Utilisateurs actuellement connectés
+- Modifications collaboratives d’un roadtrip
+- Partage de position
+- Mise à jour des dépenses
+
+- Relier Django Channels à Redis dans settings.py
+- Futures routes WebSocket dans /backend/config/websocket_urls.py
+- Ajout du bloc location /ws/ dans nginx.conf
+
+- les apps avec websocket seront connecter dans websocket_urls.py
+- les apps sans websocker seront connecter dans urls.py
+
+====================================================================================================
+
+### Conteneur Frontend - react + vite :
 
 #### React :
 - React sert à construire l’interface utilisateur de l'application - ce que l’utilisateur voit et manipule
@@ -243,7 +296,7 @@ React affiche les résultats
 
 ====================================================================================================
 
-### Nginx - server web (container 4) :
+### Conteneur Nginx - server web :
 NGINX (unique porte d’entrée) :
 - permet de mettre en place un serveur web.
 - reçoit les requêtes HTTP/HTTPS (navigateur → serveur)
