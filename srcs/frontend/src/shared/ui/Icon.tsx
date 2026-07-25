@@ -1,7 +1,8 @@
 import type { SVGProps } from "react";
 
 /* coincide avec les elements inséré une seule fois dans index.html. */
-const iconNames = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const iconNames = [
 	"arrow", "back", "bed", "bell", "cal", "car", "cash", "chat",
 	"check", "chev-down", "city", "coffee", "compass", "dots", "ext",
 	"fork", "heart", "heart-f", "home", "inbox", "info", "map",
