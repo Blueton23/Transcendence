@@ -248,7 +248,7 @@ Redis pourra etre utilisé pour :
 - Ajout du bloc location /ws/ dans nginx.conf
 
 - les apps avec websocket seront connecter dans websocket_urls.py
-- les apps sans websocker seront connecter dans urls.py
+- les apps sans websocket seront connecter dans urls.py
 
 ====================================================================================================
 
