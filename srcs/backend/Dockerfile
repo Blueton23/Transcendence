@@ -1,6 +1,7 @@
 # Evite la création de fichiers Python __pycache__ et .pyc dans le projet
 # Affiche les logs Django dans Docker
 # Définit /app comme dossier de travail dans le conteneur
+# Installe curl pour les checks dans compose
 # Copie les dépendances
 # Installe les requirements
 # Utilise le script comme point d'entrée
@@ -14,6 +15,9 @@ ENV     PYTHONDONTWRITEBYTECODE=1
 ENV     PYTHONUNBUFFERED=1
 
 WORKDIR /app
+
+RUN     apt-get update && apt-get install -y curl \
+        && rm -rf /var/lib/apt/lists/*
 
 COPY    requirements.txt .
 
