@@ -1,4 +1,4 @@
-Ce projet a été créé dans le cadre du cursus 42 par dle-fur - Technical Lead / Architect
+Ce projet a été créé dans le cadre du cursus 42 par <dle-fur[Technical Lead - Architect]>
 
 ## Architecture :
 
@@ -129,7 +129,7 @@ Table PostgreSQL users
 
 | Commandes psql | Description |
 |---|---|
-| `docker compose exec db psql -U <POSTGRES_DB> -d <POSTGRES_DB>` | Se connecter a postgres + entrée dans la base de données |
+| `docker compose exec db psql -U <POSTGRES_USER> -d <POSTGRES_DB>` | Se connecter a postgres + entrée dans la base de données |
 | `\h SELECT` | Aide SQL |
 | `\?` | Aide psql |
 | `\conninfo` | Connexion actuelle |
@@ -166,6 +166,9 @@ Le backend installe les dependances via un fichier requirements.txt mis dans doc
 | `Django==5.2.16` | Django est le framework principal de ton application backend |
 | `djangorestframework==3.17.1` | Django REST Framework sert à créer une API avec Django. Une API permet au frontend de communiquer avec le backend|
 | `psycopg[binary]==3.3.4` | Psycopg est le pilote qui permet à Django de communiquer avec PostgreSQL |
+| `channels==4.3.2` | Extension officielle qui permet à Django de gérer les WebSockets. Garde une connexion ouverte en continu avec le client |
+| `channels-redis==4.3.0` | Backend de communication utilisé par Channels pour faire circuler les messages entre plusieurs connexions |
+| `uvicorn[standard]==0.51.0` | Serveur ASGI qui fait tourner l'application |
 
 Deux concepts principaux avec Django :
 - un Projet
@@ -312,23 +315,39 @@ Le dockerfile sera a modifie avec le port 443
 ### Makfile :
 - Un makefile pour rassembler les commandes de docker et django
 
-| Commande | Description |
+| Commande compose | Description |
 |---|---|
 | `make up` | Construit les images si nécessaire et démarre les conteneurs au premier plan |
-| `make start` | Démarre les conteneurs en arrière-plan |
 | `make down` | Arrête et supprime les conteneurs et le réseau du projet. Les volumes et les données PostgreSQL sont conservés |
+| `make start` | Démarre les conteneurs en arrière-plan |
 | `make stop` | Arrête les conteneurs sans les supprimer |
 | `make restart` | Redémarre tous les conteneurs du projet |
 | `make build` | Construit ou reconstruit les images Docker |
-| `make logs` | Affiche et suit les logs de tous les services |
 | `make ps` | Affiche l’état des conteneurs du projet |
-| `make createsuperuser` | Creer le super-utilisateur |
-| `make migrate` | Applique les migrations Django dans la base de données |
-| `make makemigrations` | Crée les fichiers de migration après une modification des modèles Django |
-| `make shell` | Ouvre le shell Python avec l’environnement Django chargé |
+| `make images` | Affiche les images du projet |
+| `make volumes` | Affiche les volumes du projet |
+| `make logs` | Affiche et suit les logs de tous les services |
 | `make clean` | Supprime les conteneurs et les services. Les volumes et les données PostgreSQL sont conservés |
 | `make fclean` |Supprime les conteneurs, les services et les volumes. Attention : les données PostgreSQL sont définitivement supprimées |
 | `make re` | Supprime complètement le projet puis le reconstruit et le redémarre |
+
+-------
+
+| Commande db | Description |
+|---|---|
+| `make psql` | Connexion locale, sans mot de passe |
+| `make test-db` | Vérifie que backend peut bien atteindre la base |
+
+-------
+
+| Commande django | Description |
+|---|---|
+| `make makemigrations` | Crée les fichiers de migration après une modification des modèles Django |
+| `make migrate` | Applique les migrations Django dans la base de données |
+| `make startapp` | Permet de créer une app django -> "make startapp name=nom_app" |
+| `make createsuperuser` | Creer le super-utilisateur |
+| `make shell` | Ouvre le shell Python avec l’environnement Django chargé |
+| `make check` | Permet de controler avant une migration si aucune erreur dans les settings |
 
 ====================================================================================================
 
