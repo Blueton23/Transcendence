@@ -5,11 +5,16 @@
 # Copie les dépendances
 # Installe les requirements
 # Utilise le script comme point d'entrée
+# Arguments pour les permissions
+# Creation du non-root
 # Port backend
 # uvicorn pour asgi
 # --reload est uniquement destiné au développement
 
 FROM    python:3.13-slim-bookworm
+
+ARG     UID=1000
+ARG     GID=1000
 
 ENV     PYTHONDONTWRITEBYTECODE=1
 ENV     PYTHONUNBUFFERED=1
@@ -29,6 +34,13 @@ COPY    entrypoint.sh /entrypoint.sh
 
 RUN     chmod +x /entrypoint.sh
 
+RUN     groupadd -g $GID appgroup && \
+        useradd -u $UID -g appgroup -m appuser && \
+        mkdir -p /app/staticfiles && \
+        chown -R appuser:appgroup /app
+
 EXPOSE  8000
+
+USER    appuser
 
 CMD     ["/entrypoint.sh"]
