@@ -131,7 +131,7 @@ erDiagram
 - `||--o{` : un vers plusieurs — la cardinalité est aussi écrite en clair sur chaque relation
 - CreatedAt / UpdatedAt sont gérés automatiquement par Django (auto_now_add et auto_now). Reaction et Participate n'ont pas d'UpdatedAt : un ❤️ ne se modifie pas, et LeftAt porte déjà le changement d'état d'une participation.
 
-## Ce que fait chaque table
+## Détails des tables
 
 - **Traveler** : un compte. Désactivable plutôt que supprimé.
 - **Travel** : un voyage, avec sa date de départ. Aucun propriétaire : tous les participants ont les mêmes droits.
@@ -142,9 +142,7 @@ erDiagram
 - **Message** : un message du chat, rattachable au voyage, à une étape ou à une idée. `IsSystem` distingue les notifications automatiques.
 - **Spending** : une dépense, rattachable au voyage seul (carburant), à une étape (péage) ou à une idée (le resto qu'on a fait).
 
-## Comportements de suppression
-
-Le principe : rien de ce qui a réellement eu lieu ne disparaît par ricochet.
+## Comportements en cas de suppression
 
 - **Voyage** : on ne le supprime pas, on le quitte (comme un groupe WhatsApp). Il sort de sa liste, rien ne bouge pour les autres, et sa participation reste en base pour que les soldes restent justes.
 - **Étape et idée** : corbeille (`DeletedAt`), restaurables. Protège des suppressions accidentelles à plusieurs.
