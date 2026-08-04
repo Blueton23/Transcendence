@@ -17,6 +17,7 @@ erDiagram
     TRAVELER ||--o{ REACTION : "réagit (0,N)"
     TRAVELER ||--o{ MESSAGE : "écrit (0,N)"
     TRAVELER ||--o{ SPENDING : "paie (0,N)"
+    TRAVELER ||--o{ FRIENDSHIP : "est ami (0,N)"
 
     TRAVEL ||--o{ STEP : "contient (0,N)"
     TRAVEL ||--o{ IDEA : "contient (0,N)"
@@ -85,14 +86,22 @@ erDiagram
     }
 
     REACTION {
-        int TravelerId PK_FK
-        int IdeaId PK_FK
+        int TravelerId PK, FK
+        int IdeaId PK, FK
+        datetime CreatedAt
+    }
+
+    FRIENDSHIP {
+        int TravelerAId PK, FK "toujours le plus petit id"
+        int TravelerBId PK, FK
+        int RequestedBy FK "qui a fait la demande"
+        enum Status "en attente / acceptée"
         datetime CreatedAt
     }
 
     PARTICIPATE {
-        int TravelerId PK_FK
-        int TravelId PK_FK
+        int TravelerId PK, FK
+        int TravelId PK, FK
         enum Status "invité / accepté / refusé / parti"
         datetime LeftAt "optionnel"
         datetime CreatedAt
@@ -139,6 +148,7 @@ erDiagram
 - **Step** : un arrêt du trajet. `Position` donne l'ordre, `Nights` la durée (0 pour une halte). Les dates se déduisent de `Travel.StartDate` et du cumul des nuits.
 - **Idea** : une proposition faite pour un voyage. Rattachée à une étape, ou libre dans le pool. Une idée d'hébergement porte en plus son prix et ses dates.
 - **Reaction** : un ❤️ d'une personne sur une idée. Purement indicatif.
+- **Friendship** : un lien d'amitié entre deux comptes, indépendant des voyages. Un refus supprime la ligne plutôt que de la conserver.
 - **Message** : un message du chat, rattachable au voyage, à une étape ou à une idée. `IsSystem` distingue les notifications automatiques.
 - **Spending** : une dépense, rattachable au voyage seul (carburant), à une étape (péage) ou à une idée (le resto qu'on a fait).
 
@@ -169,6 +179,7 @@ erDiagram
 | 12 | `DeletedAt` sur `Step` et `Idea` | Édition à quatre en simultané : la suppression accidentelle est un cas réel, et les cascades la rendent irrattrapable. | Maquette |
 | 13 | Promotion idée → étape : l'idée disparaît | Sinon le même lieu s'affiche deux fois. Dépenses et messages sont transférés vers l'étape. | |
 | 14 | `PricePerNight` sur `Idea` | Affiché dans la maquette (« 95 CHF/nuit »), absent de la v2. | Maquette |
+| 15 | Table `Friendship` réintroduite | **Exigée par un module de notre socle**, pas un bonus : « standard user management » impose d'ajouter des amis et de voir leur statut en ligne. Présente en v1 de Sylvain, disparue en v2. La maquette affiche déjà « 12 Amis ». | Sujet + maquette |
 
 ### Statuts (point 5)
 
