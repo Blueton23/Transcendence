@@ -159,9 +159,9 @@ Le principe : rien de ce qui a réellement eu lieu ne disparaît par ricochet.
 |---|-----------|----------|--------|
 | 1 | `Step` : `Position` + `Nights` remplacent `ArrivalDate` (+ `StartDate` sur `Travel`) | Sinon plusieurs arrêts le même jour sont indépartageables. Les dates se recalculent seules quand on insère une étape. | PV 18/07 |
 | 2 | `Choice` + `Vote` → `Reaction` | La v2 imposait un vote exclusif. Le ❤️ est un signal : on en met sur autant d'idées qu'on veut. | PV 18/07 |
-| 3 | `ChosenBy` / `ChosenAt` sur `Idea`, statut `réservée` ajouté | Trace l'acte de décision et permet le bouton annuler. Maquette : « À choisir » → « Réservé ». | PV 18/07 |
+| 3 | `ChosenBy` / `ChosenAt` sur `Idea`, statut `réservée` ajouté | Trace l'acte de décision et permet le bouton annuler. Maquette : « À choisir » → « Réservé ». Choisir exclut, programmer non, même statut en base, un seul bouton avec un libellé qui change selon le type. | PV 18/07 |
 | 4 | Pas de table hébergement séparée | Sa seule spécificité est l'exclusivité, réglée par un index unique partiel. Lien : https://docs.djangoproject.com/en/5.2/ref/models/constraints/#uniqueconstraint Le reste fonctionne à l'identique. | PV 18/07 |
-| 5 | Valeurs de statuts fixées (voir ci-dessous) | Tâche du PV restée ouverte. | PV 18/07 |
+| 5 | Valeurs de statuts fixées | Tâche du PV restée ouverte (voir ci-dessous). | PV 18/07 |
 | 6 | Tables de statut → énumérations Django | Listes courtes et figées : `TextChoices` protège autant, sans table ni jointure. Schéma de 14 à 8 tables. lien : https://docs.djangoproject.com/en/5.2/ref/models/fields/#enumeration-types | |
 | 7 | `TravelerRole` supprimé, aucun propriétaire | Mêmes droits pour tous. On quitte un voyage, on ne le supprime pas — et la ligne reste pour les soldes. | Maquette |
 | 8 | `Spending` : un seul champ `Amount` | Aucun écran ne compare prévu et réel. En v2, l'estimation était obligatoire et le réel optionnel. | Maquette |
@@ -177,7 +177,3 @@ Le principe : rien de ce qui a réellement eu lieu ne disparaît par ricochet.
 - **`Travel`** : ouvert → terminé. Le passage à « terminé» clôt les réactions. Pas de statut « annulé » : un voyage qui ne se fera jamais, on le quitte.
 - **`Idea`** : proposée → retenue → réservée. Retour en arrière toujours possible. Une idée non retenue reste dans le pool indéfiniment : elle ne disparaît jamais faute de ❤️, ce serait transformer le signal en décision automatique.
 - **`Participate`** : invité → accepté / refusé / parti.
-
-### Deux libellés, un seul mécanisme (point 3)
-
-Le bouton s'appelle « Choisir » pour un hébergement et « Programme » pour une activité. Choisir exclut les autres, programmer non. Même statut en base, un seul bouton côté front dont le libellé change selon le type.
