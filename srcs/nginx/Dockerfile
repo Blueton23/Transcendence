@@ -1,5 +1,5 @@
-# Copie du dossier conf dans le conteneur
-# Utilise le port 80 en dev (changer en prod avec 443)
+# POUR LA PROD
+# Ajouter le port 443 pour la prod
 
 FROM    nginx:1.30.3-alpine
 

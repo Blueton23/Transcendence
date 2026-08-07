@@ -1,15 +1,6 @@
-# Evite la création de fichiers Python __pycache__ et .pyc dans le projet
-# Affiche les logs Django dans Docker
-# Définit /app comme dossier de travail dans le conteneur
-# Installe curl pour les checks dans compose
-# Copie les dépendances
-# Installe les requirements
-# Utilise le script comme point d'entrée
-# Arguments pour les permissions
-# Creation du non-root
-# Port backend
-# uvicorn pour asgi
-# --reload est uniquement destiné au développement
+# POUR LA PROD DANS ENTRYPOINT.SH
+# Ajouter si besoin pour la migration auto - "python manage.py migrate --noinput"
+# Remplacer "--reload" par "--workers 4"
 
 FROM    python:3.13-slim-bookworm
 
@@ -36,7 +27,7 @@ RUN     chmod +x /entrypoint.sh
 
 RUN     groupadd -o -g $GID appgroup && \
         useradd -o -u $UID -g appgroup -m appuser && \
-        mkdir -p /app/staticfiles && \
+        mkdir -p /app/staticfiles /app/mediafiles && \
         chown -R appuser:appgroup /app
 
 EXPOSE  8000
