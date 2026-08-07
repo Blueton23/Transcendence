@@ -1,8 +1,8 @@
-# Définit /app comme dossier de travail dans le conteneur
-# Installe les versions enregistrées dans package-lock.json
-# Copie le code React dans l’image
-# --host 0.0.0.0 - Permet aux autres conteneurs d’accéder au serveur Vite
-# --strictPort - Vite doit obligatoirement utiliser le port demandé
+# POUR LA PROD
+# Ajouter apres COPY - "RUN npm install -g serve"
+# Ajouter - "RUN npm run build"
+# Changer expose 5173 avec 3000
+# Changer la CMD avec ["serve", "-s", "dist", "-l", "3000"]
 
 FROM    node:22-alpine
 

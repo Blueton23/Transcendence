@@ -232,6 +232,38 @@ Requirements a installer :
 - Redis : comme couche de communication entre les connexions WebSocket
 - Gunicorn + uvicorn-worker : pour superviser plusieurs workers ASGI en production
 
+### Volumes :
+staticfiles
+- Dossier où Django va rassembler tous les fichiers statiques via collectstatic
+
+mediafiles
+- Dossier où seront stockés les fichiers uploadés par les utilisateurs (images, etc)
+
+### REST Framework :
+- Django REST Framework (DRF, package djangorestframework) est une extension de Django pour construire des API. Cela va construire des API REST en JSON que le frontend (React/Vite) va utiliser via des requêtes HTTP et va les transformer en interface
+
+DRF ajoute par-dessus Django :
+- Serializers : convertissent les modèles Django (objets Python/DB) en JSON, et inversement (valident les données JSON reçues avant de les sauvegarder en DB)
+- Views/ViewSets : gèrent proprement les méthodes HTTP (GET, POST, PUT, DELETE) pour chaque ressource
+- Routers : génèrent automatiquement les URLs REST classiques (/api/users/, /api/users/1/, etc.)
+
+Explication dockerfile backend :
+| Nom | Description |
+|---|---|
+| `ARG UID/GID` | Pour les permissions non-root |
+| `ENV PYTHONDONTWRITEBYTECODE=1/PYTHONUNBUFFERED=1` | Evite la création de fichiers Python __pycache__ et .pyc dans le projet |
+| `WORKDIR /app` | Définit /app comme dossier de travail dans le conteneur |
+| `RUN curl` | Installe curl pour les checks dans compose |
+| `COPY requirements.txt .` | Copie les dépendances |
+| `RUN pip install` | Installe les requirements |
+| `COPY . .` | Copie le code dans l’image |
+| `COPY entrypoint.sh` | Utilise le script comme point d'entrée |
+| `RUN chmod +x` | Permission entrypoint |
+| `RUN groupadd/useradd` | Creation du non-root |
+| `EXPOSE 8000` | port backend |
+| `USER appuser` | permssion sur appuser |
+| `CMD ["/entrypoint.sh"]` | Commande du point d'entré |
+
 ====================================================================================================
 
 ### Conteneur Redis
@@ -297,6 +329,16 @@ Django renvoie du JSON
 React affiche les résultats
 ```
 
+Explication dockerfile frontend :
+| Nom | Description |
+|---|---|
+| `WORKDIR /app` | Définit /app comme dossier de travail dans le conteneur |
+| `COPY package.json package-lock.json ./` | Installe les versions enregistrées dans package-lock.json |
+| `RUN npm ci` | installation propre des dépendances du projet |
+| `COPY . .` | Copie le code React dans l’image |
+| `--host 0.0.0.0` | Permet aux autres conteneurs d’accéder au serveur Vite |
+| `--strictPort` | Vite doit obligatoirement utiliser le port demandé |
+
 ====================================================================================================
 
 ### Conteneur Nginx - server web :
@@ -309,6 +351,22 @@ NGINX (unique porte d’entrée) :
 
 Lors de la mise en production, le fichier conf sera a modifier pour mettre le port 443 et les certificats
 Le dockerfile sera a modifie avec le port 443
+
+Explication nginx.conf :
+| Nom | Description |
+|---|---|
+| `events` | connexions simultanées |
+| `client_max_body_size` | Taille max des fichiers uploadés (ex: media Django) |
+| `map` | Gestion des WebSockets Vite |
+| `upstream backend` | Serveur backend vers lequel Nginx peut transmettre des requêtes |
+| `upstream frontend` | Serveur frontend vers lequel Nginx peut transmettre des requêtes |
+| `server` | Server HTTP (en prod, HTTPS et certificat TLS) |
+| `location /api/` | Intercepte les URLs qui commencent par /api/ : http://localhost/api/users/, Transmets les requetes au backend Django |
+| `location /admin/` | Intercepte les URLs qui commencent par /admin/ : http://localhost/admin/, Permet d’accéder à l’administration Django |
+| `location /static/` | Route pour les fichiers statiques Django : /static/admin/css/base.css |
+| `location /media/` | Route pour les fichiers media Django (uploads utilisateurs): /media/avatars/photo.jpg |
+| `location /ws/` | location /ws/ : WebSockets Django applicatifs |
+| `location` | Route principale, envoyer au server Vite, Sert à récupérer les fichiers visuels et techniques de Django (hors python), WebSocket Vite pour le rechargement en développement |
 
 ====================================================================================================
 
