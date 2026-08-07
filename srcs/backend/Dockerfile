@@ -34,8 +34,8 @@ COPY    entrypoint.sh /entrypoint.sh
 
 RUN     chmod +x /entrypoint.sh
 
-RUN     groupadd -g $GID appgroup && \
-        useradd -u $UID -g appgroup -m appuser && \
+RUN     groupadd -o -g $GID appgroup && \
+        useradd -o -u $UID -g appgroup -m appuser && \
         mkdir -p /app/staticfiles && \
         chown -R appuser:appgroup /app
 
