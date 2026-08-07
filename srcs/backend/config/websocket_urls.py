@@ -1,5 +1,6 @@
 # config/websocket_urls.py
 from django.urls import path
+
 from config.consumers import PingConsumer
 
 websocket_urlpatterns = [

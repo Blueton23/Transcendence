@@ -1,6 +1,8 @@
 # config/consumers.py
 import json
+
 from channels.generic.websocket import AsyncWebsocketConsumer
+
 
 class PingConsumer(AsyncWebsocketConsumer):
     async def connect(self):
