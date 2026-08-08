@@ -5,10 +5,11 @@ name: PR review demandée → In Review (carte de l'issue liée)
 
 on:
   pull_request:
-    types: [review_requested, ready_for_review]
+    types: [opened, review_requested, ready_for_review]
 
 jobs:
   move-linked-issue:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
