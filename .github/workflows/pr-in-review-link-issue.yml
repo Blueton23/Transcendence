@@ -4,7 +4,7 @@ name: PR review demandée -> In Review / rejetee -> In Progress
 
 on:
   pull_request:
-    types: [opened, review_requested, ready_for_review, closed]
+    types: [opened, reopened, review_requested, ready_for_review, closed]
   pull_request_review:
     types: [submitted]
 
