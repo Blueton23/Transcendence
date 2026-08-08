@@ -1,0 +1,126 @@
+name: Branche créée → In Progress (+ cascade au parent)
+
+# Prérequis :
+# - le nom de la branche doit commencer par le numéro de l'issue
+#   ex: 31-test-sub1 ou david/31-test-sub1 (le numéro doit être suivi d'un tiret)
+
+on:
+  create:
+
+jobs:
+  move-to-in-progress:
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ secrets.PROJECT_PAT }}
+      BRANCH_NAME: ${{ github.event.ref }}
+      PROJECT_OWNER: "Blueton23"
+      PROJECT_NUMBER: "1"
+      STATUS_FIELD_NAME: "Status"
+      TARGET_OPTION_NAME: "In Progress"
+
+    steps:
+      - name: Extraire le numéro d'issue du nom de la branche
+        id: extract
+        run: |
+          NUM=$(echo "$BRANCH_NAME" | grep -oE '(^|/)[0-9]+-' | grep -oE '[0-9]+' | head -n1)
+          if [ -z "$NUM" ]; then
+            echo "Pas de numéro d'issue détecté dans '$BRANCH_NAME', on s'arrête là."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "issue_number=$NUM" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Récupérer id du Project + champ Status + option "In Progress"
+        if: steps.extract.outputs.skip != 'true'
+        id: project-info
+        run: |
+          RESULT=$(gh api graphql -f query='
+            query($owner: String!, $number: Int!) {
+              user(login: $owner) {
+                projectV2(number: $number) {
+                  id
+                  field(name: "'"$STATUS_FIELD_NAME"'") {
+                    ... on ProjectV2SingleSelectField {
+                      id
+                      options { id name }
+                    }
+                  }
+                }
+              }
+            }' -f owner="$PROJECT_OWNER" -F number="$PROJECT_NUMBER")
+
+          echo "project_id=$(echo "$RESULT" | jq -r '.data.user.projectV2.id')" >> "$GITHUB_OUTPUT"
+          echo "field_id=$(echo "$RESULT" | jq -r '.data.user.projectV2.field.id')" >> "$GITHUB_OUTPUT"
+          echo "option_id=$(echo "$RESULT" | jq -r --arg n "$TARGET_OPTION_NAME" '.data.user.projectV2.field.options[] | select(.name==$n) | .id')" >> "$GITHUB_OUTPUT"
+
+      - name: Récupérer la carte de l'issue et celle de son parent (si elle en a un)
+        if: steps.extract.outputs.skip != 'true'
+        id: issue-info
+        run: |
+          RESULT=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $number: Int!) {
+              repository(owner: $owner, name: $repo) {
+                issue(number: $number) {
+                  projectItems(first: 10) {
+                    nodes {
+                      id
+                      project { number }
+                    }
+                  }
+                  parent {
+                    projectItems(first: 10) {
+                      nodes {
+                        id
+                        project { number }
+                        fieldValueByName(name: "Status") {
+                          ... on ProjectV2ItemFieldSingleSelectValue { name }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }' -f owner="${{ github.repository_owner }}" -f repo="$(basename ${{ github.repository }})" -F number="${{ steps.extract.outputs.issue_number }}")
+
+          ITEM_ID=$(echo "$RESULT" | jq -r --arg num "$PROJECT_NUMBER" '.data.repository.issue.projectItems.nodes[] | select(.project.number==($num|tonumber)) | .id')
+          PARENT_ITEM_ID=$(echo "$RESULT" | jq -r --arg num "$PROJECT_NUMBER" '.data.repository.issue.parent.projectItems.nodes[]? | select(.project.number==($num|tonumber)) | .id')
+          PARENT_STATUS=$(echo "$RESULT" | jq -r --arg num "$PROJECT_NUMBER" '.data.repository.issue.parent.projectItems.nodes[]? | select(.project.number==($num|tonumber)) | .fieldValueByName.name')
+
+          echo "item_id=$ITEM_ID" >> "$GITHUB_OUTPUT"
+          echo "parent_item_id=$PARENT_ITEM_ID" >> "$GITHUB_OUTPUT"
+          echo "parent_status=$PARENT_STATUS" >> "$GITHUB_OUTPUT"
+
+      - name: Passer la carte de l'issue en "In Progress"
+        if: steps.extract.outputs.skip != 'true' && steps.issue-info.outputs.item_id != ''
+        run: |
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $project, itemId: $item, fieldId: $field
+                value: { singleSelectOptionId: $option }
+              }) { projectV2Item { id } }
+            }' \
+            -f project="${{ steps.project-info.outputs.project_id }}" \
+            -f item="${{ steps.issue-info.outputs.item_id }}" \
+            -f field="${{ steps.project-info.outputs.field_id }}" \
+            -f option="${{ steps.project-info.outputs.option_id }}"
+
+      - name: Si le parent est encore en Backlog/Todo, le faire suivre en "In Progress"
+        if: >
+          steps.extract.outputs.skip != 'true' &&
+          steps.issue-info.outputs.parent_item_id != '' &&
+          (steps.issue-info.outputs.parent_status == 'Backlog' || steps.issue-info.outputs.parent_status == 'Todo')
+        run: |
+          gh api graphql -f query='
+            mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $project, itemId: $item, fieldId: $field
+                value: { singleSelectOptionId: $option }
+              }) { projectV2Item { id } }
+            }' \
+            -f project="${{ steps.project-info.outputs.project_id }}" \
+            -f item="${{ steps.issue-info.outputs.parent_item_id }}" \
+            -f field="${{ steps.project-info.outputs.field_id }}" \
+            -f option="${{ steps.project-info.outputs.option_id }}"
