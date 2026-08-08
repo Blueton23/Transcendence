@@ -5,10 +5,12 @@ name: PR review demandée -> In Review / rejetee -> In Progress
 on:
   pull_request:
     types: [opened, review_requested, ready_for_review, closed]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   move-linked-issue-to-in-review:
-    if: github.event.action != 'closed' && github.event.pull_request.draft == false
+    if: github.event_name == 'pull_request' && github.event.action != 'closed' && github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -92,7 +94,7 @@ jobs:
             -f option="${{ steps.project-info.outputs.option_id }}"
 
   move-linked-issue-back-to-in-progress:
-    if: github.event.action == 'closed' && github.event.pull_request.merged == false
+    if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
     runs-on: ubuntu-latest
     timeout-minutes: 5
     env:
@@ -174,3 +176,87 @@ jobs:
             -f item="${{ steps.linked-issue.outputs.item_id }}" \
             -f field="${{ steps.project-info.outputs.field_id }}" \
             -f option="${{ steps.project-info.outputs.option_id }}"
+
+  move-linked-issue-back-on-changes-requested:
+      if: github.event_name == 'pull_request_review' && github.event.review.state == 'changes_requested'
+      runs-on: ubuntu-latest
+      timeout-minutes: 5
+      env:
+        GH_TOKEN: ${{ secrets.PROJECT_PAT }}
+        PR_NODE_ID: ${{ github.event.pull_request.node_id }}
+        PROJECT_OWNER: "Blueton23"
+        PROJECT_NUMBER: "1"
+        STATUS_FIELD_NAME: "Status"
+        TARGET_OPTION_NAME: "In Progress"
+  
+      steps:
+        - name: Récupérer les infos du Project (id, champ Status, option "In Progress")
+          id: project-info
+          run: |
+            RESULT=$(gh api graphql -f query='
+              query($owner: String!, $number: Int!) {
+                user(login: $owner) {
+                  projectV2(number: $number) {
+                    id
+                    field(name: "'"$STATUS_FIELD_NAME"'") {
+                      ... on ProjectV2SingleSelectField {
+                        id
+                        options { id name }
+                      }
+                    }
+                  }
+                }
+              }' -f owner="$PROJECT_OWNER" -F number="$PROJECT_NUMBER")
+  
+            PROJECT_ID=$(echo "$RESULT" | jq -r '.data.user.projectV2.id')
+            FIELD_ID=$(echo "$RESULT" | jq -r '.data.user.projectV2.field.id')
+            OPTION_ID=$(echo "$RESULT" | jq -r --arg name "$TARGET_OPTION_NAME" '.data.user.projectV2.field.options[] | select(.name == $name) | .id')
+  
+            echo "project_id=$PROJECT_ID" >> "$GITHUB_OUTPUT"
+            echo "field_id=$FIELD_ID" >> "$GITHUB_OUTPUT"
+            echo "option_id=$OPTION_ID" >> "$GITHUB_OUTPUT"
+  
+        - name: Trouver la carte de l'issue liée à cette PR
+          id: linked-issue
+          run: |
+            RESULT=$(gh api graphql -f query='
+              query($pr: ID!) {
+                node(id: $pr) {
+                  ... on PullRequest {
+                    closingIssuesReferences(first: 1) {
+                      nodes {
+                        projectItems(first: 10) {
+                          nodes { id project { number } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }' -f pr="$PR_NODE_ID")
+  
+            ITEM_ID=$(echo "$RESULT" | jq -r --arg num "$PROJECT_NUMBER" \
+              '.data.node.closingIssuesReferences.nodes[0].projectItems.nodes[] | select(.project.number == ($num|tonumber)) | .id')
+  
+            if [ -z "$ITEM_ID" ] || [ "$ITEM_ID" == "null" ]; then
+              echo "Aucune issue liée trouvée, rien à faire."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+            else
+              echo "item_id=$ITEM_ID" >> "$GITHUB_OUTPUT"
+            fi
+  
+        - name: Repasser la carte en "In Progress"
+          if: steps.linked-issue.outputs.skip != 'true'
+          run: |
+            gh api graphql -f query='
+              mutation($project: ID!, $item: ID!, $field: ID!, $option: String!) {
+                updateProjectV2ItemFieldValue(input: {
+                  projectId: $project
+                  itemId: $item
+                  fieldId: $field
+                  value: { singleSelectOptionId: $option }
+                }) { projectV2Item { id } }
+              }' \
+              -f project="${{ steps.project-info.outputs.project_id }}" \
+              -f item="${{ steps.linked-issue.outputs.item_id }}" \
+              -f field="${{ steps.project-info.outputs.field_id }}" \
+              -f option="${{ steps.project-info.outputs.option_id }}"
