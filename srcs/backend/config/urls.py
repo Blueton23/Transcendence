@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.http import JsonResponse
 from django.urls import path
 
+from test.views import create_user
+
 
 def api_test(request):
     return JsonResponse({
@@ -28,4 +30,6 @@ def api_test(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", api_test, name="api-test"),
+
+    path("api/users/", create_user),
 ]

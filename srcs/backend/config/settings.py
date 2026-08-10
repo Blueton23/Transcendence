@@ -56,6 +56,8 @@ INSTALLED_APPS = [
 
     "channels",
     "rest_framework",
+
+    "test.apps.TestConfig",
 ]
 
 MIDDLEWARE = [

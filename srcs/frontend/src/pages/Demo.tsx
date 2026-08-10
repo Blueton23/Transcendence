@@ -53,15 +53,54 @@ function Specimen({ label, children }: SpecimenProps) {
 function Demo() {
   const [cat, setCat] = useState('resto');
 
+  const fillDatabase = async () => {
+    try {
+      const response = await fetch("/api/users/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: "sylvain",
+//          username: `sylvain-${Date.now()}`,
+        }),
+      });
+
+      if (!response.ok) {
+
+        console.log(response.status);
+        const text = await response.text();
+        console.log(text);
+        throw new Error("Erreur");
+
+
+        throw new Error("Erreur lors de la création de l'utilisateur");
+      }
+
+      const user = await response.json();
+
+      console.log("Utilisateur créé :", user);
+      alert("Utilisateur Sylvain créé !");
+    } catch (error) {
+      console.error(error);
+//      alert("Impossible de créer l'utilisateur." );
+    }
+  };
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 p-8">
       <header className="flex flex-col gap-2">
-        <Heading level={1} size="lg">Design system</Heading>
+        <Heading level={1} size="lg">Design system SDU</Heading>
         <Text tone="secondary">
           Catalogue de shared/ui, avec les variantes réelles telles qu'elles
           apparaissent dans la maquette.
         </Text>
       </header>
+
+      <Button variant="primary" onClick={fillDatabase}>
+      Remplir
+      </Button>
+
 
       <Section
         name="Button"
