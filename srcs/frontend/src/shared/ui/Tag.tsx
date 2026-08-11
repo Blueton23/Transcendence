@@ -1,15 +1,25 @@
 import type { ReactNode } from "react";
 
+type TagTone = "default"| "muted"| "inverse";
+
 interface TagProps {
 	children: ReactNode;
+	tone?: TagTone;
 	className?: string;
 }
 
-const baseStyle = "inline-flex items-center justify-center rounded-full border border-border bg-surface-container px-[11px] py-1 font-mono font-semibold text-xs text-text-secondary"
+const toneStyles = {
+	default: "bg-surface-container text-text-secondary border border-border",
+	muted: "bg-surface-container text-muted",
+	inverse: "bg-white/12 text-inverse border border-white/16"
+}
 
-function Tag({ children, className = "" }: TagProps) {
+const baseStyle = "inline-flex items-center justify-center rounded-full  px-[11px] py-1 font-mono font-semibold text-xs"
+
+function Tag({ children, tone = "default", className = "" }: TagProps) {
+	const tagTone = toneStyles[tone];
 	return (
-		<span className={`${baseStyle} ${className}`}>
+		<span className={`${baseStyle} ${tagTone} ${className}`}>
 			{children}
 		</span>
 	);

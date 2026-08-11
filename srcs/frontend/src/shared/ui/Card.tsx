@@ -5,6 +5,7 @@ type CardVariant = "default" | "accent" | "success" | "alert" | "dashed" | "dash
 interface CardProps {
   children: ReactNode;
   variant?: CardVariant;
+  interactive?: boolean;
   className?: string;
 }
 
@@ -18,12 +19,14 @@ const variantStyles = {
 };
 
 const baseStyle = "border rounded-md p-4";
+const interactiveStyle = "transition-all hover:border-brand-primary/50 hover:-translate-y-px cursor-pointer";
 
-function Card({ children, variant = "default", className = "" }: CardProps) {
+function Card({ children, variant = "default", interactive = false, className = "" }: CardProps) {
   const cardStyle = variantStyles[variant];
+  const hoverStyle = interactive ? interactiveStyle : "";
 
   return (
-    <div className={`${baseStyle} ${cardStyle} ${className}`}>
+    <div className={`${baseStyle} ${cardStyle} ${hoverStyle} ${className}`}>
       {children}
     </div>
   );
