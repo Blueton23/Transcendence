@@ -145,10 +145,13 @@ function Demo() {
         name="Badge"
         role="Étiquette de statut. Ne se clique pas."
       >
-        <Specimen label='variant="success" — validé, réservé'>
+        <Specimen label='variant="success" — validé, réservé, accepte'>
           <Badge variant="success">Réservé</Badge>
+          <Badge icon={<Icon name="check" size={16} />} variant="success">Accepte</Badge>
         </Specimen>
-        <Specimen label='variant="warning" — à surveiller'>
+        <Specimen label='variant="warning" — en attente, info neutre, en tete'>
+          <Badge variant="warning" icon={<Icon name="clock" size={16} />}>En attente</Badge>
+          <Badge variant="warning">Séjour · 2 nuits</Badge>
           <Badge variant="warning">EN TETE</Badge>
         </Specimen>
         <Specimen label='variant="error" — action requise'>
