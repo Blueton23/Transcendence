@@ -45,7 +45,6 @@
 
   /* Borders */
   --color-border: rgba(43, 42, 71, 0.08);        /* défaut*/
-  --color-border-divider: rgba(43, 42, 71, 0.16); 
   --color-border-control: rgba(43, 42, 71, 0.12); /* contour chips inactifs, inputs */
   --color-border-avatar: #2B2A47;
   --color-border-success: #B9E3CC;

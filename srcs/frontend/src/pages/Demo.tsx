@@ -68,7 +68,7 @@ function Demo() {
         role="L'action principale d'un écran : épingler une idée, ajouter une étape."
       >
         <Specimen label='variant="primary"'>
-          <Button variant="primary">Epingler une idée</Button>
+          <Button variant="primary">Enregister les modifications</Button>
         </Specimen>
         <Specimen label='variant="dark"'>
           <Button variant="dark">Ajouter une étape</Button>
@@ -76,8 +76,11 @@ function Demo() {
         <Specimen label='variant="outline"'>
           <Button variant="outline">Ajouter une dépense</Button>
         </Specimen>
+        <Specimen label='variant="danger"'>
+          <Button variant="danger">Confirmer</Button>
+        </Specimen>
         <Specimen label="icon">
-          <Button variant="primary" icon={<Icon name="plus" size={16} />}>Avec icône</Button>
+          <Button variant="primary" icon={<Icon name="pinplus" size={16} />}>Epingler une idee</Button>
         </Specimen>
       </Section>
 
@@ -86,13 +89,16 @@ function Demo() {
         role="Comme Button mais sans texte, juste une icône dans un rond. Pour les actions évidentes : fermer, ajouter, options. label reste obligatoire pour savoir ce que c'est"
       >
         <Specimen label='variant="outline" (défaut) · size="sm" — 34px'>
-          <IconButton icon={<Icon name="plus" size={16} />} label="Ajouter" variant="outline" size="sm" />
+          <IconButton icon={<Icon name="back" size={16} />} label="Ajouter" variant="outline" size="sm" />
         </Specimen>
-        <Specimen label='variant="dark" · size="sm"'>
-          <IconButton icon={<Icon name="plus" size={16} />} label="Ajouter" variant="dark" size="sm" />
+        <Specimen label='variant="flat" · size="sm"'>
+          <IconButton icon={<Icon name="x" size={16} />} label="Fermer" variant="flat" size="sm" />
         </Specimen>
-        <Specimen label='variant="primary" · size="md" — 44px, action flottante'>
-          <IconButton icon={<Icon name="plus" size={16} />} label="Ajouter" variant="primary" size="md" />
+        <Specimen label='variant="primary" · size="md" — 44px'>
+          <IconButton icon={<Icon name="pinplus" size={20} />} label="Epingler une idee" variant="primary" size="md" />
+        </Specimen>
+        <Specimen label='variant="ghost" · size="sm" — 44px'>
+          <IconButton icon={<Icon name="dots" size={16} />} label="Voir les options" variant="ghost" size="sm" />
         </Specimen>
       </Section>
 
@@ -128,10 +134,10 @@ function Demo() {
         role="Filtre sélectionnable. Se clique, et surtout : il a un état. Sert à choisir une catégorie parmi plusieurs."
       >
         <Specimen label="active={true} / active={false} — cliquez pour changer la sélection">
-          <Chip active={cat === 'resto'} onClick={() => setCat('resto')}>Resto</Chip>
-          <Chip active={cat === 'hebergement'} onClick={() => setCat('hebergement')}>Hébergement</Chip>
-          <Chip active={cat === 'activite'} onClick={() => setCat('activite')}>Activité</Chip>
-          <Chip active={cat === 'avoir'} onClick={() => setCat('avoir')}>À voir</Chip>
+          <Chip active={cat === 'resto'} onClick={() => setCat('resto')} icon={<Icon name="fork" size={16} />}>Resto</Chip>
+          <Chip active={cat === 'hebergement'} onClick={() => setCat('hebergement')} icon={<Icon name="bed" size={16} />}>Hébergement</Chip>
+          <Chip active={cat === 'activite'} onClick={() => setCat('activite')}>Tous</Chip>
+          <Chip active={cat === 'avoir'} onClick={() => setCat('avoir')}>Sans etapes</Chip>
         </Specimen>
       </Section>
 
@@ -139,10 +145,13 @@ function Demo() {
         name="Badge"
         role="Étiquette de statut. Ne se clique pas."
       >
-        <Specimen label='variant="success" — validé, réservé'>
+        <Specimen label='variant="success" — validé, réservé, accepte'>
           <Badge variant="success">Réservé</Badge>
+          <Badge icon={<Icon name="check" size={16} />} variant="success">Accepte</Badge>
         </Specimen>
-        <Specimen label='variant="warning" — à surveiller'>
+        <Specimen label='variant="warning" — en attente, info neutre, en tete'>
+          <Badge variant="warning" icon={<Icon name="clock" size={16} />}>En attente</Badge>
+          <Badge variant="warning">Séjour · 2 nuits</Badge>
           <Badge variant="warning">EN TETE</Badge>
         </Specimen>
         <Specimen label='variant="error" — action requise'>
@@ -154,11 +163,23 @@ function Demo() {
         name="Tag"
         role="repère factuel en mono (jour, date, autre). Simple texte, jamais cliquable. Avec un chevron pour faire un composant pliable, mais ce n'est pas Tag qui s'en charge."
       >
-        <Specimen label="children — texte libre ; le chevron est un voisin, pas un enfant">
+        <Specimen label='tone="default" (défaut) — bordé, texte secondaire'>
           <Icon name="chev-down" size={15} className="text-muted" />
           <Tag>JOUR 1 · dim 12</Tag>
           <Icon name="chev-down" size={15} className="text-muted" />
           <Tag>JOUR 2 · lun 13</Tag>
+        </Specimen>
+
+        <Specimen label='tone="muted" — sans bordure, info neutre de rattachement'>
+          <Tag tone="muted">Pool general</Tag>
+          <Tag tone="muted">→ Zermatt</Tag>
+        </Specimen>
+
+        <Specimen label='tone="inverse"  — sur fond sombre (bandeau voyage)'>
+          <div className="flex gap-3 rounded-md bg-brand-dark p-3">
+            <Tag tone="inverse">12 - 16 juil.</Tag>
+            <Tag tone="inverse">219 km</Tag>
+          </div>
         </Specimen>
       </Section>
 
@@ -186,6 +207,9 @@ function Demo() {
       >
         <Specimen label='variant="default" (défaut)'>
           <Card variant="default">Carte normale</Card>
+        </Specimen>
+        <Specimen label='variant="default avec hover" (défaut + hover)'>
+          <Card variant="default" interactive={true}>Carte normale avec hover (pour les etapes)</Card>
         </Specimen>
         <Specimen label='variant="accent" — proposition en attente de décision'>
           <Card variant="accent">Carte à choisir</Card>
@@ -259,6 +283,26 @@ function Demo() {
         </Specimen>
         <Specimen label='tone="muted" — timestamp, hint'>
           <Text tone="muted">à l'instant</Text>
+        </Specimen>
+        <Specimen label='tone="success" — valide, reserve'>
+          <Text tone="success">Chalet à Grindelwald · réservé</Text>
+        </Specimen>
+        <Specimen label='tone="accent" — action requise'>
+          <Text tone="accent">À choisir · 2 propositions </Text>
+        </Specimen>
+        <Specimen label='size="md" (défaut, 14px) vs size="sm" (12px, densité compacte)'>
+          <Text size="md">Pas de nuit · 2 idées épinglées</Text>
+          <Text size="sm" tone="muted">Pas de nuit · 2 idées épinglées</Text>
+        </Specimen>
+        <Specimen label='font="sans" (défaut) vs font="mono" — pour une valeur quon scanne, pas une phrase quon lit'>
+          <Text font="mono" tone="muted">95 CHF </Text>
+          <Text font="sans">· réservé · PDF joint</Text>
+        </Specimen>
+        <Specimen label="composition — deux fragments, chacun sa police, pas un seul Text qui devine">
+          <span className="inline-flex items-center gap-1">
+            <Text font="mono" tone="muted">48 CHF</Text>
+            <Text tone="muted">· par Damien</Text>
+          </span>
         </Specimen>
       </Section>
     </div>

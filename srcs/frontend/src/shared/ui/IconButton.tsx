@@ -1,6 +1,6 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
-type IconButtonVariant = "primary" | "dark" | "outline";
+type IconButtonVariant = "primary" | "flat" | "outline" | "ghost";
 type IconButtonSize = "sm" | "md";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -12,8 +12,9 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles = {
 	primary: "bg-brand-primary text-inverse border-transparent",
-	dark: "bg-brand-dark text-surface-soft border-transparent",
-	outline: "bg-surface border-border text-text",
+	flat: "bg-surface-container text-muted border-transparent",
+	outline: "bg-surface border-border text-text-secondary",
+	ghost: "bg-transparent border-transparent text-muted",
 };
 
 const sizeStyles = {
