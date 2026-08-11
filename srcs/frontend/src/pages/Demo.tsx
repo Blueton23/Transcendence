@@ -154,11 +154,23 @@ function Demo() {
         name="Tag"
         role="repère factuel en mono (jour, date, autre). Simple texte, jamais cliquable. Avec un chevron pour faire un composant pliable, mais ce n'est pas Tag qui s'en charge."
       >
-        <Specimen label="children — texte libre ; le chevron est un voisin, pas un enfant">
+        <Specimen label='tone="default" (défaut) — bordé, texte secondaire'>
           <Icon name="chev-down" size={15} className="text-muted" />
           <Tag>JOUR 1 · dim 12</Tag>
           <Icon name="chev-down" size={15} className="text-muted" />
           <Tag>JOUR 2 · lun 13</Tag>
+        </Specimen>
+
+        <Specimen label='tone="muted" — sans bordure, info neutre de rattachement'>
+          <Tag tone="muted">Pool general</Tag>
+          <Tag tone="muted">→ Zermatt</Tag>
+        </Specimen>
+
+        <Specimen label='tone="inverse"  — sur fond sombre (bandeau voyage)'>
+          <div className="flex gap-3 rounded-md bg-brand-dark p-3">
+            <Tag tone="inverse">12 - 16 juil.</Tag>
+            <Tag tone="inverse">219 km</Tag>
+          </div>
         </Specimen>
       </Section>
 
