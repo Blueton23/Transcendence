@@ -134,10 +134,10 @@ function Demo() {
         role="Filtre sélectionnable. Se clique, et surtout : il a un état. Sert à choisir une catégorie parmi plusieurs."
       >
         <Specimen label="active={true} / active={false} — cliquez pour changer la sélection">
-          <Chip active={cat === 'resto'} onClick={() => setCat('resto')}>Resto</Chip>
-          <Chip active={cat === 'hebergement'} onClick={() => setCat('hebergement')}>Hébergement</Chip>
-          <Chip active={cat === 'activite'} onClick={() => setCat('activite')}>Activité</Chip>
-          <Chip active={cat === 'avoir'} onClick={() => setCat('avoir')}>À voir</Chip>
+          <Chip active={cat === 'resto'} onClick={() => setCat('resto')} icon={<Icon name="fork" size={16} />}>Resto</Chip>
+          <Chip active={cat === 'hebergement'} onClick={() => setCat('hebergement')} icon={<Icon name="bed" size={16} />}>Hébergement</Chip>
+          <Chip active={cat === 'activite'} onClick={() => setCat('activite')}>Tous</Chip>
+          <Chip active={cat === 'avoir'} onClick={() => setCat('avoir')}>Sans etapes</Chip>
         </Specimen>
       </Section>
 
