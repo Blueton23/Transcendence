@@ -4,11 +4,11 @@ import type { SVGProps } from "react";
 // eslint-disable-next-line react-refresh/only-export-components
 export const iconNames = [
 	"arrow", "back", "bed", "bell", "cal", "car", "cash", "chat",
-	"check", "chev-down", "city", "coffee", "compass", "dots", "ext",
+	"check", "chev-down", "city", "clock", "coffee", "compass", "dots", "ext",
 	"fork", "heart", "heart-f", "home", "inbox", "info", "map",
 	"moon", "moon-off", "mtn", "photo", "pin", "pinplus", "plus",
 	"route", "search", "spark", "spark-f", "store", "sun", "tent",
-	"user", "users", "van", "wallet", "wifi-off",
+	"user", "users", "van", "wallet", "wifi-off", "x",
 ] as const;
 
 export type IconName = typeof iconNames[number];

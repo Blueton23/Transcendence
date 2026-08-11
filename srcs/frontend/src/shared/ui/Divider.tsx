@@ -10,7 +10,7 @@ const orientationStyles = {
 	vertical: "h-4 w-px",
 };
 
-const baseStyle = "shrink-0 bg-border-divider"
+const baseStyle = "shrink-0 bg-border"
 
 function Divider({ orientation = "horizontal", className = "" }: DividerProps) {
 	const orientationStyle = orientationStyles[orientation];

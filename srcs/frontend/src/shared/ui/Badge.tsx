@@ -15,9 +15,9 @@ const variantStyles = {
 	error: "bg-error-bg text-error",
 };
 
-const baseStyle = "inline-flex items-center justify-center rounded-full px-2.5 py-1 font-bold text-xs"
+const baseStyle = "inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 font-bold text-xs"
 
-function Badge({ children, variant, icon, className=""}: BadgeProps) {
+function Badge({ children, variant, icon, className="" }: BadgeProps) {
 	const variantStyle = variantStyles[variant];
 	let iconElement = null;
 	if (icon){
