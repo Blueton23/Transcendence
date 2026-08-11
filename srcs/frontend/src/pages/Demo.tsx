@@ -68,7 +68,7 @@ function Demo() {
         role="L'action principale d'un écran : épingler une idée, ajouter une étape."
       >
         <Specimen label='variant="primary"'>
-          <Button variant="primary">Epingler une idée</Button>
+          <Button variant="primary">Enregister les modifications</Button>
         </Specimen>
         <Specimen label='variant="dark"'>
           <Button variant="dark">Ajouter une étape</Button>
@@ -76,8 +76,11 @@ function Demo() {
         <Specimen label='variant="outline"'>
           <Button variant="outline">Ajouter une dépense</Button>
         </Specimen>
+        <Specimen label='variant="danger"'>
+          <Button variant="danger">Confirmer</Button>
+        </Specimen>
         <Specimen label="icon">
-          <Button variant="primary" icon={<Icon name="plus" size={16} />}>Avec icône</Button>
+          <Button variant="primary" icon={<Icon name="pinplus" size={16} />}>Epingler une idee</Button>
         </Specimen>
       </Section>
 
