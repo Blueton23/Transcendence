@@ -278,6 +278,26 @@ function Demo() {
         <Specimen label='tone="muted" — timestamp, hint'>
           <Text tone="muted">à l'instant</Text>
         </Specimen>
+        <Specimen label='tone="success" — valide, reserve'>
+          <Text tone="success">Chalet à Grindelwald · réservé</Text>
+        </Specimen>
+        <Specimen label='tone="accent" — action requise'>
+          <Text tone="accent">À choisir · 2 propositions </Text>
+        </Specimen>
+        <Specimen label='size="md" (défaut, 14px) vs size="sm" (12px, densité compacte)'>
+          <Text size="md">Pas de nuit · 2 idées épinglées</Text>
+          <Text size="sm" tone="muted">Pas de nuit · 2 idées épinglées</Text>
+        </Specimen>
+        <Specimen label='font="sans" (défaut) vs font="mono" — pour une valeur quon scanne, pas une phrase quon lit'>
+          <Text font="mono" tone="muted">95 CHF </Text>
+          <Text font="sans">· réservé · PDF joint</Text>
+        </Specimen>
+        <Specimen label="composition — deux fragments, chacun sa police, pas un seul Text qui devine">
+          <span className="inline-flex items-center gap-1">
+            <Text font="mono" tone="muted">48 CHF</Text>
+            <Text tone="muted">· par Damien</Text>
+          </span>
+        </Specimen>
       </Section>
     </div>
   );
