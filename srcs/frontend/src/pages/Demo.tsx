@@ -187,6 +187,9 @@ function Demo() {
         <Specimen label='variant="default" (défaut)'>
           <Card variant="default">Carte normale</Card>
         </Specimen>
+        <Specimen label='variant="default avec hover" (défaut + hover)'>
+          <Card variant="default" interactive={true}>Carte normale avec hover (pour les etapes)</Card>
+        </Specimen>
         <Specimen label='variant="accent" — proposition en attente de décision'>
           <Card variant="accent">Carte à choisir</Card>
         </Specimen>
