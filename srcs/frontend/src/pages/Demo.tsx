@@ -86,13 +86,16 @@ function Demo() {
         role="Comme Button mais sans texte, juste une icône dans un rond. Pour les actions évidentes : fermer, ajouter, options. label reste obligatoire pour savoir ce que c'est"
       >
         <Specimen label='variant="outline" (défaut) · size="sm" — 34px'>
-          <IconButton icon={<Icon name="plus" size={16} />} label="Ajouter" variant="outline" size="sm" />
+          <IconButton icon={<Icon name="back" size={16} />} label="Ajouter" variant="outline" size="sm" />
         </Specimen>
-        <Specimen label='variant="dark" · size="sm"'>
-          <IconButton icon={<Icon name="plus" size={16} />} label="Ajouter" variant="dark" size="sm" />
+        <Specimen label='variant="flat" · size="sm"'>
+          <IconButton icon={<Icon name="x" size={16} />} label="Fermer" variant="flat" size="sm" />
         </Specimen>
-        <Specimen label='variant="primary" · size="md" — 44px, action flottante'>
-          <IconButton icon={<Icon name="plus" size={16} />} label="Ajouter" variant="primary" size="md" />
+        <Specimen label='variant="primary" · size="md" — 44px'>
+          <IconButton icon={<Icon name="pinplus" size={20} />} label="Epingler une idee" variant="primary" size="md" />
+        </Specimen>
+        <Specimen label='variant="ghost" · size="sm" — 44px'>
+          <IconButton icon={<Icon name="dots" size={16} />} label="Voir les options" variant="ghost" size="sm" />
         </Specimen>
       </Section>
 
