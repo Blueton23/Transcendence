@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     "channels",
     "rest_framework",
 
-    "traveler",
+	"traveler",
+	"friendship",
 ]
 
 AUTH_USER_MODEL = "traveler.Traveler"
