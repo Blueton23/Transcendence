@@ -2,7 +2,6 @@ import type {Step, StepIdeaPreview} from "../types";
 import Card from "../../../shared/ui/Card";
 import Heading from "../../../shared/ui/Heading";
 import Text from "../../../shared/ui/Text";
-import Tag from "../../../shared/ui/Tag";
 import IconButton from "../../../shared/ui/IconButton";
 import Icon from "../../../shared/ui/Icon";
 
@@ -26,21 +25,50 @@ function formatNights(nights: number) : string{
 	return `${nights} nuits`
 }
 
-function StepCard({step, dateLabel, ideaPreview, ideaCount}: StepCardProps){
+function StepOptionsButton() {
 	return (
-		<Card variant="default" interactive={true}>
-			<Text font="mono">{dateLabel}</Text>
-			<Heading level={2}>{step.localisation}</Heading>
-			<Text tone="muted" size="sm">
+		<IconButton
+			icon={<Icon name="dots" size={16} />}
+			label="Options"
+			className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100"
+		/>
+	);
+}
+
+function StepDescription({step, ideaPreview, ideaCount} : Pick<StepCardProps, "step" | "ideaPreview" | "ideaCount">){
+	return (
+		<Text tone="muted" size="sm">
 				{ideaPreview && (
 				<>
 				<Text as="span" tone={ideaPreviewTones[ideaPreview.status]}>{ideaPreview.label}</Text>
-				{"·"}
+				{" · "}
 				</>
 			)}
 			{formatNights(step.nights)} · {ideaCount} idées épinglées
 			</Text>
-		</Card>
+	);
+}
+
+function StepPositionBadge({position}: {position: number}){
+	return (
+		<span className="flex items-center justify-center h-7 w-7 md:h-8 md:w-8 rounded-full bg-brand-dark text-inverse text-sm font-bold">{position}</span>
+	);
+}
+
+function StepCard({step, dateLabel, ideaPreview, ideaCount}: StepCardProps){
+	return (
+		<div className="flex items-start gap-3">
+			<StepPositionBadge position={step.position} />
+			<Card variant="default" interactive={true} className="group relative flex-1">
+				<Text font="mono">{dateLabel}</Text>
+				<div className="flex items-center">
+					<Heading level={2}>{step.localisation}</Heading>
+					<Icon name="arrow" size={17} className="text-muted ml-auto" />
+				</div>
+				<StepDescription step={step} ideaPreview={ideaPreview} ideaCount={ideaCount}/>
+				<StepOptionsButton />
+			</Card>
+		</div>
 	); 
 }
 export default StepCard;
