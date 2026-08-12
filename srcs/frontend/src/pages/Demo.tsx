@@ -284,7 +284,7 @@ function Demo() {
         <Specimen label='tone="muted" — timestamp, hint'>
           <Text tone="muted">à l'instant</Text>
         </Specimen>
-        <Specimen label='tone="success" — valide, reserve'>
+        <Specimen label='tone="success" — validé, réservé'>
           <Text tone="success">Chalet à Grindelwald · réservé</Text>
         </Specimen>
         <Specimen label='tone="accent" — action requise'>
@@ -294,15 +294,20 @@ function Demo() {
           <Text size="md">Pas de nuit · 2 idées épinglées</Text>
           <Text size="sm" tone="muted">Pas de nuit · 2 idées épinglées</Text>
         </Specimen>
-        <Specimen label='font="sans" (défaut) vs font="mono" — pour une valeur quon scanne, pas une phrase quon lit'>
-          <Text font="mono" tone="muted">95 CHF </Text>
-          <Text font="sans">· réservé · PDF joint</Text>
+        <Specimen label='font="mono" — pour une valeur quon scanne, pas une phrase quon lit'>
+          <Text font="mono" tone="muted">95 CHF · réservé · PDF joint</Text>
         </Specimen>
-        <Specimen label="composition — deux fragments, chacun sa police, pas un seul Text qui devine">
-          <span className="inline-flex items-center gap-1">
-            <Text font="mono" tone="muted">48 CHF</Text>
-            <Text tone="muted">· par Damien</Text>
-          </span>
+        <Specimen label='span brut dans un Text — hérite du tone du parent, rien à répéter'>
+          <Text tone="muted">
+            <span className="font-mono">48 CHF</span>
+            {" · par Damien"}
+          </Text>
+        </Specimen>
+        <Specimen label='as="span" avec son propre tone — quand la couleur doit changer, pas juste la police'>
+          <Text tone="muted">
+            <Text as="span" tone="success">Chalet à Grindelwald · réservé</Text>
+            {" · 2 nuits · 1 idée épinglée"}
+          </Text>
         </Specimen>
       </Section>
     </div>
