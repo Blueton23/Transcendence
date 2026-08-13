@@ -1,7 +1,8 @@
 import Demo from './pages/Demo';
+import ItineraryPage from './pages/ItineraryPage';
 
 function App() {
-  return <Demo />;
+  return <ItineraryPage />;
 }
 
 export default App;

@@ -20,6 +20,8 @@ const ideaPreviewTones = {
 	reserved: "success",
 } as const;
 
+const optionsButtonStyle =  "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
+
 function formatNights(nights: number) : string{
 	if (nights === 0)  return "Pas de nuit";
 	if (nights === 1) return "1 nuit";
@@ -31,7 +33,7 @@ function StepOptionsButton() {
 		<IconButton
 			icon={<Icon name="dots" size={16} />}
 			label="Options"
-			className="absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100"
+			className={optionsButtonStyle}
 		/>
 	);
 }
@@ -56,6 +58,7 @@ function StepPositionBadge({position}: {position: number}){
 	);
 }
 
+//possible decrire function StepCard(props: StepCardProps) et utiliser props.step, props.dateLabel....
 function StepCard({step, dateLabel, ideaPreview, ideaCount}: StepCardProps){
 	return (
 		<div className="flex items-start gap-3">
