@@ -1,7 +1,8 @@
 import { getSteps } from "../features/step/api/stepApi";
 import StepCard from "../features/step/components/StepCard";
 
-
+//TODO(branchement): dateLabel en dur, remplacer par travel.startDAte une fois Travel branche
+// + quand getStep sera async faudra utiliser ex:useSteps() pour letat de chargement
 function ItineraryPage() {
 	const steps = getSteps();
   

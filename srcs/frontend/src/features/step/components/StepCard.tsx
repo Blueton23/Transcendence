@@ -5,7 +5,8 @@ import Text from "../../../shared/ui/Text";
 import IconButton from "../../../shared/ui/IconButton";
 import Icon from "../../../shared/ui/Icon";
 
-
+//TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
+// pas un champ stocke dans Step
 interface StepCardProps {
 	step: Step;
 	dateLabel: string;

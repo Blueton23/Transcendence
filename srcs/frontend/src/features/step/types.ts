@@ -1,4 +1,5 @@
-// question: dans le MDD latitude et longitude on a mis optionnel, mais mnt je suis pas sure que ce soit coherent
+// TODO(branchement): confirmer avec Sebastien si latitude/longitude peuvent vraiment etre vides
+// flux texte libre sans geolocatison ? sinon enlever le null
 export interface Step {
 	id: number;
 	travelId: number;
@@ -12,8 +13,8 @@ export interface Step {
 	updatedAt: string;
 }
 
-// cette interface disparait une fois qu'on connecte avec le backend et le fichier types.ts de Idea
-export interface StepIdeaPreview {
+// TODO(branchement): placeholder en attendant le vrai type Idea de fetaures/idea
+// A supprimer une fois le vrai type disponible
 	label: string;
 	status: "proposed"| "selected"| "reserved";
 }
