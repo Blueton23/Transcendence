@@ -4,39 +4,47 @@ type IconButtonVariant = "primary" | "flat" | "outline" | "ghost";
 type IconButtonSize = "sm" | "md";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-	icon: ReactNode;
-	label: string;
-	variant?: IconButtonVariant;
-	size?: IconButtonSize;
+  icon: ReactNode;
+  label: string;
+  variant?: IconButtonVariant;
+  size?: IconButtonSize;
 }
 
 const variantStyles = {
-	primary: "bg-brand-primary text-inverse border-transparent",
-	flat: "bg-surface-container text-muted border-transparent",
-	outline: "bg-surface border-border text-text-secondary",
-	ghost: "bg-transparent border-transparent text-muted",
+  primary: "bg-brand-primary text-inverse border-transparent",
+  flat: "bg-surface-container text-muted border-transparent",
+  outline: "bg-surface border-border text-text-secondary",
+  ghost: "bg-transparent border-transparent text-muted",
 };
 
 const sizeStyles = {
-	sm: "w-[34px] h-[34px]",
-	md: "w-11 h-11",
+  sm: "w-[34px] h-[34px]",
+  md: "w-11 h-11",
 };
 
-const baseStyle = "inline-flex items-center justify-center shrink-0 rounded-full border cursor-pointer"
+const baseStyle =
+  "inline-flex items-center justify-center shrink-0 rounded-full border cursor-pointer";
 
-function IconButton({ icon, label, variant = "outline", size = "sm", className = "", ...rest }: IconButtonProps) {
-	const variantStyle = variantStyles[variant];
-	const sizeStyle = sizeStyles[size];
+function IconButton({
+  icon,
+  label,
+  variant = "outline",
+  size = "sm",
+  className = "",
+  ...rest
+}: IconButtonProps) {
+  const variantStyle = variantStyles[variant];
+  const sizeStyle = sizeStyles[size];
 
-	return (
-		<button
-			type="button"
-			aria-label={label}
-			className={`${baseStyle} ${variantStyle} ${sizeStyle} ${className}`}
-			{...rest}
-		>
-			{icon}
-		</button>
-	);
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      className={`${baseStyle} ${variantStyle} ${sizeStyle} ${className}`}
+      {...rest}
+    >
+      {icon}
+    </button>
+  );
 }
 export default IconButton;

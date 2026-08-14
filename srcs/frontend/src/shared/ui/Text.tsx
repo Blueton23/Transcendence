@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 
-type TextTone = "primary" | "secondary" | "muted" | "success"| "accent";
-type TextSize = "sm"| "md";
-type TextFont = "sans"| "mono";
+type TextTone = "primary" | "secondary" | "muted" | "success" | "accent";
+type TextSize = "sm" | "md";
+type TextFont = "sans" | "mono";
 
 interface TextProps {
   children: ReactNode;
@@ -30,12 +30,19 @@ const fontStyles = {
   mono: "font-mono",
 };
 
-
-function Text({ children, tone = "primary", size = "md", font = "sans", className = "" }: TextProps) {
+function Text({
+  children,
+  tone = "primary",
+  size = "md",
+  font = "sans",
+  className = "",
+}: TextProps) {
   const textTone = toneStyles[tone];
 
   return (
-    <p className={`${textTone} ${sizeStyles[size]} ${fontStyles[font]} ${className}`}>
+    <p
+      className={`${textTone} ${sizeStyles[size]} ${fontStyles[font]} ${className}`}
+    >
       {children}
     </p>
   );
