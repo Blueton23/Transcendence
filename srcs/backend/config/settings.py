@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     "rest_framework",
 
 	"traveler",
-	"friendship",
 ]
 
 AUTH_USER_MODEL = "traveler.Traveler"
