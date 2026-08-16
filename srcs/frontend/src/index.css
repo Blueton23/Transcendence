@@ -8,65 +8,71 @@
 @import "@fontsource/caveat/500.css";
 
 @theme {
-
   /* Typography tokens */
-  --font-sans: 'Archivo', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
-  --font-accent: 'Caveat', cursive;
+  --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-accent: "Caveat", cursive;
 
-  --text-2xs: 0.4375rem;  /* 7px — initiales avatar xs, très compact */
-  --text-xs: 0.75rem;     /* 12px — badges, labels mono */
-  --text-sm: 0.8125rem;  /* 13px - buttons*/
-  --text-md: 0.875rem;   /* 14px — corps de texte*/
-  --text-lg: 1.125rem;   /* 18px — sous-titres */
-  --text-xl: 1.375rem;   /* 22px — titres de carte/modale ("Montreux", "Épingler une idée") */
-  --text-2xl: 2rem;      /* 32px — titres de page ("Mes voyages", "Road trip Suisse") */
+  --text-2xs: 0.4375rem; /* 7px — initiales avatar xs, très compact */
+  --text-xs: 0.75rem; /* 12px — badges, labels mono */
+  --text-sm: 0.8125rem; /* 13px - buttons*/
+  --text-md: 0.875rem; /* 14px — corps de texte*/
+  --text-lg: 1.125rem; /* 18px — sous-titres */
+  --text-xl: 1.375rem; /* 22px — titres de carte/modale ("Montreux", "Épingler une idée") */
+  --text-2xl: 2rem; /* 32px — titres de page ("Mes voyages", "Road trip Suisse") */
 
   --leading-tight: 1.2;
   --leading-normal: 1.4;
 
   /* Text color tokens */
-  --color-text: #2B2A47;            /* encre, texte par defaut */
-  --color-text-secondary: #615B6E;  /* texte de phrase courante ("a voté pour...") */
-  --color-muted: #9A8F7E;           /* labels, timestamps, hints */
-  --color-inverse: #FFFFFF;         /* texte sur fond dark */
+  --color-text: #2b2a47; /* encre, texte par defaut */
+  --color-text-secondary: #615b6e; /* texte de phrase courante ("a voté pour...") */
+  --color-muted: #9a8f7e; /* labels, timestamps, hints */
+  --color-inverse: #ffffff; /* texte sur fond dark */
 
   /* Background colors tokens */
-  --color-background: #E7DECF;         /* fond de l'app */
-  --color-surface: #FCFAF3;            /* cartes */
-  --color-surface-container: #F3ECDD;  /* chips, panneaux latéraux */
-  --color-surface-soft: #F7F1E6;       /* zone pointillée "idées à placer" */
-  --color-surface-control: #FFFFFF;    /* fond des chips inactifs, inputs */
+  --color-background: #e7decf; /* fond de l'app */
+  --color-surface: #fcfaf3; /* cartes */
+  --color-surface-container: #f3ecdd; /* chips, panneaux latéraux */
+  --color-surface-soft: #f7f1e6; /* zone pointillée "idées à placer" */
+  --color-surface-control: #ffffff; /* fond des chips inactifs, inputs */
 
   /* Brand colors */
-  --color-brand-primary: #F2664A;          /* corail, accent d'action */
-  --color-brand-primary-strong: #D8482D;   /* corail foncé pour hover, liens */
-  --color-brand-dark: var(--color-text); /* encre = aussi couleur structurelle (nav, hero) */
+  --color-brand-primary: #f2664a; /* corail, accent d'action */
+  --color-brand-primary-strong: #d8482d; /* corail foncé pour hover, liens */
+  --color-brand-dark: var(
+    --color-text
+  ); /* encre = aussi couleur structurelle (nav, hero) */
 
   /* Borders */
-  --color-border: rgba(43, 42, 71, 0.08);        /* défaut*/
-  --color-border-control: rgba(43, 42, 71, 0.12); /* contour chips inactifs, inputs */
-  --color-border-avatar: #2B2A47;
-  --color-border-success: #B9E3CC;
-  --color-border-collection: #DBCEB6;    /* bordure pointillée "idées à placer" */
-  --color-border-alert-dashed: #EFC2B3;  /* bordure pointillée "nuit à choisir" */
+  --color-border: rgba(43, 42, 71, 0.08); /* défaut*/
+  --color-border-control: rgba(
+    43,
+    42,
+    71,
+    0.12
+  ); /* contour chips inactifs, inputs */
+  --color-border-avatar: #2b2a47;
+  --color-border-success: #b9e3cc;
+  --color-border-collection: #dbceb6; /* bordure pointillée "idées à placer" */
+  --color-border-alert-dashed: #efc2b3; /* bordure pointillée "nuit à choisir" */
 
   /* Semantic colors */
-  --color-success: #3FB477;
-  --color-success-text: #2E7D52;
-  --color-success-bg: #E4F3EA;
+  --color-success: #3fb477;
+  --color-success-text: #2e7d52;
+  --color-success-bg: #e4f3ea;
 
-  --color-warning: #E7A23C;
-  --color-warning-text: #9A6B16;
-  --color-warning-bg: #F8EBD3;
+  --color-warning: #e7a23c;
+  --color-warning-text: #9a6b16;
+  --color-warning-bg: #f8ebd3;
 
-  --color-error: #C24024;
-  --color-error-bg: #F8E6DD;
+  --color-error: #c24024;
+  --color-error-bg: #f8e6dd;
 
-  --color-alert-dashed-bg: #FBEEE7;   /* fond pointillé "nuit à choisir" */
+  --color-alert-dashed-bg: #fbeee7; /* fond pointillé "nuit à choisir" */
 
-  --color-info: #6C6597;
-  --color-info-bg: #E4E1F0;
+  --color-info: #6c6597;
+  --color-info-bg: #e4e1f0;
 
   /* Overlay */
   --color-scrim: rgba(43, 42, 71, 0.55);
@@ -82,7 +88,7 @@
   --radius-md: 14px;
   --radius-lg: 20px;
   --radius-xl: 26px;
-  --radius-full: 9999px;  /* pills */
+  --radius-full: 9999px; /* pills */
 
   /* Spacing */
   --spacing-xs: 6px;

@@ -24,9 +24,15 @@ const colorStyles = {
   "4": "bg-info text-inverse",
 };
 
-const baseStyle = "inline-flex items-center justify-center rounded-full font-bold";
+const baseStyle =
+  "inline-flex items-center justify-center rounded-full font-bold";
 
-function Avatar({ children, size = "md", color = "1", className = "" }: AvatarProps) {
+function Avatar({
+  children,
+  size = "md",
+  color = "1",
+  className = "",
+}: AvatarProps) {
   const avatarSize = sizeStyles[size];
   const avatarColor = colorStyles[color];
 
