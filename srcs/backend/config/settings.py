@@ -45,8 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "channels",
     "rest_framework",
-
-	"traveler",
+    "traveler",
 ]
 
 AUTH_USER_MODEL = "traveler.Traveler"
