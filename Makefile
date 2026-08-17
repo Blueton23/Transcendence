@@ -72,7 +72,7 @@ print('✅ Connexion réussie à la base :', conn.info.dbname)"
 
 #######################################
 
-# Commandes Django
+# Commandes Django/backend
 makemigrations:
 	$(COMPOSE) exec backend python manage.py makemigrations
 
@@ -91,8 +91,27 @@ shell:
 check:
 	docker compose exec backend python manage.py check
 
+format-back:
+	$(COMPOSE) exec backend ruff format .
+
+format-check-back:
+	$(COMPOSE) exec backend ruff format --check .
+
+#######################################
+
+# Commandes Frontend
+format-front:
+	$(COMPOSE) exec frontend npm run format
+
+format-check-front:
+	$(COMPOSE) exec frontend npm run format:check
+
+lint:
+	$(COMPOSE) exec frontend npm run lint
+
 #######################################
 
 .PHONY: up down start stop restart build ps images volumes logs clean fclean re \
 	psql test-db \
-	makemigrations migrate startapp createsuperuser shell check front-install
+	makemigrations migrate startapp createsuperuser shell check format-back format-check-back \
+	format-front format-check-front front-install
