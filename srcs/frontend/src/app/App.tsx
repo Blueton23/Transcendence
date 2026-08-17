@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router";
-import Demo from "./pages/Demo";
-import Text from "./shared/ui/Text";
-import { AppLayout } from "./app/AppLayout";
+import Demo from "../pages/Demo";
+import Text from "../shared/ui/Text";
+import { AppLayout } from "./AppLayout";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
