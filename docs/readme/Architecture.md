@@ -370,7 +370,7 @@ Explication nginx.conf :
 
 ====================================================================================================
 
-### Makfile :
+### Makefile :
 - Un makefile pour rassembler les commandes de docker et django
 
 | Commande compose | Description |
@@ -388,6 +388,7 @@ Explication nginx.conf :
 | `make clean` | Supprime les conteneurs et les services. Les volumes et les données PostgreSQL sont conservés |
 | `make fclean` |Supprime les conteneurs, les services et les volumes. Attention : les données PostgreSQL sont définitivement supprimées |
 | `make re` | Supprime complètement le projet puis le reconstruit et le redémarre |
+| `make front-install` | Réinstalle les dépendances npm du frontend dans le conteneur puis le redémarre. À lancer après un `git pull` qui modifie `package.json` (ex : ajout de react-router). Nécessite que le conteneur frontend tourne (`make start`) |
 
 -------
 
