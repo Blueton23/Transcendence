@@ -35,6 +35,10 @@ images:
 volumes:
 	$(COMPOSE) volumes
 
+front-install:
+	$(COMPOSE) exec frontend npm ci
+	$(COMPOSE) restart frontend
+
 logs:
 	$(COMPOSE) logs -f
 
@@ -91,4 +95,4 @@ check:
 
 .PHONY: up down start stop restart build ps images volumes logs clean fclean re \
 	psql test-db \
-	makemigrations migrate startapp createsuperuser shell check
+	makemigrations migrate startapp createsuperuser shell check front-install
