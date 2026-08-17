@@ -10,12 +10,12 @@ function PlaceHolder({ label }: { label: string }) {
 function App() {
   return (
     <Routes>
+      <Route path="/design-system" element={<DesignSystem />} />
       <Route path="/" element={<PlaceHolder label="accueil" />} />
       <Route path="/login" element={<PlaceHolder label="login" />} />
       <Route path="/signup" element={<PlaceHolder label="signup" />} />
       <Route path="/join/:slug" element={<PlaceHolder label="join" />} />
       <Route element={<AppLayout />}>
-        <Route path="/design-system" element={<DesignSystem />} />
         <Route path="/profil" element={<PlaceHolder label="profile" />} />
         <Route path="/trip" element={<PlaceHolder label="trip" />} />
         <Route path="/trip/:id">
