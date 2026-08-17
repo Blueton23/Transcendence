@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router";
-import Demo from "../pages/Demo";
+import DesignSystem from "../pages/DesignSystem";
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
 
@@ -15,7 +15,7 @@ function App() {
       <Route path="/signup" element={<PlaceHolder label="signup" />} />
       <Route path="/join/:slug" element={<PlaceHolder label="join" />} />
       <Route element={<AppLayout />}>
-        <Route path="/design-system" element={<Demo />} />
+        <Route path="/design-system" element={<DesignSystem />} />
         <Route path="/profil" element={<PlaceHolder label="profile" />} />
         <Route path="/trip" element={<PlaceHolder label="trip" />} />
         <Route path="/trip/:id">
