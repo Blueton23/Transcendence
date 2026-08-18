@@ -36,15 +36,16 @@ function Text({
   tone = "primary",
   size = "md",
   font = "sans",
+  as = "p",
   className = "",
 }: TextProps) {
-
-function Text({ children, tone = "primary", size = "md", font = "sans", as = "p", className = "" }: TextProps) {
   const textTone = toneStyles[tone];
   const Tag = as;
 
   return (
-    <Tag className={`${textTone} ${sizeStyles[size]} ${fontStyles[font]} ${className}`}>
+    <Tag
+      className={`${textTone} ${sizeStyles[size]} ${fontStyles[font]} ${className}`}
+    >
       {children}
     </Tag>
   );
