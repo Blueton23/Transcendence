@@ -370,7 +370,7 @@ Explication nginx.conf :
 
 ====================================================================================================
 
-### Makfile :
+### Makefile :
 - Un makefile pour rassembler les commandes de docker et django
 
 | Commande compose | Description |
@@ -388,6 +388,7 @@ Explication nginx.conf :
 | `make clean` | Supprime les conteneurs et les services. Les volumes et les données PostgreSQL sont conservés |
 | `make fclean` |Supprime les conteneurs, les services et les volumes. Attention : les données PostgreSQL sont définitivement supprimées |
 | `make re` | Supprime complètement le projet puis le reconstruit et le redémarre |
+| `make front-install` | Réinstalle les dépendances npm du frontend dans le conteneur puis le redémarre. À lancer après un `git pull` qui modifie `package.json` (ex : ajout de react-router). Nécessite que le conteneur frontend tourne (`make start`) |
 
 -------
 
@@ -406,6 +407,16 @@ Explication nginx.conf :
 | `make createsuperuser` | Creer le super-utilisateur |
 | `make shell` | Ouvre le shell Python avec l’environnement Django chargé |
 | `make check` | Permet de controler avant une migration si aucune erreur dans les settings |
+| `make format-back` | Corrige le format au niveau du code backend dans les fichiers, utilise ruff |
+| `make format-check-back` | Check (ne corrige pas) le format au niveau du code backend dans les fichiers, utilise ruff |
+
+-------
+
+| Commande Frontend | Description |
+|---|---|
+| `make format` | Corrige le format au niveau du code frontend dans les fichiers, utilise prettierrc |
+| `make format-check` | Check (ne corrige pas) le format au niveau du code frontend dans les fichiers, utilise prettierrc |
+| `make lint` | Check les dossiers/fichiers/variable inutilisé |
 
 ====================================================================================================
 

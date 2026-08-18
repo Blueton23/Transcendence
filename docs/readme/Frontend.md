@@ -27,11 +27,11 @@ Avant de créer un nouveau composant custom dans une feature, vérifier s'il exi
 
 Composants disponibles actuellement : Avatar, Badge, Button, Card, Chip, Divider, Heading, Icon, IconButton, Input, Tag, Text.
 
-Une page `/demo` (`pages/Demo.tsx`) affiche tous les composants avec leurs variantes — à consulter avant de coder une nouvelle UI.
+Une page `/DesignSystem` (`pages/DesignSystem.tsx`) affiche tous les composants avec leurs variantes — à consulter avant de coder une nouvelle UI.
 
 | Page | URL |
 |---|---|
-| Démo du design system | http://localhost:8080/demo |
+| Démo du design system | http://localhost:8080/design-system |
 
 ## Features
 
@@ -64,7 +64,7 @@ Une page `/demo` (`pages/Demo.tsx`) affiche tous les composants avec leurs varia
 
 Un fichier par écran routé. Une page ne contient pas de logique métier : elle assemble des composants venus de `features/` et `shared/`, et gère la mise en page générale de l'écran.
 
-Nommage : PascalCase avec le suffixe `Page` — `ItinerairePage.tsx`, `ProfilPage.tsx`, `ConnexionPage.tsx`. 
+Nommage : PascalCase avec le suffixe `Page` — `ItinerairePage.tsx`, `ProfilPage.tsx`, `ConnexionPage.tsx`.
 
 ## Conventions
 

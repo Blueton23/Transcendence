@@ -13,4 +13,6 @@ class PingConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         data = json.loads(text_data)
-        await self.send(text_data=json.dumps({"message": f"pong: {data.get('message', '')}"}))
+        await self.send(
+            text_data=json.dumps({"message": f"pong: {data.get('message', '')}"})
+        )
