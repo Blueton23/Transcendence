@@ -13,9 +13,9 @@ import Input from "../shared/ui/Input";
 import Tag from "../shared/ui/Tag";
 import Icon, { iconNames } from "../shared/ui/Icon";
 
-/* page de démo */
+/* page de Design System */
 
-/* Helper pour la page demo */
+/* Helper pour la page design system */
 
 interface SectionProps {
   name: string;
@@ -50,7 +50,7 @@ function Specimen({ label, children }: SpecimenProps) {
   );
 }
 
-function Demo() {
+function DesignSystem() {
   const [cat, setCat] = useState("resto");
 
   return (
@@ -355,4 +355,4 @@ function Demo() {
   );
 }
 
-export default Demo;
+export default DesignSystem;
