@@ -22,8 +22,8 @@ const toneStyles = {
 };
 
 const sizeStyles = {
-  sm: "text-xs",
-  md: "text-md",
+  sm: "text-xs md:text-sm",
+  md: "text-xs md:text-md",
 };
 
 const fontStyles = {
