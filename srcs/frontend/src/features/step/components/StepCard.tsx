@@ -59,37 +59,26 @@ function StepDescription({
   );
 }
 
-function StepPositionBadge({ position }: { position: number }) {
-  return (
-    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-dark text-sm font-bold text-inverse md:h-8 md:w-8">
-      {position}
-    </span>
-  );
-}
-
 //possible decrire function StepCard(props: StepCardProps) et utiliser props.step, props.dateLabel....
 function StepCard({ step, dateLabel, ideaPreview, ideaCount }: StepCardProps) {
   return (
-    <div className="flex items-start gap-3">
-      <StepPositionBadge position={step.position} />
-      <Card
-        variant="default"
-        interactive={true}
-        className="group relative flex-1"
-      >
-        <Text font="mono">{dateLabel}</Text>
-        <div className="flex items-center">
-          <Heading level={2}>{step.localisation}</Heading>
-          <Icon name="arrow" size={17} className="ml-auto text-muted" />
-        </div>
-        <StepDescription
-          step={step}
-          ideaPreview={ideaPreview}
-          ideaCount={ideaCount}
-        />
-        <StepOptionsButton />
-      </Card>
-    </div>
+    <Card
+      variant="default"
+      interactive={true}
+      className="group relative flex-1"
+    >
+      <Text font="mono">{dateLabel}</Text>
+      <div className="flex items-center">
+        <Heading level={2}>{step.localisation}</Heading>
+        <Icon name="arrow" size={17} className="ml-auto text-muted" />
+      </div>
+      <StepDescription
+        step={step}
+        ideaPreview={ideaPreview}
+        ideaCount={ideaCount}
+      />
+      <StepOptionsButton />
+    </Card>
   );
 }
 export default StepCard;
