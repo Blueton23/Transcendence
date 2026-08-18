@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router";
 import DesignSystem from "../pages/DesignSystem";
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
+import ItineraryPage from "../pages/ItineraryPage";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
@@ -20,7 +21,7 @@ function App() {
         <Route path="/trip" element={<PlaceHolder label="trip" />} />
         <Route path="/trip/:id">
           <Route index element={<Navigate to="itinerary" replace />} />
-          <Route path="itinerary" element={<PlaceHolder label="itinerary" />} />
+          <Route path="itinerary" element={<ItineraryPage />} />
           <Route path="idea" element={<PlaceHolder label="idea" />} />
           <Route path="expenses" element={<PlaceHolder label="expenses" />} />
           <Route path="chat" element={<PlaceHolder label="chat" />} />
