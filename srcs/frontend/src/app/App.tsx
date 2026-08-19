@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router";
 import DesignSystem from "../pages/DesignSystem";
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
+import ProfilePage from "../pages/ProfilePage";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
@@ -16,7 +17,7 @@ function App() {
       <Route path="/signup" element={<PlaceHolder label="signup" />} />
       <Route path="/join/:slug" element={<PlaceHolder label="join" />} />
       <Route element={<AppLayout />}>
-        <Route path="/profil" element={<PlaceHolder label="profile" />} />
+        <Route path="/profil" element={<ProfilePage/>} />
         <Route path="/trip" element={<PlaceHolder label="trip" />} />
         <Route path="/trip/:id">
           <Route index element={<Navigate to="itinerary" replace />} />
