@@ -5,6 +5,7 @@ import StepCard from "../features/step/components/StepCard";
 import StepPositionBadge from "../features/step/components/StepPositionBadge";
 import { computeDateLabels } from "../features/step/stepDates";
 import { Fragment } from "react/jsx-runtime";
+import TotalSegment from "../features/step/components/TotalSegment";
 
 //TODO(branchement): dateLabel en dur, remplacer par travel.startDAte une fois Travel branche
 // + quand getStep sera async faudra utiliser ex:useSteps() pour letat de chargement
@@ -29,7 +30,9 @@ function ItineraryPage() {
           <StepCard step={step} dateLabel={dateLabels[index]} ideaCount={2} />
         </Fragment>
       ))}
+      <TotalSegment segments={segments}/>
     </div>
+
   );
 }
 export default ItineraryPage;
