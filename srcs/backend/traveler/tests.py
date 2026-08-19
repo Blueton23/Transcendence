@@ -80,6 +80,7 @@ class FriendshipModelTest(TestCase):
         friendship = Friendship.objects.create(
             sender=self.user_a,
             receiver=self.user_b,
+            requested_by=self.user_a,
         )
         self.assertEqual(friendship.status, Status.PENDING)
         self.assertIsNotNone(friendship.created_at)
@@ -88,21 +89,41 @@ class FriendshipModelTest(TestCase):
         friendship = Friendship.objects.create(
             sender=self.user_a,
             receiver=self.user_b,
+            requested_by=self.user_a,
             status=Status.ACCEPTED,
         )
         self.assertEqual(friendship.status, Status.ACCEPTED)
 
+    def test_requested_by_tracks_the_initiator_regardless_of_sender_order(self):
+        # user_b initiated the request even though it must be stored as
+        # "receiver" to satisfy the sender < receiver ordering constraint.
+        friendship = Friendship.objects.create(
+            sender=self.user_a,
+            receiver=self.user_b,
+            requested_by=self.user_b,
+        )
+        self.assertEqual(friendship.requested_by, self.user_b)
+        self.assertIn(friendship, self.user_b.friendships_requested.all())
+
     def test_duplicate_friendship_raises_integrity_error(self):
-        Friendship.objects.create(sender=self.user_a, receiver=self.user_b)
+        Friendship.objects.create(
+            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+        )
         with self.assertRaises(IntegrityError), transaction.atomic():
-            Friendship.objects.create(sender=self.user_a, receiver=self.user_b)
+            Friendship.objects.create(
+                sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+            )
 
     def test_sender_must_be_less_than_receiver(self):
         with self.assertRaises(IntegrityError), transaction.atomic():
-            Friendship.objects.create(sender=self.user_b, receiver=self.user_a)
+            Friendship.objects.create(
+                sender=self.user_b, receiver=self.user_a, requested_by=self.user_b
+            )
 
     def test_cascade_delete_on_sender_removal(self):
-        friendship = Friendship.objects.create(sender=self.user_a, receiver=self.user_b)
+        friendship = Friendship.objects.create(
+            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+        )
         friendship_id = friendship.id
 
         self.user_a.delete()
@@ -110,7 +131,9 @@ class FriendshipModelTest(TestCase):
         self.assertFalse(Friendship.objects.filter(id=friendship_id).exists())
 
     def test_cascade_delete_on_receiver_removal(self):
-        friendship = Friendship.objects.create(sender=self.user_a, receiver=self.user_b)
+        friendship = Friendship.objects.create(
+            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+        )
         friendship_id = friendship.id
 
         self.user_b.delete()
@@ -118,7 +141,10 @@ class FriendshipModelTest(TestCase):
         self.assertFalse(Friendship.objects.filter(id=friendship_id).exists())
 
     def test_related_names(self):
-        friendship = Friendship.objects.create(sender=self.user_a, receiver=self.user_b)
+        friendship = Friendship.objects.create(
+            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+        )
 
         self.assertIn(friendship, self.user_a.friendships_as_sender.all())
         self.assertIn(friendship, self.user_b.friendships_as_receiver.all())
+        self.assertIn(friendship, self.user_a.friendships_requested.all())

@@ -36,6 +36,11 @@ class Friendship(models.Model):
         on_delete=models.CASCADE,
         related_name="friendships_as_receiver",
     )
+    requested_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="friendships_requested",
+    )
     status = models.CharField(
         max_length=1, choices=Status.choices, default=Status.PENDING
     )
