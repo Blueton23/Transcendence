@@ -6,11 +6,14 @@ import StepPositionBadge from "../features/step/components/StepPositionBadge";
 import { computeDateLabels } from "../features/step/stepDates";
 import { Fragment } from "react/jsx-runtime";
 import TotalSegment from "../features/step/components/TotalSegment";
+import Button from "../shared/ui/Button";
+import AddExpenseButton from "../features/spending/components/AddExpenseButton";
 
 //TODO(branchement): dateLabel en dur, remplacer par travel.startDAte une fois Travel branche
 // + quand getStep sera async faudra utiliser ex:useSteps() pour letat de chargement
 // + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
 // cote serializer comme ca step.ideaCount au lieu de la valeur en dur {2}
+// Button epingler une idee a importer une fois que la features chez David existe
 function ItineraryPage() {
   const steps = getSteps();
   const segments = getSegments();
@@ -31,6 +34,10 @@ function ItineraryPage() {
         </Fragment>
       ))}
       <TotalSegment segments={segments}/>
+      <div className="col-span-2 flex gap-4">
+        <Button variant="primary" className="flex-1">Epingler une idee</Button>
+        <AddExpenseButton className="flex-1"/>
+      </div>
     </div>
 
   );
