@@ -7,11 +7,22 @@ from .models import Friendship, Traveler
 class TravelerAdmin(UserAdmin):
     model = Traveler
     fieldsets = UserAdmin.fieldsets + (
-        ("Traveler info", {"fields": ("profile_picture_url",)}),
+        (
+            "Traveler info",
+            {
+                "fields": (
+                    "profile_picture_url",
+                    "is_online",
+                    "created_at",
+                    "updated_at",
+                )
+            },
+        ),
     )
     readonly_fields = (
         "created_at",
         "updated_at",
+        "is_online",
     )
 
 
