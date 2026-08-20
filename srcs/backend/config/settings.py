@@ -45,7 +45,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "channels",
     "rest_framework",
+    "traveler",
 ]
+
+AUTH_USER_MODEL = "traveler.Traveler"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
