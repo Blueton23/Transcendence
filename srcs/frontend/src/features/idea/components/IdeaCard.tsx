@@ -1,4 +1,4 @@
-import type { Idea } from "../types";
+import type { Idea, IdeaType } from "../types";
 import Card from "../../../shared/ui/Card";
 import Icon from "../../../shared/ui/Icon";
 import Heading from "../../../shared/ui/Heading";
@@ -14,7 +14,6 @@ export interface IdeaCardProps {
     proposerInitials: string;
     voteCount: number;
     stepName?: string;
-    pricePerNight?: number;
 }
 
 //defini le type d icone qui sera afficher
@@ -25,62 +24,73 @@ const ideaIcons = {
     sightseeing: "pin",
 } as const;
 
-
-export function IdeaCard({ idea, proposerName, proposerInitials, voteCount, stepName, pricePerNight }: IdeaCardProps) {
-
-  let stepButton;
-
-  if (idea.step_id === null) {
-      stepButton = (
-        <Button variant="outline">
-          <Text tone="accent" size="sm">
-            <div className="flex flex-row items-end gap-1">
-              À placer
-                {<Icon name="arrow" size={14} />}
-            </div>
-          </Text>
-        </Button>
-    );
-  } else {
-      stepButton = (
-        <Button variant="outline">
-          Voir l'étape
-        </Button>
-    );
-  }
-
-  let stepLabel;
-
-  if (idea.step_id === null) {
-    stepLabel = (
-        <Tag tone="muted">
-          Pool Générale
-        </Tag>
-    );
-  } else {
-    stepLabel = (
-        <Tag tone="muted">
-          {`→ ${stepName}`}
-        </Tag>
-    );
-  }
-
-  let priceAccommodation
-
-  if (idea.type === "accommodation" && pricePerNight != null) {
-    priceAccommodation = (
-        <Text tone="muted" size="sm">
-          {idea.price_per_night} CHF . {proposerName}
+// bouton de droite, a placer ou voir l etape
+function stepButton(stepId: number | null) {
+  if (stepId === null) {
+    return (
+      <Button>
+        <Text tone="accent" size="sm">
+          À placer
+            {<Icon name="arrow" size={14} />}
         </Text>
+      </Button>
     );
   }
 
+    return (
+      <Button variant="outline">
+        Voir l'étape
+      </Button>
+    );
+}
 
+// a gauche, defini si pool generale ou si une etape et afficher
+function stepLabel(stepId: number | null, stepName: string) {
+  if (stepId === null) {
+    return (
+      <Tag tone="muted">
+        Pool Général
+      </Tag>
+    );
+  }
 
+    return (
+      <Tag tone="muted">
+          {`→ ${stepName}`}
+      </Tag>
+    );
+}
 
+// a gauche, si c est un herbegement ecrit le prix et proposer par
+function secondaryInfo(ideaType: IdeaType, pricePerNight: number | null, proposerName: string, proposerInitials: string) {
+  if (ideaType === "accommodation" && pricePerNight != null) {
+    return (
+      <div className="flex items-center gap-3">
+        <Avatar size="xs" color="2">
+          {proposerInitials}
+        </Avatar>
 
+        <Text tone="muted" size="sm">
+          {pricePerNight} CHF . {proposerName}
+        </Text>
+      </div>
+    );
+  }
 
+    return (
+      <div className="flex items-center gap-3">
+        <Avatar size="xs" color="2">
+          {proposerInitials}
+        </Avatar>
 
+        <Text tone="muted" size="sm">
+          proposée par {proposerName}
+        </Text>
+      </div>
+    );
+}
+
+export function IdeaCard({ idea, proposerName, proposerInitials, voteCount, stepName }: IdeaCardProps) {
 
   return (
     <Card>
@@ -94,16 +104,10 @@ export function IdeaCard({ idea, proposerName, proposerInitials, voteCount, step
             <Heading level={3} size="sm">
               {idea.title}
             </Heading>
-            {priceAccommodation}
 
             <div className="flex items-center gap-3">
-              <Avatar size="xs" color="2">
-                {proposerInitials}
-              </Avatar>
-              <Text tone="muted" size="sm">
-                proposée par {proposerName}
-              </Text>
-                {stepLabel}
+                {secondaryInfo(idea.type, idea.price_per_night, proposerName, proposerInitials)}
+                {stepLabel(idea.step_id, stepName)}
             </div>
           </div>
         </div>
@@ -112,9 +116,8 @@ export function IdeaCard({ idea, proposerName, proposerInitials, voteCount, step
           <Button variant="primary"> {<Icon name="heart-f" size={16} />}
             {voteCount}
           </Button>
-          {stepButton}
+          {stepButton(idea.step_id)}
         </div>
-
       </div>
     </Card>
   );
@@ -144,4 +147,19 @@ items-center     = aligne au centre
 items-end        = aligne à la fin
 
 gap-*            = espace entre les éléments
+
+flex-col       = vertical
+flex-row       = horizontal
+flex-wrap  tenir sur une seule ligne ou s'ils peuvent passer automatiquement à la ligne suivante lorsque l'espace manque
+
+items-start    = aligner en haut
+items-center   = centrer
+
+justify-between = séparer gauche/droite
+justify-center  = centrer
+
+gap-3          = espace entre éléments
+
+shrink-0       = ne pas rétrécir
+min-w-0        = autoriser à rétrécir
 */
