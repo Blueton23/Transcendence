@@ -2,11 +2,11 @@ import Button from "../../../shared/ui/Button";
 import Heading from "../../../shared/ui/Heading";
 import Icon from "../../../shared/ui/Icon";
 
-interface ProfileModifierProps {
+interface ProfileModifyProps {
   onClose: () => void;
 }
 
-function ProfileModifier({ onClose }: ProfileModifierProps) {
+function ProfileModify({ onClose }: ProfileModifyProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
       <div className="w-full max-w-2xl rounded-lg bg-surface p-6 shadow-lg">
@@ -43,4 +43,4 @@ function ProfileModifier({ onClose }: ProfileModifierProps) {
   );
 }
 
-export default ProfileModifier;
+export default ProfileModify;
