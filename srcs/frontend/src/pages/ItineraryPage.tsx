@@ -9,6 +9,8 @@ import Button from "../shared/ui/Button";
 import AddExpenseButton from "../features/spending/components/AddExpenseButton";
 import type { Step } from "../features/step/types";
 import { Fragment } from "react";
+import { useState } from "react";
+import ItineraryLayout from "../features/step/components/ItineraryLayout";
 
 //TODO(branchement): dateLabel en dur, remplacer par travel.startDAte une fois Travel branche
 // + quand getStep sera async faudra utiliser ex:useSteps() pour letat de chargement
@@ -47,7 +49,7 @@ function ItineraryTimeline({
 
 function TripActions() {
   return (
-    <div className="flex gap-5">
+    <div className="flex flex-col gap-3 md:flex-row md:gap-5">
       <Button variant="primary" className="flex-1">
         Epingler une idee
       </Button>
@@ -60,9 +62,10 @@ function ItineraryPage() {
   const steps = getSteps();
   const segments = getSegments();
   const dateLabels = computeDateLabels(steps, "2026-07-12");
+  const [mobileView, setMobileView] = useState<"list" | "map">("list");
 
   return (
-    <div className="flex flex-col gap-6">
+    <ItineraryLayout mobileView={mobileView} onToggle={setMobileView}>
       <ItineraryTimeline
         steps={steps}
         segments={segments}
@@ -70,7 +73,7 @@ function ItineraryPage() {
       />
       <TotalSegment segments={segments} />
       <TripActions />
-    </div>
+    </ItineraryLayout>
   );
 }
 export default ItineraryPage;

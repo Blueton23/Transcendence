@@ -16,7 +16,7 @@ function SegmentRow({ segment }: { segment: Segment }) {
   return (
     <div className="flex gap-3">
       <Icon name="car" size={16} className="text-brand-primary" />
-      <Text font="mono" size="sm" tone="muted">
+      <Text font="mono" tone="muted" className="text-[10px] md:text-sm">
         {durationHours} · {segment.distanceKm} KM
       </Text>
       <DashedDivider />
