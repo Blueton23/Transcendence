@@ -76,7 +76,7 @@
   --color-info-bg: #e4e1f0;
 
   /* Overlay */
-  --color-scrim: rgba(43, 42, 71, 0.55);
+  --color-scrim: rgba(43, 42, 71, 0.2);
 
   /* Shadow */
   --shadow-sm: 0 1px 3px rgba(43, 42, 71, 0.08);
