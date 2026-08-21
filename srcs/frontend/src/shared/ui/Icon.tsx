@@ -31,7 +31,7 @@ export const iconNames = [
   "mtn",
   "photo",
   "pin",
-  "add",
+  "pinplus",
   "plus",
   "route",
   "search",

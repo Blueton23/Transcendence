@@ -82,7 +82,7 @@ function DesignSystem() {
           <Button variant="danger">Confirmer</Button>
         </Specimen>
         <Specimen label="icon">
-          <Button variant="primary" icon={<Icon name="add" size={16} />}>
+          <Button variant="primary" icon={<Icon name="pinplus" size={16} />}>
             Epingler une idee
           </Button>
         </Specimen>
