@@ -34,6 +34,7 @@
   --color-background: #e7decf; /* fond de l'app */
   --color-surface: #fcfaf3; /* cartes */
   --color-surface-container: #f3ecdd; /* chips, panneaux latéraux */
+  --color-surface-raised: #ede6d8; /*modale*/
   --color-surface-soft: #f7f1e6; /* zone pointillée "idées à placer" */
   --color-surface-control: #ffffff; /* fond des chips inactifs, inputs */
 
