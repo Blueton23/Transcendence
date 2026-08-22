@@ -7,7 +7,11 @@ interface PinIdeaButtonProps {
 
 export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
   return (
-    <Button variant="primary" icon={<Icon name="pinplus" size={16} />} onClick={onClick}>
+    <Button
+      variant="primary"
+      icon={<Icon name="pinplus" size={16} />}
+      onClick={onClick}
+    >
       Épingler une idée
     </Button>
   );
