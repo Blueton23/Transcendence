@@ -110,7 +110,7 @@ function DesignSystem() {
         </Specimen>
         <Specimen label='variant="primary" · size="md" — 44px'>
           <IconButton
-            icon={<Icon name="add" size={20} />}
+            icon={<Icon name="pinplus" size={20} />}
             label="Epingler une idee"
             variant="primary"
             size="md"
