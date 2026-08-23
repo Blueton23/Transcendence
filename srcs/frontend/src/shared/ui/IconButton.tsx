@@ -19,7 +19,7 @@ const variantStyles = {
 
 const sizeStyles = {
   sm: "w-[34px] h-[34px]",
-  md: "w-11 h-11",
+  md: "md:w-11 md:h-11 w-[36px] h-[36px]",
 };
 
 const baseStyle =

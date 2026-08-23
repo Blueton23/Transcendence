@@ -15,7 +15,7 @@ const sizeStyles = {
   lg: "text-xl md:text-2xl", // 32px titre de page
 };
 
-const baseStyle = "font-extrabold text-text tracking-tight";
+const baseStyle = "font-extrabold text-text";
 
 function Heading({
   children,
