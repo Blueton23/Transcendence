@@ -1,4 +1,5 @@
-export type IdeaType = "restaurant" | "accommodation" | "activity" | "sightseeing";
+export type IdeaType =
+  "restaurant" | "accommodation" | "activity" | "sightseeing";
 export type IdeaStatus = "proposed" | "selected" | "reserved";
 
 export interface Idea {

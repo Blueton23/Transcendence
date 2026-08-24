@@ -49,7 +49,6 @@ function filterIdeas(
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
-
   const ideas = useIdeas();
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
@@ -148,7 +147,8 @@ export function IdeasPage() {
           idea={idea}
           proposerName="David"
           proposerInitials="DL"
-          voteCount={4}
+          voteCount={0}
+          voted={false}
           stepName="Montreux"
         />
       ))}

@@ -1,8 +1,9 @@
 import type { Idea, IdeaType } from "../types";
+import { VoteButton } from "../../../features/idea/components/VoteButton";
+import { StepButton } from "../../../features/idea/components/StepButton";
 import Card from "../../../shared/ui/Card";
 import Icon from "../../../shared/ui/Icon";
 import Heading from "../../../shared/ui/Heading";
-import Button from "../../../shared/ui/Button";
 import Text from "../../../shared/ui/Text";
 import Avatar from "../../../shared/ui/Avatar";
 import Tag from "../../../shared/ui/Tag";
@@ -13,6 +14,7 @@ export interface IdeaCardProps {
   proposerName: string;
   proposerInitials: string;
   voteCount: number;
+  voted: boolean;
   stepName: string;
   onPlace?: () => void;
   onView?: () => void;
@@ -31,43 +33,6 @@ const ideaIcons = {
 
 /*----------------------------------------------------------------------------------*/
 
-// Fonction pour le bouton de droite, le coeur de vote
-function voteButton(voteCount: number, onVote?: () => void) {
-  return (
-    <Button variant="outline" onClick={onVote} className="!px-3 !py-2 !text-xs sm:!px-5 sm:!py-3 sm:!text-sm" >
-      {<Icon name="heart-f" size={16} />}
-      {voteCount}
-    </Button>
-  );
-}
-
-// Fonction pour le bouton de droite "A placer" / "Voir l'étape"
-function stepButton(stepId: number | null, onPlace?: () => void, onView?: () => void) {
-  if (stepId === null) {
-    return (
-      <Button variant="outline" onClick={onPlace} className="!px-3 !py-2 !text-xs sm:!px-5 sm:!py-3 sm:!text-sm">
-        <span className="text-xs text-error" >
-          Placer
-        </span>
-        <Icon name="arrow" size={14} className="text-error" />
-      </Button>
-    );
-  }
-
-  return <Button variant="outline" onClick={onView} className="!px-3 !py-2 !text-xs sm:!px-5 sm:!py-3 sm:!text-sm" >Voir l'étape</Button>;
-}
-
-/*----------------------------------------------------------------------------------*/
-
-// Fonction pour la partie gauche, défini si pool générale ou une étape a afficher
-function stepLabel(stepId: number | null, stepName: string) {
-  if (stepId === null) {
-    return <Tag tone="muted">Pool Général</Tag>;
-  }
-
-  return <Tag tone="muted">{`→ ${stepName}`}</Tag>;
-}
-
 // Fonction pour la partie gauche, si c'est un hébérgement , écrit "le prix" / "proposé par"
 // Si c'est un autre type, met le logo "initiale" / "proposé par"
 function secondaryInfo(
@@ -78,12 +43,12 @@ function secondaryInfo(
 ) {
   if (ideaType === "accommodation" && pricePerNight !== null) {
     return (
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 sm:gap-2">
         <Avatar size="xs" color="2">
           {proposerInitials}
         </Avatar>
 
-        <Text tone="muted" size="sm">
+        <Text tone="muted" size="sm" className="text-xs sm:text-sm">
           {pricePerNight} CHF . par {proposerName}
         </Text>
       </div>
@@ -91,16 +56,29 @@ function secondaryInfo(
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2 sm:gap-2">
       <Avatar size="xs" color="2">
         {proposerInitials}
       </Avatar>
 
-      <Text tone="muted" size="sm">
+      <Text tone="muted" size="sm" className="text-xs sm:text-sm">
         proposée par {proposerName}
       </Text>
     </div>
   );
+}
+
+// Fonction pour la partie gauche, défini si pool générale ou une étape a afficher
+function stepLabel(stepId: number | null, stepName: string) {
+  if (stepId === null) {
+    return (
+      <Tag tone="muted" className="text-xs">
+        Pool Général
+      </Tag>
+    );
+  }
+
+  return <Tag tone="muted" className="text-xs">{`→ ${stepName}`}</Tag>;
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -111,6 +89,7 @@ export function IdeaCard({
   proposerName,
   proposerInitials,
   voteCount,
+  voted,
   stepName,
   onPlace,
   onView,
@@ -118,18 +97,22 @@ export function IdeaCard({
 }: IdeaCardProps) {
   return (
     <Card>
-      <div className="flex flex-row sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex min-w-0 flex-1 items-start gap-2 sm:gap-3">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-error-bg sm:h-10 sm:w-10">
+      <div className="flex flex-row sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-1 items-start gap-2 sm:items-center sm:gap-3">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-error-bg sm:size-10">
             <Icon name={ideaIcons[idea.type]} />
           </div>
 
-          <div className="flex min-w-0 flex-1 flex-col whitespace-nowrap">
-            <Heading level={3} size="sm" className="whitespace-nowrap">
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Heading
+              level={3}
+              size="sm"
+              className="truncate !text-xs whitespace-nowrap sm:!text-sm"
+            >
               {idea.title}
             </Heading>
 
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-1.5">
               {secondaryInfo(
                 idea.type,
                 idea.price_per_night,
@@ -141,9 +124,9 @@ export function IdeaCard({
           </div>
         </div>
 
-        <div className="flex flex-col shrink-0 items-end justify-end whitespace-nowrap gap-2 sm:flex-row sm:gap-3">
-          {voteButton(voteCount, onVote)}
-          {stepButton(idea.step_id, onPlace, onView)}
+        <div className="flex shrink-0 flex-col items-end justify-end gap-2 whitespace-nowrap sm:flex-row sm:gap-3">
+          <VoteButton voteCount={voteCount} voted={voted} onVote={onVote} />
+          <StepButton stepId={idea.step_id} onPlace={onPlace} onView={onView} />
         </div>
       </div>
     </Card>
@@ -187,6 +170,24 @@ gap-3          = espace entre éléments
 
 shrink-0       = ne pas rétrécir
 min-w-0        = autoriser à rétrécir
+
+className="px-8 pt-8" espace en haut
+px-8 pb-8
+
+
+pr-8  → padding-right
+pl-8  → padding-left
+px-8  → padding gauche + droite
+
+mr-8  → margin-right
+ml-8  → margin-left
+mx-8  → margin gauche + droite
+mb-8  en dessous
+
+
+
+const numbers = [1, 2, 3, 4, 5];
+ideas.filter((idea) => idea.type === "restaurant");
 
 
 
