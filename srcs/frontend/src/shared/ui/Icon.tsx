@@ -45,6 +45,7 @@ export const iconNames = [
   "van",
   "wallet",
   "wifi-off",
+  "edit",
   "x",
 ] as const;
 
