@@ -1,6 +1,6 @@
 import type { Idea, IdeaType } from "../types";
-import { VoteButton } from "../../../features/idea/components/VoteButton";
-import { StepButton } from "../../../features/idea/components/StepButton";
+import { VoteButton } from "./VoteButton";
+import { StepButton } from "./StepButton";
 import Card from "../../../shared/ui/Card";
 import Icon from "../../../shared/ui/Icon";
 import Heading from "../../../shared/ui/Heading";
@@ -49,7 +49,7 @@ function secondaryInfo(
         </Avatar>
 
         <Text tone="muted" size="sm" className="text-xs sm:text-sm">
-          {pricePerNight} CHF . par {proposerName}
+          {pricePerNight} CHF/nuit par {proposerName}
         </Text>
       </div>
     );
@@ -78,7 +78,9 @@ function stepLabel(stepId: number | null, stepName: string) {
     );
   }
 
-  return <Tag tone="muted" className="text-xs">{`→ ${stepName}`}</Tag>;
+  return <Tag tone="muted" className="text-xs">
+            {`→ ${stepName}`}
+          </Tag>;
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -115,18 +117,18 @@ export function IdeaCard({
             <div className="flex min-w-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-1.5">
               {secondaryInfo(
                 idea.type,
-                idea.price_per_night,
+                idea.pricePerNight,
                 proposerName,
                 proposerInitials,
               )}
-              {stepLabel(idea.step_id, stepName)}
+              {stepLabel(idea.stepId, stepName)}
             </div>
           </div>
         </div>
 
         <div className="flex shrink-0 flex-col items-end justify-end gap-2 whitespace-nowrap sm:flex-row sm:gap-3">
           <VoteButton voteCount={voteCount} voted={voted} onVote={onVote} />
-          <StepButton stepId={idea.step_id} onPlace={onPlace} onView={onView} />
+          <StepButton stepId={idea.stepId} onPlace={onPlace} onView={onView} />
         </div>
       </div>
     </Card>

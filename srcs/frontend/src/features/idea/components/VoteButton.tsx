@@ -4,7 +4,7 @@ import Icon from "../../../shared/ui/Icon";
 interface VoteButtonProps {
   voteCount: number;
   voted: boolean;
-  onVote: () => void;
+  onVote?: () => void;
 }
 
 export function VoteButton({ voteCount, voted, onVote }: VoteButtonProps) {
