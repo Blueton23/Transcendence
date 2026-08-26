@@ -23,7 +23,7 @@ function App() {
         <Route path="/trip/:id">
           <Route index element={<Navigate to="itinerary" replace />} />
           <Route path="itinerary" element={<PlaceHolder label="itinerary" />} />
-          <Route path="idea" element={<PlaceHolder label="idea" />} />
+          <Route path="ideas" element={<PlaceHolder label="ideas" />} />
           <Route path="expenses" element={<PlaceHolder label="expenses" />} />
           <Route path="chat" element={<PlaceHolder label="chat" />} />
           <Route path="assistant" element={<PlaceHolder label="assistant" />} />

@@ -6,7 +6,7 @@ interface NavFrameProps {
 
 export function NavFrameDesktop({ children }: NavFrameProps) {
   return (
-    <div className="hidden md:flex md:w-[300px] md:flex-col md:bg-surface-container md:p-4">
+    <div className="hidden md:flex md:w-[250px] md:flex-col md:bg-surface-soft md:p-6">
       {children}
     </div>
   );
