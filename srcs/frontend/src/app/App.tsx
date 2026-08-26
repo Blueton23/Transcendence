@@ -3,6 +3,7 @@ import DesignSystem from "../pages/DesignSystem";
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
 import ProfilePage from "../pages/ProfilePage";
+import SignupPage from "../pages/SignupPage";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
@@ -14,7 +15,7 @@ function App() {
       <Route path="/design-system" element={<DesignSystem />} />
       <Route path="/" element={<PlaceHolder label="accueil" />} />
       <Route path="/login" element={<PlaceHolder label="login" />} />
-      <Route path="/signup" element={<PlaceHolder label="signup" />} />
+      <Route path="/signup" element={<SignupPage/>} />
       <Route path="/join/:slug" element={<PlaceHolder label="join" />} />
       <Route element={<AppLayout />}>
         <Route path="/profil" element={<ProfilePage/>} />
