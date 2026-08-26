@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router";
 import DesignSystem from "../pages/DesignSystem";
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
+import ModalTestPage from "../pages/ModalTestPage";
 import ProfilePage from "../pages/ProfilePage";
 import SignupPage from "../pages/SignupPage";
 
@@ -12,6 +13,7 @@ function PlaceHolder({ label }: { label: string }) {
 function App() {
   return (
     <Routes>
+      <Route path="/modal" element={<ModalTestPage />} />
       <Route path="/design-system" element={<DesignSystem />} />
       <Route path="/" element={<PlaceHolder label="accueil" />} />
       <Route path="/login" element={<PlaceHolder label="login" />} />
