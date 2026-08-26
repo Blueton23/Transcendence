@@ -233,7 +233,8 @@ En plus des apps métier (Users, Trips, ...), l'app `common` centralise ce qui e
 common/
 ├── management/commands/seed.py   # commande "python manage.py seed", orchestre l'ordre de création
 └── seeders/
-    └── traveler.py                # génération pour l'app traveler : seed_travelers(), seed_friendships()
+    ├── traveler.py                # génération pour l'app traveler : seed_travelers(), seed_friendships()
+    └── travel.py                  # génération pour l'app travel : seed_travels(), seed_participations()
 ```
 
 - `seed.py` reste volontairement fin : il appelle uniquement les fonctions `seed_*` de `common/seeders/` dans l'ordre des dépendances
@@ -242,8 +243,8 @@ common/
 
 | Commande | Description |
 |---|---|
-| `docker compose exec backend python manage.py seed --travelers 20 --friendships 10` | Crée 20 travelers et 10 friendships aléatoires |
-| `make seed ARGS="--travelers 50 --friendships 30"` | Équivalent via le Makefile |
+| `docker compose exec backend python manage.py seed --travelers 20 --friendships 10 --travels 10 --participations 30` | Crée 20 travelers, 10 friendships, 10 travels et 30 participations aléatoires |
+| `make seed ARGS="--travelers 50 --friendships 30 --travels 20 --participations 60"` | Équivalent via le Makefile |
 
 #### Server ASGI :
 - Point d’entrée pour les serveurs Web compatibles aSGI pour déployer le projet
