@@ -17,6 +17,10 @@ interface TripNavItem {
   badgeCount?: number;
 }
 
+// badgeCount => valeurs de test pour l'instant.
+// - "ideas" : nombre d'idées à placer (Idea sans step) calculable à partir des idées
+// - "chat"  : messages NON LUS --> nécessite un LastMessageReadAt par participation côté backend.
+// TODO(backend): brancher ces compteurs sur les vraies données.
 function getTripNavItems(tripId: string): TripNavItem[] {
   return [
     { to: `/trip/${tripId}/itinerary`, iconName: "route", label: "Itinéraire" },
