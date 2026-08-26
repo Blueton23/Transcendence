@@ -7,7 +7,7 @@ interface VoteButtonProps {
   onVote?: () => void;
 }
 
-export function VoteButton({ voteCount, voted, onVote }: VoteButtonProps) {
+export function VoteButton({ voteCount, voted, onVote, }: VoteButtonProps) {
   return (
     <Button
       variant={voted ? "primary" : "gray"}

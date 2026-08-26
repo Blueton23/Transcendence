@@ -38,7 +38,7 @@ export function IdeasPage() {
       </div>
 
       <div>
-        <Text tone="muted" className="mb-1">
+        <Text tone="primary" className="mb-1">
           Type
         </Text>
         <div className="mb-8 flex flex-wrap gap-2">
@@ -83,7 +83,7 @@ export function IdeasPage() {
       </div>
 
       <div>
-        <Text tone="muted" className="mb-1">
+        <Text tone="primary" className="mb-1">
           Etape
         </Text>
         <div className="mb-8 flex flex-wrap gap-2">
@@ -130,7 +130,7 @@ export function IdeasPage() {
       })}
 
       {createIdeaModalOpen && (
-        <CreateIdeaModal onClose={() => setCreateIdeaModalOpen(false)} />
+        <CreateIdeaModal steps={mockSteps} onClose={() => setCreateIdeaModalOpen(false)} />
       )}
     </div>
   );

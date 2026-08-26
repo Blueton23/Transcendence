@@ -7,7 +7,7 @@ interface StepButtonProps {
   onView?: () => void;
 }
 
-export function StepButton({ stepId, onPlace, onView }: StepButtonProps) {
+export function StepButton({ stepId, onPlace, onView, }: StepButtonProps) {
   if (stepId === null) {
     return (
       <Button
