@@ -169,6 +169,7 @@ Le backend installe les dependances via un fichier requirements.txt mis dans doc
 | `channels==4.3.2` | Extension officielle qui permet à Django de gérer les WebSockets. Garde une connexion ouverte en continu avec le client |
 | `channels-redis==4.3.0` | Backend de communication utilisé par Channels pour faire circuler les messages entre plusieurs connexions |
 | `uvicorn[standard]==0.51.0` | Serveur ASGI qui fait tourner l'application |
+| `Faker==40.37.0` | Génère des fausses données réalistes (noms, emails, etc.) pour la commande `seed` |
 
 Deux concepts principaux avec Django :
 - un Projet
@@ -191,7 +192,7 @@ Dans config/settings.py :
 - Plusieurs choses seront a modifier pour la production
 - La secret key sera a modifiée
 
-Dans config/urls : 
+Dans config/urls :
 - Va permettre de definir les routes. Une route est un chemin pour acceder a une ressource, exemple http://localhost/admin/, admin est une route
 - Sera ajouter les api/user etc.
 
@@ -215,6 +216,34 @@ Une application Django représente un domaine fonctionnel comme :
 
 Une fois qu'une app est crée, elle doit etre ajouter dans settings.py sous INSTALLED_APPS, exemple : "users"
 Chaque app aura ses propres fichiers .py, ils seront a connecter
+
+#### App commune - `common` :
+En plus des apps métier (Users, Trips, ...), l'app `common` centralise ce qui est transverse et partagé entre plusieurs apps :
+- Champs communs aux modèles (`created_at`, `updated_at`) via une classe abstraite
+- Droits d'accès (permissions DRF réutilisables)
+- Format d'erreur standardisé pour toutes les API
+- Génération de données de test (seeds)
+
+#### Seeds (données de test) :
+- Objectif : remplir rapidement la base avec des données de test réalistes, sans tout créer à la main via l'admin
+- Centralisé dans `common` car l'ordre de création entre apps (dépendances entre modèles, ex: un traveler doit exister avant une friendship) doit être géré à un seul endroit
+- Utilise `Faker` pour générer les données aléatoires
+
+```
+common/
+├── management/commands/seed.py   # commande "python manage.py seed", orchestre l'ordre de création
+└── seeders/
+    └── traveler.py                # génération pour l'app traveler : seed_travelers(), seed_friendships()
+```
+
+- `seed.py` reste volontairement fin : il appelle uniquement les fonctions `seed_*` de `common/seeders/` dans l'ordre des dépendances
+- Chaque app avec des données à seed a son propre fichier `common/seeders/nom_app.py`, qui expose des fonctions `seed_xxx(fake, ...)` retournant les objets créés
+- Pour seed une nouvelle app : créer `common/seeders/nom_app.py`, puis appeler ses fonctions depuis `seed.py` dans le bon ordre de dépendance
+
+| Commande | Description |
+|---|---|
+| `docker compose exec backend python manage.py seed --travelers 20 --friendships 10` | Crée 20 travelers et 10 friendships aléatoires |
+| `make seed ARGS="--travelers 50 --friendships 30"` | Équivalent via le Makefile |
 
 #### Server ASGI :
 - Point d’entrée pour les serveurs Web compatibles aSGI pour déployer le projet
@@ -405,6 +434,7 @@ Explication nginx.conf :
 | `make migrate` | Applique les migrations Django dans la base de données |
 | `make startapp` | Permet de créer une app django -> "make startapp name=nom_app" |
 | `make createsuperuser` | Creer le super-utilisateur |
+| `make seed` | Génère les seed pour remplir la DB -> "make seed ARGS=--{table} {quantitée}" |
 | `make shell` | Ouvre le shell Python avec l’environnement Django chargé |
 | `make check` | Permet de controler avant une migration si aucune erreur dans les settings |
 | `make format-back` | Corrige le format au niveau du code backend dans les fichiers, utilise ruff |
