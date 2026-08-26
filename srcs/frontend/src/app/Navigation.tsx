@@ -1,15 +1,20 @@
 import { useParams } from "react-router";
-import NavFrame from "./NavFrame";
-import TripNavBlock from "./TripNavBlock";
-import AppNavBlock from "./AppNavBlock";
+import { NavFrameDesktop, NavFrameMobile } from "./NavFrame";
+import { AppNavDesktop, AppNavMobile } from "./AppNav";
+import { TripNavDesktop, TripNavMobile } from "./TripNav";
 
 export function Navigation() {
   const { id: tripId } = useParams();
 
   return (
-    <NavFrame>
-      {tripId ? <TripNavBlock tripId={tripId} /> : <AppNavBlock />}
-    </NavFrame>
+    <>
+      <NavFrameDesktop>
+        {tripId ? <TripNavDesktop tripId={tripId} /> : <AppNavDesktop />}
+      </NavFrameDesktop>
+      <NavFrameMobile>
+        {tripId ? <TripNavMobile tripId={tripId} /> : <AppNavMobile />}
+      </NavFrameMobile>
+    </>
   );
 }
 export default Navigation;
