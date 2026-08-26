@@ -1,10 +1,6 @@
 import IconBadge from "../shared/ui/IconBadge";
 import Heading from "../shared/ui/Heading";
-import IconButton from "../shared/ui/IconButton";
-import NavPill from "./NavPill";
-import Icon from "../shared/ui/Icon";
-
-
+import NavPill, { NavPillMobile } from "./NavPill";
 
 
 export function AppNavDesktop() {
@@ -15,8 +11,8 @@ export function AppNavDesktop() {
         <Heading>Peripl</Heading>
       </div>
       <div className="flex flex-col gap-1">
-      <NavPill to="/trip" icon={<Icon name="home"/>} label="Mes voyages"></NavPill>
-      <NavPill to="/profil" icon={<Icon name="user"/>} label="Profil"></NavPill>
+        <NavPill to="/trip" iconName="home" label="Mes voyages"></NavPill>
+        <NavPill to="/profil" iconName="user" label="Profil"></NavPill>
       </div>
     </div>
   );
@@ -24,12 +20,9 @@ export function AppNavDesktop() {
 
 export function AppNavMobile() {
   return (
-    <div>
-      <IconButton
-        variant="ghost"
-        className="text-white"
-        icon={<Icon name="compass" size={30} />}
-      />
+    <div className="flex gap-1">
+      <NavPillMobile to="/trip" iconName="home"></NavPillMobile>
+      <NavPillMobile to="/profil" iconName="user"></NavPillMobile>
     </div>
   );
 }
