@@ -1,11 +1,15 @@
-import Text from "../shared/ui/Text";
+import { useParams } from "react-router";
+import NavFrame from "./NavFrame";
+import TripNavBlock from "./TripNavBlock";
+import AppNavBlock from "./AppNavBlock";
 
 export function Navigation() {
+  const { id: tripId } = useParams();
+
   return (
-    <aside>
-      <Text className="w-56 shrink-0 border-r border-gray-200 p-4">
-        Navigation a venir
-      </Text>
-    </aside>
+    <NavFrame>
+      {tripId ? <TripNavBlock tripId={tripId} /> : <AppNavBlock />}
+    </NavFrame>
   );
 }
+export default Navigation;
