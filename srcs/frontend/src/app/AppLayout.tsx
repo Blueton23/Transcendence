@@ -1,4 +1,4 @@
-import { Navigation } from "./Navigation";
+import { Navigation } from "./navigation/Navigation";
 import { Outlet } from "react-router";
 
 export function AppLayout() {

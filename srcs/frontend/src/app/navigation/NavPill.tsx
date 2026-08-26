@@ -1,9 +1,9 @@
-import Badge from "../shared/ui/Badge";
 import { pillBase, pillStateStyles } from "./pillStyles";
 import { NavLink } from "react-router";
-import type { IconName } from "../shared/ui/Icon";
-import Icon from "../shared/ui/Icon";
+import type { IconName } from "../../shared/ui/Icon";
+import Icon from "../../shared/ui/Icon";
 import { navPillMobileBase, navPillMobileStateStyles } from "./pillStyles";
+import CountBadge from "./CountBadge";
 
 interface NavPillMobileProps {
   to: string;
@@ -27,11 +27,7 @@ export function NavPillMobile({
       }
     >
       <Icon name={iconName} size={23} />
-      {badgeCount != null && badgeCount > 0 && (
-        <span className="absolute top-1 right-1.25 flex h-3.75 w-3.75 items-center justify-center rounded-full bg-brand-primary text-[10px] font-bold text-inverse">
-          {badgeCount}
-        </span>
-      )}
+      <CountBadge count={badgeCount} variant="mobile" />
     </NavLink>
   );
 }
@@ -56,9 +52,7 @@ export function NavPill({ to, iconName, label, badgeCount }: NavPillProps) {
     >
       <Icon name={iconName} />
       {label}
-      {badgeCount != null && badgeCount > 0 && (
-        <Badge variant="warning">{badgeCount}</Badge>
-      )}
+      <CountBadge count={badgeCount} />
     </NavLink>
   );
 }

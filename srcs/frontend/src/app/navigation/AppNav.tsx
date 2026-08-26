@@ -1,7 +1,6 @@
-import IconBadge from "../shared/ui/IconBadge";
-import Heading from "../shared/ui/Heading";
+import IconBadge from "../../shared/ui/IconBadge";
+import Heading from "../../shared/ui/Heading";
 import NavPill, { NavPillMobile } from "./NavPill";
-
 
 export function AppNavDesktop() {
   return (
