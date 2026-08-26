@@ -5,15 +5,15 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import CheckConstraint, F, Q, UniqueConstraint
 
+from common.models import TimeStampedModel
+
 # Traveler
 
 
-class Traveler(AbstractUser):
+class Traveler(AbstractUser, TimeStampedModel):
     email = models.EmailField("email address", unique=True)
     profile_picture_url = models.URLField(blank=True, null=True)
     is_online = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         swappable = "AUTH_USER_MODEL"
@@ -25,7 +25,7 @@ class Status(models.TextChoices):
     ACCEPTED = "a", "Accepted"
 
 
-class Friendship(models.Model):
+class Friendship(TimeStampedModel):
     sender = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -44,7 +44,6 @@ class Friendship(models.Model):
     status = models.CharField(
         max_length=1, choices=Status.choices, default=Status.PENDING
     )
-    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints: ClassVar[list] = [
