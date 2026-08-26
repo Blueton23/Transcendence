@@ -85,6 +85,9 @@ startapp:
 createsuperuser:
 	$(COMPOSE) exec backend python manage.py createsuperuser
 
+seed:
+	$(COMPOSE) exec backend python manage.py seed $(ARGS)
+
 shell:
 	$(COMPOSE) exec backend python manage.py shell
 
@@ -113,5 +116,5 @@ lint:
 
 .PHONY: up down start stop restart build ps images volumes logs clean fclean re \
 	psql test-db \
-	makemigrations migrate startapp createsuperuser shell check format-back format-check-back \
+	makemigrations migrate startapp createsuperuser seed shell check format-back format-check-back \
 	format-front format-check-front front-install
