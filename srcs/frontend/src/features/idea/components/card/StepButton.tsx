@@ -1,13 +1,13 @@
-import Button from "../../../shared/ui/Button";
-import Icon from "../../../shared/ui/Icon";
+import Button from "../../../../shared/ui/Button";
+import Icon from "../../../../shared/ui/Icon";
 
 interface StepButtonProps {
   stepId: number | null;
-  onPlace?: () => void;
-  onView?: () => void;
+  onPlace: () => void;
+  onView: () => void;
 }
 
-export function StepButton({ stepId, onPlace, onView, }: StepButtonProps) {
+export function StepButton({ stepId, onPlace, onView }: StepButtonProps) {
   if (stepId === null) {
     return (
       <Button
@@ -31,3 +31,7 @@ export function StepButton({ stepId, onPlace, onView, }: StepButtonProps) {
     </Button>
   );
 }
+
+/*
+Fonction du bouton "Placer" / "Voir l'étape"
+*/

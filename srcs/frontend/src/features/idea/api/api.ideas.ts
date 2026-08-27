@@ -88,3 +88,15 @@ export function getIdeas(): Idea[] {
     },
   ];
 }
+
+// les fonctions suivant sont a modifier plus tard
+
+// fonction métier pour le bouton de vote
+export function voteIdea(ideaId: Idea["id"]) {
+  console.log(ideaId);
+}
+
+// fonction métier pour le bouton "placer"
+export function placeIdea(ideaId: Idea["id"], stepId: number) {
+  console.log(ideaId, stepId);
+}

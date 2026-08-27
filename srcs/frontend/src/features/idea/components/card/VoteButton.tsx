@@ -1,13 +1,13 @@
-import Button from "../../../shared/ui/Button";
-import Icon from "../../../shared/ui/Icon";
+import Button from "../../../../shared/ui/Button";
+import Icon from "../../../../shared/ui/Icon";
 
 interface VoteButtonProps {
   voteCount: number;
   voted: boolean;
-  onVote?: () => void;
+  onVote: () => void;
 }
 
-export function VoteButton({ voteCount, voted, onVote, }: VoteButtonProps) {
+export function VoteButton({ voteCount, voted, onVote }: VoteButtonProps) {
   return (
     <Button
       variant={voted ? "primary" : "gray"}
@@ -19,3 +19,7 @@ export function VoteButton({ voteCount, voted, onVote, }: VoteButtonProps) {
     </Button>
   );
 }
+
+/*
+Fonction du bouton de vote avec l'icone coeur
+*/

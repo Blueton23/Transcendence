@@ -1,10 +1,9 @@
-import type { ReactNode, SelectHTMLAttributes, } from "react";
+import type { ReactNode, SelectHTMLAttributes } from "react";
 import Icon from "./Icon";
 
 type SelectVariant = "default" | "mono";
 
-interface SelectProps
-  extends SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   children: ReactNode;
   variant?: SelectVariant;
   icon?: ReactNode;
@@ -26,9 +25,7 @@ function Select({
   ...rest
 }: SelectProps) {
   const variantStyle = variantStyles[variant];
-  const paddingStyle = icon
-    ? "pl-10 sm:pl-11"
-    : "pl-3.5 sm:pl-4";
+  const paddingStyle = icon ? "pl-10 sm:pl-11" : "pl-3.5 sm:pl-4";
 
   let iconElement = null;
 

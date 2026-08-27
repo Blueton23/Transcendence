@@ -1,7 +1,4 @@
-import type { Idea, IdeaType } from "../types";
-
-export type IdeaFilter = "all" | IdeaType;
-export type StepFilter = "all" | "none" | number;
+import type { Idea, IdeaFilter, StepFilter } from "../types";
 
 export function filterIdeas(
   ideas: Idea[],
@@ -26,3 +23,7 @@ export function filterIdeas(
 
   return filteredIdeas;
 }
+
+/*
+Fonction utiles pour gérer le filtrage d'idées
+*/

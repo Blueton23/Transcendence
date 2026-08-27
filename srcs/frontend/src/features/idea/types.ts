@@ -1,6 +1,11 @@
-export type IdeaType = "restaurant" | "accommodation" | "activity" | "sightseeing";
+export type IdeaType =
+  "restaurant" | "accommodation" | "activity" | "sightseeing";
 export type IdeaStatus = "proposed" | "selected" | "reserved";
 
+export type IdeaFilter = "all" | IdeaType;
+export type StepFilter = "all" | "none" | number;
+
+//represente une idee complete cote backend
 export interface Idea {
   id: number;
   travelId: number;
@@ -22,6 +27,8 @@ export interface Idea {
   updatedAt: string;
 }
 
+// represente les donnee necessaire pour creer une idee
+// a utiliser dans epingler une idee
 export interface CreateIdeaInput {
   title: string;
   type: IdeaType;
