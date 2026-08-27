@@ -12,6 +12,7 @@ import type { Step } from "../features/step/types";
 import { Fragment } from "react";
 import { useState } from "react";
 import ItineraryLayout from "../features/step/components/ItineraryLayout";
+import { AddStepForm } from "../features/step/components/add-step/AddStepForm";
 
 //TODO(branchement): dateLabel en dur, remplacer par travel.startDAte une fois Travel branche
 // + quand getStep sera async faudra utiliser ex:useSteps() pour letat de chargement
@@ -71,6 +72,7 @@ function ItineraryPage() {
         Itinéraire
       </Heading>
       <ItineraryLayout mobileView={mobileView} onToggle={setMobileView}>
+        <AddStepForm />
         <ItineraryTimeline
           steps={steps}
           segments={segments}
