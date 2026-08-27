@@ -20,7 +20,7 @@ function App() {
       <Route path="/signup" element={<SignupPage/>} />
       <Route path="/join/:slug" element={<PlaceHolder label="join" />} />
       <Route element={<AppLayout />}>
-        <Route path="/profil" element={<ProfilePage/>} />
+        <Route path="/profile" element={<ProfilePage/>} />
         <Route path="/trip" element={<PlaceHolder label="trip" />} />
         <Route path="/trip/:id">
           <Route index element={<Navigate to="itinerary" replace />} />

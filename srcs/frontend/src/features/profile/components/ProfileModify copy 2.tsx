@@ -19,53 +19,34 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
   const { currentUser, setCurrentUser } = useAuth();
   const { updateProfile, isLoading, error } = useProfile();
 
-  console.log("SDU updateProfile = " , updateProfile.first_name);
-  console.log("SDU currentUser.id Modify = " , currentUser.id);
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
 
   useEffect(() => {
-    if (!currentUser) {
-      return;
+    if (currentUser) {
+      setFirstName(currentUser.first_name);
+      setLastName(currentUser.last_name);
+      setUsername(currentUser.username);
+      setEmail(currentUser.email);
     }
-
-    setFirstName(currentUser.first_name);
-    setLastName(currentUser.last_name);
-    setUsername(currentUser.username);
-    setEmail(currentUser.email);
   }, [currentUser]);
 
-  const initials =
-    `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  const initials = `${firstName?.charAt(0) ?? ""}${lastName?.charAt(0) ?? ""}`.toUpperCase();
 
-  async function handleSubmit() {
-    if (!currentUser) {
-      return;
-    }
-
-    const updatedUser = await updateProfile(currentUser.id, {
+  const handleSubmit = () => {
+    console.log("Données à enregistrer :", {
       first_name: firstName,
       last_name: lastName,
       username,
       email,
     });
 
-    if (!updatedUser) {
-      console.log("SDU no updatedUser");
-      return;
-    }
+    // TODO : envoyer les données à ton backend
 
-    setCurrentUser(updatedUser);
     onClose();
-  }
-
-  if (!currentUser) {
-    console.log("SDU no currentUser");
-    return null;
-  }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -119,9 +100,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
 
               <Input
                 value={firstName}
-                onChange={(event) =>
-                  setFirstName(event.target.value)
-                }
+                onChange={(event) => setFirstName(event.target.value)}
               />
             </label>
 
@@ -132,9 +111,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
 
               <Input
                 value={lastName}
-                onChange={(event) =>
-                  setLastName(event.target.value)
-                }
+                onChange={(event) => setLastName(event.target.value)}
               />
             </label>
 
@@ -148,9 +125,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
 
             <Input
               value={username}
-              onChange={(event) =>
-                setUsername(event.target.value)
-              }
+              onChange={(event) => setUsername(event.target.value)}
               variant="mono"
             />
           </label>
@@ -164,9 +139,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
             <Input
               type="email"
               value={email}
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
+              onChange={(event) => setEmail(event.target.value)}
             />
           </label>
         </div>
@@ -195,22 +168,14 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
           </div>
         </div>
 
-        {/* Erreur */}
-        {error && (
-          <p className="mt-4 text-sm text-red-500">
-            {error}
-          </p>
-        )}
-
         {/* Enregistrer */}
         <div className="mt-7">
           <Button
             variant="primary"
             className="w-full rounded-full py-3"
             onClick={handleSubmit}
-            disabled={isLoading}
           >
-            {isLoading ? "Enregistrement..." : "Enregistrer"}
+            Enregistrer
           </Button>
         </div>
 

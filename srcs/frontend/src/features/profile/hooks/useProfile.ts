@@ -1,9 +1,26 @@
 import { useState } from "react";
-import { createTraveler } from "../api/profileApi";
-import type { CreateTravelerData, Traveler } from "../types";
+
+import {
+  createTraveler,
+  updateTraveler,
+} from "../api/profileApi";
+
+import type {
+  CreateTravelerData,
+  UpdateTravelerData,
+  Traveler,
+} from "../types";
 
 interface UseProfileReturn {
-  createProfile: (data: CreateTravelerData) => Promise<Traveler | null>;
+  createProfile: (
+    data: CreateTravelerData,
+  ) => Promise<Traveler | null>;
+
+  updateProfile: (
+    id: number,
+    data: UpdateTravelerData,
+  ) => Promise<Traveler | null>;
+
   isLoading: boolean;
   error: string | null;
   clearError: () => void;
@@ -37,12 +54,38 @@ export function useProfile(): UseProfileReturn {
     }
   }
 
+  async function updateProfile(
+    id: number,
+    data: UpdateTravelerData,
+  ): Promise<Traveler | null> {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await updateTraveler(id, data);
+
+      return response.traveler;
+    } catch (err) {
+      const message =
+        err instanceof Error
+          ? err.message
+          : "Une erreur est survenue.";
+
+      setError(message);
+
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   function clearError() {
     setError(null);
   }
 
   return {
     createProfile,
+    updateProfile,
     isLoading,
     error,
     clearError,

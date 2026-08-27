@@ -1,13 +1,11 @@
 import ProfileCreate from "../features/profile/components/ProfileCreate";
 
-
-
 function SignupPage() {
-    return (
-      <div className="mx-auto flex max-w3xl flex-col gap-6 p-8">
-        <ProfileCreate onClose={[]} />
-      </div>
-    );
-  }
+  return (
+    <main className="mx-auto w-full max-w-3xl px-6 py-10">
+      <ProfileCreate />
+    </main>
+  );
+}
 
-  export default SignupPage;
+export default SignupPage;

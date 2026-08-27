@@ -1,12 +1,15 @@
 from django.contrib.auth import get_user_model
 
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import TravelerCreateSerializer
+from .serializers import (
+    TravelerCreateSerializer,
+    TravelerUpdateSerializer,
+)
 
 
 Traveler = get_user_model()
@@ -52,9 +55,7 @@ class TravelerCreateView(APIView):
             email=serializer.validated_data["email"],
         )
 
-        # Temporaire : le mot de passe sera traité plus tard.
         traveler.set_unusable_password()
-
         traveler.save()
 
         return Response(
@@ -62,4 +63,49 @@ class TravelerCreateView(APIView):
                 "traveler": TravelerCreateSerializer(traveler).data,
             },
             status=status.HTTP_201_CREATED,
+        )
+
+
+class TravelerUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request: Request, pk: int) -> Response:
+
+        try:
+            traveler = Traveler.objects.get(pk=pk)
+        except Traveler.DoesNotExist:
+            return Response(
+                {
+                    "detail": "Utilisateur introuvable.",
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if request.user.id != traveler.id:
+            return Response(
+                {
+                    "detail": "Vous ne pouvez modifier que votre propre profil.",
+                },
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = TravelerUpdateSerializer(
+            traveler,
+            data=request.data,
+            partial=True,
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        traveler = serializer.save()
+
+        return Response(
+            {
+                "traveler": TravelerUpdateSerializer(traveler).data,
+            },
+            status=status.HTTP_200_OK,
         )

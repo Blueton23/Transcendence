@@ -6,9 +6,14 @@ import Text from "../../../shared/ui/Text";
 import Avatar from "../../../shared/ui/Avatar";
 import ProfileModify from "./ProfileModify"
 
+import { useAuth } from "../../auth/context/AuthContext";
+
 
 function ProfileInfo() {
     const [isModifierOpen, setIsModifierOpen] = useState(false);
+    const {currentUser} = useAuth();
+
+    console.log("SDU curent :", currentUser)
 
     return(
     <>
@@ -16,18 +21,19 @@ function ProfileInfo() {
         <div className="flex items-center">
             <div className="flex w-24 justify-center">
                 <Avatar size="lg" color="1">
-                    JS
+                    {currentUser.first_name?.charAt(0).toUpperCase()}
+                    {currentUser.last_name?.charAt(0).toUpperCase()}
                 </Avatar>
             </div>
             <div>
                 <Heading level={3} size="lg">
-                    John Smith
+                    {currentUser.first_name} {currentUser.last_name}
                 </Heading>
                 <Text tone="secondary" size="md" font="mono">
-                    PseudoJS
+                    {currentUser.username}
                 </Text>
                 <Text tone="primary" size="md">
-                    JohnSmith@yahoo.fr
+                    {currentUser.email}
                 </Text>
             </div>
             <div className="ml-auto">
