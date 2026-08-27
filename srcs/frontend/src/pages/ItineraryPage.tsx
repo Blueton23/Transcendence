@@ -6,6 +6,7 @@ import StepPositionBadge from "../features/step/components/StepPositionBadge";
 import { computeDateLabels } from "../features/step/stepDates";
 import TotalSegment from "../features/step/components/TotalSegment";
 import Button from "../shared/ui/Button";
+import Heading from "../shared/ui/Heading";
 import AddExpenseButton from "../features/spending/components/AddExpenseButton";
 import type { Step } from "../features/step/types";
 import { Fragment } from "react";
@@ -65,15 +66,20 @@ function ItineraryPage() {
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
 
   return (
-    <ItineraryLayout mobileView={mobileView} onToggle={setMobileView}>
-      <ItineraryTimeline
-        steps={steps}
-        segments={segments}
-        dateLabels={dateLabels}
-      />
-      <TotalSegment segments={segments} />
-      <TripActions />
-    </ItineraryLayout>
+    <div className="flex flex-col gap-4 p-4">
+      <Heading level={1} size="lg">
+        Itinéraire
+      </Heading>
+      <ItineraryLayout mobileView={mobileView} onToggle={setMobileView}>
+        <ItineraryTimeline
+          steps={steps}
+          segments={segments}
+          dateLabels={dateLabels}
+        />
+        <TotalSegment segments={segments} />
+        <TripActions />
+      </ItineraryLayout>
+    </div>
   );
 }
 export default ItineraryPage;
