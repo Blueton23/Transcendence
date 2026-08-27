@@ -19,7 +19,7 @@ const sizeStyles = {
 
 const iconSizeStyles = {
   sm: "w-[18px] h-[18px]",
-  md: "w-[18px] h-[18px] md:w-[22px] md:h-[22px]",
+  md: "w-[18px] h-[18px] md:w-[25px] md:h-[25px]",
 };
 
 const colorStyles = {
