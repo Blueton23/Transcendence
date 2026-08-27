@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router";
 import DesignSystem from "../pages/DesignSystem";
-import { IdeasPage } from "../pages/IdeasPage";
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
 import ModalTestPage from "../pages/ModalTestPage";
@@ -24,7 +23,7 @@ function App() {
         <Route path="/trip/:id">
           <Route index element={<Navigate to="itinerary" replace />} />
           <Route path="itinerary" element={<PlaceHolder label="itinerary" />} />
-          <Route path="idea" element={<IdeasPage />} />
+          <Route path="ideas" element={<PlaceHolder label="ideas" />} />
           <Route path="expenses" element={<PlaceHolder label="expenses" />} />
           <Route path="chat" element={<PlaceHolder label="chat" />} />
           <Route path="assistant" element={<PlaceHolder label="assistant" />} />
