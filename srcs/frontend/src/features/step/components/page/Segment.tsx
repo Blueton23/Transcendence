@@ -1,7 +1,7 @@
-import type { Segment } from "../api/segmentApi";
-import Text from "../../../shared/ui/Text";
-import Icon from "../../../shared/ui/Icon";
-import { computeDurationLabel } from "../segmentDuration";
+import type { Segment } from "@/features/step/api/segmentApi";
+import Text from "@/shared/ui/Text";
+import Icon from "@/shared/ui/Icon";
+import { computeDurationLabel } from "@/features/step/segmentDuration";
 
 function DashedDivider() {
   return (
@@ -11,7 +11,7 @@ function DashedDivider() {
   );
 }
 
-function SegmentRow({ segment }: { segment: Segment }) {
+export function SegmentRow({ segment }: { segment: Segment }) {
   const durationHours = computeDurationLabel(segment.durationMinutes);
   return (
     <div className="flex gap-3">
@@ -23,4 +23,3 @@ function SegmentRow({ segment }: { segment: Segment }) {
     </div>
   );
 }
-export default SegmentRow;

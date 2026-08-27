@@ -1,9 +1,9 @@
-import Divider from "../../../shared/ui/Divider";
-import Text from "../../../shared/ui/Text";
-import type { Segment } from "../api/segmentApi";
-import { computeDurationLabel } from "../segmentDuration";
+import Divider from "@/shared/ui/Divider";
+import Text from "@/shared/ui/Text";
+import type { Segment } from "@/features/step/api/segmentApi";
+import { computeDurationLabel } from "@/features/step/segmentDuration";
 
-function TotalSegment({ segments }: { segments: Segment[] }) {
+export function TotalSegment({ segments }: { segments: Segment[] }) {
   const totalHours = segments.reduce(
     (total, segment) => total + segment.durationMinutes,
     0,
@@ -23,4 +23,3 @@ function TotalSegment({ segments }: { segments: Segment[] }) {
     </div>
   );
 }
-export default TotalSegment;

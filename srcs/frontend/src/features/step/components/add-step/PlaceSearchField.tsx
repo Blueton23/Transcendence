@@ -1,7 +1,7 @@
-import Icon from "../../../../shared/ui/Icon";
-import Divider from "../../../../shared/ui/Divider";
+import Icon from "@/shared/ui/Icon";
+import Divider from "@/shared/ui/Divider";
 import { type ChangeEventHandler, type FocusEventHandler } from "react";
-import IconButton from "../../../../shared/ui/IconButton";
+import IconButton from "@/shared/ui/IconButton";
 
 interface PlaceSearchFieldProps {
   value: string;

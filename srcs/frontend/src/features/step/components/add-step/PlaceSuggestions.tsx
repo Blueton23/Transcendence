@@ -1,5 +1,5 @@
-import Icon from "../../../../shared/ui/Icon";
-import Text from "../../../../shared/ui/Text";
+import Icon from "@/shared/ui/Icon";
+import Text from "@/shared/ui/Text";
 
 interface PlaceSuggestionsProps {
   items: string[];

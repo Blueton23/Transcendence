@@ -1,9 +1,9 @@
-import type { Step, StepIdeaPreview } from "../types";
-import Card from "../../../shared/ui/Card";
-import Heading from "../../../shared/ui/Heading";
-import Text from "../../../shared/ui/Text";
-import IconButton from "../../../shared/ui/IconButton";
-import Icon from "../../../shared/ui/Icon";
+import type { Step, StepIdeaPreview } from "@/features/step/types";
+import Card from "@/shared/ui/Card";
+import Heading from "@/shared/ui/Heading";
+import Text from "@/shared/ui/Text";
+import IconButton from "@/shared/ui/IconButton";
+import Icon from "@/shared/ui/Icon";
 
 //TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
 // pas un champ stocke dans Step
@@ -60,7 +60,12 @@ function StepDescription({
 }
 
 //possible decrire function StepCard(props: StepCardProps) et utiliser props.step, props.dateLabel....
-function StepCard({ step, dateLabel, ideaPreview, ideaCount }: StepCardProps) {
+export function StepCard({
+  step,
+  dateLabel,
+  ideaPreview,
+  ideaCount,
+}: StepCardProps) {
   return (
     <Card
       variant="default"
@@ -81,4 +86,3 @@ function StepCard({ step, dateLabel, ideaPreview, ideaCount }: StepCardProps) {
     </Card>
   );
 }
-export default StepCard;

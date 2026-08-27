@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import Card from "../../../shared/ui/Card";
-import Button from "../../../shared/ui/Button";
+import Card from "@/shared/ui/Card";
+import Button from "@/shared/ui/Button";
 
 function MapPlaceholder() {
   return <Card className="min-h-64 md:h-full">I am a map</Card>;
@@ -36,7 +36,7 @@ function ToggleMobileButton({
   );
 }
 
-function ItineraryLayout({
+export function ItineraryLayout({
   mobileView,
   onToggle,
   children,
@@ -55,4 +55,3 @@ function ItineraryLayout({
     </div>
   );
 }
-export default ItineraryLayout;
