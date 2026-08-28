@@ -16,7 +16,7 @@ export function IdeaStepFilter({
   onChange,
 }: IdeaStepFilterProps) {
   return (
-    <div className="mb-8 flex flex-wrap gap-2">
+    <div className="mb-5 flex flex-wrap gap-2">
       <Chip active={stepActiveFilter === "all"} onClick={() => onChange("all")}>
         Toutes
       </Chip>

@@ -22,6 +22,8 @@ export function getIdeas(): Idea[] {
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
+      url: null,
+      note: null,
     },
 
     {
@@ -43,6 +45,8 @@ export function getIdeas(): Idea[] {
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
+      url: null,
+      note: null,
     },
 
     {
@@ -64,6 +68,8 @@ export function getIdeas(): Idea[] {
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
+      url: null,
+      note: null,
     },
 
     {
@@ -85,6 +91,8 @@ export function getIdeas(): Idea[] {
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
+      url: null,
+      note: null,
     },
   ];
 }

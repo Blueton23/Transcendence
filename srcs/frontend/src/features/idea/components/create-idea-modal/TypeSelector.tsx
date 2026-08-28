@@ -1,22 +1,18 @@
 import Chip from "../../../../shared/ui/Chip";
 import Icon from "../../../../shared/ui/Icon";
-import type { IdeaFilter } from "../../types";
+import type { IdeaType } from "../../types";
 
-interface IdeaTypeFilterProps {
-  typeActiveFilter: IdeaFilter;
-  onChange: (filter: IdeaFilter) => void;
+interface TypeSelectorProps {
+  typeActiveFilter: IdeaType;
+  onChange: (filter: IdeaType) => void;
 }
 
-export function IdeaTypeFilter({
+export function TypeSelector({
   typeActiveFilter,
   onChange,
-}: IdeaTypeFilterProps) {
+}: TypeSelectorProps) {
   return (
     <div className="mb-4 flex flex-wrap gap-2">
-      <Chip active={typeActiveFilter === "all"} onClick={() => onChange("all")}>
-        Tous
-      </Chip>
-
       <Chip
         active={typeActiveFilter === "restaurant"}
         onClick={() => onChange("restaurant")}
@@ -52,5 +48,5 @@ export function IdeaTypeFilter({
 }
 
 /*
-Fonction pour filtrer les types dans la page d'idée
+Fonction pour séléctionner le type dans la modal "épingler une idée"
 */

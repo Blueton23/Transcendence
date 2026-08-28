@@ -3,6 +3,7 @@ import DesignSystem from "../pages/DesignSystem";
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
 import ModalTestPage from "../pages/ModalTestPage";
+import { IdeasPage } from "../pages/IdeasPage";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
@@ -23,7 +24,7 @@ function App() {
         <Route path="/trip/:id">
           <Route index element={<Navigate to="itinerary" replace />} />
           <Route path="itinerary" element={<PlaceHolder label="itinerary" />} />
-          <Route path="ideas" element={<PlaceHolder label="ideas" />} />
+          <Route path="ideas" element={<IdeasPage />} />
           <Route path="expenses" element={<PlaceHolder label="expenses" />} />
           <Route path="chat" element={<PlaceHolder label="chat" />} />
           <Route path="assistant" element={<PlaceHolder label="assistant" />} />

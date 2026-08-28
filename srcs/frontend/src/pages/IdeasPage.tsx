@@ -4,7 +4,7 @@ import { IdeaCard } from "../features/idea/components/IdeaCard";
 import { PinIdeaButton } from "../features/idea/components/page/PinIdeaButton";
 import { IdeaTypeFilter } from "../features/idea/components/page/IdeaTypeFilter";
 import { IdeaStepFilter } from "../features/idea/components/page/IdeaStepFilter";
-import { CreateIdeaModal } from "../features/idea/components/create_idea_modal/CreateIdeaModal";
+import { CreateIdeaModal } from "../features/idea/components/create-idea-modal/CreateIdeaModal";
 import type { IdeaFilter, StepFilter } from "../features/idea/types";
 import { filterIdeas } from "../features/idea/utils/filterIdeas";
 import Heading from "../shared/ui/Heading";
@@ -33,7 +33,7 @@ export function IdeasPage() {
   const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
 
   return (
-    <div className="px-8 pt-8">
+    <div className="px-4 sm:px-8 pt-8">
       <div className="mb-6 flex items-center justify-between">
         <Heading level={1} size="lg">
           Idées
@@ -45,25 +45,21 @@ export function IdeasPage() {
         <Text tone="primary" className="mb-1">
           Type
         </Text>
-        <div className="-mb-2 flex flex-wrap gap-2">
-          <IdeaTypeFilter
-            typeActiveFilter={typeActiveFilter}
-            onChange={setTypeActiveFilter}
-          />
-        </div>
+        <IdeaTypeFilter
+          typeActiveFilter={typeActiveFilter}
+          onChange={setTypeActiveFilter}
+        />
       </div>
 
       <div>
         <Text tone="primary" className="mb-1">
           Etape
         </Text>
-        <div className="-mb-2 flex flex-wrap gap-2">
-          <IdeaStepFilter
-            steps={mockSteps}
-            stepActiveFilter={stepActiveFilter}
-            onChange={setStepActiveFilter}
-          />
-        </div>
+        <IdeaStepFilter
+          steps={mockSteps}
+          stepActiveFilter={stepActiveFilter}
+          onChange={setStepActiveFilter}
+        />
       </div>
 
       {filteredIdeas.map((idea) => {

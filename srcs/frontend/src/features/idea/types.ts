@@ -25,6 +25,8 @@ export interface Idea {
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  url: string | null;
+  note: string | null;
 }
 
 // represente les donnee necessaire pour creer une idee
@@ -39,4 +41,6 @@ export interface CreateIdeaInput {
   pricePerNight: number | null;
   arrivalDate: string | null;
   departureDate: string | null;
+  url: string | null;
+  note: string | null;
 }
