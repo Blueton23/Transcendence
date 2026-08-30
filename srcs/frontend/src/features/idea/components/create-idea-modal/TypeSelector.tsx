@@ -26,7 +26,7 @@ export function TypeSelector({
         onClick={() => onChange("accommodation")}
       >
         <Icon name="bed" size={18} />
-        Hébérgement
+        Hébergement
       </Chip>
 
       <Chip

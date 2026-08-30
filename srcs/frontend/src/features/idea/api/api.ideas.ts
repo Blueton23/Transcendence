@@ -1,4 +1,4 @@
-import type { Idea } from "../types";
+import type { Idea, CreateIdeaInput } from "../types";
 
 //récupère plusieurs idées
 export function getIdeas(): Idea[] {
@@ -107,4 +107,20 @@ export function voteIdea(ideaId: Idea["id"]) {
 // fonction métier pour le bouton "placer"
 export function placeIdea(ideaId: Idea["id"], stepId: number) {
   console.log(ideaId, stepId);
+}
+
+// fonction métier pour le bouton "epingler une idée"
+export function createIdea(input: CreateIdeaInput): Idea {
+  return {
+    id: Date.now(),
+    travelId: 1,
+    travelerId: 1,
+    chosenBy: null,
+    ...input,
+    status: "proposed",
+    chosenAt: null,
+    deletedAt: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
 }

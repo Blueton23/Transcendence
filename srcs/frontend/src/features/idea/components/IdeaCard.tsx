@@ -23,7 +23,7 @@ export interface IdeaCardProps {
 /*----------------------------------------------------------------------------------*/
 
 // Défini le type d'icone a afficher
-const ideaIcons = {
+export const ideaIcons = {
   restaurant: "fork",
   accommodation: "bed",
   activity: "mtn",

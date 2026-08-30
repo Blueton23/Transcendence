@@ -5,6 +5,7 @@ import { PinIdeaButton } from "../features/idea/components/page/PinIdeaButton";
 import { IdeaTypeFilter } from "../features/idea/components/page/IdeaTypeFilter";
 import { IdeaStepFilter } from "../features/idea/components/page/IdeaStepFilter";
 import { CreateIdeaModal } from "../features/idea/components/create-idea-modal/CreateIdeaModal";
+import { PlaceIdeaModal } from "../features/idea/components/place-idea-modal/PlaceIdeaModal";
 import type { IdeaFilter, StepFilter } from "../features/idea/types";
 import { filterIdeas } from "../features/idea/utils/filterIdeas";
 import Heading from "../shared/ui/Heading";
@@ -20,17 +21,16 @@ const mockSteps = [
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
-  const { ideas, handleVote, handlePlaceIdea } = useIdeas();
+  const { ideas, handleVote, handlePlaceIdea, handleCreateIdea, } = useIdeas();
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
+  const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
 
   const [ideaToPlaceId, setIdeaToPlaceId] = useState<number | null>(null);
-  const [viewedStepId, setViewedStepId] = useState<number | null>(null);
+  const ideaToPlace = ideas.find((idea) => idea.id === ideaToPlaceId);
 
   const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
-
-  const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
 
   return (
     <div className="px-4 sm:px-8 pt-8">
@@ -76,7 +76,7 @@ export function IdeasPage() {
             stepName={step?.name}
             onVote={() => handleVote(idea.id)}
             onPlace={() => setIdeaToPlaceId(idea.id)}
-            onView={() => setViewedStepId(idea.stepId)}
+            onView={() => (null)}
           />
         );
       })}
@@ -85,8 +85,22 @@ export function IdeasPage() {
         <CreateIdeaModal
           steps={mockSteps}
           onClose={() => setCreateIdeaModalOpen(false)}
+          onCreate={handleCreateIdea}
         />
       )}
+
+      {ideaToPlaceId !== null && (
+        <PlaceIdeaModal
+        idea={ideaToPlace}
+        steps={mockSteps}
+        onClose={() => setIdeaToPlaceId(null)}
+        onPlace={handlePlaceIdea}
+        />
+      )}
+
     </div>
   );
 }
+
+
+//steps={mockSteps}

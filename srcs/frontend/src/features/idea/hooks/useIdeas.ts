@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { Idea } from "../types";
-import { getIdeas, voteIdea, placeIdea } from "../api/api.ideas";
+import type { Idea, CreateIdeaInput } from "../types";
+import { getIdeas, voteIdea, placeIdea, createIdea } from "../api/api.ideas";
 
 //gère plusieurs idées
 export function useIdeas() {
@@ -8,6 +8,12 @@ export function useIdeas() {
 
   function handleVote(ideaId: Idea["id"]) {
     voteIdea(ideaId);
+  }
+
+  function handleCreateIdea(input: CreateIdeaInput) {
+    const newIdea = createIdea(input);
+
+    setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
   }
 
   function handlePlaceIdea(ideaId: Idea["id"], stepId: number) {
@@ -25,5 +31,6 @@ export function useIdeas() {
     ideas,
     handleVote,
     handlePlaceIdea,
+    handleCreateIdea,
   };
 }
