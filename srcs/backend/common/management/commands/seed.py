@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandParser
 from faker import Faker
 
-from common.seeders.travel import seed_participations, seed_travels
+from common.seeders.travel import seed_participations, seed_steps, seed_travels
 from common.seeders.traveler import seed_friendships, seed_travelers
 
 
@@ -15,6 +15,7 @@ class Command(BaseCommand):
         parser.add_argument("--friendships", type=int, default=10)
         parser.add_argument("--travels", type=int, default=10)
         parser.add_argument("--participations", type=int, default=30)
+        parser.add_argument("--steps-per-travel", type=int, default=4)
 
     def handle(self, *args: object, **options: object) -> None:
         fake = Faker()
@@ -32,5 +33,8 @@ class Command(BaseCommand):
             fake, travelers, travels, options["participations"]
         )
         self.stdout.write(f"Created {len(participations)} participations.")
+
+        steps = seed_steps(fake, travels, options["steps_per_travel"])
+        self.stdout.write(f"Created {len(steps)} steps.")
 
         self.stdout.write(self.style.SUCCESS("Seed complete."))

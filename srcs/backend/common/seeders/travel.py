@@ -1,6 +1,6 @@
 from faker import Faker
 
-from travel.models import Participation, ParticipationStatus, Travel
+from travel.models import Participation, ParticipationStatus, Step, Travel
 
 
 def seed_travels(fake: Faker, count: int) -> list:
@@ -42,3 +42,20 @@ def seed_participations(
         )
 
     return participations
+
+
+def seed_steps(fake: Faker, travels: list, per_travel: int) -> list:
+    steps = []
+    for travel in travels:
+        for position in range(1, per_travel + 1):
+            steps.append(
+                Step.objects.create(
+                    travel=travel,
+                    position=position,
+                    nights=fake.random_int(min=0, max=4),
+                    localisation=fake.city(),
+                    latitude=round(fake.latitude(), 6),
+                    longitude=round(fake.longitude(), 6),
+                )
+            )
+    return steps
