@@ -20,7 +20,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "DJANGO_ALLOWED_HOSTS",
-        "localhost,127.0.0.1",
+        "localhost,127.0.0.1,37.59.120.163", # a checker SDU
     ).split(",")
     if host.strip()
 ]
@@ -29,7 +29,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "DJANGO_CSRF_TRUSTED_ORIGINS",
-        "http://localhost:8080",
+        "http://localhost:8080,http://37.59.120.163:8080", # a checker SDU
     ).split(",")
     if origin.strip()
 ]

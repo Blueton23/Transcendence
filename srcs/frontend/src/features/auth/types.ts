@@ -10,7 +10,15 @@ export interface User {
   updated_at: string;
 }
 
-export interface LoginCredentials {
+export interface SignupData {
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  password: string;
+}
+
+export interface LoginData {
   username: string;
   password: string;
 }
@@ -19,6 +27,7 @@ export interface AuthResponse {
   traveler: User;
 }
 
-export interface LogoutResponse {
-  message: string;
+export interface ApiError {
+  detail?: string;
+  [key: string]: unknown;
 }

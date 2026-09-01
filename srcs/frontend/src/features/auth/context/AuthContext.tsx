@@ -6,18 +6,13 @@ import {
   type ReactNode,
 } from "react";
 
-import {
-  getMe,
-  login as apiLogin,
-} from "../api/authApi";
-
+import { getMe } from "../api/auth";
 import type { User } from "../types";
 
 interface AuthContextType {
   currentUser: User | null;
+  setCurrentUser: (user: User | null) => void;
   isLoading: boolean;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => void;
   refreshUser: () => Promise<void>;
 }
 
@@ -29,34 +24,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function refreshUser() {
     try {
-//      const user = await getCurrentUser();
-      const user = await getMe();
-      setCurrentUser(user);
-    } catch (error) {
-      console.error(
-        "Erreur lors de la récupération de l'utilisateur :",
-        error,
-      );
+      const response = await getMe();
+      setCurrentUser(response.traveler);
+    } catch {
       setCurrentUser(null);
     }
   }
 
-  async function login(username: string, password: string) {
-    const user = await apiLogin(username, password);
-    setCurrentUser(user);
-  }
-
-  function logout() {
-    setCurrentUser(null);
-  }
-
   useEffect(() => {
     async function initializeAuth() {
-      try {
-        await refreshUser();
-      } finally {
-        setIsLoading(false);
-      }
+      await refreshUser();
+      setIsLoading(false);
     }
 
     initializeAuth();
@@ -66,9 +44,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         currentUser,
+        setCurrentUser,
         isLoading,
-        login,
-        logout,
         refreshUser,
       }}
     >
