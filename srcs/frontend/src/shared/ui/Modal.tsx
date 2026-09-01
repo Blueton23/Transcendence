@@ -5,6 +5,9 @@ import IconButton from "./IconButton";
 import type { ReactNode } from "react";
 import { iconColor } from "./iconColor";
 import Text from "./Text";
+import { useOnClickOutside } from "../hooks/useOnClickOutside";
+import { useRef } from "react";
+import { useEscapeKey } from "../hooks/useEscapeKey";
 
 interface ModalProps {
   children: ReactNode;
@@ -49,9 +52,13 @@ const cardDesktop =
   "md:h-auto md:max-h-[90dvh] md:max-w-2xl md:rounded-lg md:shadow-lg md:overflow-hidden";
 
 function Modal({ icon, title, subtitle, children, onClose }: ModalProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(cardRef, onClose);
+  useEscapeKey(onClose);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim">
-      <div className={`${cardBase} ${cardDesktop} ${cardMobile}`}>
+      <div ref={cardRef} className={`${cardBase} ${cardDesktop} ${cardMobile}`}>
         <ModalHeader
           icon={icon}
           title={title}
