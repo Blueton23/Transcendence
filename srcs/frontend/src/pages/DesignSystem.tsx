@@ -12,6 +12,7 @@ import Divider from "../shared/ui/Divider";
 import Input from "../shared/ui/Input";
 import Tag from "../shared/ui/Tag";
 import Icon, { iconNames } from "../shared/ui/Icon";
+import { DatePicker } from "../shared/ui/DatePicker";
 
 /* page de Design System */
 
@@ -349,6 +350,14 @@ function DesignSystem() {
             </Text>
             <Text tone="muted">· par Damien</Text>
           </span>
+        </Specimen>
+      </Section>
+
+      <Section name="Calendrier" role="choix de dates">
+        <Specimen label="2 mois range">
+          <Card className="flex justify-center p-4">
+            <DatePicker />
+          </Card>
         </Specimen>
       </Section>
     </div>
