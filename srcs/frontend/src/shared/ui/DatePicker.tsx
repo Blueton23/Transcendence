@@ -1,22 +1,26 @@
-import { useState } from "react";
-import { DayPicker, type DateRange } from "@daypicker/react";
+import { DayPicker, type DateRange, type Matcher } from "@daypicker/react";
 import "./DatePicker.css";
 import { fr } from "@daypicker/react/locale";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 
-export function DatePicker() {
-  const [selected, setSelected] = useState<DateRange>();
+interface DatePickerProps {
+  selected: DateRange | undefined;
+  onSelect: (range: DateRange | undefined) => void;
+  disabled?: Matcher | Matcher[];
+}
+
+export function DatePicker({ selected, onSelect, disabled }: DatePickerProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   return (
     <DayPicker
       locale={fr}
-      animate
       mode="range"
       numberOfMonths={isDesktop ? 2 : 1}
       navLayout="around"
       selected={selected}
-      onSelect={setSelected}
+      onSelect={onSelect}
+      disabled={disabled}
     />
   );
 }
