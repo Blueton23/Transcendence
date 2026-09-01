@@ -6,16 +6,13 @@ import Heading from "../../../shared/ui/Heading";
 import Icon from "../../../shared/ui/Icon";
 import Avatar from "../../../shared/ui/Avatar";
 import Input from "../../../shared/ui/Input";
-
 import { useProfile } from "../hooks/useProfile";
-
-
-import { login } from "../../auth/api/authApi";
 import { useAuth } from "../../auth/context/AuthContext";
+
+
 
 function ProfileCreate() {
   const navigate = useNavigate();
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
@@ -53,7 +50,7 @@ function ProfileCreate() {
         </div>
 
         <Heading level={2} size="md">
-          Créer un compte
+          Créer un profil
         </Heading>
       </div>
 

@@ -6,6 +6,8 @@ import ModalTestPage from "../pages/ModalTestPage";
 import ProfilePage from "../pages/ProfilePage";
 import SignupPage from "../pages/SignupPage";
 
+import AuthTest from "../features/auth/components/AuthTest";
+
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
 }
@@ -18,6 +20,7 @@ function App() {
       <Route path="/" element={<PlaceHolder label="accueil" />} />
       <Route path="/login" element={<PlaceHolder label="login" />} />
       <Route path="/signup" element={<SignupPage/>} />
+      <Route path="/auth-test" element={<AuthTest />} />
       <Route path="/join/:slug" element={<PlaceHolder label="join" />} />
       <Route element={<AppLayout />}>
         <Route path="/profile" element={<ProfilePage/>} />

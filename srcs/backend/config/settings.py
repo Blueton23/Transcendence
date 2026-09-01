@@ -61,6 +61,13 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+
+#A AJOUTER EN PROD SDU
+#SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
+
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [

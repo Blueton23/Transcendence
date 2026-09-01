@@ -1,3 +1,5 @@
+#urls.py
+
 from django.urls import path
 
 from .views import (
@@ -5,6 +7,10 @@ from .views import (
     TravelerCreateView,
     TravelerPingView,
     TravelerUpdateView,
+    LoginView,
+    MeView,
+    LogoutView,
+    CsrfTokenView,
 )
 
 urlpatterns = [
@@ -23,4 +29,17 @@ urlpatterns = [
         TravelerUpdateView.as_view(),
         name="traveler-update",
     ),
+
+    path( "auth/login/", LoginView.as_view(), name="auth-login", ),
+
+    path( "auth/me/", MeView.as_view(), name="auth-me", ),
+
+    path( "auth/logout/", LogoutView.as_view(), name="auth-logout", ),
+
+    path(
+    "auth/csrf/",
+    CsrfTokenView.as_view(),
+    name="auth-csrf", ),
+
+    
 ]
