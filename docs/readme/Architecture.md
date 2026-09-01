@@ -224,6 +224,18 @@ En plus des apps métier (Users, Trips, ...), l'app `common` centralise ce qui e
 - Format d'erreur standardisé pour toutes les API
 - Génération de données de test (seeds)
 
+#### Modèles métier — app `travel` :
+L'app `travel` porte les modèles du roadtrip. Tous héritent de `TimeStampedModel` (`created_at` / `updated_at`) sauf mention contraire.
+
+| Modèle | Rôle | Champs principaux |
+|---|---|---|
+| `Travel` | Un roadtrip | `title`, `start_date`, `end_date` (contrainte : `end_date >= start_date`), `invite_token` (unique, généré), `status` (`current` / `finished`) |
+| `Participation` | Lien traveler ↔ travel | `traveler` (FK), `travel` (FK), `status` (`invited` / `accepted` / `refused` / `left`), `left_at` ; unicité `(traveler, travel)` |
+| `Step` | Une étape ordonnée d'un travel | `travel` (FK), `position`, `nights` (0 = simple halte), `localisation`, `latitude` / `longitude` (optionnels, remplis par la recherche), `deleted_at` (corbeille) |
+
+- `Step` gère une **suppression douce** : `deleted_at` marque l'étape comme dans la corbeille. Le manager expose `Step.objects.alive()` et `Step.objects.trashed()`, et l'instance a `soft_delete()` / `restore()` + la propriété `is_trashed`.
+- Unicité `(travel, position)` restreinte aux étapes vivantes (`deleted_at IS NULL`), pour qu'une étape supprimée ne bloque pas la réutilisation de sa position.
+
 #### Seeds (données de test) :
 - Objectif : remplir rapidement la base avec des données de test réalistes, sans tout créer à la main via l'admin
 - Centralisé dans `common` car l'ordre de création entre apps (dépendances entre modèles, ex: un traveler doit exister avant une friendship) doit être géré à un seul endroit
@@ -231,20 +243,32 @@ En plus des apps métier (Users, Trips, ...), l'app `common` centralise ce qui e
 
 ```
 common/
-├── management/commands/seed.py   # commande "python manage.py seed", orchestre l'ordre de création
+├── management/commands/
+│   ├── seed.py                    # commande "python manage.py seed", orchestre l'ordre de création
+│   └── unseed.py                  # commande "python manage.py unseed", vide les données de seed
 └── seeders/
     ├── traveler.py                # génération pour l'app traveler : seed_travelers(), seed_friendships()
-    └── travel.py                  # génération pour l'app travel : seed_travels(), seed_participations()
+    ├── travel.py                  # génération pour l'app travel : seed_travels(), seed_participations(), seed_steps()
+    └── clear.py                   # clear_seed_data() : suppression partagée par unseed et seed --fresh
 ```
 
 - `seed.py` reste volontairement fin : il appelle uniquement les fonctions `seed_*` de `common/seeders/` dans l'ordre des dépendances
 - Chaque app avec des données à seed a son propre fichier `common/seeders/nom_app.py`, qui expose des fonctions `seed_xxx(fake, ...)` retournant les objets créés
 - Pour seed une nouvelle app : créer `common/seeders/nom_app.py`, puis appeler ses fonctions depuis `seed.py` dans le bon ordre de dépendance
 
+#### Nettoyage des seeds :
+- Les lignes seedées ne sont pas taguées en base : `unseed` vide donc **tout le domaine** (travels, steps, participations, friendships, travelers). Les superusers sont conservés par défaut pour garder l'accès admin.
+- `clear_seed_data()` (dans `common/seeders/clear.py`) est la fonction partagée ; elle renvoie un dict `{label: nombre_supprimé}`.
+- `unseed` demande une confirmation ; `--yes` la saute, `--all-travelers` supprime aussi les superusers.
+- `seed --fresh` appelle `clear_seed_data()` avant de re-générer : reset + reseed en une commande.
+
 | Commande | Description |
 |---|---|
 | `docker compose exec backend python manage.py seed --travelers 20 --friendships 10 --travels 10 --participations 30` | Crée 20 travelers, 10 friendships, 10 travels et 30 participations aléatoires |
 | `make seed ARGS="--travelers 50 --friendships 30 --travels 20 --participations 60"` | Équivalent via le Makefile |
+| `make seed ARGS="--fresh --travelers 50"` | Vide les seeds existants (superusers gardés) puis re-seed |
+| `make unseed ARGS="--yes"` | Supprime toutes les données de seed (superusers gardés) |
+| `make unseed ARGS="--yes --all-travelers"` | Idem en supprimant aussi les superusers |
 
 #### Server ASGI :
 - Point d’entrée pour les serveurs Web compatibles aSGI pour déployer le projet
@@ -435,7 +459,8 @@ Explication nginx.conf :
 | `make migrate` | Applique les migrations Django dans la base de données |
 | `make startapp` | Permet de créer une app django -> "make startapp name=nom_app" |
 | `make createsuperuser` | Creer le super-utilisateur |
-| `make seed` | Génère les seed pour remplir la DB -> "make seed ARGS=--{table} {quantitée}" |
+| `make seed` | Génère les seed pour remplir la DB -> "make seed ARGS=--{table} {quantitée}" (ajouter `--fresh` pour vider avant) |
+| `make unseed` | Vide les données de seed -> "make unseed ARGS=--yes" (superusers gardés, `--all-travelers` pour tout supprimer) |
 | `make shell` | Ouvre le shell Python avec l’environnement Django chargé |
 | `make check` | Permet de controler avant une migration si aucune erreur dans les settings |
 | `make format-back` | Corrige le format au niveau du code backend dans les fichiers, utilise ruff |

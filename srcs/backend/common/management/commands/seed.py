@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandParser
 from faker import Faker
 
+from common.seeders.clear import clear_seed_data
 from common.seeders.travel import seed_participations, seed_steps, seed_travels
 from common.seeders.traveler import seed_friendships, seed_travelers
 
@@ -16,9 +17,18 @@ class Command(BaseCommand):
         parser.add_argument("--travels", type=int, default=10)
         parser.add_argument("--participations", type=int, default=30)
         parser.add_argument("--steps-per-travel", type=int, default=4)
+        parser.add_argument(
+            "--fresh",
+            action="store_true",
+            help="Wipe existing seed data (keeping superusers) before seeding.",
+        )
 
     def handle(self, *args: object, **options: object) -> None:
         fake = Faker()
+
+        if options["fresh"]:
+            deleted = clear_seed_data()
+            self.stdout.write(f"Cleared {sum(deleted.values())} existing rows.")
 
         travelers = seed_travelers(fake, options["travelers"])
         self.stdout.write(f"Created {len(travelers)} travelers.")
