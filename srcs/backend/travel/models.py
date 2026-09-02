@@ -135,7 +135,7 @@ class Step(TimeStampedModel):
     )
     deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
-    objects = StepQuerySet.as_manager()
+    objects = StepQuerySet.as_manager() # for soft delete convenience
 
     class Meta:
         ordering: ClassVar[list] = ["position"]
