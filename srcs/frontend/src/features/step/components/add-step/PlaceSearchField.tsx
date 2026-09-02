@@ -8,6 +8,7 @@ interface PlaceSearchFieldProps {
   onChange: ChangeEventHandler<HTMLInputElement>;
   onBlur: FocusEventHandler<HTMLInputElement>;
   onFocus: FocusEventHandler<HTMLInputElement>;
+  onCalendarClick: () => void;
 }
 
 export function PlaceSearchField({
@@ -15,6 +16,7 @@ export function PlaceSearchField({
   onChange,
   onBlur,
   onFocus,
+  onCalendarClick,
 }: PlaceSearchFieldProps) {
   return (
     <div className="flex items-center gap-2 rounded-md bg-surface px-3 py-2">
@@ -28,7 +30,14 @@ export function PlaceSearchField({
         placeholder="Où vous arrêtez-vous ensuite ?"
       ></input>
       <Divider orientation="vertical" />
-      <IconButton icon={<Icon name="cal" />} label="cal" variant="ghost" />
+      <IconButton
+        icon={<Icon name="cal" />}
+        label="cal"
+        variant="ghost"
+        disabled={value === ""}
+        onClick={onCalendarClick}
+        onMouseDown={(event) => event.stopPropagation()}
+      />
     </div>
   );
 }
