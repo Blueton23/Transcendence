@@ -1,6 +1,6 @@
 import type { Step } from "@/features/step/types";
 
-//TOD(branchement): fonction en dur pour le moment. A terme: async, rprend travelId en param, fetch reel et mapping API
+//TODO(branchement): fonction en dur pour le moment. A terme: async, rprend travelId en param, fetch reel et mapping API
 // pour convertir les champs Decimal de DRF en number
 export function getSteps(): Step[] {
   return [

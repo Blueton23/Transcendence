@@ -6,7 +6,7 @@ interface PlaceSuggestionsProps {
   onSelect: (lieu: string) => void;
 }
 
-export function PlaceSuggestions({ items, onSelect}: PlaceSuggestionsProps) {
+export function PlaceSuggestions({ items, onSelect }: PlaceSuggestionsProps) {
   return (
     <div className="absolute z-10 mt-2 flex w-full flex-col rounded-md bg-surface py-2">
       {items.length > 0 ? (
