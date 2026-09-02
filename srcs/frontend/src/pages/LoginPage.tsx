@@ -1,15 +1,9 @@
-import Connexion from "../features/auth/components/connexion";
+import Login from "../features/auth/components/login";
 
 function LoginPage() {
   return (
     <main className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-3xl">
-        <h1 className="text-3xl font-bold mb-6">
-          Connexion
-        </h1>
-
-        <Connexion />
-      </div>
+        <Login />
     </main>
   );
 }

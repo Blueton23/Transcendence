@@ -6,14 +6,16 @@ import {
   type ReactNode,
 } from "react";
 
-import { getMe } from "../api/auth";
 import type { User } from "../types";
+import { getMe } from "../api/auth";
+import { logout as logoutApi} from "../api/auth";
 
 interface AuthContextType {
   currentUser: User | null;
-  setCurrentUser: (user: User | null) => void;
   isLoading: boolean;
+  setCurrentUser: (user: User | null) => void;
   refreshUser: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,6 +31,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       setCurrentUser(null);
     }
+  }
+
+  async function logout() {
+    await logoutApi();
+    setCurrentUser(null);
   }
 
   useEffect(() => {
@@ -47,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCurrentUser,
         isLoading,
         refreshUser,
+        logout,
       }}
     >
       {children}

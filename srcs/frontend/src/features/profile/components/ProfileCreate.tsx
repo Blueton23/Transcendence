@@ -4,6 +4,10 @@ import { useNavigate } from "react-router";
 import { signup, login } from "../../auth/api/auth";
 import { useAuth } from "../../auth/context/AuthContext";
 
+import Button from "../../../shared/ui/Button";
+import Heading from "../../../shared/ui/Heading";
+import Input from "../../../shared/ui/Input";
+
 function SignupPage() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
@@ -79,90 +83,141 @@ function SignupPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-3xl">
-        <h1 className="text-3xl font-bold mb-6">
+    <div className="w-full">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface">
+          <span className="text-xl">✦</span>
+        </div>
+
+        <Heading level={2} size="md">
           Créer un compte
-        </h1>
+        </Heading>
+      </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
-        >
-          <input
-            name="first_name"
-            type="text"
-            placeholder="Prénom"
-            value={form.first_name}
-            onChange={handleChange}
-            required
-          />
+      {/* Formulaire */}
+      <form
+        onSubmit={handleSubmit}
+        className="mt-7 flex flex-col gap-4"
+      >
+        {/* Prénom / Nom */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-semibold text-text-secondary">
+              Prénom
+            </span>
 
-          <input
-            name="last_name"
-            type="text"
-            placeholder="Nom"
-            value={form.last_name}
-            onChange={handleChange}
-            required
-          />
+            <Input
+              name="first_name"
+              type="text"
+              value={form.first_name}
+              onChange={handleChange}
+              required
+            />
+          </label>
 
-          <input
+          <label className="flex flex-col gap-2">
+            <span className="text-sm font-semibold text-text-secondary">
+              Nom
+            </span>
+
+            <Input
+              name="last_name"
+              type="text"
+              value={form.last_name}
+              onChange={handleChange}
+              required
+            />
+          </label>
+        </div>
+
+        {/* Nom d'utilisateur */}
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Nom d'utilisateur
+          </span>
+
+          <Input
             name="username"
             type="text"
-            placeholder="Nom d'utilisateur"
             value={form.username}
             onChange={handleChange}
+            variant="mono"
             required
           />
+        </label>
 
-          <input
+        {/* Email */}
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Email
+          </span>
+
+          <Input
             name="email"
             type="email"
-            placeholder="Email"
             value={form.email}
             onChange={handleChange}
             required
           />
+        </label>
 
-          <input
+        {/* Mot de passe */}
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Mot de passe
+          </span>
+
+          <Input
             name="password"
             type="password"
-            placeholder="Mot de passe"
             value={form.password}
             onChange={handleChange}
+            variant="mono"
             minLength={8}
             required
           />
+        </label>
 
-          <input
+        {/* Confirmation du mot de passe */}
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Confirmer le mot de passe
+          </span>
+
+          <Input
             name="password_confirmation"
             type="password"
-            placeholder="Confirmer le mot de passe"
             value={form.password_confirmation}
             onChange={handleChange}
+            variant="mono"
             minLength={8}
             required
           />
+        </label>
 
-          {error && (
-            <p className="text-red-600">
-              {error}
-            </p>
-          )}
+        {/* Erreur */}
+        {error && (
+          <p className="text-sm font-medium text-red-500">
+            {error}
+          </p>
+        )}
 
-          <button
+        {/* Bouton */}
+        <div className="mt-3">
+          <Button
             type="submit"
+            variant="primary"
+            className="w-full rounded-full py-3"
             disabled={isSubmitting}
-            className="rounded px-4 py-2 bg-black text-white disabled:opacity-50"
           >
             {isSubmitting
               ? "Création..."
               : "Créer mon compte"}
-          </button>
-        </form>
-      </div>
-    </main>
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
 

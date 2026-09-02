@@ -31,6 +31,33 @@ function getCookie(name: string): string | null {
   return null;
 }
 
+//SDU : les messages sont en anglais
+function getApiErrorMessage(result: unknown): string {
+  if (typeof result === "string") {
+    return result;
+  }
+
+  if (typeof result === "object" && result !== null) {
+    const errors = result as Record<string, unknown>;
+
+    if (typeof errors.detail === "string") {
+      return errors.detail;
+    }
+
+    return Object.entries(errors)
+      .map(([field, message]) => {
+        if (Array.isArray(message)) {
+          return `${field} : ${message.join(", ")}`;
+        }
+
+        return `${field} : ${String(message)}`;
+      })
+      .join("\n");
+  }
+
+  return "Impossible de créer le compte.";
+}
+
 export async function signup(data: SignupData): Promise<AuthResponse> {
   await getCsrfToken();
 
@@ -55,7 +82,8 @@ export async function signup(data: SignupData): Promise<AuthResponse> {
   if (!response.ok) {
     throw new Error(
 //      result.detail || "Impossible de créer le compte.",
-      result.detail || JSON.stringify(result),
+//      result.detail || JSON.stringify(result),
+        getApiErrorMessage(result)
     );
   }
 
