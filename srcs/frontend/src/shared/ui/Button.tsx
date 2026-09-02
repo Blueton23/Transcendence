@@ -17,7 +17,7 @@ const variantStyles = {
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-bold text-sm tracking-wide";
+  "cursor-pointer inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-bold text-sm tracking-wide";
 
 function Button({
   children,
