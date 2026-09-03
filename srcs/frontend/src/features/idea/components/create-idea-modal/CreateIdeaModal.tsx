@@ -131,7 +131,7 @@ export function CreateIdeaModal({
           className="mb-3"
         />
 
-         {isAccommodation && (
+        {isAccommodation && (
           <>
             <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
               Dates du séjour
