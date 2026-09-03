@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import Modal from "../shared/ui/Modal";
 
-function ModalTestPage() {
+function ModalDemo() {
   const navigate = useNavigate();
   return (
     <Modal
@@ -14,4 +14,4 @@ function ModalTestPage() {
     </Modal>
   );
 }
-export default ModalTestPage;
+export default ModalDemo;
