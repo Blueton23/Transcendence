@@ -14,6 +14,7 @@ import Tag from "../shared/ui/Tag";
 import Icon, { iconNames } from "../shared/ui/Icon";
 import { DatePicker } from "../shared/ui/DatePicker";
 import type { DateRange } from "@daypicker/react";
+import { DropdownDemo } from "./DropdownDemo";
 
 /* page de Design System */
 
@@ -360,6 +361,11 @@ function DesignSystem() {
           <Card className="flex justify-center p-4">
             <DatePicker selected={selected} onSelect={setSelected} />
           </Card>
+        </Specimen>
+      </Section>
+      <Section name="DropDown" role="menu cacher avec les ...">
+        <Specimen label="menu a choix">
+          <DropdownDemo />
         </Specimen>
       </Section>
     </div>
