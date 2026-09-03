@@ -27,7 +27,10 @@ export interface AuthResponse {
   traveler: User;
 }
 
+//a supprimer SDU
+/*
 export interface ApiError {
   detail?: string;
   [key: string]: unknown;
 }
+*/

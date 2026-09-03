@@ -7,13 +7,25 @@ import Avatar from "../../../shared/ui/Avatar";
 import ProfileModify from "./ProfileModify"
 
 import { useAuth } from "../../auth/context/AuthContext";
+import { useNavigate } from "react-router";
 
 
 function ProfileInfo() {
     const [isModifierOpen, setIsModifierOpen] = useState(false);
     const {currentUser} = useAuth();
+    const navigate = useNavigate();
+    const { logout } = useAuth();
 
     console.log("SDU curent :", currentUser)
+
+    async function handleLogout() {
+        try {
+          await logout();
+          navigate("/signup", { replace: true });
+        } catch (error) {
+          console.error("Erreur lors de la déconnexion :", error);
+        }
+      }
 
     return(
     <>
@@ -39,6 +51,12 @@ function ProfileInfo() {
             <div className="ml-auto">
             <Button variant="primary" className="mt-4" onClick={() => setIsModifierOpen(true)} >
                 Modifier le profil
+            </Button>
+            <Button
+            variant="outline"
+            onClick={handleLogout}
+            >
+                Se déconnecter
             </Button>
             </div>
         </div>

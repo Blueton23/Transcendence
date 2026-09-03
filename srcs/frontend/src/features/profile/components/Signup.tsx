@@ -24,9 +24,7 @@ function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleChange(
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setForm((previous) => ({

@@ -1,4 +1,4 @@
-import ProfileCreate from "../features/profile/components/ProfileCreate";
+import ProfileCreate from "../features/profile/components/Signup";
 
 function SignupPage() {
   return (
