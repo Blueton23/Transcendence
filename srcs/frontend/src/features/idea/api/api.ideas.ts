@@ -53,7 +53,7 @@ export function getIdeas(): Idea[] {
       id: 3,
       travelId: 1,
       travelerId: 1,
-      stepId: 1,
+      stepId: null,
       chosenBy: 2,
       title: "Rando du Bachalpsee",
       type: "activity",

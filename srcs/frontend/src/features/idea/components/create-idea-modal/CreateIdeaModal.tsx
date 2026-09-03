@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { TypeSelector } from "./TypeSelector";
+import { DatePicker } from "../../../../shared/ui/DatePicker";
+import { formatDateToISO } from "../../utils/formatDate";
+import type { IdeaType, CreateIdeaInput } from "../../types";
+import type { DateRange } from "@daypicker/react";
 import Modal from "../../../../shared/ui/Modal";
 import Text from "../../../../shared/ui/Text";
 import Select from "../../../../shared/ui/Select";
-import { TypeSelector } from "./TypeSelector";
-import type { IdeaType, CreateIdeaInput } from "../../types";
 import Input from "../../../../shared/ui/Input";
 import Button from "../../../../shared/ui/Button";
 
@@ -29,8 +32,9 @@ export function CreateIdeaModal({
   const [url, setUrl] = useState("");
   const [note, setNote] = useState("");
   const [pricePerNight, setPricePerNight] = useState("");
-  const [arrivalDate, setArrivalDate] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
+
+  const isAccommodation = type === "accommodation";
 
   return (
     <Modal
@@ -52,9 +56,17 @@ export function CreateIdeaModal({
             localisation: null,
             latitude: null,
             longitude: null,
-            pricePerNight: null,
-            arrivalDate: null,
-            departureDate: null,
+            pricePerNight:
+              isAccommodation && pricePerNight !== "" 
+                ? Number(pricePerNight) : null,
+            arrivalDate:
+              isAccommodation && dateRange?.from
+                ? formatDateToISO(dateRange.from)
+                : null,
+            departureDate:
+              isAccommodation && dateRange?.to
+                ? formatDateToISO(dateRange.to)
+                : null,
           };
 
           onCreate(input);
@@ -118,6 +130,30 @@ export function CreateIdeaModal({
           onChange={(event) => setNote(event.target.value)}
           className="mb-3"
         />
+
+         {isAccommodation && (
+          <>
+            <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+              Dates du séjour
+            </Text>
+            <DatePicker selected={dateRange} onSelect={setDateRange} />
+
+            <Text
+              tone="primary"
+              size="sm"
+              className="mb-1 mt-3 text-xs sm:text-sm"
+            >
+              Prix par nuit
+            </Text>
+            <Input
+              variant="default"
+              type=""
+              value={pricePerNight}
+              onChange={(event) => setPricePerNight(event.target.value)}
+              className="mb-3"
+            />
+          </>
+        )}
 
         <Button type="submit" variant="primary" className="w-full" disabled={title.trim() === ""} >
           Enregistrer
