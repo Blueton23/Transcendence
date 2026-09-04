@@ -1,14 +1,10 @@
 import { useState } from "react";
-import type { Idea, CreateIdeaInput } from "../types";
-import { getIdeas, voteIdea, placeIdea, createIdea } from "../api/api.ideas";
+import type { Idea, CreateIdeaInput, PlaceIdeaInput, } from "../types";
+import { getIdeas, createIdea, placeIdea, voteIdea, } from "../api/api.ideas";
 
 //gère plusieurs idées
 export function useIdeas() {
   const [ideas, setIdeas] = useState<Idea[]>(() => getIdeas());
-
-  function handleVote(ideaId: Idea["id"]) {
-    voteIdea(ideaId);
-  }
 
   function handleCreateIdea(input: CreateIdeaInput) {
     const newIdea = createIdea(input);
@@ -16,8 +12,9 @@ export function useIdeas() {
     setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
   }
 
-  function handlePlaceIdea(ideaId: Idea["id"], stepId: number) {
-    placeIdea(ideaId, stepId);
+  function handlePlaceIdea(ideaId: Idea["id"], stepId: number | null) {
+    const input: PlaceIdeaInput = { stepId, };
+    placeIdea(ideaId, input);
 
     setIdeas((currentIdeas) =>
       currentIdeas.map((idea) =>
@@ -26,11 +23,22 @@ export function useIdeas() {
     );
   }
 
+  function handleDeleteIdea(ideaId: Idea["id"]) {
+    setIdeas((currentIdeas) =>
+      currentIdeas.filter((idea) => idea.id !== ideaId),
+    );
+  }
+
+  function handleVote(ideaId: Idea["id"]) {
+    voteIdea(ideaId);
+  }
+
   //tableau d'idées
   return {
     ideas,
-    handleVote,
-    handlePlaceIdea,
     handleCreateIdea,
+    handlePlaceIdea,
+    handleDeleteIdea,
+    handleVote,
   };
 }

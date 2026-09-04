@@ -16,7 +16,7 @@ export function IdeaOptionsMenu({
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <div>
+    <div className="relative">
       <IconButton
         icon={<Icon name="dots" size={18} />}
         label="Options de l'idée"

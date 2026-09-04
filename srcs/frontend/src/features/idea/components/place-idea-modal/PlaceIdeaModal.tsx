@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ideaIcons } from "../IdeaCard";
 import type { Idea } from "../../types";
-import type { StepOption, CreateIdeaModal } from "../create-idea-modal/CreateIdeaModal";
+import type { StepOption } from "../create-idea-modal/CreateIdeaModal";
 import Modal from "../../../../shared/ui/Modal";
 import Text from "../../../../shared/ui/Text";
 import Select from "../../../../shared/ui/Select";
@@ -9,9 +9,6 @@ import Input from "../../../../shared/ui/Input";
 import Button from "../../../../shared/ui/Button";
 import Icon from "../../../../shared/ui/Icon";
 import Chip from "../../../../shared/ui/Chip";
-import { DatePicker } from "../../../../shared/ui/DatePicker";
-import { formatDateToISO } from "../../utils/formatDate";
-import type { DateRange } from "@daypicker/react";
 
 const ideaTypeLabels = {
   restaurant: "Restaurant",
@@ -34,6 +31,7 @@ export function PlaceIdeaModal({
   onPlace,
 }: PlaceIdeaModalProps) {
   const [stepId, setStepId] = useState<number | null>(null);
+  const isAccommodation = idea.type === "accommodation";
 
   return (
     <Modal
@@ -111,28 +109,42 @@ export function PlaceIdeaModal({
       />
 
       {isAccommodation && (
-          <>
-            <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
-              Dates du séjour
-            </Text>
-            <DatePicker selected={dateRange} onSelect={setDateRange} />
+        <>
+          <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+            Date d'arrivée
+          </Text>
 
-            <Text
-              tone="primary"
-              size="sm"
-              className="mb-1 mt-3 text-xs sm:text-sm"
-            >
-              Prix par nuit
-            </Text>
-            <Input
-              variant="default"
-              type=""
-              value={pricePerNight}
-              onChange={(event) => setPricePerNight(event.target.value)}
-              className="mb-3"
-            />
-          </>
-        )}
+          <Input
+            value={idea.arrivalDate ?? ""}
+            readOnly
+            className="mb-2 cursor-default bg-surface-soft text-muted"
+          />
+
+          <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+            Date de départ
+          </Text>
+
+          <Input
+            value={idea.departureDate ?? ""}
+            readOnly
+            className="mb-2 cursor-default bg-surface-soft text-muted"
+          />
+
+          <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+            Prix par nuit
+          </Text>
+
+          <Input
+            value={
+            idea.pricePerNight !== null
+            ? `${idea.pricePerNight} CHF`
+            : ""
+          }
+            readOnly
+          className="mb-3 cursor-default bg-surface-soft text-muted"
+          />
+        </>
+      )}
 
       <Button
         variant="primary"
@@ -142,7 +154,6 @@ export function PlaceIdeaModal({
           if (stepId === null) {
             return;
           }
-
           onPlace(idea.id, stepId);
           onClose();
         }}

@@ -43,3 +43,8 @@ export interface CreateIdeaInput {
   url: string | null;
   note: string | null;
 }
+
+// Représente ce que l’utilisateur saisit dans la modal “Placer”
+export interface PlaceIdeaInput {
+  stepId: number | null;
+}

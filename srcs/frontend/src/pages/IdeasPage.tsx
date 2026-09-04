@@ -26,16 +26,16 @@ const mockTravelers = [
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
-  const { ideas, handleVote, handlePlaceIdea, handleCreateIdea, } = useIdeas();
+  const { ideas, handleCreateIdea, handlePlaceIdea, handleDeleteIdea , handleVote, } = useIdeas();
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
   const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
 
+  const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
+
   const [ideaToPlaceId, setIdeaToPlaceId] = useState<number | null>(null);
   const ideaToPlace = ideas.find((idea) => idea.id === ideaToPlaceId);
-
-  const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
 
   return (
     <div className="px-4 sm:px-8 pt-8">
@@ -85,8 +85,8 @@ export function IdeasPage() {
             onVote={() => handleVote(idea.id)}
             onPlace={() => setIdeaToPlaceId(idea.id)}
             onView={() => (null)}
-            onEdit={() => (null)}
-            onDelete={() => (null)}
+            onEdit={() => console.log("Modifier", idea.id)}
+            onDelete={() => handleDeleteIdea(idea.id)}
           />
         );
       })}
