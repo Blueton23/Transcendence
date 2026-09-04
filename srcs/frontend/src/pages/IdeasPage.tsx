@@ -4,8 +4,8 @@ import { IdeaCard } from "../features/idea/components/IdeaCard";
 import { PinIdeaButton } from "../features/idea/components/page/PinIdeaButton";
 import { IdeaTypeFilter } from "../features/idea/components/page/IdeaTypeFilter";
 import { IdeaStepFilter } from "../features/idea/components/page/IdeaStepFilter";
-import { CreateIdeaModal } from "../features/idea/components/CreateIdeaModal";
-import { PlaceIdeaModal } from "../features/idea/components/PlaceIdeaModal";
+import { CreateIdeaModal } from "../features/idea/components/create-idea/CreateIdeaModal";
+import { PlaceIdeaModal } from "../features/idea/components/place-idea/PlaceIdeaModal";
 import type { IdeaFilter, StepFilter } from "../features/idea/types";
 import { filterIdeas } from "../features/idea/utils/filterIdeas";
 import Heading from "../shared/ui/Heading";
@@ -13,20 +13,26 @@ import Text from "../shared/ui/Text";
 
 //A SUPPRIMER, mettre useStep dans la foncton princiale et dans le .map
 const mockSteps = [
-  { id: 1, name: "Interlaken", },
-  { id: 2, name: "Zermatt", },
+  { id: 1, name: "Interlaken" },
+  { id: 2, name: "Zermatt" },
 ];
 
 const mockTravelers = [
-  { id: 1, name: "David", initials: "DL", },
-  { id: 2, name: "Alice", initials: "AM", },
+  { id: 1, name: "David", initials: "DL" },
+  { id: 2, name: "Alice", initials: "AM" },
 ];
 
 /*----------------------------------------------------------------------------------*/
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
-  const { ideas, handleCreateIdea, handlePlaceIdea, handleDeleteIdea , handleVote, } = useIdeas();
+  const {
+    ideas,
+    handleCreateIdea,
+    handlePlaceIdea,
+    handleDeleteIdea,
+    handleVote,
+  } = useIdeas();
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
@@ -38,7 +44,7 @@ export function IdeasPage() {
   const ideaToPlace = ideas.find((idea) => idea.id === ideaToPlaceId);
 
   return (
-    <div className="px-4 sm:px-8 pt-8">
+    <div className="px-4 pt-8 sm:px-8">
       <div className="mb-6 flex items-center justify-between">
         <Heading level={1} size="lg">
           Idées
@@ -70,8 +76,9 @@ export function IdeasPage() {
       {filteredIdeas.map((idea) => {
         const step = mockSteps.find((step) => step.id === idea.stepId);
 
-      const proposer = mockTravelers.find(
-        (traveler) => traveler.id === idea.travelerId);
+        const proposer = mockTravelers.find(
+          (traveler) => traveler.id === idea.travelerId,
+        );
 
         return (
           <IdeaCard
@@ -84,7 +91,7 @@ export function IdeasPage() {
             stepName={step?.name}
             onVote={() => handleVote(idea.id)}
             onPlace={() => setIdeaToPlaceId(idea.id)}
-            onView={() => (null)}
+            onView={() => null}
             onEdit={() => console.log("Modifier", idea.id)}
             onDelete={() => handleDeleteIdea(idea.id)}
           />
@@ -107,10 +114,8 @@ export function IdeasPage() {
           onPlace={handlePlaceIdea}
         />
       )}
-
     </div>
   );
 }
-
 
 //steps={mockSteps}

@@ -9,10 +9,7 @@ interface IdeaOptionsMenuProps {
   onDelete: () => void;
 }
 
-export function IdeaOptionsMenu({
-  onEdit,
-  onDelete,
-}: IdeaOptionsMenuProps) {
+export function IdeaOptionsMenu({ onEdit, onDelete }: IdeaOptionsMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -29,7 +26,7 @@ export function IdeaOptionsMenu({
       {menuOpen && (
         <DropdownMenu
           onClose={() => setMenuOpen(false)}
-          className="right-0 top-full mt-2"
+          className="top-full right-0 mt-2"
         >
           <MenuItem
             icon="edit"

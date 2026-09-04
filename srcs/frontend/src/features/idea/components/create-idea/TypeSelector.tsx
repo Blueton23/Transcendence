@@ -1,6 +1,6 @@
-import Chip from "../../../shared/ui/Chip";
-import Icon from "../../../shared/ui/Icon";
-import type { IdeaType } from "../types";
+import Chip from "../../../../shared/ui/Chip";
+import Icon from "../../../../shared/ui/Icon";
+import type { IdeaType } from "../../types";
 
 interface TypeSelectorProps {
   typeActiveFilter: IdeaType;

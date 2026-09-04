@@ -81,25 +81,18 @@ export function IdeaCard({
 
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 whitespace-nowrap sm:flex-nowrap sm:gap-3">
           <div className="order-1">
-            <VoteButton
-            voteCount={voteCount}
-            voted={voted}
-            onVote={onVote}
-            />
+            <VoteButton voteCount={voteCount} voted={voted} onVote={onVote} />
           </div>
 
           <div className="order-2 sm:order-3">
-            <IdeaOptionsMenu
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
+            <IdeaOptionsMenu onEdit={onEdit} onDelete={onDelete} />
           </div>
 
           <div className="order-3 flex basis-full justify-end sm:order-2 sm:basis-auto">
             <StepButton
-            stepId={idea.stepId}
-            onPlace={onPlace}
-            onView={onView}
+              stepId={idea.stepId}
+              onPlace={onPlace}
+              onView={onView}
             />
           </div>
         </div>

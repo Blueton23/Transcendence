@@ -124,9 +124,7 @@ export function deleteIdea(ideaId: Idea["id"]) {
   console.log(ideaId);
 }
 
-
 // fonction métier pour le bouton de vote
 export function voteIdea(ideaId: Idea["id"]) {
   console.log(ideaId);
 }
-

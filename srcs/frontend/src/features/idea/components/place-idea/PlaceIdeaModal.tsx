@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { ideaIcons } from "./IdeaCard";
-import type { Idea } from "../types";
-import type { StepOption } from "./CreateIdeaModal";
-import Modal from "../../../shared/ui/Modal";
-import Text from "../../../shared/ui/Text";
-import Select from "../../../shared/ui/Select";
-import Input from "../../../shared/ui/Input";
-import Button from "../../../shared/ui/Button";
-import Icon from "../../../shared/ui/Icon";
-import Chip from "../../../shared/ui/Chip";
+import { ideaIcons } from "../IdeaCard";
+import type { Idea } from "../../types";
+import type { StepOption } from "../create-idea/CreateIdeaModal";
+import Modal from "../../../../shared/ui/Modal";
+import Text from "../../../../shared/ui/Text";
+import Select from "../../../../shared/ui/Select";
+import Input from "../../../../shared/ui/Input";
+import Button from "../../../../shared/ui/Button";
+import Icon from "../../../../shared/ui/Icon";
+import Chip from "../../../../shared/ui/Chip";
 
 const ideaTypeLabels = {
   restaurant: "Restaurant",
@@ -49,9 +49,7 @@ export function PlaceIdeaModal({
         value={stepId ?? ""}
         onChange={(event) =>
           setStepId(
-            event.target.value === ""
-              ? null
-              : Number(event.target.value),
+            event.target.value === "" ? null : Number(event.target.value),
           )
         }
         className="mb-4"
@@ -69,11 +67,13 @@ export function PlaceIdeaModal({
         Type
       </Text>
 
-      <Chip disabled className="mb-3 cursor-default bg-surface-soft text-muted focus:border-border-control">
+      <Chip
+        disabled
+        className="mb-3 cursor-default bg-surface-soft text-muted focus:border-border-control"
+      >
         <Icon name={ideaIcons[idea.type]} size={14} />
         {ideaTypeLabels[idea.type]}
       </Chip>
-
 
       <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
         Nom
@@ -136,12 +136,10 @@ export function PlaceIdeaModal({
 
           <Input
             value={
-            idea.pricePerNight !== null
-            ? `${idea.pricePerNight} CHF`
-            : ""
-          }
+              idea.pricePerNight !== null ? `${idea.pricePerNight} CHF` : ""
+            }
             readOnly
-          className="mb-3 cursor-default bg-surface-soft text-muted"
+            className="mb-3 cursor-default bg-surface-soft text-muted"
           />
         </>
       )}

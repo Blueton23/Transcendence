@@ -48,4 +48,3 @@ export interface CreateIdeaInput {
 export interface PlaceIdeaInput {
   stepId: number | null;
 }
-
