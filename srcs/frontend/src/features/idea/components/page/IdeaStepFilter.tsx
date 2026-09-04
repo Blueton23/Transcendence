@@ -1,5 +1,5 @@
-import Chip from "../../../../shared/ui/Chip";
 import type { StepFilter } from "../../types";
+import Chip from "../../../../shared/ui/Chip";
 
 interface IdeaStepFilterProps {
   steps: {

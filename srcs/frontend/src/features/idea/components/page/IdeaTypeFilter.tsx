@@ -1,6 +1,6 @@
+import type { IdeaFilter } from "../../types";
 import Chip from "../../../../shared/ui/Chip";
 import Icon from "../../../../shared/ui/Icon";
-import type { IdeaFilter } from "../../types";
 
 interface IdeaTypeFilterProps {
   typeActiveFilter: IdeaFilter;

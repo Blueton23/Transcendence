@@ -31,6 +31,7 @@ export function IdeasPage() {
     handleCreateIdea,
     handlePlaceIdea,
     handleDeleteIdea,
+    handleEditIdea,
     handleVote,
   } = useIdeas();
 
@@ -39,6 +40,8 @@ export function IdeasPage() {
   const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
 
   const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
+
+  //const [editIdeaModalOpen, setEditIdeaModalOpen] = useState(false);
 
   const [ideaToPlaceId, setIdeaToPlaceId] = useState<number | null>(null);
   const ideaToPlace = ideas.find((idea) => idea.id === ideaToPlaceId);

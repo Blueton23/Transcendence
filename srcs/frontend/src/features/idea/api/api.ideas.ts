@@ -1,4 +1,9 @@
-import type { Idea, CreateIdeaInput, PlaceIdeaInput } from "../types";
+import type {
+  Idea,
+  CreateIdeaInput,
+  PlaceIdeaInput,
+  EditIdeaInput,
+} from "../types";
 
 //récupère plusieurs idées
 export function getIdeas(): Idea[] {
@@ -122,6 +127,10 @@ export function placeIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
 
 export function deleteIdea(ideaId: Idea["id"]) {
   console.log(ideaId);
+}
+
+export function editIdea(ideaId: Idea["id"], input: EditIdeaInput) {
+  console.log(ideaId, input);
 }
 
 // fonction métier pour le bouton de vote

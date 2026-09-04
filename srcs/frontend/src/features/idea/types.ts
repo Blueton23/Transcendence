@@ -48,3 +48,6 @@ export interface CreateIdeaInput {
 export interface PlaceIdeaInput {
   stepId: number | null;
 }
+
+// Représente ce que l’utilisateur saisit dans la modal “Modifier”
+export type EditIdeaInput = CreateIdeaInput;

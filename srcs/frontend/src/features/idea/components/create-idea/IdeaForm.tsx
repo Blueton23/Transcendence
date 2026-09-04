@@ -2,10 +2,10 @@ import { TypeSelector } from "./TypeSelector";
 import { DatePicker } from "../../../../shared/ui/DatePicker";
 import type { IdeaType } from "../../types";
 import type { DateRange } from "@daypicker/react";
+import type { StepOption } from "./CreateIdeaModal";
 import Text from "../../../../shared/ui/Text";
 import Select from "../../../../shared/ui/Select";
 import Input from "../../../../shared/ui/Input";
-import type { StepOption } from "./CreateIdeaModal";
 
 interface IdeaFormProps {
   steps: StepOption[];

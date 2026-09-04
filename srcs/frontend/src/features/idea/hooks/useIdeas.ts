@@ -1,6 +1,17 @@
 import { useState } from "react";
-import type { Idea, CreateIdeaInput, PlaceIdeaInput } from "../types";
-import { getIdeas, createIdea, placeIdea, voteIdea } from "../api/api.ideas";
+import type {
+  Idea,
+  CreateIdeaInput,
+  PlaceIdeaInput,
+  EditIdeaInput,
+} from "../types";
+import {
+  getIdeas,
+  createIdea,
+  placeIdea,
+  voteIdea,
+  editIdea,
+} from "../api/api.ideas";
 
 //gère plusieurs idées
 export function useIdeas() {
@@ -29,6 +40,22 @@ export function useIdeas() {
     );
   }
 
+  function handleEditIdea(ideaId: Idea["id"], input: EditIdeaInput) {
+    editIdea(ideaId, input);
+
+    setIdeas((currentIdeas) =>
+      currentIdeas.map((idea) =>
+        idea.id === ideaId
+          ? {
+              ...idea,
+              ...input,
+              updatedAt: new Date().toISOString(),
+            }
+          : idea,
+      ),
+    );
+  }
+
   function handleVote(ideaId: Idea["id"]) {
     voteIdea(ideaId);
   }
@@ -39,6 +66,7 @@ export function useIdeas() {
     handleCreateIdea,
     handlePlaceIdea,
     handleDeleteIdea,
+    handleEditIdea,
     handleVote,
   };
 }
