@@ -3,9 +3,11 @@ import { VoteButton } from "./card/VoteButton";
 import { StepButton } from "./card/StepButton";
 import { SecondaryInfo } from "./card/SecondaryInfo";
 import { StepLabel } from "./card/StepLabel";
+import { IdeaOptionsMenu } from "./card/IdeaOptionsMenu";
 import Card from "../../../shared/ui/Card";
 import Icon from "../../../shared/ui/Icon";
 import Heading from "../../../shared/ui/Heading";
+import IconButton from "../../../shared/ui/IconButton";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -18,6 +20,8 @@ export interface IdeaCardProps {
   onPlace: () => void;
   onView: () => void;
   onVote: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -43,6 +47,8 @@ export function IdeaCard({
   onPlace,
   onView,
   onVote,
+  onEdit,
+  onDelete,
 }: IdeaCardProps) {
   return (
     <Card>
@@ -73,9 +79,29 @@ export function IdeaCard({
           </div>
         </div>
 
-        <div className="flex shrink-0 flex-col items-end justify-end gap-2 whitespace-nowrap sm:flex-row sm:gap-3">
-          <VoteButton voteCount={voteCount} voted={voted} onVote={onVote} />
-          <StepButton stepId={idea.stepId} onPlace={onPlace} onView={onView} />
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 whitespace-nowrap sm:flex-nowrap sm:gap-3">
+          <div className="order-1">
+            <VoteButton
+            voteCount={voteCount}
+            voted={voted}
+            onVote={onVote}
+            />
+          </div>
+
+          <div className="order-2 sm:order-3">
+            <IdeaOptionsMenu
+              onEdit={onEdit}
+              onDelete={onDelete}
+            />
+          </div>
+
+          <div className="order-3 flex basis-full justify-end sm:order-2 sm:basis-auto">
+            <StepButton
+            stepId={idea.stepId}
+            onPlace={onPlace}
+            onView={onView}
+            />
+          </div>
         </div>
       </div>
     </Card>

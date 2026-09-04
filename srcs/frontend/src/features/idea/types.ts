@@ -29,8 +29,7 @@ export interface Idea {
   note: string | null;
 }
 
-// represente les donnee necessaire pour creer une idee
-// a utiliser dans epingler une idee
+// Représente ce que l’utilisateur saisit dans la modal “Épingler une idée”
 export interface CreateIdeaInput {
   title: string;
   type: IdeaType;

@@ -13,8 +13,13 @@ import Text from "../shared/ui/Text";
 
 //A SUPPRIMER, mettre useStep dans la foncton princiale et dans le .map
 const mockSteps = [
-  { id: 1, name: "Interlaken" },
-  { id: 2, name: "Zermatt" },
+  { id: 1, name: "Interlaken", },
+  { id: 2, name: "Zermatt", },
+];
+
+const mockTravelers = [
+  { id: 1, name: "David", initials: "DL", },
+  { id: 2, name: "Alice", initials: "AM", },
 ];
 
 /*----------------------------------------------------------------------------------*/
@@ -65,18 +70,23 @@ export function IdeasPage() {
       {filteredIdeas.map((idea) => {
         const step = mockSteps.find((step) => step.id === idea.stepId);
 
+      const proposer = mockTravelers.find(
+        (traveler) => traveler.id === idea.travelerId);
+
         return (
           <IdeaCard
             key={idea.id}
             idea={idea}
-            proposerName="David"
-            proposerInitials="DL"
+            proposerName={proposer?.name ?? "Inconnu"}
+            proposerInitials={proposer?.initials ?? "?"}
             voteCount={0}
             voted={false}
             stepName={step?.name}
             onVote={() => handleVote(idea.id)}
             onPlace={() => setIdeaToPlaceId(idea.id)}
             onView={() => (null)}
+            onEdit={() => (null)}
+            onDelete={() => (null)}
           />
         );
       })}
@@ -91,10 +101,10 @@ export function IdeasPage() {
 
       {ideaToPlaceId !== null && (
         <PlaceIdeaModal
-        idea={ideaToPlace}
-        steps={mockSteps}
-        onClose={() => setIdeaToPlaceId(null)}
-        onPlace={handlePlaceIdea}
+          idea={ideaToPlace}
+          steps={mockSteps}
+          onClose={() => setIdeaToPlaceId(null)}
+          onPlace={handlePlaceIdea}
         />
       )}
 
