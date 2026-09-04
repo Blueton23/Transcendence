@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { ideaIcons } from "../IdeaCard";
-import type { Idea } from "../../types";
-import type { StepOption } from "../create-idea-modal/CreateIdeaModal";
-import Modal from "../../../../shared/ui/Modal";
-import Text from "../../../../shared/ui/Text";
-import Select from "../../../../shared/ui/Select";
-import Input from "../../../../shared/ui/Input";
-import Button from "../../../../shared/ui/Button";
-import Icon from "../../../../shared/ui/Icon";
-import Chip from "../../../../shared/ui/Chip";
+import { ideaIcons } from "./IdeaCard";
+import type { Idea } from "../types";
+import type { StepOption } from "./CreateIdeaModal";
+import Modal from "../../../shared/ui/Modal";
+import Text from "../../../shared/ui/Text";
+import Select from "../../../shared/ui/Select";
+import Input from "../../../shared/ui/Input";
+import Button from "../../../shared/ui/Button";
+import Icon from "../../../shared/ui/Icon";
+import Chip from "../../../shared/ui/Chip";
 
 const ideaTypeLabels = {
   restaurant: "Restaurant",

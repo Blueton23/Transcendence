@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { TypeSelector } from "./TypeSelector";
-import { DatePicker } from "../../../../shared/ui/DatePicker";
-import { formatDateToISO } from "../../utils/formatDate";
-import type { IdeaType, CreateIdeaInput } from "../../types";
+import { TypeSelector } from "../utils/TypeSelector";
+import { DatePicker } from "../../../shared/ui/DatePicker";
+import { formatDateToISO } from "../utils/formatDate";
+import type { IdeaType, CreateIdeaInput } from "../types";
 import type { DateRange } from "@daypicker/react";
-import Modal from "../../../../shared/ui/Modal";
-import Text from "../../../../shared/ui/Text";
-import Select from "../../../../shared/ui/Select";
-import Input from "../../../../shared/ui/Input";
-import Button from "../../../../shared/ui/Button";
+import Modal from "../../../shared/ui/Modal";
+import Text from "../../../shared/ui/Text";
+import Select from "../../../shared/ui/Select";
+import Input from "../../../shared/ui/Input";
+import Button from "../../../shared/ui/Button";
 
 export interface StepOption {
   id: number;
