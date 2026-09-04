@@ -8,15 +8,6 @@ from django.utils import timezone
 
 from common.models import TimeStampedModel
 
-# int id PK
-# string Title
-# date StartDate "date de départ"
-# date EndDate "date de fin - borne ferme"
-# string InviteToken UK "lien de partage pour rejoindre"
-# enum Status "ouvert / terminé"
-# datetime CreatedAt
-# datetime UpdatedAt
-
 
 def generate_invite_token() -> str:
     return secrets.token_urlsafe(16)
@@ -51,14 +42,6 @@ class Travel(TimeStampedModel):
         return self.title
 
 
-# Participation
-# int TravelerId PK, FK
-# int TravelId PK, FK
-# enum Status "invité / accepté / refusé / parti"
-# datetime LeftAt "optionnel"
-# datetime CreatedAt
-
-
 class ParticipationStatus(models.TextChoices):
     INVITED = "i", "Invited"
     ACCEPTED = "a", "Accepted"
@@ -66,7 +49,8 @@ class ParticipationStatus(models.TextChoices):
     LEFT = "l", "Left"
 
 
-# TODO trouver un moyen de mettre qu'il y a des msg non lu
+# TODO quand l'app chat serait a faire
+# Pointer vers le last-read + un counter
 class Participation(models.Model):
     traveler = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -97,19 +81,6 @@ class Participation(models.Model):
         return f"{self.traveler} -> {self.travel} ({self.status})"
 
 
-# STEP
-# int id PK
-# int TravelId FK
-# int Position "ordre dans le trajet"
-# int Nights "0 pour une halte"
-# string Localisation
-# decimal Latitude "optionnel - rempli par la recherche"
-# decimal Longitude "optionnel - rempli par la recherche"
-# datetime DeletedAt "optionnel - corbeille"
-# datetime CreatedAt
-# datetime UpdatedAt
-
-
 class StepQuerySet(models.QuerySet):
     def alive(self) -> "StepQuerySet":
         return self.filter(deleted_at__isnull=True)
@@ -124,8 +95,11 @@ class Step(TimeStampedModel):
         on_delete=models.CASCADE,
         related_name="steps",
     )
-    position = models.PositiveIntegerField()
-    nights = models.PositiveIntegerField(default=0)
+    # Ordre relatif entre etapes qui partagent la meme plage de dates.
+    # Null par defaut : utile seulement pour departager un chevauchement.
+    priority = models.PositiveIntegerField(null=True, blank=True)
+    start_date = models.DateField()
+    end_date = models.DateField()
     localisation = models.CharField(max_length=255)
     latitude = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
@@ -138,17 +112,41 @@ class Step(TimeStampedModel):
     objects = StepQuerySet.as_manager()  # for soft delete convenience
 
     class Meta:
-        ordering: ClassVar[list] = ["position"]
+        ordering: ClassVar[list] = ["start_date", "end_date", "priority"]
         constraints: ClassVar[list] = [
+            CheckConstraint(
+                check=Q(end_date__gte=models.F("start_date")),
+                name="step_end_date_gte_start_date",
+            ),
             UniqueConstraint(
-                fields=["travel", "position"],
-                condition=Q(deleted_at__isnull=True),
-                name="unique_step_position_per_travel",
+                fields=["travel", "start_date", "end_date", "priority"],
+                condition=Q(deleted_at__isnull=True, priority__isnull=False),
+                name="unique_step_priority_per_travel_dates",
             ),
         ]
 
     def __str__(self) -> str:
-        return f"{self.travel} #{self.position} - {self.localisation}"
+        return f"{self.travel} - {self.localisation} ({self.start_date} -> {self.end_date})"
+
+    def save(self, *args: object, **kwargs: object) -> None:
+        super().save(*args, **kwargs)
+        update_fields = kwargs.get("update_fields")
+        if update_fields is None or {"start_date", "end_date"} & set(update_fields):
+            self.extend_travel_dates_to_fit()
+
+    # Elargit la plage de dates du travel parent pour englober l'etape.
+    def extend_travel_dates_to_fit(self) -> bool:
+        widened_fields: list[str] = []
+        if self.start_date and self.start_date < self.travel.start_date:
+            self.travel.start_date = self.start_date
+            widened_fields.append("start_date")
+        if self.end_date and self.end_date > self.travel.end_date:
+            self.travel.end_date = self.end_date
+            widened_fields.append("end_date")
+        if not widened_fields:
+            return False
+        self.travel.save(update_fields=[*widened_fields, "updated_at"])
+        return True
 
     @property
     def is_trashed(self) -> bool:

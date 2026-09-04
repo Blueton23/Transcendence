@@ -7,9 +7,10 @@ class StepInline(admin.TabularInline):
     model = Step
     extra = 0
     fields = (
-        "position",
+        "start_date",
+        "end_date",
+        "priority",
         "localisation",
-        "nights",
         "latitude",
         "longitude",
         "deleted_at",
@@ -35,7 +36,14 @@ admin.site.register(Participation, ParticipationAdmin)
 
 
 class StepAdmin(admin.ModelAdmin):
-    list_display = ("travel", "position", "localisation", "nights", "deleted_at")
+    list_display = (
+        "travel",
+        "localisation",
+        "start_date",
+        "end_date",
+        "priority",
+        "deleted_at",
+    )
     list_filter = ("travel",)
     search_fields = ("localisation",)
 
