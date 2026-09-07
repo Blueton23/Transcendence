@@ -4,6 +4,10 @@ import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 import IconButton from "@/shared/ui/IconButton";
 import Icon from "@/shared/ui/Icon";
+import MenuItem from "@/shared/ui/MenuItem";
+import DropdownMenu from "@/shared/ui/DropdownMenu";
+import { useState } from "react";
+import Divider from "@/shared/ui/Divider";
 
 //TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
 // pas un champ stocke dans Step
@@ -20,7 +24,7 @@ const ideaPreviewTones = {
   reserved: "success",
 } as const;
 
-const optionsButtonStyle =
+const StepOptionsStyle =
   "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
 
 function formatNights(nights: number): string {
@@ -30,12 +34,26 @@ function formatNights(nights: number): string {
 }
 
 function StepOptionsButton() {
+  const [isOpen, setIsOpen] = useState(false);
   return (
+    <div className={StepOptionsStyle} onClick={(e) => e.stopPropagation()}>
     <IconButton
       icon={<Icon name="dots" size={16} />}
       label="Options"
-      className={optionsButtonStyle}
+      onClick={() => setIsOpen((v) => !v)}
+      onMouseDown={(e) => e.stopPropagation()}
     />
+    {isOpen && (
+      <DropdownMenu
+        onClose={() => setIsOpen(false)}
+        className="top-full right-0 mt-2"
+      >
+        <MenuItem icon="edit">Modifier étape</MenuItem>
+        <Divider />
+        <MenuItem icon="x" tone="danger">Supprimer l'étape</MenuItem>
+      </DropdownMenu>
+    )}
+    </div>
   );
 }
 

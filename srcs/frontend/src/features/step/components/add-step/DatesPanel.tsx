@@ -26,6 +26,15 @@ export function DatesPanel({
   const cardRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(cardRef, onClose);
   useEscapeKey(onClose);
+
+  const handleDateSelect = (range: DateRange | undefined) => {
+    if (noOvernight && range?.from) {
+      onSelect({from: range.from, to:range.from});
+    } else {
+        onSelect(range);
+    }
+  };
+
   return (
     <div ref={cardRef}>
       <Card
@@ -34,8 +43,8 @@ export function DatesPanel({
       >
         <DatePicker
           selected={selected}
-          onSelect={onSelect}
-          disabled={[noOvernight, { before: new Date() }]}
+          onSelect={handleDateSelect}
+          singleDay={noOvernight}
           // TODO(branchement): borner aussi aux dates du voyage (travel.startDate/endDate) une fois Travel branché
           // TODO(branchement): exclure les dates déjà prises par d'autres étapes (sauf étapes "pas de nuit")
         />

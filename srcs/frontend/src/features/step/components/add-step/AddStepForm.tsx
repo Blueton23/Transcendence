@@ -37,7 +37,7 @@ export function AddStepForm() {
   const handleNoOvernightChange = (checked: boolean) => {
     setNoOvernight(checked);
     if (checked) {
-      setSelected(undefined);
+      setSelected({from: selected.from, to: selected.from});
     }
   };
 
