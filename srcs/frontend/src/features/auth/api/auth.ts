@@ -23,7 +23,6 @@ function getCookie(name: string): string | null {
       return decodeURIComponent(value.join("="));
     }
   }
-
   return null;
 }
 
@@ -32,14 +31,12 @@ function getApiErrorMessage(result: unknown): string {
   if (typeof result === "string") {
     return result;
   }
-
   if (typeof result === "object" && result !== null) {
     const errors = result as Record<string, unknown>;
 
     if (typeof errors.detail === "string") {
       return errors.detail;
     }
-
     return Object.entries(errors)
       .map(([field, message]) => {
         if (Array.isArray(message)) {
@@ -50,7 +47,6 @@ function getApiErrorMessage(result: unknown): string {
       })
       .join("\n");
   }
-
   return "Impossible de créer le compte.";
 }
 

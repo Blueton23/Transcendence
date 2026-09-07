@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { signup, login } from "../../auth/api/auth";
-import { useAuth } from "../../auth/context/AuthContext";
+import { useAuth } from "../../auth/context/useAuth";
 
 import Button from "../../../shared/ui/Button";
 import Heading from "../../../shared/ui/Heading";

@@ -20,7 +20,6 @@ export async function createTraveler(
 
   if (!response.ok) {
     let message = "Impossible de créer le profil.";
-
     try {
       const errorData = await response.json();
 
@@ -32,10 +31,8 @@ export async function createTraveler(
     } catch {
       // Le backend n'a pas renvoyé de JSON.
     }
-
     throw new Error(message);
   }
-
   return response.json();
 }
 
@@ -65,7 +62,6 @@ export async function updateTraveler(
     } catch {
       // Le backend n'a pas renvoyé de JSON.
     }
-
     throw new Error(message);
   }
 

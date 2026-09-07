@@ -16,7 +16,6 @@ from .serializers import (
     TravelerUpdateSerializer,
 )
 
-
 Traveler = get_user_model()
 
 

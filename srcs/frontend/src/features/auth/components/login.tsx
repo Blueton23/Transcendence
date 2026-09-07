@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { login } from "../api/auth";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/useAuth";
 
 import Button from "../../../shared/ui/Button";
 import Card from "../../../shared/ui/Card";
@@ -13,10 +13,8 @@ import Text from "../../../shared/ui/Text";
 function Connexion() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

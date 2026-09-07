@@ -9,14 +9,15 @@ import Avatar from "../../../shared/ui/Avatar";
 import Input from "../../../shared/ui/Input";
 import Divider from "../../../shared/ui/Divider";
 
-import { useAuth } from "../../auth/context/AuthContext";
+import { useAuth } from "../../auth/context/useAuth";
 import { useProfile } from "../hooks/useProfile";
 
 interface ProfileModifyProps {
   onClose: () => void;
 }
 */
-function ProfileModify({ onClose }: ProfileModifyProps) {
+//function ProfileModify({ onClose }: ProfileModifyProps) {
+function ProfileModify() {
   /*  const { currentUser, setCurrentUser } = useAuth();
   const { updateProfile, isLoading, error } = useProfile();
 

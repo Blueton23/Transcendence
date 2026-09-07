@@ -1,24 +1,8 @@
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import type { User } from "../types";
-import { getMe } from "../api/auth";
-import { logout as logoutApi } from "../api/auth";
-
-interface AuthContextType {
-  currentUser: User | null;
-  isLoading: boolean;
-  setCurrentUser: (user: User | null) => void;
-  refreshUser: () => Promise<void>;
-  logout: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+import { getMe, logout as logoutApi } from "../api/auth";
+import { AuthContext } from "./AuthContext";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -60,14 +44,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth doit être utilisé dans un AuthProvider");
-  }
-
-  return context;
 }

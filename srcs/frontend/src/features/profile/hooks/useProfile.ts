@@ -10,12 +10,10 @@ import type {
 
 interface UseProfileReturn {
   createProfile: (data: CreateTravelerData) => Promise<Traveler | null>;
-
   updateProfile: (
     id: number,
     data: UpdateTravelerData,
   ) => Promise<Traveler | null>;
-
   isLoading: boolean;
   error: string | null;
   clearError: () => void;
@@ -33,14 +31,11 @@ export function useProfile(): UseProfileReturn {
 
     try {
       const response = await createTraveler(data);
-
       return response.traveler;
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Une erreur est survenue.";
-
       setError(message);
-
       return null;
     } finally {
       setIsLoading(false);

@@ -1,21 +1,15 @@
-import { useState } from "react";
-
 import Button from "../../../shared/ui/Button";
 import Heading from "../../../shared/ui/Heading";
 import Text from "../../../shared/ui/Text";
 import Avatar from "../../../shared/ui/Avatar";
 import ProfileModify from "./ProfileModify";
 
-import { useAuth } from "../../auth/context/AuthContext";
-import { useNavigate } from "react-router";
+import { useState } from "react";
+import { useAuth } from "../../auth/context/useAuth";
 
 function ProfileInfo() {
   const [isModifierOpen, setIsModifierOpen] = useState(false);
   const { currentUser } = useAuth();
-  const navigate = useNavigate();
-  const { logout } = useAuth();
-
-  console.log("SDU curent :", currentUser);
 
   return (
     <>
@@ -55,5 +49,4 @@ function ProfileInfo() {
     </>
   );
 }
-
 export default ProfileInfo;

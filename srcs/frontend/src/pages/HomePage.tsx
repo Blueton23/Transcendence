@@ -3,7 +3,7 @@ import Heading from "../shared/ui/Heading";
 import Text from "../shared/ui/Text";
 
 import { useNavigate } from "react-router";
-import { useAuth } from "../features/auth/context/AuthContext";
+import { useAuth } from "../features/auth/context/useAuth";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ function HomePage() {
   async function handleLogout() {
     try {
       await logout();
-      navigate("/", { replace: true });
+      console.log("SDU : logout terminé");
     } catch (error) {
       console.error("Erreur lors de la déconnexion :", error);
     }
@@ -25,7 +25,6 @@ function HomePage() {
           <Heading level={1} size="lg">
             Accueil
           </Heading>
-
           <Text tone="secondary">Page temporaire SDU</Text>
         </div>
 
