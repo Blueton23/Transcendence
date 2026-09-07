@@ -20,9 +20,7 @@ function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleChange(
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setForm((previous) => ({
@@ -42,9 +40,7 @@ function SignupPage() {
     }
 
     if (form.password.length < 8) {
-      setError(
-        "Le mot de passe doit contenir au moins 8 caractères.",
-      );
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
 
@@ -68,27 +64,18 @@ function SignupPage() {
 
       navigate("/profile");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Une erreur est survenue.",
-      );
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <main className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-3xl">
-        <h1 className="text-3xl font-bold mb-6">
-          Créer un compte
-        </h1>
+        <h1 className="mb-6 text-3xl font-bold">Créer un compte</h1>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <input
             name="first_name"
             type="text"
@@ -145,20 +132,14 @@ function SignupPage() {
             required
           />
 
-          {error && (
-            <p className="text-red-600">
-              {error}
-            </p>
-          )}
+          {error && <p className="text-red-600">{error}</p>}
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="rounded px-4 py-2 bg-black text-white disabled:opacity-50"
+            className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
           >
-            {isSubmitting
-              ? "Création..."
-              : "Créer mon compte"}
+            {isSubmitting ? "Création..." : "Créer mon compte"}
           </button>
         </form>
       </div>

@@ -37,9 +37,7 @@ function Connexion() {
       navigate("/profile");
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible de se connecter.",
+        err instanceof Error ? err.message : "Impossible de se connecter.",
       );
     } finally {
       setIsSubmitting(false);
@@ -47,13 +45,10 @@ function Connexion() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center p-6">
+    <main className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-3xl">
         <Card variant="default">
-          <form
-            onSubmit={handleSubmit}
-            className="flex flex-col gap-5"
-          >
+          <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-2">
               <Heading level={1} size="lg">
                 Bon retour
@@ -86,17 +81,9 @@ function Connexion() {
               />
             </div>
 
-            {error && (
-              <Text tone="accent">
-                {error}
-              </Text>
-            )}
+            {error && <Text tone="accent">{error}</Text>}
 
-            <Button
-              type="submit"
-              variant="primary"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? "Connexion..." : "Se connecter"}
             </Button>
           </form>

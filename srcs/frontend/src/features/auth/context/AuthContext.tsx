@@ -8,7 +8,7 @@ import {
 
 import type { User } from "../types";
 import { getMe } from "../api/auth";
-import { logout as logoutApi} from "../api/auth";
+import { logout as logoutApi } from "../api/auth";
 
 interface AuthContextType {
   currentUser: User | null;

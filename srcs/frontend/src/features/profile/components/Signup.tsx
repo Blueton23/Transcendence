@@ -44,9 +44,7 @@ function SignupPage() {
     }
 
     if (form.password.length < 8) {
-      setError(
-        "Le mot de passe doit contenir au moins 8 caractères.",
-      );
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
 
@@ -70,11 +68,7 @@ function SignupPage() {
 
       navigate("/profile");
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Une erreur est survenue.",
-      );
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setIsSubmitting(false);
     }
@@ -94,10 +88,7 @@ function SignupPage() {
       </div>
 
       {/* Formulaire */}
-      <form
-        onSubmit={handleSubmit}
-        className="mt-7 flex flex-col gap-4"
-      >
+      <form onSubmit={handleSubmit} className="mt-7 flex flex-col gap-4">
         {/* Prénom / Nom */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-2">
@@ -195,11 +186,7 @@ function SignupPage() {
         </label>
 
         {/* Erreur */}
-        {error && (
-          <p className="text-sm font-medium text-red-500">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-sm font-medium text-red-500">{error}</p>}
 
         {/* Bouton */}
         <div className="mt-3">
@@ -209,9 +196,7 @@ function SignupPage() {
             className="w-full rounded-full py-3"
             disabled={isSubmitting}
           >
-            {isSubmitting
-              ? "Création..."
-              : "Créer mon compte"}
+            {isSubmitting ? "Création..." : "Créer mon compte"}
           </Button>
         </div>
       </form>

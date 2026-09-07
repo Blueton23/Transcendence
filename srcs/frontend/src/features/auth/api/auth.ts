@@ -1,8 +1,4 @@
-import type {
-  AuthResponse,
-  LoginData,
-  SignupData,
-} from "../types";
+import type { AuthResponse, LoginData, SignupData } from "../types";
 
 const API_BASE_URL = "/api";
 
@@ -81,9 +77,9 @@ export async function signup(data: SignupData): Promise<AuthResponse> {
 
   if (!response.ok) {
     throw new Error(
-//      result.detail || "Impossible de créer le compte.",
-//      result.detail || JSON.stringify(result),
-        getApiErrorMessage(result)
+      //      result.detail || "Impossible de créer le compte.",
+      //      result.detail || JSON.stringify(result),
+      getApiErrorMessage(result),
     );
   }
 
@@ -112,9 +108,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      result.detail || "Identifiants invalides.",
-    );
+    throw new Error(result.detail || "Identifiants invalides.");
   }
 
   return result;
@@ -129,9 +123,7 @@ export async function getMe(): Promise<AuthResponse> {
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      result.detail || "Utilisateur non authentifié.",
-    );
+    throw new Error(result.detail || "Utilisateur non authentifié.");
   }
 
   return result;
@@ -155,8 +147,6 @@ export async function logout(): Promise<void> {
   if (!response.ok) {
     const result = await response.json();
 
-    throw new Error(
-      result.detail || "Impossible de se déconnecter.",
-    );
+    throw new Error(result.detail || "Impossible de se déconnecter.");
   }
 }

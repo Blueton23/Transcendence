@@ -1,9 +1,6 @@
 import { useState } from "react";
 
-import {
-  createTraveler,
-  updateTraveler,
-} from "../api/profileApi";
+import { createTraveler, updateTraveler } from "../api/profileApi";
 
 import type {
   CreateTravelerData,
@@ -12,9 +9,7 @@ import type {
 } from "../types";
 
 interface UseProfileReturn {
-  createProfile: (
-    data: CreateTravelerData,
-  ) => Promise<Traveler | null>;
+  createProfile: (data: CreateTravelerData) => Promise<Traveler | null>;
 
   updateProfile: (
     id: number,
@@ -42,9 +37,7 @@ export function useProfile(): UseProfileReturn {
       return response.traveler;
     } catch (err) {
       const message =
-        err instanceof Error
-          ? err.message
-          : "Une erreur est survenue.";
+        err instanceof Error ? err.message : "Une erreur est survenue.";
 
       setError(message);
 
@@ -67,9 +60,7 @@ export function useProfile(): UseProfileReturn {
       return response.traveler;
     } catch (err) {
       const message =
-        err instanceof Error
-          ? err.message
-          : "Une erreur est survenue.";
+        err instanceof Error ? err.message : "Une erreur est survenue.";
 
       setError(message);
 

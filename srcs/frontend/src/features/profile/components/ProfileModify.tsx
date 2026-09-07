@@ -17,7 +17,7 @@ interface ProfileModifyProps {
 }
 */
 function ProfileModify({ onClose }: ProfileModifyProps) {
-/*  const { currentUser, setCurrentUser } = useAuth();
+  /*  const { currentUser, setCurrentUser } = useAuth();
   const { updateProfile, isLoading, error } = useProfile();
 
   console.log("SDU updateProfile = " , updateProfile.first_name);
@@ -69,7 +69,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
   }
 */
   return (
-/*    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+    /*    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-[575px] rounded-[28px] bg-surface-container p-8 shadow-xl">
 
         <div className="flex items-center justify-between">

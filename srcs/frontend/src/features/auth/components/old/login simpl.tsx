@@ -31,9 +31,7 @@ function Connexion() {
       navigate("/profile");
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible de se connecter.",
+        err instanceof Error ? err.message : "Impossible de se connecter.",
       );
     } finally {
       setIsSubmitting(false);
@@ -41,10 +39,7 @@ function Connexion() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-4"
-    >
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       <input
         type="text"
         name="username"
@@ -65,16 +60,12 @@ function Connexion() {
         required
       />
 
-      {error && (
-        <p className="text-red-600">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-red-600">{error}</p>}
 
       <button
         type="submit"
         disabled={isSubmitting}
-        className="rounded px-4 py-2 bg-black text-white disabled:opacity-50"
+        className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
       >
         {isSubmitting ? "Connexion..." : "Se connecter"}
       </button>

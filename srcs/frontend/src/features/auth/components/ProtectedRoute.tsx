@@ -6,21 +6,11 @@ function ProtectedRoute() {
   const location = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="p-6">
-        Chargement...
-      </div>
-    );
+    return <div className="p-6">Chargement...</div>;
   }
 
   if (!currentUser) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-        state={{ from: location }}
-      />
-    );
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   return <Outlet />;

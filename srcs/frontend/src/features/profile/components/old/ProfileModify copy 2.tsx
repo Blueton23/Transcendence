@@ -33,7 +33,8 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
     }
   }, [currentUser]);
 
-  const initials = `${firstName?.charAt(0) ?? ""}${lastName?.charAt(0) ?? ""}`.toUpperCase();
+  const initials =
+    `${firstName?.charAt(0) ?? ""}${lastName?.charAt(0) ?? ""}`.toUpperCase();
 
   const handleSubmit = () => {
     console.log("Données à enregistrer :", {
@@ -51,7 +52,6 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-[575px] rounded-[28px] bg-surface-container p-8 shadow-xl">
-
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -79,20 +79,15 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
             {initials}
           </Avatar>
 
-          <Button
-            variant="outline"
-            icon={<Icon name="image" size={16} />}
-          >
+          <Button variant="outline" icon={<Icon name="image" size={16} />}>
             Changer l'avatar
           </Button>
         </div>
 
         {/* Formulaire */}
         <div className="mt-7 flex flex-col gap-4">
-
           {/* Prénom / Nom */}
           <div className="grid grid-cols-2 gap-4">
-
             <label className="flex flex-col gap-2">
               <span className="text-sm font-semibold text-text-secondary">
                 Prénom
@@ -114,7 +109,6 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
                 onChange={(event) => setLastName(event.target.value)}
               />
             </label>
-
           </div>
 
           {/* Pseudo */}
@@ -178,7 +172,6 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
             Enregistrer
           </Button>
         </div>
-
       </div>
     </div>
   );

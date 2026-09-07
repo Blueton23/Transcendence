@@ -9,8 +9,6 @@ import Input from "../../../shared/ui/Input";
 import { useProfile } from "../hooks/useProfile";
 import { useAuth } from "../../auth/context/AuthContext";
 
-
-
 function ProfileCreate() {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
@@ -20,9 +18,7 @@ function ProfileCreate() {
   const [password, setPassword] = useState("");
 
   const { createProfile, isLoading, error } = useProfile();
-  const { currentUser, setCurrentUser} = useAuth();
-
-  
+  const { currentUser, setCurrentUser } = useAuth();
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -60,19 +56,13 @@ function ProfileCreate() {
           CP
         </Avatar>
 
-        <Button
-          variant="outline"
-          icon={<Icon name="image" size={16} />}
-        >
+        <Button variant="outline" icon={<Icon name="image" size={16} />}>
           Changer l'avatar
         </Button>
       </div>
 
       {/* Formulaire */}
-      <form
-        className="mt-7 flex flex-col gap-4"
-        onSubmit={handleSubmit}
-      >
+      <form className="mt-7 flex flex-col gap-4" onSubmit={handleSubmit}>
         {/* Prénom / Nom */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-2">
@@ -139,11 +129,7 @@ function ProfileCreate() {
         </label>
 
         {/* Erreur */}
-        {error && (
-          <p className="text-sm font-medium text-red-500">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-sm font-medium text-red-500">{error}</p>}
 
         {/* Enregistrer */}
         <div className="mt-3">

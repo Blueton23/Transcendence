@@ -14,14 +14,12 @@ interface ProfileModifyProps {
 }
 
 function ProfileModify({ onClose }: ProfileModifyProps) {
-  const {currentUser} = useAuth();
-  
+  const { currentUser } = useAuth();
+
   const [firstName, setFirstName] = useState(currentUser.first_name);
   const [lastName, setLastName] = useState(currentUser.last_name);
   const [username, setUsername] = useState(currentUser.username);
   const [email, setEmail] = useState(currentUser.email);
-
-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -30,7 +28,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface">
-              <Icon name="edit" size={22}/>
+              <Icon name="edit" size={22} />
             </div>
 
             <Heading level={2} size="md">
@@ -53,10 +51,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
             CP
           </Avatar>
 
-          <Button
-            variant="outline"
-            icon={<Icon name="image" size={16} />}
-          >
+          <Button variant="outline" icon={<Icon name="image" size={16} />}>
             Changer l'avatar
           </Button>
         </div>
@@ -141,10 +136,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
 
         {/* Enregistrer */}
         <div className="mt-7">
-          <Button
-            variant="primary"
-            className="w-full rounded-full py-3"
-          >
+          <Button variant="primary" className="w-full rounded-full py-3">
             Enregistrer
           </Button>
         </div>
