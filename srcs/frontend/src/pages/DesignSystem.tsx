@@ -12,6 +12,9 @@ import Divider from "../shared/ui/Divider";
 import Input from "../shared/ui/Input";
 import Tag from "../shared/ui/Tag";
 import Icon, { iconNames } from "../shared/ui/Icon";
+import { DatePicker } from "../shared/ui/DatePicker";
+import type { DateRange } from "@daypicker/react";
+import { DropdownDemo } from "./DropdownDemo";
 
 /* page de Design System */
 
@@ -52,6 +55,7 @@ function Specimen({ label, children }: SpecimenProps) {
 
 function DesignSystem() {
   const [cat, setCat] = useState("resto");
+  const [selected, setSelected] = useState<DateRange>();
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 p-8">
@@ -349,6 +353,19 @@ function DesignSystem() {
             </Text>
             <Text tone="muted">· par Damien</Text>
           </span>
+        </Specimen>
+      </Section>
+
+      <Section name="Calendrier" role="choix de dates">
+        <Specimen label="2 mois range">
+          <Card className="flex justify-center p-4">
+            <DatePicker selected={selected} onSelect={setSelected} />
+          </Card>
+        </Specimen>
+      </Section>
+      <Section name="DropDown" role="menu cacher avec les ...">
+        <Specimen label="menu a choix">
+          <DropdownDemo />
         </Specimen>
       </Section>
     </div>

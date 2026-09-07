@@ -6,7 +6,7 @@ import { AppLayout } from "./AppLayout";
 import ProtectedRoute from "../features/auth/components/ProtectedRoute";
 
 import DesignSystem from "../pages/DesignSystem";
-import ModalTestPage from "../pages/ModalTestPage";
+import ModalDemo from "../pages/ModalDemo";
 import ProfilePage from "../pages/ProfilePage";
 import SignupPage from "../pages/SignupPage";
 import LoginPage from "../pages/LoginPage";
@@ -19,7 +19,7 @@ function PlaceHolder({ label }: { label: string }) {
 function App() {
   return (
     <Routes>
-      <Route path="/modal" element={<ModalTestPage />} />
+      <Route path="/modal" element={<ModalDemo />} />
       <Route path="/design-system" element={<DesignSystem />} />
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
