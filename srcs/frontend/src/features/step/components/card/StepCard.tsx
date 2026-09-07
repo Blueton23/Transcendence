@@ -16,6 +16,7 @@ interface StepCardProps {
   dateLabel: string;
   ideaPreview?: StepIdeaPreview;
   ideaCount: number;
+  onClick?: () => void;
 }
 
 const ideaPreviewTones = {
@@ -37,22 +38,24 @@ function StepOptionsButton() {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className={StepOptionsStyle} onClick={(e) => e.stopPropagation()}>
-    <IconButton
-      icon={<Icon name="dots" size={16} />}
-      label="Options"
-      onClick={() => setIsOpen((v) => !v)}
-      onMouseDown={(e) => e.stopPropagation()}
-    />
-    {isOpen && (
-      <DropdownMenu
-        onClose={() => setIsOpen(false)}
-        className="top-full right-0 mt-2"
-      >
-        <MenuItem icon="edit">Modifier étape</MenuItem>
-        <Divider />
-        <MenuItem icon="x" tone="danger">Supprimer l'étape</MenuItem>
-      </DropdownMenu>
-    )}
+      <IconButton
+        icon={<Icon name="dots" size={16} />}
+        label="Options"
+        onClick={() => setIsOpen((v) => !v)}
+        onMouseDown={(e) => e.stopPropagation()}
+      />
+      {isOpen && (
+        <DropdownMenu
+          onClose={() => setIsOpen(false)}
+          className="top-full right-0 mt-2"
+        >
+          <MenuItem icon="edit">Modifier étape</MenuItem>
+          <Divider />
+          <MenuItem icon="x" tone="danger">
+            Supprimer l'étape
+          </MenuItem>
+        </DropdownMenu>
+      )}
     </div>
   );
 }
@@ -83,23 +86,27 @@ export function StepCard({
   dateLabel,
   ideaPreview,
   ideaCount,
+  onClick,
 }: StepCardProps) {
   return (
     <Card
       variant="default"
       interactive={true}
       className="group relative flex-1"
+      onClick={onClick}
     >
       <Text font="mono">{dateLabel}</Text>
       <div className="flex items-center">
         <Heading level={2}>{step.localisation}</Heading>
+      </div>
+      <div className="flex items-center">
+        <StepDescription
+          step={step}
+          ideaPreview={ideaPreview}
+          ideaCount={ideaCount}
+        />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
-      <StepDescription
-        step={step}
-        ideaPreview={ideaPreview}
-        ideaCount={ideaCount}
-      />
       <StepOptionsButton />
     </Card>
   );

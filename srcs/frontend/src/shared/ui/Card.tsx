@@ -8,6 +8,7 @@ interface CardProps {
   variant?: CardVariant;
   interactive?: boolean;
   className?: string;
+  onClick?: () => void;
 }
 
 const variantStyles = {
@@ -30,12 +31,16 @@ function Card({
   variant = "default",
   interactive = false,
   className = "",
+  onClick,
 }: CardProps) {
   const cardStyle = variantStyles[variant];
   const hoverStyle = interactive ? interactiveStyle : "";
 
   return (
-    <div className={`${baseStyle} ${cardStyle} ${hoverStyle} ${className}`}>
+    <div
+      className={`${baseStyle} ${cardStyle} ${hoverStyle} ${className}`}
+      onClick={onClick}
+    >
       {children}
     </div>
   );

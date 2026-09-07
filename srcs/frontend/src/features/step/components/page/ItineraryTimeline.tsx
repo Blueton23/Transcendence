@@ -9,12 +9,14 @@ export interface ItineraryTimelineProps {
   steps: Step[];
   segments: Segment[];
   dateLabels: string[];
+  onDetailView: (step: Step) => void;
 }
 
 export function ItineraryTimeline({
   steps,
   segments,
   dateLabels,
+  onDetailView,
 }: ItineraryTimelineProps) {
   return (
     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
@@ -27,7 +29,12 @@ export function ItineraryTimeline({
             </Fragment>
           )}
           <StepPositionBadge position={step.position} />
-          <StepCard step={step} dateLabel={dateLabels[index]} ideaCount={2} />
+          <StepCard
+            step={step}
+            dateLabel={dateLabels[index]}
+            ideaCount={2}
+            onClick={() => onDetailView(step)}
+          />
         </Fragment>
       ))}
     </div>
