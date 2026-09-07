@@ -1,4 +1,4 @@
-#views.py
+# views.py
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login, logout
@@ -167,7 +167,6 @@ class MeView(APIView):
         )
 
 
-
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -181,6 +180,7 @@ class LogoutView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
 class CsrfTokenView(APIView):
     permission_classes = [AllowAny]
 
@@ -193,5 +193,3 @@ class CsrfTokenView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
-

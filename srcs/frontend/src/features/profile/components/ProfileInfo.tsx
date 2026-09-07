@@ -18,15 +18,6 @@ function ProfileInfo() {
 
     console.log("SDU curent :", currentUser)
 
-    async function handleLogout() {
-        try {
-          await logout();
-          navigate("/signup", { replace: true });
-        } catch (error) {
-          console.error("Erreur lors de la déconnexion :", error);
-        }
-      }
-
     return(
     <>
     <div>
@@ -51,12 +42,6 @@ function ProfileInfo() {
             <div className="ml-auto">
             <Button variant="primary" className="mt-4" onClick={() => setIsModifierOpen(true)} >
                 Modifier le profil
-            </Button>
-            <Button
-            variant="outline"
-            onClick={handleLogout}
-            >
-                Se déconnecter
             </Button>
             </div>
         </div>

@@ -37,7 +37,6 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
 
 
 class TravelerUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Traveler
 
@@ -67,4 +66,3 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(
         write_only=True,
     )
-

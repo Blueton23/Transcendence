@@ -1,3 +1,4 @@
+/*
 import { useEffect, useState } from "react";
 
 import Button from "../../../shared/ui/Button";
@@ -14,9 +15,9 @@ import { useProfile } from "../hooks/useProfile";
 interface ProfileModifyProps {
   onClose: () => void;
 }
-
+*/
 function ProfileModify({ onClose }: ProfileModifyProps) {
-  const { currentUser, setCurrentUser } = useAuth();
+/*  const { currentUser, setCurrentUser } = useAuth();
   const { updateProfile, isLoading, error } = useProfile();
 
   console.log("SDU updateProfile = " , updateProfile.first_name);
@@ -66,12 +67,11 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
     console.log("SDU no currentUser");
     return null;
   }
-
+*/
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+/*    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
       <div className="w-full max-w-[575px] rounded-[28px] bg-surface-container p-8 shadow-xl">
 
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface">
@@ -92,7 +92,6 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
           />
         </div>
 
-        {/* Avatar */}
         <div className="mt-6 flex items-center gap-4">
           <Avatar size="lg" color="4">
             {initials}
@@ -106,10 +105,7 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
           </Button>
         </div>
 
-        {/* Formulaire */}
         <div className="mt-7 flex flex-col gap-4">
-
-          {/* Prénom / Nom */}
           <div className="grid grid-cols-2 gap-4">
 
             <label className="flex flex-col gap-2">
@@ -140,7 +136,6 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
 
           </div>
 
-          {/* Pseudo */}
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
               Pseudo
@@ -155,7 +150,6 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
             />
           </label>
 
-          {/* Email */}
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
               Email
@@ -171,7 +165,6 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
           </label>
         </div>
 
-        {/* Mot de passe */}
         <div className="mt-6">
           <Divider />
 
@@ -195,14 +188,12 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
           </div>
         </div>
 
-        {/* Erreur */}
         {error && (
           <p className="mt-4 text-sm text-red-500">
             {error}
           </p>
         )}
 
-        {/* Enregistrer */}
         <div className="mt-7">
           <Button
             variant="primary"
@@ -216,6 +207,8 @@ function ProfileModify({ onClose }: ProfileModifyProps) {
 
       </div>
     </div>
+  */
+    <> Page a venir </>
   );
 }
 
