@@ -21,30 +21,34 @@ interface TravelHeaderProps {
 function TravelOptionsButton() {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className="absolute top-4 right-4" onClick={(e) => e.stopPropagation()}>
-    <IconButton
-      icon={<Icon name="dots" size={16} />}
-      label="Options"
-      className="border-white/16! bg-white/12! text-inverse!"
-      onClick={() => setIsOpen((v) => !v)}
-      onMouseDown={(e) => e.stopPropagation()}
-    />
-    {isOpen && (
-      <DropdownMenu
-        onClose={() => setIsOpen(false)}
-        className="top-full right-0 mt-2"
-      >
-        <MenuItem icon="edit">Créer le lien d'invitation</MenuItem>
-        <MenuItem icon="users">Gérer les voyageurs</MenuItem>
-        <MenuItem icon="cal">Changer les dates</MenuItem>
-        <Divider />
-        <MenuItem icon="arrow" tone="danger">Quitter le voyage</MenuItem>
-      </DropdownMenu>
-    )}
+    <div
+      className="absolute top-4 right-4"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <IconButton
+        icon={<Icon name="dots" size={16} />}
+        label="Options"
+        className="border-white/16! bg-white/12! text-inverse!"
+        onClick={() => setIsOpen((v) => !v)}
+        onMouseDown={(e) => e.stopPropagation()}
+      />
+      {isOpen && (
+        <DropdownMenu
+          onClose={() => setIsOpen(false)}
+          className="top-full right-0 mt-2"
+        >
+          <MenuItem icon="edit">Créer le lien d'invitation</MenuItem>
+          <MenuItem icon="users">Gérer les voyageurs</MenuItem>
+          <MenuItem icon="cal">Changer les dates</MenuItem>
+          <Divider />
+          <MenuItem icon="arrow" tone="danger">
+            Quitter le voyage
+          </MenuItem>
+        </DropdownMenu>
+      )}
     </div>
   );
 }
-
 
 export function TravelHeader({
   travel,

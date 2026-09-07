@@ -29,9 +29,9 @@ export function DatesPanel({
 
   const handleDateSelect = (range: DateRange | undefined) => {
     if (noOvernight && range?.from) {
-      onSelect({from: range.from, to:range.from});
+      onSelect({ from: range.from, to: range.from });
     } else {
-        onSelect(range);
+      onSelect(range);
     }
   };
 
