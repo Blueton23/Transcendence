@@ -103,6 +103,12 @@ test:
 format-back:
 	$(COMPOSE) exec backend ruff format .
 
+check-back:
+	$(COMPOSE) exec backend ruff check .
+
+fix-back:
+	$(COMPOSE) exec backend ruff check . --fix
+
 format-check-back:
 	$(COMPOSE) exec backend ruff format --check .
 
