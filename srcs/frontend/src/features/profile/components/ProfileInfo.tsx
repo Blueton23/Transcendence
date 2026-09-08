@@ -8,12 +8,12 @@ import Avatar from "../../../shared/ui/Avatar";
 import { useAuth } from "../../auth/context/useAuth";
 
 function ProfileInfo() {
-//  const [isModifierOpen, setIsModifierOpen] = useState(false);
+  //  const [isModifierOpen, setIsModifierOpen] = useState(false);
   const { currentUser } = useAuth();
   if (!currentUser) {
     return null;
   }
-  
+
   return (
     <>
       <div>
@@ -36,7 +36,7 @@ function ProfileInfo() {
             </Text>
           </div>
           <div className="ml-auto">
-{/*            <Button
+            {/*            <Button
               variant="primary"
               className="mt-4"
               onClick={() => setIsModifierOpen(true)}
@@ -46,7 +46,7 @@ function ProfileInfo() {
           </div>
         </div>
       </div>
-{/*      {isModifierOpen && (
+      {/*      {isModifierOpen && (
         <ProfileModify onClose={() => setIsModifierOpen(false)} />
 )} */}
     </>
