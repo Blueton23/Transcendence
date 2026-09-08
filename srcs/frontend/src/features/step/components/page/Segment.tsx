@@ -1,7 +1,7 @@
 import type { Segment } from "@/features/step/api/segmentApi";
 import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
-import { computeDurationLabel } from "@/features/step/segmentDuration";
+import { computeDurationLabel } from "@/features/step/utils/segmentDuration";
 
 function DashedDivider() {
   return (

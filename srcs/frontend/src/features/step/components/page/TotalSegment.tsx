@@ -5,7 +5,7 @@ import {
   computeDurationLabel,
   computeTotalHours,
   computeTotalKms,
-} from "@/features/step/segmentDuration";
+} from "@/features/step/utils/segmentDuration";
 
 export function TotalSegment({ segments }: { segments: Segment[] }) {
   const totalHours = computeTotalHours(segments);

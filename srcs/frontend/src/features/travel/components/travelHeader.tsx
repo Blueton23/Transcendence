@@ -1,5 +1,6 @@
 import type { Step } from "@/features/step/types";
-import { computeDates, computeNights } from "@/features/travel/travelDates";
+import { computeNights } from "@/features/travel/utils/computeNights";
+import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
 import type { Travel } from "@/features/travel/types";
 import Heading from "@/shared/ui/Heading";
 import Tag from "@/shared/ui/Tag";
@@ -57,7 +58,7 @@ export function TravelHeader({
   totalKms,
 }: TravelHeaderProps) {
   const NbNights = computeNights(travel.startDate, travel.endDate);
-  const DatesLabel = computeDates(travel.startDate, travel.endDate);
+  const DatesLabel = computeTravelDates(travel.startDate, travel.endDate);
   return (
     <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-6">
       <Text

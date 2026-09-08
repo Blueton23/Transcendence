@@ -1,7 +1,7 @@
 import { TravelHeader } from "@/features/travel/components/travelHeader";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
-import { computeTotalKms } from "@/features/step/segmentDuration";
+import { computeTotalKms } from "@/features/step/utils/segmentDuration";
 import type { Segment } from "@/features/step/api/segmentApi";
 import { ToggleMobileButton } from "@/features/step/components/mobile/ToggleMobileButton";
 
