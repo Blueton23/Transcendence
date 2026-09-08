@@ -5,7 +5,7 @@ export interface Step {
   travelId: number;
   startDate: string;
   endDate: string;
-  priority: number;
+  priority: number | null;
   localisation: string;
   latitude: number;
   longitude: number;
