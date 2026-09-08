@@ -118,6 +118,11 @@ format-check-front:
 lint:
 	$(COMPOSE) exec frontend npm run lint
 
+build-frontend:
+	$(COMPOSE) exec frontend npm run build
+
+frontend-check: lint build-frontend
+
 #######################################
 
 .PHONY: up down start stop restart build ps images volumes logs clean fclean re \
