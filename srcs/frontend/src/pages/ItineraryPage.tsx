@@ -1,7 +1,7 @@
 import { getSteps } from "@/features/step/api/stepApi";
 import { getSegments } from "@/features/step/api/segmentApi";
 import { getTravel } from "@/features/travel/api/travelApi";
-import { computeDateLabels } from "@/features/step/stepDates";
+import { computeDateLabels } from "@/features/step/utils/stepDates";
 import { useState } from "react";
 import { ItineraryLayout } from "@/features/step/components/page/ItineraryLayout";
 import { ItineraryList } from "@/features/step/components/page/ItineraryList";
@@ -19,7 +19,7 @@ function ItineraryPage() {
   const steps = getSteps();
   const travel = getTravel();
   const segments = getSegments();
-  const dateLabels = computeDateLabels(steps, travel.startDate);
+  const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const [detailView, setDetailView] = useState<Step | null>(null);
 

@@ -28,7 +28,7 @@ export function ItineraryTimeline({
               <SegmentRow segment={segments[index - 1]} />
             </Fragment>
           )}
-          <StepPositionBadge position={step.position} />
+          <StepPositionBadge position={index + 1} />
           <StepCard
             step={step}
             dateLabel={dateLabels[index]}
