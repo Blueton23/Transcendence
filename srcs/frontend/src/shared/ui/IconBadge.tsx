@@ -1,5 +1,6 @@
 import Icon from "./Icon";
 import type { IconName } from "./Icon";
+import { iconColor } from "@/shared/ui/iconColor";
 
 export type IconBadgeColor =
   "green" | "red" | "purple" | "amber" | "ink" | "brand" | "chosen";
@@ -34,7 +35,7 @@ const colorStyles = {
 
 const baseStyle = "inline-flex items-center justify-center rounded-md";
 
-function IconBadge({ name, color = "purple", size = "md" }: IconBadgeProps) {
+function IconBadge({ name, color = iconColor[name] ?? "ink", size = "md" }: IconBadgeProps) {
   return (
     <span className={`${baseStyle} ${sizeStyles[size]} ${colorStyles[color]}`}>
       <Icon name={name} className={iconSizeStyles[size]} />
