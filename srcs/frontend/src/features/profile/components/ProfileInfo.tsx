@@ -1,14 +1,14 @@
-import Button from "../../../shared/ui/Button";
+//import Button from "../../../shared/ui/Button";
 import Heading from "../../../shared/ui/Heading";
 import Text from "../../../shared/ui/Text";
 import Avatar from "../../../shared/ui/Avatar";
-import ProfileModify from "./ProfileModify";
+//import ProfileModify from "./ProfileModify";
 
-import { useState } from "react";
+//import { useState } from "react";
 import { useAuth } from "../../auth/context/useAuth";
 
 function ProfileInfo() {
-  const [isModifierOpen, setIsModifierOpen] = useState(false);
+//  const [isModifierOpen, setIsModifierOpen] = useState(false);
   const { currentUser } = useAuth();
   if (!currentUser) {
     return null;
