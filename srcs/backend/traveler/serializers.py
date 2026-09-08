@@ -1,6 +1,9 @@
 # serializers.py
 
+from typing import ClassVar
+
 from rest_framework import serializers
+
 from .models import Traveler
 
 
@@ -14,7 +17,7 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Traveler
 
-        fields = [
+        fields: ClassVar[list[str]] = [
             "id",
             "username",
             "first_name",
@@ -27,7 +30,7 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-        read_only_fields = [
+        read_only_fields: ClassVar[list[str]] = [
             "id",
             "profile_picture_url",
             "is_online",
@@ -40,7 +43,7 @@ class TravelerUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Traveler
 
-        fields = [
+        fields: ClassVar[list[str]] = [
             "id",
             "username",
             "first_name",
@@ -52,7 +55,7 @@ class TravelerUpdateSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-        read_only_fields = [
+        read_only_fields: ClassVar[list[str]] = [
             "id",
             "profile_picture_url",
             "is_online",

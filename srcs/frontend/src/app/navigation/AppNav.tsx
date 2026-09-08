@@ -17,7 +17,7 @@ export function AppNavDesktop() {
         <NavPill to="/profile" iconName="user" label="Profil"></NavPill>
       </div>
       <Button variant="outline" onClick={() => navigate("/")}>
-        Acceuil
+        Accueil
       </Button>
     </div>
   );

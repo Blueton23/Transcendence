@@ -1,9 +1,9 @@
 # views.py
 
-from django.contrib.auth import get_user_model
-from django.contrib.auth import authenticate, login, logout
-from django.middleware.csrf import get_token
+from typing import ClassVar
 
+from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.middleware.csrf import get_token
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
@@ -20,7 +20,7 @@ Traveler = get_user_model()
 
 
 class ApiHealthView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = ClassVar[list][AllowAny]
 
     def get(self, request: Request) -> Response:
         return Response(
@@ -41,7 +41,7 @@ class TravelerPingView(APIView):
 
 
 class TravelerCreateView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = ClassVar[list][AllowAny]
 
     def post(self, request: Request) -> Response:
         serializer = TravelerCreateSerializer(data=request.data)
@@ -71,7 +71,7 @@ class TravelerCreateView(APIView):
 
 
 class TravelerUpdateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = ClassVar[list][IsAuthenticated]
 
     def patch(self, request: Request, pk: int) -> Response:
 
@@ -116,7 +116,7 @@ class TravelerUpdateView(APIView):
 
 
 class LoginView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = ClassVar[list][AllowAny]
 
     def post(self, request: Request) -> Response:
         serializer = LoginSerializer(data=request.data)
@@ -155,7 +155,7 @@ class LoginView(APIView):
 
 
 class MeView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = ClassVar[list][IsAuthenticated]
 
     def get(self, request: Request) -> Response:
         return Response(
@@ -167,7 +167,7 @@ class MeView(APIView):
 
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = ClassVar[list][IsAuthenticated]
 
     def post(self, request: Request) -> Response:
         logout(request)
@@ -181,7 +181,7 @@ class LogoutView(APIView):
 
 
 class CsrfTokenView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = ClassVar[list][AllowAny]
 
     def get(self, request: Request) -> Response:
         get_token(request)
