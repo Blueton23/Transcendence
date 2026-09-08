@@ -22,7 +22,8 @@ function Tag({ children, tone = "default", icon, className = "" }: TagProps) {
   const tagTone = toneStyles[tone];
   return (
     <span className={`${baseStyle} ${tagTone} ${className}`}>
-      {icon} {children}
+      {icon}
+      {children}
     </span>
   );
 }
