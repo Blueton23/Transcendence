@@ -1,6 +1,6 @@
 import { StepPositionBadge } from "@/features/step/components/card/StepPositionBadge";
 import { StepCard } from "@/features/step/components/card/StepCard";
-import { SegmentRow } from "./Segment";
+import { SegmentRow } from "@/features/step/components/timeline/Segment";
 import { Fragment } from "react/jsx-runtime";
 import type { Segment } from "@/features/step/api/segmentApi";
 import type { Step } from "@/features/step/types";

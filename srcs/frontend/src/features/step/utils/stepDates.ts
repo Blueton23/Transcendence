@@ -1,6 +1,12 @@
 import type { Step } from "../types";
 
-function formatDate(date: Date): string {
+export function formatDayLabel(date: Date): string {
+  return new Intl.DateTimeFormat("fr-CH", { weekday: "short", day: "numeric" })
+    .format(date)
+    .replace(".", "");
+}
+
+export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("fr-CH", { day: "numeric", month: "2-digit" })
     .format(date)
     .replace("/", ".");

@@ -4,10 +4,11 @@ import { getTravel } from "@/features/travel/api/travelApi";
 import { computeDateLabels } from "@/features/step/utils/stepDates";
 import { useState } from "react";
 import { ItineraryLayout } from "@/features/step/components/page/ItineraryLayout";
-import { ItineraryList } from "@/features/step/components/page/ItineraryList";
+import { ItineraryListPanel } from "@/features/step/components/page/ItineraryListPanel";
 import { ItineraryHeader } from "@/features/step/components/page/ItineraryHeader";
-import { StepDetail } from "@/features/step/components/detail/StepDetail";
+import { StepDetail } from "@/features/step/components/page/StepDetail";
 import type { Step } from "@/features/step/types";
+import { TripActionsButton } from "@/features/step/components/page/TripActionsButton";
 
 //TODO(branchement):
 // + quand getStep sera async faudra utiliser ex:useSteps() pour letat de chargement
@@ -45,10 +46,11 @@ function ItineraryPage() {
             step={detailView}
             dateLabel={dateLabels[selectedStepIndex]}
             onBack={() => setDetailView(null)}
+            travel={travel}
           />
         ) : (
           <div className="flex min-h-0 flex-1 flex-col gap-4">
-            <ItineraryList
+            <ItineraryListPanel
               steps={steps}
               segments={segments}
               dateLabels={dateLabels}
@@ -56,6 +58,7 @@ function ItineraryPage() {
             />
           </div>
         )}
+        <TripActionsButton />
       </ItineraryLayout>
     </div>
   );
