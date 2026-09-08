@@ -6,3 +6,4 @@ channels-redis==4.3.0
 uvicorn[standard]==0.51.0
 Faker==40.37.0
 ruff==0.16.3
+ipython==9.17.1
