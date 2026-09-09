@@ -10,7 +10,10 @@ from travel.models import (
     Travel,
     TravelStatus,
 )
+from travel.serializers import StepSerializer, TravelSerializer
 from traveler.models import Traveler
+
+# --- Model tests ---
 
 
 class TravelModelTest(TestCase):
@@ -268,3 +271,132 @@ class StepModelTest(TestCase):
 
         self.assertEqual(self.travel.start_date, datetime.date(2026, 5, 25))
         self.assertEqual(self.travel.end_date, datetime.date(2026, 6, 15))
+
+
+# --- Serializer tests ---
+
+
+class TravelSerializerTest(TestCase):
+    def setUp(self):
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+    def test_rejects_end_date_before_start_date(self):
+        serializer = TravelSerializer(
+            data={
+                "title": "France Road Trip",
+                "start_date": "2026-10-12",
+                "end_date": "2026-10-11",
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("end_date", serializer.errors)
+
+    def test_seriaized_has_expected_keys(self):
+        travel = Travel.objects.create(
+            title="Road Trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        data = TravelSerializer(travel).data
+
+        expected_keys = {
+            "id",
+            "travelers",
+            "title",
+            "start_date",
+            "end_date",
+            "nights",
+            "invite_token",
+            "status",
+            "created_at",
+            "updated_at",
+        }
+        self.assertEqual(set(data.keys()), expected_keys)
+
+    def test_nights_is_computed(self):
+        travel = Travel.objects.create(
+            title="France Road Trip",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        self.assertEqual(TravelSerializer(travel).data["nights"], 8)
+
+    def test_travelers_includes_only_accepted_participation(self):
+        accepted_traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        invited_traveler = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="password123"
+        )
+        Participation.objects.create(
+            traveler=accepted_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        Participation.objects.create(
+            traveler=invited_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.INVITED,
+        )
+        travelers = TravelSerializer(self.travel).data["travelers"]
+
+        self.assertEqual(len(travelers), 1)
+        self.assertEqual(travelers[0]["id"], accepted_traveler.id)
+
+
+class StepSerializerTest(TestCase):
+    def setUp(self):
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+
+    def test_rejects_end_date_before_start_date(self):
+        serializer = StepSerializer(
+            data={
+                "start_date": "2026-10-12",
+                "end_date": "2026-10-11",
+                "localisation": "Test",
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("end_date", serializer.errors)
+
+    def test_seriaized_has_expected_keys(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        data = StepSerializer(step).data
+
+        expected_keys = {
+            "id",
+            "travel",
+            "priority",
+            "start_date",
+            "end_date",
+            "nights",
+            "idea_count",
+            "localisation",
+            "latitude",
+            "longitude",
+            "created_at",
+            "updated_at",
+        }
+        self.assertEqual(set(data.keys()), expected_keys)
+
+    def test_nights_is_computed(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        self.assertEqual(StepSerializer(step).data["nights"], 2)
