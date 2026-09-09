@@ -98,13 +98,23 @@ check:
 	docker compose exec backend python manage.py check
 
 test:
-	$(COMPOSE) exec backend python manage.py test
+	$(COMPOSE) exec backend python manage.py test $(ARGS)
 
 format-back:
 	$(COMPOSE) exec backend ruff format .
 
 format-check-back:
 	$(COMPOSE) exec backend ruff format --check .
+
+lint-back:
+	$(COMPOSE) exec backend ruff check .
+
+lint-fix-back:
+	$(COMPOSE) exec backend ruff check --fix .
+
+check-back: lint-back format-check-back
+
+fix-back: lint-fix-back format-back
 
 #######################################
 
@@ -123,4 +133,4 @@ lint:
 .PHONY: up down start stop restart build ps images volumes logs clean fclean re \
 	psql test-db \
 	makemigrations migrate startapp createsuperuser seed unseed shell check test format-back format-check-back \
-	format-front format-check-front front-install
+	lint-back lint-fix-back check-back fix-back format-front format-check-front front-install
