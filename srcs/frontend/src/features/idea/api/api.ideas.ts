@@ -5,7 +5,7 @@ import type {
   EditIdeaInput,
 } from "../types";
 
-//récupère plusieurs idées
+// get -> permet de récupérer une idée
 export function getIdeas(): Idea[] {
   return [
     {
@@ -23,12 +23,12 @@ export function getIdeas(): Idea[] {
       pricePerNight: null,
       arrivalDate: null,
       departureDate: null,
+      url: null,
+      note: null,
       chosenAt: null,
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
-      url: null,
-      note: null,
     },
 
     {
@@ -46,12 +46,12 @@ export function getIdeas(): Idea[] {
       pricePerNight: null,
       arrivalDate: null,
       departureDate: null,
+      url: null,
+      note: null,
       chosenAt: null,
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
-      url: null,
-      note: null,
     },
 
     {
@@ -69,12 +69,12 @@ export function getIdeas(): Idea[] {
       pricePerNight: null,
       arrivalDate: null,
       departureDate: null,
+      url: null,
+      note: null,
       chosenAt: "2026-08-05T18:30:00Z",
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
-      url: null,
-      note: null,
     },
 
     {
@@ -92,19 +92,19 @@ export function getIdeas(): Idea[] {
       pricePerNight: 48,
       arrivalDate: null,
       departureDate: null,
+      url: null,
+      note: null,
       chosenAt: "2026-08-05T18:30:00Z",
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
-      url: null,
-      note: null,
     },
   ];
 }
 
-// les fonctions suivant sont a modifier plus tard
+// les fonctions suivant sont a modifier plus tard pour la connexion backend
 
-// fonction métier pour le bouton "epingler une idée"
+// fonction métier pour le bouton "Epingler une idée"
 export function createIdea(input: CreateIdeaInput): Idea {
   return {
     id: Date.now(),

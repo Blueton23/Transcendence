@@ -42,8 +42,8 @@ export function IdeasPage() {
 
   const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
 
-  const [ideaToPlaceId, setIdeaToPlaceId] = useState<number | null>(null);
-  const ideaToPlace = ideas.find((idea) => idea.id === ideaToPlaceId);
+  const [ideaPlaceId, setIdeaPlaceId] = useState<number | null>(null);
+  const ideaToPlace = ideas.find((idea) => idea.id === ideaPlaceId);
 
   const [editIdeaId, setEditIdeaId] = useState<number | null>(null);
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
@@ -95,7 +95,7 @@ export function IdeasPage() {
             voted={false}
             stepName={step?.name}
             onVote={() => handleVote(idea.id)}
-            onPlace={() => setIdeaToPlaceId(idea.id)}
+            onPlace={() => setIdeaPlaceId(idea.id)}
             onView={() => null}
             onEdit={() => setEditIdeaId(idea.id)}
             onDelete={() => handleDeleteIdea(idea.id)}
@@ -111,11 +111,11 @@ export function IdeasPage() {
         />
       )}
 
-      {ideaToPlaceId !== null && (
+      {ideaPlaceId !== null && (
         <PlaceIdeaModal
           idea={ideaToPlace}
           steps={mockSteps}
-          onClose={() => setIdeaToPlaceId(null)}
+          onClose={() => setIdeaPlaceId(null)}
           onPlace={handlePlaceIdea}
         />
       )}

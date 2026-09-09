@@ -6,5 +6,5 @@ export const ideaIcons = {
 } as const;
 
 /*
-Fonction utiles pour gérer les icons sur la carte
+Fonction utiles pour gérer les icons sur la carte d'idée
 */

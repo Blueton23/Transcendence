@@ -25,5 +25,5 @@ export function filterIdeas(
 }
 
 /*
-Fonction utiles pour gérer le filtrage d'idées
+Fonction utiles pour gérer le filtrage d'idées "Type et Etape"
 */

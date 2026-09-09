@@ -113,3 +113,7 @@ export function EditIdeaModal({
     </Modal>
   );
 }
+
+/*
+Fonction pour créer la modal "Modifier l'idée"
+*/

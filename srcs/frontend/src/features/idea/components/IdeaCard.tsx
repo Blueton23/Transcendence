@@ -90,3 +90,7 @@ export function IdeaCard({
     </Card>
   );
 }
+
+/*
+Fonction qui gère l'ensemble d'une carte d'idée
+*/

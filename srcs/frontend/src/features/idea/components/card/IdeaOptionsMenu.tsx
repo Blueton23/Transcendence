@@ -53,3 +53,8 @@ export function IdeaOptionsMenu({ onEdit, onDelete }: IdeaOptionsMenuProps) {
     </div>
   );
 }
+
+/*
+Fonction du bouton de droite menu d'option (...)
+Permet de "Modifier / Supprimer"
+*/

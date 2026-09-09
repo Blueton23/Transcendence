@@ -21,5 +21,5 @@ export function VoteButton({ voteCount, voted, onVote }: VoteButtonProps) {
 }
 
 /*
-Fonction du bouton de vote avec l'icone coeur
+Fonction du bouton de droite de vote avec l'icone coeur
 */

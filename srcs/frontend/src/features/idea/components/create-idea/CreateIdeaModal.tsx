@@ -100,3 +100,7 @@ export function CreateIdeaModal({
     </Modal>
   );
 }
+
+/*
+Fonction pour créer la modal "Epingler une idée"
+*/

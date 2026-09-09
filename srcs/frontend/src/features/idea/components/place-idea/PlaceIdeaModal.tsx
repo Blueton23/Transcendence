@@ -51,3 +51,7 @@ export function PlaceIdeaModal({
     </Modal>
   );
 }
+
+/*
+Fonction pour créer la modal "Placer l'idée"
+*/

@@ -29,5 +29,5 @@ export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
 }
 
 /*
-Fonction pour le boutton épingler une idée
+Fonction pour le boutton sur la page "Epingler une idée"
 */

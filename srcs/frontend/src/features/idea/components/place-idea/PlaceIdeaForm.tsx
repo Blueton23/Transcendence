@@ -132,3 +132,7 @@ export function PlaceIdeaForm({
     </>
   );
 }
+
+/*
+Fonction qui permet de remplir le formulaire "Placer l'idée"
+*/

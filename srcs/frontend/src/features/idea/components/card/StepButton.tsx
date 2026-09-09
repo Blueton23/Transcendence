@@ -33,5 +33,5 @@ export function StepButton({ stepId, onPlace, onView }: StepButtonProps) {
 }
 
 /*
-Fonction du bouton "Placer" / "Voir l'étape"
+Fonction du bouton de droite "Placer" / "Voir l'étape"
 */

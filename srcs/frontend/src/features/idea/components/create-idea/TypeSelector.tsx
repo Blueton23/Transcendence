@@ -48,5 +48,5 @@ export function TypeSelector({
 }
 
 /*
-Fonction pour séléctionner le type dans la modal "épingler une idée"
+Fonction pour séléctionner le type dans la modal "Epingler une idée"
 */

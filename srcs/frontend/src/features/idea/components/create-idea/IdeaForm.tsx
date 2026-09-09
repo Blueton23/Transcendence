@@ -137,3 +137,7 @@ export function IdeaForm({
     </>
   );
 }
+
+/*
+Fonction qui permet de remplir le formulaire "Epingler une idée"
+*/
