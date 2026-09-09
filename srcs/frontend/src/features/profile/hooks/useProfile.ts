@@ -8,10 +8,7 @@ import type { User } from "../../auth/types";
 
 interface UseProfileReturn {
   createProfile: (data: CreateTravelerData) => Promise<User | null>;
-  updateProfile: (
-    id: number,
-    data: UpdateTravelerData,
-  ) => Promise<User| null>;
+  updateProfile: (id: number, data: UpdateTravelerData) => Promise<User | null>;
   isLoading: boolean;
   error: string | null;
   clearError: () => void;
@@ -21,9 +18,7 @@ export function useProfile(): UseProfileReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function createProfile(
-    data: CreateTravelerData,
-  ): Promise<User| null> {
+  async function createProfile(data: CreateTravelerData): Promise<User | null> {
     setIsLoading(true);
     setError(null);
 
@@ -43,7 +38,7 @@ export function useProfile(): UseProfileReturn {
   async function updateProfile(
     id: number,
     data: UpdateTravelerData,
-  ): Promise<User| null> {
+  ): Promise<User | null> {
     setIsLoading(true);
     setError(null);
 
