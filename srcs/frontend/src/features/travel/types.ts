@@ -5,7 +5,7 @@ export interface Travel {
   endDate: string;
   travelers: { id: number; initials: string; name: string }[];
   inviteToken: string;
-  status: "ouvert" | "terminé";
+  status: "current" | "finished";
   createdAt: string;
   updatedAt: string;
 }

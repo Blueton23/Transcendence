@@ -14,7 +14,7 @@ export function getTravel(): Travel {
       { id: 3, initials: "SY", name: "Sofia Y." },
     ],
     inviteToken: "suisse-roadtrip-2026",
-    status: "ouvert",
+    status: "current",
     createdAt: "2026-09-02T16:17:00Z",
     updatedAt: "2026-09-02T16:17:00Z",
   };
