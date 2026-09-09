@@ -1,7 +1,4 @@
-import type {
-  CreateTravelerData,
-  CreateTravelerResponse,
-} from "../types";
+import type { CreateTravelerData, CreateTravelerResponse } from "../types";
 
 const API_BASE_URL = "/api";
 
