@@ -4,3 +4,7 @@ export function formatDateToISO(date: Date): string {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+/*
+Fonction utiles pour gérer le format de date
+*/

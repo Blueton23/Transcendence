@@ -1,6 +1,6 @@
 import type { Idea } from "../../types";
-import { ideaTypeLabels } from "./PlaceIdeaModal";
-import { ideaIcons } from "../IdeaCard";
+import { ideaTypeLabels } from "../../utils/ideaTypeLabels";
+import { ideaIcons } from "../../utils/ideaIcons";
 import type { StepOption } from "../create-idea/CreateIdeaModal";
 import Text from "../../../../shared/ui/Text";
 import Select from "../../../../shared/ui/Select";

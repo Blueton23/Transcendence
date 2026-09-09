@@ -4,10 +4,10 @@ import { StepButton } from "./card/StepButton";
 import { SecondaryInfo } from "./card/SecondaryInfo";
 import { StepLabel } from "./card/StepLabel";
 import { IdeaOptionsMenu } from "./card/IdeaOptionsMenu";
+import { ideaIcons } from "../utils/ideaIcons";
 import Card from "../../../shared/ui/Card";
 import Icon from "../../../shared/ui/Icon";
 import Heading from "../../../shared/ui/Heading";
-import IconButton from "../../../shared/ui/IconButton";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -23,16 +23,6 @@ export interface IdeaCardProps {
   onEdit: () => void;
   onDelete: () => void;
 }
-
-/*----------------------------------------------------------------------------------*/
-
-// Défini le type d'icone a afficher
-export const ideaIcons = {
-  restaurant: "fork",
-  accommodation: "bed",
-  activity: "mtn",
-  sightseeing: "pin",
-} as const;
 
 /*----------------------------------------------------------------------------------*/
 

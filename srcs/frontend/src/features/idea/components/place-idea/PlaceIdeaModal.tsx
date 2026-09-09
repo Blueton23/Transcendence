@@ -5,13 +5,6 @@ import { PlaceIdeaForm } from "./PlaceIdeaForm";
 import Modal from "../../../../shared/ui/Modal";
 import Button from "../../../../shared/ui/Button";
 
-export const ideaTypeLabels = {
-  restaurant: "Restaurant",
-  accommodation: "Hébergement",
-  activity: "Activité",
-  sightseeing: "À voir",
-} as const;
-
 interface PlaceIdeaModalProps {
   idea: Idea;
   steps: StepOption[];
@@ -53,7 +46,7 @@ export function PlaceIdeaModal({
           onClose();
         }}
       >
-        Placer
+        Enregistrer
       </Button>
     </Modal>
   );
