@@ -1,3 +1,14 @@
-# from django.shortcuts import render
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 
-# Create your views here.
+from .models import Travel
+from .serializers import TravelSerializer
+
+class TravelListCreateView(ListCreateAPIView):
+    queryset = Travel.objects.all()
+    serializer_class = TravelSerializer
+
+class TravelDetailView(RetrieveUpdateDestroyAPIView):
+    queryset = Travel.objects.all()
+    serializer_class = TravelSerializer
+
+
