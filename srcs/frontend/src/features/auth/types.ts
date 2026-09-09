@@ -1,19 +1,19 @@
 export interface User {
   id: number;
   username: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  profile_picture_url: string | null;
-  is_online: boolean;
-  created_at: string;
-  updated_at: string;
+  profilePictureUrl: string | null;
+  isOnline: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface SignupData {
   username: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }

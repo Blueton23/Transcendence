@@ -2,18 +2,16 @@ import { useState } from "react";
 
 import { createTraveler, updateTraveler } from "../api/profileApi";
 
-import type {
-  CreateTravelerData,
-  UpdateTravelerData,
-  Traveler,
-} from "../types";
+import type { CreateTravelerData, UpdateTravelerData } from "../types";
+
+import type { User } from "../../auth/types";
 
 interface UseProfileReturn {
-  createProfile: (data: CreateTravelerData) => Promise<Traveler | null>;
+  createProfile: (data: CreateTravelerData) => Promise<User | null>;
   updateProfile: (
     id: number,
     data: UpdateTravelerData,
-  ) => Promise<Traveler | null>;
+  ) => Promise<User| null>;
   isLoading: boolean;
   error: string | null;
   clearError: () => void;
@@ -25,7 +23,7 @@ export function useProfile(): UseProfileReturn {
 
   async function createProfile(
     data: CreateTravelerData,
-  ): Promise<Traveler | null> {
+  ): Promise<User| null> {
     setIsLoading(true);
     setError(null);
 
@@ -45,7 +43,7 @@ export function useProfile(): UseProfileReturn {
   async function updateProfile(
     id: number,
     data: UpdateTravelerData,
-  ): Promise<Traveler | null> {
+  ): Promise<User| null> {
     setIsLoading(true);
     setError(null);
 

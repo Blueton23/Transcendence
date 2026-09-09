@@ -1,14 +1,10 @@
-//import Button from "../../../shared/ui/Button";
 import Heading from "../../../shared/ui/Heading";
 import Text from "../../../shared/ui/Text";
 import Avatar from "../../../shared/ui/Avatar";
-//import ProfileModify from "./ProfileModify";
 
-//import { useState } from "react";
 import { useAuth } from "../../auth/context/useAuth";
 
 function ProfileInfo() {
-  //  const [isModifierOpen, setIsModifierOpen] = useState(false);
   const { currentUser } = useAuth();
   if (!currentUser) {
     return null;
@@ -20,13 +16,13 @@ function ProfileInfo() {
         <div className="flex items-center">
           <div className="flex w-24 justify-center">
             <Avatar size="lg" color="1">
-              {currentUser.first_name?.charAt(0).toUpperCase()}
-              {currentUser.last_name?.charAt(0).toUpperCase()}
+              {currentUser.firstName?.charAt(0).toUpperCase()}
+              {currentUser.lastName?.charAt(0).toUpperCase()}
             </Avatar>
           </div>
           <div>
             <Heading level={3} size="lg">
-              {currentUser.first_name} {currentUser.last_name}
+              {currentUser.firstName} {currentUser.lastName}
             </Heading>
             <Text tone="secondary" size="md" font="mono">
               {currentUser.username}
@@ -35,20 +31,8 @@ function ProfileInfo() {
               {currentUser.email}
             </Text>
           </div>
-          <div className="ml-auto">
-            {/*            <Button
-              variant="primary"
-              className="mt-4"
-              onClick={() => setIsModifierOpen(true)}
-            >
-              Modifier le profil
-  </Button>*/}
-          </div>
         </div>
       </div>
-      {/*      {isModifierOpen && (
-        <ProfileModify onClose={() => setIsModifierOpen(false)} />
-)} */}
     </>
   );
 }

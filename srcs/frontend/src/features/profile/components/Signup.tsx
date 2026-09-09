@@ -9,17 +9,17 @@ import Button from "../../../shared/ui/Button";
 import Heading from "../../../shared/ui/Heading";
 import Input from "../../../shared/ui/Input";
 
-function SignupPage() {
+function Signup() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
 
   const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
+    firstName: "",
+    lastName: "",
     username: "",
     email: "",
     password: "",
-    password_confirmation: "",
+    passwordConfirmation: "",
   });
 
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +39,7 @@ function SignupPage() {
 
     setError(null);
 
-    if (form.password !== form.password_confirmation) {
+    if (form.password !== form.passwordConfirmation) {
       setError("Les mots de passe ne correspondent pas.");
       return;
     }
@@ -53,8 +53,8 @@ function SignupPage() {
 
     try {
       await signup({
-        first_name: form.first_name,
-        last_name: form.last_name,
+        firstName: form.firstName,
+        lastName: form.lastName,
         username: form.username,
         email: form.email,
         password: form.password,
@@ -98,9 +98,9 @@ function SignupPage() {
             </span>
 
             <Input
-              name="first_name"
+              name="firstName"
               type="text"
-              value={form.first_name}
+              value={form.firstName}
               onChange={handleChange}
               required
             />
@@ -112,9 +112,9 @@ function SignupPage() {
             </span>
 
             <Input
-              name="last_name"
+              name="lastName"
               type="text"
-              value={form.last_name}
+              value={form.lastName}
               onChange={handleChange}
               required
             />
@@ -176,9 +176,9 @@ function SignupPage() {
           </span>
 
           <Input
-            name="password_confirmation"
+            name="passwordConfirmation"
             type="password"
-            value={form.password_confirmation}
+            value={form.passwordConfirmation}
             onChange={handleChange}
             variant="mono"
             minLength={8}
@@ -205,4 +205,4 @@ function SignupPage() {
   );
 }
 
-export default SignupPage;
+export default Signup;

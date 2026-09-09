@@ -11,7 +11,7 @@ import Heading from "../../../shared/ui/Heading";
 import Input from "../../../shared/ui/Input";
 import Text from "../../../shared/ui/Text";
 
-function Connexion() {
+function Login() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
   const [username, setUsername] = useState("");
@@ -92,4 +92,4 @@ function Connexion() {
   );
 }
 
-export default Connexion;
+export default Login;
