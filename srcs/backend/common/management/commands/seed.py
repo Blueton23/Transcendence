@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand, CommandParser
 from faker import Faker
 
 from common.seeders.clear import clear_seed_data
+from common.seeders.idea import seed_ideas, seed_reactions
 from common.seeders.travel import seed_participations, seed_steps, seed_travels
 from common.seeders.traveler import seed_friendships, seed_travelers
 
@@ -17,6 +18,8 @@ class Command(BaseCommand):
         parser.add_argument("--travels", type=int, default=10)
         parser.add_argument("--participations", type=int, default=30)
         parser.add_argument("--steps-per-travel", type=int, default=4)
+        parser.add_argument("--ideas-per-travel", type=int, default=6)
+        parser.add_argument("--reactions", type=int, default=40)
         parser.add_argument(
             "--fresh",
             action="store_true",
@@ -46,5 +49,11 @@ class Command(BaseCommand):
 
         steps = seed_steps(fake, travels, options["steps_per_travel"])
         self.stdout.write(f"Created {len(steps)} steps.")
+
+        ideas = seed_ideas(fake, travelers, travels, options["ideas_per_travel"])
+        self.stdout.write(f"Created {len(ideas)} ideas.")
+
+        reactions = seed_reactions(fake, travelers, ideas, options["reactions"])
+        self.stdout.write(f"Created {len(reactions)} reactions.")
 
         self.stdout.write(self.style.SUCCESS("Seed complete."))
