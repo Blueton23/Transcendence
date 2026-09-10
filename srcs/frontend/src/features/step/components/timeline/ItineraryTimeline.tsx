@@ -1,0 +1,42 @@
+import { StepPositionBadge } from "@/features/step/components/card/StepPositionBadge";
+import { StepCard } from "@/features/step/components/card/StepCard";
+import { SegmentRow } from "@/features/step/components/timeline/Segment";
+import { Fragment } from "react/jsx-runtime";
+import type { Segment } from "@/features/step/api/segmentApi";
+import type { Step } from "@/features/step/types";
+
+export interface ItineraryTimelineProps {
+  steps: Step[];
+  segments: Segment[];
+  dateLabels: string[];
+  onDetailView: (step: Step) => void;
+}
+
+export function ItineraryTimeline({
+  steps,
+  segments,
+  dateLabels,
+  onDetailView,
+}: ItineraryTimelineProps) {
+  return (
+    <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
+      {steps.map((step, index) => (
+        <Fragment key={step.id}>
+          {index > 0 && (
+            <Fragment>
+              <span aria-hidden="true" />
+              <SegmentRow segment={segments[index - 1]} />
+            </Fragment>
+          )}
+          <StepPositionBadge position={index + 1} />
+          <StepCard
+            step={step}
+            dateLabel={dateLabels[index]}
+            ideaCount={2}
+            onClick={() => onDetailView(step)}
+          />
+        </Fragment>
+      ))}
+    </div>
+  );
+}
