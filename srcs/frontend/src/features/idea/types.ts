@@ -1,6 +1,6 @@
 export type IdeaType =
   "restaurant" | "accommodation" | "activity" | "sightseeing";
-export type IdeaStatus = "proposed" | "selected" | "reserved";
+export type IdeaStatus = "proposed" | "selected" | "reserved"; //placed, chosen
 
 export type IdeaFilter = "all" | IdeaType;
 export type StepFilter = "all" | "none" | number;
