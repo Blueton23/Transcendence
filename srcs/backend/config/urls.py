@@ -1,19 +1,8 @@
 from django.contrib import admin
-from django.http import JsonResponse
-from django.urls import include, path
-
-
-def api_test(request):
-    return JsonResponse(
-        {
-            "message": "L'API Django fonctionne",
-            "status": "ok",
-        }
-    )
-
+from django.urls import include, include, path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("api/", api_test, name="api-test"),
+    path("api/", include("traveler.urls")),
     path("api/travels/", include("travel.urls")),
 ]

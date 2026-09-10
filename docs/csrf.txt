@@ -1,0 +1,21 @@
+6. Pourquoi un token CSRF ?
+
+Le CSRF est une protection contre un type d'attaque appelé :
+
+Cross-Site Request Forgery.
+
+L'idée simplifiée :
+
+Un utilisateur est connecté à ton site.
+
+Son navigateur possède par exemple :
+
+sessionid=abc123
+
+Un site malveillant pourrait essayer de faire envoyer une requête vers ton backend.
+
+Le backend doit donc pouvoir vérifier :
+
+"Cette requête vient-elle réellement de mon application ?"
+
+Le token CSRF sert notamment à ça.
