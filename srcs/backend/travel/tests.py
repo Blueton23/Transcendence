@@ -2,6 +2,8 @@ import datetime
 
 from django.db import IntegrityError, transaction
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APITestCase
 
 from travel.models import (
     Participation,
@@ -400,3 +402,36 @@ class StepSerializerTest(TestCase):
             end_date=datetime.date(2026, 6, 4),
         )
         self.assertEqual(StepSerializer(step).data["nights"], 2)
+
+# --- View tests ---
+
+class TravelViewTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.mon_voyage = Travel.objects.create(
+            title="Mon voyage",
+            start_date=datetime.date(2026,6,1),
+            end_date=datetime.date(2026,6,15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        Travel.objects.create(
+            title="Voyage de quelqu'un d'autre",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 15),
+        )
+
+        def test_list_returns_onlu_my_travels(self):
+            self.client.force_authenticate(user=self.traveler)
+
+            response = self.client.get(reverse("travel-list"))
+
+            self.assertEqual(response.status_code, 200),
+            self.assertEqual(len(response.data), 1)
+            self.assertEqual(response.data[0]["id"], self.mon_voyage.id)
