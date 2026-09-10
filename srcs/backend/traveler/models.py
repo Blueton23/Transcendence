@@ -1,3 +1,5 @@
+# models.py
+
 from typing import ClassVar
 
 from django.conf import settings
@@ -6,8 +8,6 @@ from django.db import models
 from django.db.models import CheckConstraint, F, Q, UniqueConstraint
 
 from common.models import TimeStampedModel
-
-# Traveler
 
 
 class Traveler(AbstractUser, TimeStampedModel):
@@ -19,7 +19,6 @@ class Traveler(AbstractUser, TimeStampedModel):
         swappable = "AUTH_USER_MODEL"
 
 
-# Friendship
 class Status(models.TextChoices):
     PENDING = "p", "Pending"
     ACCEPTED = "a", "Accepted"

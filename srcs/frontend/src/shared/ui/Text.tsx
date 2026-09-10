@@ -9,6 +9,7 @@ interface TextProps {
   tone?: TextTone;
   size?: TextSize;
   font?: TextFont;
+  as?: "p" | "span";
   className?: string;
 }
 
@@ -21,8 +22,8 @@ const toneStyles = {
 };
 
 const sizeStyles = {
-  sm: "text-xs",
-  md: "text-md",
+  sm: "text-xs md:text-sm",
+  md: "text-xs md:text-md",
 };
 
 const fontStyles = {
@@ -35,16 +36,18 @@ function Text({
   tone = "primary",
   size = "md",
   font = "sans",
+  as = "p",
   className = "",
 }: TextProps) {
   const textTone = toneStyles[tone];
+  const Tag = as;
 
   return (
-    <p
+    <Tag
       className={`${textTone} ${sizeStyles[size]} ${fontStyles[font]} ${className}`}
     >
       {children}
-    </p>
+    </Tag>
   );
 }
 export default Text;
