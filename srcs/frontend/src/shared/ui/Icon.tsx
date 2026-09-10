@@ -19,6 +19,7 @@ export const iconNames = [
   "coffee",
   "compass",
   "dots",
+  "edit",
   "ext",
   "fork",
   "heart",

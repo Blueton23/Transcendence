@@ -12,7 +12,7 @@ def seed_travels(fake: Faker, count: int) -> list:
         end_date = fake.date_between(start_date=start_date, end_date="+90d")
         travels.append(
             Travel.objects.create(
-                title=fake.catch_phrase(),
+                title=fake.catch_phrase()[:50],
                 start_date=start_date,
                 end_date=end_date,
             )
