@@ -1,6 +1,6 @@
 export type IdeaType =
   "restaurant" | "accommodation" | "activity" | "sightseeing";
-export type IdeaStatus = "proposed" | "selected" | "reserved"; //placed, chosen
+export type IdeaStatus = "suggested" | "placed" | "chosen";
 
 export type IdeaFilter = "all" | IdeaType;
 export type StepFilter = "all" | "none" | number;
@@ -24,7 +24,6 @@ export interface Idea {
   url: string | null;
   note: string | null;
   chosenAt: string | null;
-  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }

@@ -79,34 +79,36 @@ export function IdeasPage() {
         />
       </div>
 
-      {filteredIdeas.map((idea) => {
-        const step = mockSteps.find((step) => step.id === idea.stepId);
+      <div className="flex flex-col gap-3">
+        {filteredIdeas.map((idea) => {
+          const step = mockSteps.find((step) => step.id === idea.stepId);
 
-        const proposer = mockTravelers.find(
-          (traveler) => traveler.id === idea.travelerId,
-        );
+          const proposer = mockTravelers.find(
+            (traveler) => traveler.id === idea.travelerId,
+          );
 
-        const vote = voted.find(
-          (vote) => vote.ideaId === idea.id,
-        );
+          const vote = voted.find(
+            (vote) => vote.ideaId === idea.id,
+          );
 
-        return (
-          <IdeaCard
-            key={idea.id}
-            idea={idea}
-            proposerName={proposer?.name ?? "Inconnu"}
-            proposerInitials={proposer?.initials ?? "?"}
-            voteCount={vote?.voteCount ?? 0}
-            voted={vote?.voted ?? false}
-            stepName={step?.name}
-            onVote={() => handleVote(idea.id)}
-            onPlace={() => setIdeaPlaceId(idea.id)}
-            onView={() => null}
-            onEdit={() => setEditIdeaId(idea.id)}
-            onDelete={() => handleDeleteIdea(idea.id)}
-          />
-        );
-      })}
+          return (
+            <IdeaCard
+              key={idea.id}
+              idea={idea}
+              proposerName={proposer?.name ?? "Inconnu"}
+              proposerInitials={proposer?.initials ?? "?"}
+              voteCount={vote?.voteCount ?? 0}
+              voted={vote?.voted ?? false}
+              stepName={step?.name}
+              onVote={() => handleVote(idea.id)}
+              onPlace={() => setIdeaPlaceId(idea.id)}
+              onView={() => null}
+              onEdit={() => setEditIdeaId(idea.id)}
+              onDelete={() => handleDeleteIdea(idea.id)}
+            />
+          );
+        })}
+      </div>
 
       {createIdeaModalOpen && (
         <CreateIdeaModal

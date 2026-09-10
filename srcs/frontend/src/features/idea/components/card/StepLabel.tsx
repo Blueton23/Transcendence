@@ -8,14 +8,14 @@ interface StepLabelProps {
 export function StepLabel({ stepId, stepName }: StepLabelProps) {
   if (stepId === null) {
     return (
-      <Tag tone="muted" className="text-xs">
+      <Tag tone="muted" className="!text-xs whitespace-nowrap sm:!text-sm">
         Pool Général
       </Tag>
     );
   }
 
   return (
-    <Tag tone="muted" className="text-xs">
+    <Tag tone="muted" className="truncate !text-xs whitespace-nowrap sm:!text-sm">
       {`→ ${stepName}`}
     </Tag>
   );
