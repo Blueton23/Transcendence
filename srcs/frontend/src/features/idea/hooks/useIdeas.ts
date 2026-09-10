@@ -4,6 +4,7 @@ import type {
   CreateIdeaInput,
   PlaceIdeaInput,
   EditIdeaInput,
+  VoteIdea,
 } from "../types";
 import {
   getIdeas,
@@ -11,17 +12,28 @@ import {
   placeIdea,
   voteIdea,
   editIdea,
+  getIdeaVotes,
 } from "../api/api.ideas";
 
 //gère plusieurs idées
 export function useIdeas() {
   const [ideas, setIdeas] = useState<Idea[]>(() => getIdeas());
+  const [voted, setVoted] = useState<VoteIdea[]>(() => getIdeaVotes());
 
   // fonction qui gère la création d'idée
   function handleCreateIdea(input: CreateIdeaInput) {
     const newIdea = createIdea(input);
 
     setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
+
+    setVoted((currentVotes) => [
+      ...currentVotes,
+      {
+        ideaId: newIdea.id,
+        voteCount: 0,
+        voted: false,
+      },
+    ]);
   }
 
   // fonction qui gère le placement d'idée
@@ -60,9 +72,23 @@ export function useIdeas() {
     );
   }
 
-  // fonction qui gere le vote
+  // fonction qui gère le vote
   function handleVote(ideaId: Idea["id"]) {
     voteIdea(ideaId);
+
+    setVoted((currentVotes) =>
+      currentVotes.map((vote) =>
+        vote.ideaId === ideaId
+          ? {
+              ...vote,
+              voted: !vote.voted,
+              voteCount: vote.voted
+                ? vote.voteCount - 1
+                : vote.voteCount + 1,
+            }
+          : vote,
+      ),
+    );
   }
 
   // retourne tableau d'idées
@@ -73,5 +99,6 @@ export function useIdeas() {
     handleDeleteIdea,
     handleEditIdea,
     handleVote,
+    voted,
   };
 }

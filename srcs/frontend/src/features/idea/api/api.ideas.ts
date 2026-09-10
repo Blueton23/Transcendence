@@ -3,6 +3,7 @@ import type {
   CreateIdeaInput,
   PlaceIdeaInput,
   EditIdeaInput,
+  VoteIdea,
 } from "../types";
 
 // get -> permet de récupérer une idée
@@ -98,6 +99,31 @@ export function getIdeas(): Idea[] {
       deletedAt: null,
       createdAt: "2026-08-01T09:15:00Z",
       updatedAt: "2026-08-05T18:30:00Z",
+    },
+  ];
+}
+
+export function getIdeaVotes(): VoteIdea[] {
+  return [
+    {
+      ideaId: 1,
+      voteCount: 2,
+      voted: false,
+    },
+    {
+      ideaId: 2,
+      voteCount: 4,
+      voted: true,
+    },
+    {
+      ideaId: 3,
+      voteCount: 0,
+      voted: false,
+    },
+    {
+      ideaId: 4,
+      voteCount: 1,
+      voted: false,
     },
   ];
 }

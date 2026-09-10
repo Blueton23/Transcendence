@@ -51,3 +51,10 @@ export interface PlaceIdeaInput {
 
 // Représente ce que l’utilisateur saisit dans la modal “Modifier”
 export type EditIdeaInput = CreateIdeaInput;
+
+// Représente le bouton de vote
+export interface VoteIdea {
+  ideaId: Idea["id"];
+  voteCount: number;
+  voted: boolean;
+}
