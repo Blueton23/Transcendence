@@ -66,13 +66,7 @@ export async function signup(data: SignupData): Promise<AuthResponse> {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
     },
-    body: JSON.stringify({
-      first_name: data.firstName,
-      last_name: data.lastName,
-      username: data.username,
-      email: data.email,
-      password: data.password,
-    }),
+    body: JSON.stringify(data),
   });
 
   const result = await response.json();

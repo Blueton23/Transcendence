@@ -60,3 +60,6 @@ Thumbs.db
 *.temp
 *.bak
 *~
+
+# Fichiers
+srcs/frontend/public/mockup.html
