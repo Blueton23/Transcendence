@@ -16,7 +16,7 @@ const toneStyles = {
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center rounded-full gap-2 px-4 py-1.5 font-mono text-xs";
+  "inline-flex items-center justify-center rounded-full gap-2 px-4 py-1.5 font-mono text-xs md:text-sm";
 
 function Tag({ children, tone = "default", icon, className = "" }: TagProps) {
   const tagTone = toneStyles[tone];

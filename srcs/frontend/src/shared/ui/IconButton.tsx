@@ -1,7 +1,7 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
 type IconButtonVariant = "primary" | "flat" | "outline" | "ghost";
-type IconButtonSize = "sm" | "md";
+type IconButtonSize = "xs" | "sm" | "md";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon: ReactNode;
@@ -18,8 +18,9 @@ const variantStyles = {
 };
 
 const sizeStyles = {
+  xs: "w-7 h-7 md:w-[34px] md:h-[34px]",
   sm: "w-[34px] h-[34px]",
-  md: "md:w-11 md:h-11 w-[36px] h-[36px]",
+  md: "w-9 h-9 md:w-11 md:h-11",
 };
 
 const baseStyle =
