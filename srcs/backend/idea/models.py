@@ -72,8 +72,8 @@ class Idea(TimeStampedModel):
     price_per_night = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
-    arrival_date = models.DateTimeField(null=True, blank=True)
-    departure_date = models.DateTimeField(null=True, blank=True)
+    arrival_date = models.DateField(null=True, blank=True)
+    departure_date = models.DateField(null=True, blank=True)
     chosen_at = models.DateTimeField(null=True, blank=True)
 
     objects = IdeaQuerySet.as_manager()

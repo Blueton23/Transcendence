@@ -19,12 +19,12 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
 
             lodging = idea_type == IdeaType.LODGING
             arrival = (
-                fake.date_time_between(start_date="now", end_date="+30d", tzinfo=tz)
+                fake.date_between(start_date="today", end_date="+30d")
                 if lodging
                 else None
             )
             departure = (
-                fake.date_time_between(start_date=arrival, end_date="+40d", tzinfo=tz)
+                fake.date_between(start_date=arrival, end_date="+40d")
                 if lodging
                 else None
             )

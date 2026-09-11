@@ -107,10 +107,8 @@ class IdeaModelTest(TestCase):
         with self.assertRaises(IntegrityError), transaction.atomic():
             self._make_idea(
                 type=IdeaType.LODGING,
-                arrival_date=datetime.datetime(2026, 6, 10, 15, 0, tzinfo=datetime.UTC),
-                departure_date=datetime.datetime(
-                    2026, 6, 8, 10, 0, tzinfo=datetime.UTC
-                ),
+                arrival_date=datetime.date(2026, 6, 10),
+                departure_date=datetime.date(2026, 6, 8),
             )
 
     def test_lodging_dates_in_order_are_allowed(self):
@@ -118,8 +116,8 @@ class IdeaModelTest(TestCase):
             type=IdeaType.LODGING,
             title="Camping du lac",
             price_per_night="24.00",
-            arrival_date=datetime.datetime(2026, 6, 8, 15, 0, tzinfo=datetime.UTC),
-            departure_date=datetime.datetime(2026, 6, 10, 10, 0, tzinfo=datetime.UTC),
+            arrival_date=datetime.date(2026, 6, 8),
+            departure_date=datetime.date(2026, 6, 10),
         )
         self.assertEqual(str(idea.price_per_night), "24.00")
 
