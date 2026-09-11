@@ -13,6 +13,7 @@ import {
   voteIdea,
   editIdea,
   getIdeaVotes,
+  deleteIdea,
 } from "../api/api.ideas";
 
 //gère plusieurs idées
@@ -50,6 +51,8 @@ export function useIdeas() {
 
   // fonction qui gère la suppression d'idée
   function handleDeleteIdea(ideaId: Idea["id"]) {
+    deleteIdea(ideaId);
+
     setIdeas((currentIdeas) =>
       currentIdeas.filter((idea) => idea.id !== ideaId),
     );
