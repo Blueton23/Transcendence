@@ -4,34 +4,45 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('idea', '0001_initial'),
+        ("idea", "0001_initial"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='idea',
-            name='deleted_at',
+            model_name="idea",
+            name="deleted_at",
         ),
         migrations.AddField(
-            model_name='idea',
-            name='note',
+            model_name="idea",
+            name="note",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='idea',
-            name='url',
+            model_name="idea",
+            name="url",
             field=models.URLField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='idea',
-            name='status',
-            field=models.CharField(choices=[('s', 'Suggested'), ('p', 'Placed'), ('c', 'Chosen')], default='s', max_length=1),
+            model_name="idea",
+            name="status",
+            field=models.CharField(
+                choices=[("s", "Suggested"), ("p", "Placed"), ("c", "Chosen")],
+                default="s",
+                max_length=1,
+            ),
         ),
         migrations.AlterField(
-            model_name='idea',
-            name='type',
-            field=models.CharField(choices=[('r', 'Restaurant'), ('l', 'Lodging'), ('a', 'Activity'), ('s', 'Sight')], max_length=1),
+            model_name="idea",
+            name="type",
+            field=models.CharField(
+                choices=[
+                    ("r", "Restaurant"),
+                    ("l", "Lodging"),
+                    ("a", "Activity"),
+                    ("s", "Sight"),
+                ],
+                max_length=1,
+            ),
         ),
     ]
