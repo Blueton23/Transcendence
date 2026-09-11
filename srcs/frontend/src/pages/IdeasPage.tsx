@@ -50,7 +50,7 @@ export function IdeasPage() {
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
 
   return (
-    <div className="px-4 pt-8 sm:px-8">
+    <div className="px-4 pt-8 pb-28 sm:px-8">
       <div className="mb-6 flex items-center justify-between">
         <Heading level={1} size="lg">
           Idées
