@@ -241,10 +241,10 @@ L'app `idea` porte les propositions rattachées à un voyage (où dormir, manger
 
 | Modèle | Rôle | Champs principaux |
 |---|---|---|
-| `Idea` | Une proposition faite pour un voyage | `travel` (FK, CASCADE), `traveler` (FK, celui qui propose), `step` (FK optionnel, `SET NULL` → pool si vide), `chosen_by` (FK optionnel, `SET NULL`), `title`, `type` (`restaurant` / `lodging` / `activity` / `sight`), `status` (`proposed` / `chosen` / `booked`), `localisation`, `latitude` / `longitude` (optionnels), `price_per_night` / `arrival_date` / `departure_date` (si hébergement, contrainte `departure_date >= arrival_date`), `chosen_at`, `deleted_at` (corbeille) |
+| `Idea` | Une proposition faite pour un voyage | `travel` (FK, CASCADE), `traveler` (FK, celui qui propose), `step` (FK optionnel, `SET NULL` → pool si vide), `chosen_by` (FK optionnel, `SET NULL`), `title`, `type` (`restaurant` / `lodging` / `activity` / `sight`), `status` (`suggested` / `placed` / `chosen`), `localisation`, `note` / `url` (optionnels), `latitude` / `longitude` (optionnels), `price_per_night` / `arrival_date` / `departure_date` (si hébergement, contrainte `departure_date >= arrival_date`), `chosen_at` |
 | `Reaction` | Un <3 d'un traveler sur une idée, purement indicatif | `traveler` (FK, CASCADE), `idea` (FK, CASCADE) ; unicité `(traveler, idea)` ; `created_at` seul, pas d'`updated_at` |
 
-- `Idea` gère la **suppression douce** comme `Step` : `deleted_at`, manager `Idea.objects.alive()` / `.trashed()` (+ `.pool()` pour les idées sans étape), instance `soft_delete()` / `restore()`, propriétés `is_trashed` / `is_in_pool`.
+- Pas de suppression douce pour `Idea` : retirée du pool, elle est supprimée définitivement (`delete()`) ; retirée d'une étape, elle retourne simplement au pool. Manager `Idea.objects.pool()` pour les idées sans étape, propriété `is_in_pool`.
 - Une étape supprimée renvoie ses idées au pool (`step` → `NULL`) plutôt que de les emporter. Les réactions, elles, disparaissent avec leur idée (`CASCADE`).
 
 #### Seeds (données de test) :

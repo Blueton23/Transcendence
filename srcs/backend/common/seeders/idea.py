@@ -30,7 +30,7 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
             )
 
             status = fake.random_element(elements=IdeaStatus.values)
-            chosen = status != IdeaStatus.PROPOSED
+            chosen = status == IdeaStatus.CHOSEN
             ideas.append(
                 Idea.objects.create(
                     travel=travel,
@@ -44,6 +44,8 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
                     type=idea_type,
                     status=status,
                     localisation=fake.city() if fake.boolean() else "",
+                    note=fake.sentence() if fake.boolean() else None,
+                    url=fake.url() if fake.boolean() else None,
                     latitude=round(fake.latitude(), 6),
                     longitude=round(fake.longitude(), 6),
                     price_per_night=fake.pydecimal(

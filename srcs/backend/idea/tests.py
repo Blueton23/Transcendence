@@ -40,12 +40,12 @@ class IdeaModelTest(TestCase):
 
     def test_create_idea_defaults(self):
         idea = self._make_idea()
-        self.assertEqual(idea.status, IdeaStatus.PROPOSED)
+        self.assertEqual(idea.status, IdeaStatus.SUGGESTED)
         self.assertIsNone(idea.step_id)
         self.assertIsNone(idea.chosen_by_id)
         self.assertIsNone(idea.chosen_at)
-        self.assertIsNone(idea.deleted_at)
-        self.assertFalse(idea.is_trashed)
+        self.assertIsNone(idea.note)
+        self.assertIsNone(idea.url)
         self.assertTrue(idea.is_in_pool)
         self.assertIsNotNone(idea.created_at)
         self.assertIsNotNone(idea.updated_at)
@@ -128,18 +128,21 @@ class IdeaModelTest(TestCase):
         self.assertIsNone(idea.arrival_date)
         self.assertIsNone(idea.departure_date)
 
-    def test_soft_delete_and_restore(self):
+    def test_note_and_url_are_optional(self):
+        idea = self._make_idea(
+            note="Réserver la table côté terrasse.",
+            url="https://example.com/bouchon-lyonnais",
+        )
+        self.assertEqual(idea.note, "Réserver la table côté terrasse.")
+        self.assertEqual(idea.url, "https://example.com/bouchon-lyonnais")
+
+    def test_removing_idea_from_pool_deletes_it(self):
         idea = self._make_idea()
+        idea_id = idea.id
 
-        idea.soft_delete()
-        self.assertTrue(idea.is_trashed)
-        self.assertIsNotNone(idea.deleted_at)
-        self.assertIn(idea, Idea.objects.trashed())
-        self.assertNotIn(idea, Idea.objects.alive())
+        idea.delete()
 
-        idea.restore()
-        self.assertFalse(idea.is_trashed)
-        self.assertIn(idea, Idea.objects.alive())
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
     def test_pool_queryset_filters_out_stepped_ideas(self):
         pooled = self._make_idea()

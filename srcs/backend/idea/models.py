@@ -3,7 +3,6 @@ from typing import ClassVar
 from django.conf import settings
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
-from django.utils import timezone
 
 from common.models import TimeStampedModel
 from travel.models import Step, Travel
@@ -17,18 +16,12 @@ class IdeaType(models.TextChoices):
 
 
 class IdeaStatus(models.TextChoices):
-    PROPOSED = "p", "Proposed"
+    SUGGESTED = "s", "Suggested"
+    PLACED = "p", "Placed"
     CHOSEN = "c", "Chosen"
-    BOOKED = "b", "Booked"
 
 
 class IdeaQuerySet(models.QuerySet):
-    def alive(self) -> "IdeaQuerySet":
-        return self.filter(deleted_at__isnull=True)
-
-    def trashed(self) -> "IdeaQuerySet":
-        return self.filter(deleted_at__isnull=False)
-
     def pool(self) -> "IdeaQuerySet":
         return self.filter(step__isnull=True)
 
@@ -65,9 +58,11 @@ class Idea(TimeStampedModel):
     title = models.CharField(max_length=255)
     type = models.CharField(max_length=1, choices=IdeaType.choices)
     status = models.CharField(
-        max_length=1, choices=IdeaStatus.choices, default=IdeaStatus.PROPOSED
+        max_length=1, choices=IdeaStatus.choices, default=IdeaStatus.SUGGESTED
     )
     localisation = models.CharField(max_length=255, blank=True)
+    note = models.TextField(null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
     latitude = models.DecimalField(
         max_digits=9, decimal_places=6, null=True, blank=True
     )
@@ -80,9 +75,8 @@ class Idea(TimeStampedModel):
     arrival_date = models.DateTimeField(null=True, blank=True)
     departure_date = models.DateTimeField(null=True, blank=True)
     chosen_at = models.DateTimeField(null=True, blank=True)
-    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
-    objects = IdeaQuerySet.as_manager()  # for soft delete convenience
+    objects = IdeaQuerySet.as_manager()
 
     class Meta:
         ordering: ClassVar[list] = ["-created_at"]
@@ -97,20 +91,8 @@ class Idea(TimeStampedModel):
         return f"{self.title} ({self.travel})"
 
     @property
-    def is_trashed(self) -> bool:
-        return self.deleted_at is not None
-
-    @property
     def is_in_pool(self) -> bool:
         return self.step_id is None
-
-    def soft_delete(self) -> None:
-        self.deleted_at = timezone.now()
-        self.save(update_fields=["deleted_at", "updated_at"])
-
-    def restore(self) -> None:
-        self.deleted_at = None
-        self.save(update_fields=["deleted_at", "updated_at"])
 
 
 class Reaction(models.Model):

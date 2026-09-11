@@ -18,7 +18,6 @@ class IdeaAdmin(admin.ModelAdmin):
         "type",
         "status",
         "traveler",
-        "deleted_at",
     )
     list_filter = ("type", "status", "travel")
     search_fields = ("title", "localisation")
