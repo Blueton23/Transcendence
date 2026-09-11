@@ -13,6 +13,7 @@ export const iconNames = [
   "chat",
   "check",
   "chev-down",
+  "chev-right",
   "city",
   "clock",
   "coffee",

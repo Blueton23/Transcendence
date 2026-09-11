@@ -1,6 +1,6 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
-type ButtonVariant = "primary" | "dark" | "outline" | "danger";
+type ButtonVariant = "primary" | "dark" | "outline" | "danger" | "ghost";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -13,10 +13,11 @@ const variantStyles = {
   dark: "bg-brand-dark text-inverse",
   outline: "bg-surface border border-border text-text",
   danger: "bg-error text-inverse border-transparent",
+  ghost: "bg-transparent text-text",
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-bold text-sm tracking-wide";
+  "cursor-pointer inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-bold text-sm tracking-wide";
 
 function Button({
   children,
