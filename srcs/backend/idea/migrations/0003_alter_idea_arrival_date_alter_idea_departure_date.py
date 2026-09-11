@@ -4,20 +4,19 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('idea', '0002_remove_idea_deleted_at_idea_note_idea_url_and_more'),
+        ("idea", "0002_remove_idea_deleted_at_idea_note_idea_url_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='idea',
-            name='arrival_date',
+            model_name="idea",
+            name="arrival_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='idea',
-            name='departure_date',
+            model_name="idea",
+            name="departure_date",
             field=models.DateField(blank=True, null=True),
         ),
     ]
