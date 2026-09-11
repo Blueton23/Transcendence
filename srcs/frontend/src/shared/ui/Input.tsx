@@ -12,7 +12,7 @@ const variantStyles = {
 };
 
 const baseStyle =
-  "w-full rounded-md border border-border-control bg-surface-control px-4 py-[13px] font-semibold text-md text-text placeholder:font-medium placeholder:text-muted outline-none focus:border-brand-primary";
+  "w-full rounded-md border border-border-control bg-surface-control px-4 py-[13px] font-semibold text-md text-text placeholder:font-medium placeholder:text-muted outline-none focus:border-brand-primary read-only:cursor-default read-only:bg-surface-soft read-only:text-muted read-only:focus:border-border-control disabled:cursor-default disabled:bg-surface-soft disabled:text-muted";
 
 function Input({ variant = "default", className = "", ...rest }: InputProps) {
   const variantStyle = variantStyles[variant];
