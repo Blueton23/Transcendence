@@ -116,7 +116,7 @@ export function IdeasPage() {
         />
       )}
 
-      {ideaPlaceId !== null && (
+      {ideaPlaceId && (
         <PlaceIdeaModal
           idea={ideaToPlace}
           steps={mockSteps}
@@ -125,7 +125,7 @@ export function IdeasPage() {
         />
       )}
 
-      {editIdeaId && (
+      {editIdea && (
         <EditIdeaModal
           idea={editIdea}
           steps={mockSteps}

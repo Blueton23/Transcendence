@@ -10,7 +10,7 @@ interface VoteButtonProps {
 export function VoteButton({ voteCount, voted, onVote }: VoteButtonProps) {
   return (
     <Button
-      variant={voted ? "primary" : "gray"}
+      variant={voted ? "primary" : "outline"}
       onClick={onVote}
       className="!px-2 !py-2 !text-xs sm:!px-5 sm:!py-3 sm:!text-sm"
     >

@@ -16,7 +16,7 @@ export interface IdeaCardProps {
   proposerInitials: string;
   voteCount: number;
   voted: boolean;
-  stepName: string;
+  stepName?: string;
   onPlace: () => void;
   onView: () => void;
   onVote: () => void;
