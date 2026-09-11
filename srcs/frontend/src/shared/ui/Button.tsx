@@ -13,6 +13,7 @@ const variantStyles = {
   dark: "bg-brand-dark text-inverse",
   outline: "bg-surface border border-border text-text",
   danger: "bg-error text-inverse border-transparent",
+  ghost: "bg-transparent text-text",
 };
 
 const baseStyle =

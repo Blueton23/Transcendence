@@ -116,7 +116,7 @@ export function IdeasPage() {
         />
       )}
 
-      {ideaPlaceId && (
+      {ideaToPlace && (
         <PlaceIdeaModal
           idea={ideaToPlace}
           steps={mockSteps}

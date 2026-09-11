@@ -2,7 +2,7 @@ import Tag from "../../../../shared/ui/Tag";
 
 interface StepLabelProps {
   stepId: number | null;
-  stepName: string;
+  stepName?: string;
 }
 
 export function StepLabel({ stepId, stepName }: StepLabelProps) {
