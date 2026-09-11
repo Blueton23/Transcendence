@@ -82,9 +82,7 @@ export function useIdeas() {
           ? {
               ...vote,
               voted: !vote.voted,
-              voteCount: vote.voted
-                ? vote.voteCount - 1
-                : vote.voteCount + 1,
+              voteCount: vote.voted ? vote.voteCount - 1 : vote.voteCount + 1,
             }
           : vote,
       ),

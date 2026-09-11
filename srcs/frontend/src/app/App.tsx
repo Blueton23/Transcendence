@@ -34,7 +34,7 @@ function App() {
           <Route path="/trip/:id">
             <Route index element={<Navigate to="itinerary" replace />} />
             <Route path="itinerary" element={<ItineraryPage />} />
-            <Route path="ideas" element={<IdeasPage/>} />
+            <Route path="ideas" element={<IdeasPage />} />
             <Route path="expenses" element={<PlaceHolder label="expenses" />} />
             <Route path="chat" element={<PlaceHolder label="chat" />} />
             <Route

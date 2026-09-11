@@ -87,9 +87,7 @@ export function IdeasPage() {
             (traveler) => traveler.id === idea.travelerId,
           );
 
-          const vote = voted.find(
-            (vote) => vote.ideaId === idea.id,
-          );
+          const vote = voted.find((vote) => vote.ideaId === idea.id);
 
           return (
             <IdeaCard

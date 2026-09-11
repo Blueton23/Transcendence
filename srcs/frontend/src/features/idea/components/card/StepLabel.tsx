@@ -15,7 +15,10 @@ export function StepLabel({ stepId, stepName }: StepLabelProps) {
   }
 
   return (
-    <Tag tone="muted" className="truncate !text-xs whitespace-nowrap sm:!text-sm">
+    <Tag
+      tone="muted"
+      className="truncate !text-xs whitespace-nowrap sm:!text-sm"
+    >
       {`→ ${stepName}`}
     </Tag>
   );
