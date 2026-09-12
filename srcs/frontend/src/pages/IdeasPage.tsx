@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { useIdeas } from "../features/idea/hooks/useIdeas";
-import { IdeaCard } from "../features/idea/components/IdeaCard";
-import { PinIdeaButton } from "../features/idea/components/page/PinIdeaButton";
-import { IdeaTypeFilter } from "../features/idea/components/page/IdeaTypeFilter";
-import { IdeaStepFilter } from "../features/idea/components/page/IdeaStepFilter";
-import { CreateIdeaModal } from "../features/idea/components/create-idea/CreateIdeaModal";
-import { PlaceIdeaModal } from "../features/idea/components/place-idea/PlaceIdeaModal";
-import { EditIdeaModal } from "../features/idea/components/edit-idea/EditIdeaModal";
-import type { IdeaFilter, StepFilter } from "../features/idea/types";
-import { filterIdeas } from "../features/idea/utils/filterIdeas";
-import Heading from "../shared/ui/Heading";
-import Text from "../shared/ui/Text";
+import { useIdeas } from "@/features/idea/hooks/useIdeas";
+import { IdeaCard } from "@/features/idea/components/IdeaCard";
+import { PinIdeaButton } from "@/features/idea/components/page/PinIdeaButton";
+import { IdeaTypeFilter } from "@/features/idea/components/page/IdeaTypeFilter";
+import { IdeaStepFilter } from "@/features/idea/components/page/IdeaStepFilter";
+import { CreateIdeaModal } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import { PlaceIdeaModal } from "@/features/idea/components/place-idea/PlaceIdeaModal";
+import { EditIdeaModal } from "@/features/idea/components/edit-idea/EditIdeaModal";
+import type { IdeaFilter, StepFilter } from "@/features/idea/types";
+import { filterIdeas } from "@/features/idea/utils/filterIdeas";
+import Heading from "@/shared/ui/Heading";
+import Text from "@/shared/ui/Text";
 
 //A SUPPRIMER, mettre useStep dans la foncton princiale et dans le .map
 const mockSteps = [

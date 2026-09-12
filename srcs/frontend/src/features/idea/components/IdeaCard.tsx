@@ -1,13 +1,13 @@
-import type { Idea } from "../types";
-import { VoteButton } from "./card/VoteButton";
-import { StepButton } from "./card/StepButton";
-import { SecondaryInfo } from "./card/SecondaryInfo";
-import { StepLabel } from "./card/StepLabel";
-import { IdeaOptionsMenu } from "./card/IdeaOptionsMenu";
-import { ideaIcons } from "../utils/ideaIcons";
-import Card from "../../../shared/ui/Card";
-import Icon from "../../../shared/ui/Icon";
-import Heading from "../../../shared/ui/Heading";
+import type { Idea } from "@/features/idea/types";
+import { VoteButton } from "@/features/idea/components/card/VoteButton";
+import { StepButton } from "@/features/idea/components/card/StepButton";
+import { SecondaryInfo } from "@/features/idea/components/card/SecondaryInfo";
+import { StepLabel } from "@/features/idea/components/card/StepLabel";
+import { IdeaOptionsMenu } from "@/features/idea/components/card/IdeaOptionsMenu";
+import { ideaIcons } from "@/features/idea/utils/ideaIcons";
+import Card from "@/shared/ui/Card";
+import Icon from "@/shared/ui/Icon";
+import Heading from "@/shared/ui/Heading";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {

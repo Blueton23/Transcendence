@@ -1,15 +1,11 @@
 import { useState } from "react";
-import { formatDateToISO } from "../../utils/formatDate";
-import type { Idea, IdeaType, EditIdeaInput } from "../../types";
+import { formatDateToISO } from "@/features/idea/utils/formatDate";
+import type { Idea, IdeaType, EditIdeaInput } from "@/features/idea/types";
 import type { DateRange } from "@daypicker/react";
-import { IdeaForm } from "../create-idea/IdeaForm";
-import Modal from "../../../../shared/ui/Modal";
-import Button from "../../../../shared/ui/Button";
-
-export interface StepOption {
-  id: number;
-  name: string;
-}
+import { IdeaForm } from "@/features/idea/components/create-idea/IdeaForm";
+import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import Modal from "@/shared/ui/Modal";
+import Button from "@/shared/ui/Button";
 
 export interface EditIdeaModalProps {
   idea: Idea;

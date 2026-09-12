@@ -5,7 +5,7 @@ import type {
   PlaceIdeaInput,
   EditIdeaInput,
   VoteIdea,
-} from "../types";
+} from "@/features/idea/types";
 import {
   getIdeas,
   createIdea,
@@ -14,7 +14,7 @@ import {
   editIdea,
   getIdeaVotes,
   deleteIdea,
-} from "../api/api.ideas";
+} from "@/features/idea/api/api.ideas";
 
 //gère plusieurs idées
 export function useIdeas() {

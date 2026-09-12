@@ -1,12 +1,12 @@
-import type { Idea } from "../../types";
-import { ideaTypeLabels } from "../../utils/ideaTypeLabels";
-import { ideaIcons } from "../../utils/ideaIcons";
-import type { StepOption } from "../create-idea/CreateIdeaModal";
-import Text from "../../../../shared/ui/Text";
-import Select from "../../../../shared/ui/Select";
-import Input from "../../../../shared/ui/Input";
-import Chip from "../../../../shared/ui/Chip";
-import Icon from "../../../../shared/ui/Icon";
+import type { Idea } from "@/features/idea/types";
+import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
+import { ideaIcons } from "@/features/idea/utils/ideaIcons";
+import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import Text from "@/shared/ui/Text";
+import Select from "@/shared/ui/Select";
+import Input from "@/shared/ui/Input";
+import Chip from "@/shared/ui/Chip";
+import Icon from "@/shared/ui/Icon";
 
 interface PlaceIdeaFormProps {
   idea: Idea;

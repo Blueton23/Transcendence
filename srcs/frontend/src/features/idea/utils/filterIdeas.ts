@@ -1,4 +1,4 @@
-import type { Idea, IdeaFilter, StepFilter } from "../types";
+import type { Idea, IdeaFilter, StepFilter } from "@/features/idea/types";
 
 export function filterIdeas(
   ideas: Idea[],

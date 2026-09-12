@@ -1,9 +1,9 @@
 import { useState } from "react";
-import type { Idea } from "../../types";
-import type { StepOption } from "../create-idea/CreateIdeaModal";
-import { PlaceIdeaForm } from "./PlaceIdeaForm";
-import Modal from "../../../../shared/ui/Modal";
-import Button from "../../../../shared/ui/Button";
+import type { Idea } from "@/features/idea/types";
+import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import { PlaceIdeaForm } from "@/features/idea/components/place-idea/PlaceIdeaForm";
+import Modal from "@/shared/ui/Modal";
+import Button from "@/shared/ui/Button";
 
 interface PlaceIdeaModalProps {
   idea: Idea;

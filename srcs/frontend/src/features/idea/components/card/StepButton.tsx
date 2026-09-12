@@ -1,5 +1,5 @@
-import Button from "../../../../shared/ui/Button";
-import Icon from "../../../../shared/ui/Icon";
+import Button from "@/shared/ui/Button";
+import Icon from "@/shared/ui/Icon";
 
 interface StepButtonProps {
   stepId: number | null;

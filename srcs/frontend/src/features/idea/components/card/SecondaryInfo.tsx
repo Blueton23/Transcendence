@@ -1,6 +1,6 @@
-import type { IdeaType } from "../../types";
-import Text from "../../../../shared/ui/Text";
-import Avatar from "../../../../shared/ui/Avatar";
+import type { IdeaType } from "@/features/idea/types";
+import Text from "@/shared/ui/Text";
+import Avatar from "@/shared/ui/Avatar";
 
 interface SecondaryInfoProps {
   ideaType: IdeaType;

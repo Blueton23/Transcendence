@@ -1,6 +1,6 @@
-import Button from "../../../../shared/ui/Button";
-import Icon from "../../../../shared/ui/Icon";
-import IconButton from "../../../../shared/ui/IconButton";
+import Button from "@/shared/ui/Button";
+import Icon from "@/shared/ui/Icon";
+import IconButton from "@/shared/ui/IconButton";
 
 interface PinIdeaButtonProps {
   onClick: () => void;

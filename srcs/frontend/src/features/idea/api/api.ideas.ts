@@ -4,7 +4,7 @@ import type {
   PlaceIdeaInput,
   EditIdeaInput,
   VoteIdea,
-} from "../types";
+} from "@/features/idea/types";
 
 // get -> permet de récupérer une idée
 export function getIdeas(): Idea[] {

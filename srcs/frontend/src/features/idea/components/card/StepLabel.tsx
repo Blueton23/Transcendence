@@ -1,4 +1,4 @@
-import Tag from "../../../../shared/ui/Tag";
+import Tag from "@/shared/ui/Tag";
 
 interface StepLabelProps {
   stepId: number | null;

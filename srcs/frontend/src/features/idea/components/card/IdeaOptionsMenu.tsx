@@ -1,8 +1,8 @@
 import { useState } from "react";
-import IconButton from "../../../../shared/ui/IconButton";
-import DropdownMenu from "../../../../shared/ui/DropdownMenu";
-import MenuItem from "../../../../shared/ui/MenuItem";
-import Icon from "../../../../shared/ui/Icon";
+import IconButton from "@/shared/ui/IconButton";
+import DropdownMenu from "@/shared/ui/DropdownMenu";
+import MenuItem from "@/shared/ui/MenuItem";
+import Icon from "@/shared/ui/Icon";
 
 interface IdeaOptionsMenuProps {
   onEdit: () => void;

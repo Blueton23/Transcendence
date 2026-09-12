@@ -1,11 +1,11 @@
-import { TypeSelector } from "./TypeSelector";
-import { DatePicker } from "../../../../shared/ui/DatePicker";
-import type { IdeaType } from "../../types";
+import { TypeSelector } from "@/features/idea/components/create-idea/TypeSelector";
+import { DatePicker } from "@/shared/ui/DatePicker";
+import type { IdeaType } from "@/features/idea/types";
 import type { DateRange } from "@daypicker/react";
-import type { StepOption } from "./CreateIdeaModal";
-import Text from "../../../../shared/ui/Text";
-import Select from "../../../../shared/ui/Select";
-import Input from "../../../../shared/ui/Input";
+import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import Text from "@/shared/ui/Text";
+import Select from "@/shared/ui/Select";
+import Input from "@/shared/ui/Input";
 
 interface IdeaFormProps {
   steps: StepOption[];
