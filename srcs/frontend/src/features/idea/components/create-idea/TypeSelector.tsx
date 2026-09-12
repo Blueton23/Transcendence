@@ -16,32 +16,33 @@ export function TypeSelector({
       <Chip
         active={typeActiveFilter === "restaurant"}
         onClick={() => onChange("restaurant")}
+        icon={<Icon name="fork" size={18} />}
       >
-        <Icon name="fork" size={18} />
         Restaurant
       </Chip>
 
       <Chip
         active={typeActiveFilter === "accommodation"}
         onClick={() => onChange("accommodation")}
+        icon={<Icon name="bed" size={18} />}
       >
-        <Icon name="bed" size={18} />
         Hébergement
       </Chip>
 
       <Chip
         active={typeActiveFilter === "activity"}
         onClick={() => onChange("activity")}
+        icon={<Icon name="mtn" size={18} />}
       >
-        <Icon name="mtn" size={18} />
         Activité
       </Chip>
 
       <Chip
         active={typeActiveFilter === "sightseeing"}
         onClick={() => onChange("sightseeing")}
+        icon={<Icon name="pin" size={18} />}
       >
-        <Icon name="pin" size={18} />A voir
+        A voir
       </Chip>
     </div>
   );

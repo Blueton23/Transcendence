@@ -17,8 +17,8 @@ export function SecondaryInfo({
 }: SecondaryInfoProps) {
   if (ideaType === "accommodation" && pricePerNight !== null) {
     return (
-      <div className="flex items-start gap-2 sm:items-center sm:gap-2">
-        <Avatar size="xs" color="2" className="md:h-7 md:w-7 md:text-xs">
+      <div className="flex items-start gap-2 md:items-center">
+        <Avatar size="xs" color="2" className="md:size-7 md:text-xs">
           {proposerInitials}
         </Avatar>
 
@@ -30,8 +30,8 @@ export function SecondaryInfo({
   }
 
   return (
-    <div className="flex items-start gap-2 sm:items-center sm:gap-2">
-      <Avatar size="xs" color="2" className="md:h-7 md:w-7 md:text-xs">
+    <div className="flex items-start gap-2 md:items-center">
+      <Avatar size="xs" color="2" className="md:size-7 md:text-xs">
         {proposerInitials}
       </Avatar>
 

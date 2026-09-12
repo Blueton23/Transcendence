@@ -26,12 +26,11 @@ export function PlaceIdeaForm({
 
   return (
     <>
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Étape
       </Text>
 
       <Select
-        variant="default"
         value={stepId ?? ""}
         onChange={(event) =>
           setStepId(
@@ -49,58 +48,51 @@ export function PlaceIdeaForm({
         ))}
       </Select>
 
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Type
       </Text>
 
-      <Chip disabled className="mb-3">
-        <Icon name={ideaIcons[idea.type]} size={14} />
+      <Chip
+        disabled
+        className="mb-3"
+        icon={<Icon name={ideaIcons[idea.type]} size={14} />}
+      >
         {ideaTypeLabels[idea.type]}
       </Chip>
 
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Nom
       </Text>
 
-      <Input variant="default" value={idea.title} readOnly className="mb-2" />
+      <Input value={idea.title} readOnly className="mb-2" />
 
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Lien
       </Text>
 
-      <Input
-        variant="default"
-        value={idea.url ?? ""}
-        readOnly
-        className="mb-2"
-      />
+      <Input value={idea.url ?? ""} readOnly className="mb-2" />
 
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Note
       </Text>
 
-      <Input
-        variant="default"
-        value={idea.note ?? ""}
-        readOnly
-        className="mb-2"
-      />
+      <Input value={idea.note ?? ""} readOnly className="mb-2" />
 
       {isAccommodation && (
         <>
-          <Text tone="primary" size="sm" className="mb-1">
+          <Text size="sm" className="mb-1">
             Date d'arrivée
           </Text>
 
           <Input value={idea.arrivalDate ?? ""} readOnly className="mb-2" />
 
-          <Text tone="primary" size="sm" className="mb-1">
+          <Text size="sm" className="mb-1">
             Date de départ
           </Text>
 
           <Input value={idea.departureDate ?? ""} readOnly className="mb-2" />
 
-          <Text tone="primary" size="sm" className="mb-1">
+          <Text size="sm" className="mb-1">
             Prix par nuit
           </Text>
 

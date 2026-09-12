@@ -18,8 +18,7 @@ export function IdeaOptionsMenu({ onEdit, onDelete }: IdeaOptionsMenuProps) {
         icon={<Icon name="dots" size={18} />}
         label="Options de l'idée"
         variant="flat"
-        size="sm"
-        className="!h-7 !w-7 sm:!h-[34px] sm:!w-[34px]"
+        size="xs"
         onClick={() => setMenuOpen((open) => !open)}
       />
 

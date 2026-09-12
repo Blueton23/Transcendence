@@ -53,12 +53,11 @@ export function IdeaForm({
 
   return (
     <>
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Étape
       </Text>
 
       <Select
-        variant="default"
         value={stepId ?? ""}
         onChange={(event) =>
           setStepId(
@@ -78,34 +77,31 @@ export function IdeaForm({
 
       <TypeSelector typeActiveFilter={type} onChange={setType} />
 
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Nom
       </Text>
 
       <Input
-        variant="default"
         value={title}
         onChange={(event) => setTitle(event.target.value)}
         className="mb-2"
       />
 
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Lien
       </Text>
 
       <Input
-        variant="default"
         value={url}
         onChange={(event) => setUrl(event.target.value)}
         className="mb-2"
       />
 
-      <Text tone="primary" size="sm" className="mb-1">
+      <Text size="sm" className="mb-1">
         Note
       </Text>
 
       <Input
-        variant="default"
         value={note}
         onChange={(event) => setNote(event.target.value)}
         className="mb-3"
@@ -113,16 +109,15 @@ export function IdeaForm({
 
       {isAccommodation && (
         <>
-          <Text tone="primary" size="sm" className="mb-1">
+          <Text size="sm" className="mb-1">
             Dates du séjour
           </Text>
           <DatePicker selected={dateRange} onSelect={setDateRange} />
 
-          <Text tone="primary" size="sm" className="mt-3 mb-1">
+          <Text size="sm" className="mt-3 mb-1">
             Prix par nuit
           </Text>
           <Input
-            variant="default"
             type="number"
             value={pricePerNight}
             onChange={(event) => setPricePerNight(event.target.value)}

@@ -50,7 +50,7 @@ export function IdeasPage() {
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
 
   return (
-    <div className="px-4 pt-8 pb-28 sm:px-8">
+    <div className="px-4 pt-8 pb-28 md:px-8">
       <div className="mb-6 flex items-center justify-between">
         <Heading level={1} size="lg">
           Idées
@@ -59,9 +59,7 @@ export function IdeasPage() {
       </div>
 
       <div>
-        <Text tone="primary" className="mb-1">
-          Type
-        </Text>
+        <Text className="mb-1">Type</Text>
         <IdeaTypeFilter
           typeActiveFilter={typeActiveFilter}
           onChange={setTypeActiveFilter}
@@ -69,9 +67,7 @@ export function IdeasPage() {
       </div>
 
       <div>
-        <Text tone="primary" className="mb-1">
-          Etape
-        </Text>
+        <Text className="mb-1">Etape</Text>
         <IdeaStepFilter
           steps={mockSteps}
           stepActiveFilter={stepActiveFilter}

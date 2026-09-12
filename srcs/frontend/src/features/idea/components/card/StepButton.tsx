@@ -10,23 +10,15 @@ interface StepButtonProps {
 export function StepButton({ stepId, onPlace, onView }: StepButtonProps) {
   if (stepId === null) {
     return (
-      <Button
-        variant="outline"
-        onClick={onPlace}
-        className="!px-3 !py-2 !text-xs sm:!px-5 sm:!py-3 sm:!text-sm"
-      >
-        <span className="text-xs text-error">Placer</span>
+      <Button variant="outline" size="sm" onClick={onPlace}>
+        <span className="text-error">Placer</span>
         <Icon name="arrow" size={14} className="text-error" />
       </Button>
     );
   }
 
   return (
-    <Button
-      variant="outline"
-      onClick={onView}
-      className="!px-3 !py-2 !text-xs sm:!px-5 sm:!py-3 sm:!text-sm"
-    >
+    <Button variant="outline" size="sm" onClick={onView}>
       Voir l'étape
     </Button>
   );
