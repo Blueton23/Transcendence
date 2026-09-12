@@ -53,7 +53,7 @@ export function IdeaForm({
 
   return (
     <>
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Étape
       </Text>
 
@@ -78,7 +78,7 @@ export function IdeaForm({
 
       <TypeSelector typeActiveFilter={type} onChange={setType} />
 
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Nom
       </Text>
 
@@ -89,7 +89,7 @@ export function IdeaForm({
         className="mb-2"
       />
 
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Lien
       </Text>
 
@@ -100,7 +100,7 @@ export function IdeaForm({
         className="mb-2"
       />
 
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Note
       </Text>
 
@@ -113,7 +113,7 @@ export function IdeaForm({
 
       {isAccommodation && (
         <>
-          <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+          <Text tone="primary" size="sm" className="mb-1">
             Dates du séjour
           </Text>
           <DatePicker selected={dateRange} onSelect={setDateRange} />
@@ -121,7 +121,7 @@ export function IdeaForm({
           <Text
             tone="primary"
             size="sm"
-            className="mt-3 mb-1 text-xs sm:text-sm"
+            className="mt-3 mb-1"
           >
             Prix par nuit
           </Text>

@@ -26,7 +26,7 @@ export function PlaceIdeaForm({
 
   return (
     <>
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Étape
       </Text>
 
@@ -49,7 +49,7 @@ export function PlaceIdeaForm({
         ))}
       </Select>
 
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Type
       </Text>
 
@@ -61,7 +61,7 @@ export function PlaceIdeaForm({
         {ideaTypeLabels[idea.type]}
       </Chip>
 
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Nom
       </Text>
 
@@ -72,7 +72,7 @@ export function PlaceIdeaForm({
         className="mb-2 cursor-default bg-surface-soft text-muted focus:border-border-control"
       />
 
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Lien
       </Text>
 
@@ -83,7 +83,7 @@ export function PlaceIdeaForm({
         className="mb-2 cursor-default bg-surface-soft text-muted focus:border-border-control"
       />
 
-      <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+      <Text tone="primary" size="sm" className="mb-1">
         Note
       </Text>
 
@@ -96,7 +96,7 @@ export function PlaceIdeaForm({
 
       {isAccommodation && (
         <>
-          <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+          <Text tone="primary" size="sm" className="mb-1">
             Date d'arrivée
           </Text>
 
@@ -106,7 +106,7 @@ export function PlaceIdeaForm({
             className="mb-2 cursor-default bg-surface-soft text-muted"
           />
 
-          <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+          <Text tone="primary" size="sm" className="mb-1">
             Date de départ
           </Text>
 
@@ -116,7 +116,7 @@ export function PlaceIdeaForm({
             className="mb-2 cursor-default bg-surface-soft text-muted"
           />
 
-          <Text tone="primary" size="sm" className="mb-1 text-xs sm:text-sm">
+          <Text tone="primary" size="sm" className="mb-1">
             Prix par nuit
           </Text>
 

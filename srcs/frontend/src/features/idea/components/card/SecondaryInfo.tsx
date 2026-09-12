@@ -22,7 +22,7 @@ export function SecondaryInfo({
           {proposerInitials}
         </Avatar>
 
-        <Text tone="muted" size="sm" className="text-xs sm:text-sm">
+        <Text tone="muted" size="sm">
           {pricePerNight} CHF/nuit par {proposerName}
         </Text>
       </div>
@@ -35,7 +35,7 @@ export function SecondaryInfo({
         {proposerInitials}
       </Avatar>
 
-      <Text tone="muted" size="sm" className="text-xs sm:text-sm">
+      <Text tone="muted" size="sm">
         proposée par {proposerName}
       </Text>
     </div>
