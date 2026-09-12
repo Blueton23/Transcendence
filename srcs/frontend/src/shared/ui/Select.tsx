@@ -15,7 +15,7 @@ const variantStyles = {
 };
 
 const baseStyle =
-  "w-full appearance-none rounded-md border border-border-control bg-surface-control py-3 pr-10 font-semibold text-sm text-text outline-none focus:border-brand-primary disabled:cursor-not-allowed disabled:opacity-60 sm:py-[13px] sm:pr-12 sm:text-md";
+  "w-full appearance-none rounded-md border border-border-control bg-surface-control py-3 pr-10 font-semibold text-sm text-text outline-none focus:border-brand-primary disabled:cursor-not-allowed disabled:opacity-60 md:py-[13px] md:pr-12 md:text-md";
 
 function Select({
   children,
@@ -25,13 +25,13 @@ function Select({
   ...rest
 }: SelectProps) {
   const variantStyle = variantStyles[variant];
-  const paddingStyle = icon ? "pl-10 sm:pl-11" : "pl-3.5 sm:pl-4";
+  const paddingStyle = icon ? "pl-10 md:pl-11" : "pl-3.5 md:pl-4";
 
   let iconElement = null;
 
   if (icon) {
     iconElement = (
-      <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 sm:left-4">
+      <span className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 md:left-4">
         {icon}
       </span>
     );
@@ -51,7 +51,7 @@ function Select({
       <Icon
         name="chev-down"
         size={16}
-        className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-muted sm:right-4"
+        className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-muted md:right-4"
       />
     </div>
   );
