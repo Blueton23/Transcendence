@@ -5,8 +5,8 @@ import { SecondaryInfo } from "@/features/idea/components/card/SecondaryInfo";
 import { StepLabel } from "@/features/idea/components/card/StepLabel";
 import { IdeaOptionsMenu } from "@/features/idea/components/card/IdeaOptionsMenu";
 import { ideaIcons } from "@/features/idea/utils/ideaIcons";
+import IconBadge from "@/shared/ui/IconBadge";
 import Card from "@/shared/ui/Card";
-import Icon from "@/shared/ui/Icon";
 import Heading from "@/shared/ui/Heading";
 
 // Défini les composant d'entrée
@@ -44,9 +44,7 @@ export function IdeaCard({
     <Card>
       <div className="flex flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 flex-1 items-start gap-2 sm:items-center sm:gap-3">
-          <div className="flex size-8 shrink-0 items-center justify-center rounded-md bg-error-bg sm:size-10">
-            <Icon name={ideaIcons[idea.type]} />
-          </div>
+          <IconBadge name={ideaIcons[idea.type]} size="md" />
 
           <div className="flex min-w-0 flex-1 flex-col">
             <Heading

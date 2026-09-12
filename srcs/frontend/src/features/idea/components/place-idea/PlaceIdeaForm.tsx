@@ -53,10 +53,7 @@ export function PlaceIdeaForm({
         Type
       </Text>
 
-      <Chip
-        disabled
-        className="mb-3"
-      >
+      <Chip disabled className="mb-3">
         <Icon name={ideaIcons[idea.type]} size={14} />
         {ideaTypeLabels[idea.type]}
       </Chip>
@@ -65,12 +62,7 @@ export function PlaceIdeaForm({
         Nom
       </Text>
 
-      <Input
-        variant="default"
-        value={idea.title}
-        readOnly
-        className="mb-2"
-      />
+      <Input variant="default" value={idea.title} readOnly className="mb-2" />
 
       <Text tone="primary" size="sm" className="mb-1">
         Lien
@@ -100,21 +92,13 @@ export function PlaceIdeaForm({
             Date d'arrivée
           </Text>
 
-          <Input
-            value={idea.arrivalDate ?? ""}
-            readOnly
-            className="mb-2"
-          />
+          <Input value={idea.arrivalDate ?? ""} readOnly className="mb-2" />
 
           <Text tone="primary" size="sm" className="mb-1">
             Date de départ
           </Text>
 
-          <Input
-            value={idea.departureDate ?? ""}
-            readOnly
-            className="mb-2"
-          />
+          <Input value={idea.departureDate ?? ""} readOnly className="mb-2" />
 
           <Text tone="primary" size="sm" className="mb-1">
             Prix par nuit

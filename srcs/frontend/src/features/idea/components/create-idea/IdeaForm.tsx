@@ -118,11 +118,7 @@ export function IdeaForm({
           </Text>
           <DatePicker selected={dateRange} onSelect={setDateRange} />
 
-          <Text
-            tone="primary"
-            size="sm"
-            className="mt-3 mb-1"
-          >
+          <Text tone="primary" size="sm" className="mt-3 mb-1">
             Prix par nuit
           </Text>
           <Input
