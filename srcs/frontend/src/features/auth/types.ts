@@ -10,14 +10,6 @@ export interface User {
   updatedAt: string;
 }
 
-export interface SignupData {
-  username: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
-
 export interface LoginData {
   username: string;
   password: string;

@@ -1,23 +1,13 @@
 import type { User } from "../auth/types";
 
-export interface CreateTravelerData {
+export interface SignupData {
+  username: string;
   firstName: string;
   lastName: string;
-  username: string;
   email: string;
+  password: string;
 }
 
-export interface UpdateTravelerData {
-  firstName: string;
-  lastName: string;
-  username: string;
-  email: string;
-}
-
-export interface CreateTravelerResponse {
-  traveler: User;
-}
-
-export interface UpdateTravelerResponse {
+export interface SignupResponse {
   traveler: User;
 }
