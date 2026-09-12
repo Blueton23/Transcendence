@@ -1,0 +1,134 @@
+import { TypeSelector } from "@/features/idea/components/create-idea/TypeSelector";
+import { DatePicker } from "@/shared/ui/DatePicker";
+import type { IdeaType } from "@/features/idea/types";
+import type { DateRange } from "@daypicker/react";
+import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import Text from "@/shared/ui/Text";
+import Select from "@/shared/ui/Select";
+import Input from "@/shared/ui/Input";
+
+interface IdeaFormProps {
+  steps: StepOption[];
+
+  stepId: number | null;
+  setStepId: (stepId: number | null) => void;
+
+  type: IdeaType;
+  setType: (type: IdeaType) => void;
+
+  title: string;
+  setTitle: (title: string) => void;
+
+  url: string;
+  setUrl: (url: string) => void;
+
+  note: string;
+  setNote: (note: string) => void;
+
+  pricePerNight: string;
+  setPricePerNight: (price: string) => void;
+
+  dateRange: DateRange | undefined;
+  setDateRange: (dateRange: DateRange | undefined) => void;
+}
+
+export function IdeaForm({
+  steps,
+  stepId,
+  setStepId,
+  type,
+  setType,
+  title,
+  setTitle,
+  url,
+  setUrl,
+  note,
+  setNote,
+  pricePerNight,
+  setPricePerNight,
+  dateRange,
+  setDateRange,
+}: IdeaFormProps) {
+  const isAccommodation = type === "accommodation";
+
+  return (
+    <>
+      <Text size="sm" className="mb-1">
+        Étape
+      </Text>
+
+      <Select
+        value={stepId ?? ""}
+        onChange={(event) =>
+          setStepId(
+            event.target.value === "" ? null : Number(event.target.value),
+          )
+        }
+        className="mb-4"
+      >
+        <option value="">Pool général</option>
+
+        {steps.map((step) => (
+          <option key={step.id} value={step.id}>
+            {step.name}
+          </option>
+        ))}
+      </Select>
+
+      <TypeSelector typeActiveFilter={type} onChange={setType} />
+
+      <Text size="sm" className="mb-1">
+        Nom
+      </Text>
+
+      <Input
+        value={title}
+        onChange={(event) => setTitle(event.target.value)}
+        className="mb-2"
+      />
+
+      <Text size="sm" className="mb-1">
+        Lien
+      </Text>
+
+      <Input
+        value={url}
+        onChange={(event) => setUrl(event.target.value)}
+        className="mb-2"
+      />
+
+      <Text size="sm" className="mb-1">
+        Note
+      </Text>
+
+      <Input
+        value={note}
+        onChange={(event) => setNote(event.target.value)}
+        className="mb-3"
+      />
+
+      {isAccommodation && (
+        <>
+          <Text size="sm" className="mb-1">
+            Dates du séjour
+          </Text>
+          <DatePicker selected={dateRange} onSelect={setDateRange} />
+
+          <Text size="sm" className="mt-3 mb-1">
+            Prix par nuit
+          </Text>
+          <Input
+            type="number"
+            value={pricePerNight}
+            onChange={(event) => setPricePerNight(event.target.value)}
+            className="mb-3"
+          />
+        </>
+      )}
+    </>
+  );
+}
+
+/*
+Fonction qui permet de remplir le formulaire "Epingler une idée"
+*/

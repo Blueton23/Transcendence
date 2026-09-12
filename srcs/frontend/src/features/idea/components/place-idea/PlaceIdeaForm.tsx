@@ -1,0 +1,114 @@
+import type { Idea } from "@/features/idea/types";
+import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
+import { ideaIcons } from "@/features/idea/utils/ideaIcons";
+import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import Text from "@/shared/ui/Text";
+import Select from "@/shared/ui/Select";
+import Input from "@/shared/ui/Input";
+import Chip from "@/shared/ui/Chip";
+import Icon from "@/shared/ui/Icon";
+
+interface PlaceIdeaFormProps {
+  idea: Idea;
+  steps: StepOption[];
+
+  stepId: number | null;
+  setStepId: (stepId: number | null) => void;
+}
+
+export function PlaceIdeaForm({
+  idea,
+  steps,
+  stepId,
+  setStepId,
+}: PlaceIdeaFormProps) {
+  const isAccommodation = idea.type === "accommodation";
+
+  return (
+    <>
+      <Text size="sm" className="mb-1">
+        Étape
+      </Text>
+
+      <Select
+        value={stepId ?? ""}
+        onChange={(event) =>
+          setStepId(
+            event.target.value === "" ? null : Number(event.target.value),
+          )
+        }
+        className="mb-4"
+      >
+        <option value="">Choisir une étape</option>
+
+        {steps.map((step) => (
+          <option key={step.id} value={step.id}>
+            {step.name}
+          </option>
+        ))}
+      </Select>
+
+      <Text size="sm" className="mb-1">
+        Type
+      </Text>
+
+      <Chip
+        disabled
+        className="mb-3"
+        icon={<Icon name={ideaIcons[idea.type]} size={14} />}
+      >
+        {ideaTypeLabels[idea.type]}
+      </Chip>
+
+      <Text size="sm" className="mb-1">
+        Nom
+      </Text>
+
+      <Input value={idea.title} readOnly className="mb-2" />
+
+      <Text size="sm" className="mb-1">
+        Lien
+      </Text>
+
+      <Input value={idea.url ?? ""} readOnly className="mb-2" />
+
+      <Text size="sm" className="mb-1">
+        Note
+      </Text>
+
+      <Input value={idea.note ?? ""} readOnly className="mb-2" />
+
+      {isAccommodation && (
+        <>
+          <Text size="sm" className="mb-1">
+            Date d'arrivée
+          </Text>
+
+          <Input value={idea.arrivalDate ?? ""} readOnly className="mb-2" />
+
+          <Text size="sm" className="mb-1">
+            Date de départ
+          </Text>
+
+          <Input value={idea.departureDate ?? ""} readOnly className="mb-2" />
+
+          <Text size="sm" className="mb-1">
+            Prix par nuit
+          </Text>
+
+          <Input
+            value={
+              idea.pricePerNight !== null ? `${idea.pricePerNight} CHF` : ""
+            }
+            readOnly
+            className="mb-3"
+          />
+        </>
+      )}
+    </>
+  );
+}
+
+/*
+Fonction qui permet de remplir le formulaire "Placer l'idée"
+*/
