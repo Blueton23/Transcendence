@@ -1,4 +1,4 @@
-import ProfileInfo from "../features/profile/components/ProfileInfo";
+import ProfileInfo from "../features/profile/components/Profile";
 
 function ProfilePage() {
   return (
