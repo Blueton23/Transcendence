@@ -55,7 +55,7 @@ export function PlaceIdeaForm({
 
       <Chip
         disabled
-        className="mb-3 cursor-default bg-surface-soft text-muted focus:border-border-control"
+        className="mb-3"
       >
         <Icon name={ideaIcons[idea.type]} size={14} />
         {ideaTypeLabels[idea.type]}
@@ -69,7 +69,7 @@ export function PlaceIdeaForm({
         variant="default"
         value={idea.title}
         readOnly
-        className="mb-2 cursor-default bg-surface-soft text-muted focus:border-border-control"
+        className="mb-2"
       />
 
       <Text tone="primary" size="sm" className="mb-1">
@@ -80,7 +80,7 @@ export function PlaceIdeaForm({
         variant="default"
         value={idea.url ?? ""}
         readOnly
-        className="mb-2 cursor-default bg-surface-soft text-muted focus:border-border-control"
+        className="mb-2"
       />
 
       <Text tone="primary" size="sm" className="mb-1">
@@ -91,7 +91,7 @@ export function PlaceIdeaForm({
         variant="default"
         value={idea.note ?? ""}
         readOnly
-        className="mb-2 cursor-default bg-surface-soft text-muted focus:border-border-control"
+        className="mb-2"
       />
 
       {isAccommodation && (
@@ -103,7 +103,7 @@ export function PlaceIdeaForm({
           <Input
             value={idea.arrivalDate ?? ""}
             readOnly
-            className="mb-2 cursor-default bg-surface-soft text-muted"
+            className="mb-2"
           />
 
           <Text tone="primary" size="sm" className="mb-1">
@@ -113,7 +113,7 @@ export function PlaceIdeaForm({
           <Input
             value={idea.departureDate ?? ""}
             readOnly
-            className="mb-2 cursor-default bg-surface-soft text-muted"
+            className="mb-2"
           />
 
           <Text tone="primary" size="sm" className="mb-1">
@@ -125,7 +125,7 @@ export function PlaceIdeaForm({
               idea.pricePerNight !== null ? `${idea.pricePerNight} CHF` : ""
             }
             readOnly
-            className="mb-3 cursor-default bg-surface-soft text-muted"
+            className="mb-3"
           />
         </>
       )}

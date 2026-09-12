@@ -127,7 +127,7 @@ export function IdeaForm({
           </Text>
           <Input
             variant="default"
-            type=""
+            type="number"
             value={pricePerNight}
             onChange={(event) => setPricePerNight(event.target.value)}
             className="mb-3"
