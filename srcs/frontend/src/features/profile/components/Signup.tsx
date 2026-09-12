@@ -2,7 +2,9 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router";
 
-import { signup, login } from "../../auth/api/auth";
+import { signup } from "../api/profile";
+
+import { login } from "../../auth/api/auth";
 import { useAuth } from "../../auth/context/useAuth";
 
 import Button from "../../../shared/ui/Button";
@@ -12,7 +14,8 @@ import Input from "../../../shared/ui/Input";
 function Signup() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
-
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -21,9 +24,6 @@ function Signup() {
     password: "",
     passwordConfirmation: "",
   });
-
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
