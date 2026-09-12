@@ -1,4 +1,4 @@
-import type { AuthResponse, LoginData} from "../types";
+import type { AuthResponse, LoginData } from "../types";
 
 const API_BASE_URL = "/api";
 

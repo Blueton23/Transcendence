@@ -1,5 +1,5 @@
 import type { SignupData, SignupResponse } from "../types";
-import { getCsrfToken, getCookie } from "../../auth/api/auth"
+import { getCsrfToken, getCookie } from "../../auth/api/auth";
 
 const API_BASE_URL = "/api";
 
