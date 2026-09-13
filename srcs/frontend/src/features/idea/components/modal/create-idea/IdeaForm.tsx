@@ -1,6 +1,6 @@
-import { TypeSelector } from "@/features/idea/components/create-idea/TypeSelector";
+import { TypeSelector } from "@/features/idea/components/modal/create-idea/TypeSelector";
 import { DatePicker } from "@/shared/ui/DatePicker";
-import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import type { StepOption } from "@/features/idea/components/modal/create-idea/CreateIdeaModal";
 import type { Dispatch, SetStateAction } from "react";
 import type { IdeaFormValues } from "@/features/idea/types";
 import Text from "@/shared/ui/Text";

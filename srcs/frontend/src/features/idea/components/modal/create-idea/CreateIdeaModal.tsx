@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
-import { IdeaForm } from "@/features/idea/components/create-idea/IdeaForm";
+import { IdeaForm } from "@/features/idea/components/modal/create-idea/IdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";

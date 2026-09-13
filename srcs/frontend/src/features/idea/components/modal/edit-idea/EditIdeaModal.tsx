@@ -4,8 +4,8 @@ import type {
   EditIdeaInput,
   IdeaFormValues,
 } from "@/features/idea/types";
-import { IdeaForm } from "@/features/idea/components/create-idea/IdeaForm";
-import type { StepOption } from "@/features/idea/components/create-idea/CreateIdeaModal";
+import { IdeaForm } from "@/features/idea/components/modal/create-idea/IdeaForm";
+import type { StepOption } from "@/features/idea/components/modal/create-idea/CreateIdeaModal";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
