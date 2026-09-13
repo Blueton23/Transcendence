@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { formatDateToISO } from "@/features/idea/utils/formatDate";
-import type { IdeaType, CreateIdeaInput } from "@/features/idea/types";
-import type { DateRange } from "@daypicker/react";
+import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
 import { IdeaForm } from "@/features/idea/components/create-idea/IdeaForm";
+import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 
@@ -22,15 +21,15 @@ export function CreateIdeaModal({
   onClose,
   onCreate,
 }: CreateIdeaModalProps) {
-  const [stepId, setStepId] = useState<number | null>(null);
-  const [type, setType] = useState<IdeaType>("restaurant");
-  const [title, setTitle] = useState("");
-  const [url, setUrl] = useState("");
-  const [note, setNote] = useState("");
-  const [pricePerNight, setPricePerNight] = useState("");
-  const [dateRange, setDateRange] = useState<DateRange | undefined>();
-
-  const isAccommodation = type === "accommodation";
+  const [values, setValues] = useState<IdeaFormValues>({
+    stepId: null,
+    type: "restaurant",
+    title: "",
+    url: "",
+    note: "",
+    pricePerNight: "",
+    dateRange: undefined,
+  });
 
   return (
     <Modal
@@ -42,57 +41,18 @@ export function CreateIdeaModal({
       <form
         onSubmit={(event) => {
           event.preventDefault();
-
-          const input: CreateIdeaInput = {
-            title,
-            type,
-            stepId,
-            url: url === "" ? null : url,
-            note: note === "" ? null : note,
-            localisation: null,
-            latitude: null,
-            longitude: null,
-            pricePerNight:
-              isAccommodation && pricePerNight !== ""
-                ? Number(pricePerNight)
-                : null,
-            arrivalDate:
-              isAccommodation && dateRange?.from
-                ? formatDateToISO(dateRange.from)
-                : null,
-            departureDate:
-              isAccommodation && dateRange?.to
-                ? formatDateToISO(dateRange.to)
-                : null,
-          };
-
+          const input = ideaFormInput(values);
           onCreate(input);
           onClose();
         }}
       >
-        <IdeaForm
-          steps={steps}
-          stepId={stepId}
-          setStepId={setStepId}
-          type={type}
-          setType={setType}
-          title={title}
-          setTitle={setTitle}
-          url={url}
-          setUrl={setUrl}
-          note={note}
-          setNote={setNote}
-          pricePerNight={pricePerNight}
-          setPricePerNight={setPricePerNight}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-        />
+        <IdeaForm steps={steps} values={values} setValues={setValues} />
 
         <Button
           type="submit"
           variant="primary"
           className="w-full"
-          disabled={title.trim() === ""}
+          disabled={values.title.trim() === ""}
         >
           Enregistrer
         </Button>

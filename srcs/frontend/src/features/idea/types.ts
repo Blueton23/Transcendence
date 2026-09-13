@@ -1,3 +1,5 @@
+import type { DateRange } from "@daypicker/react";
+
 export type IdeaType =
   "restaurant" | "accommodation" | "activity" | "sightseeing";
 export type IdeaStatus = "suggested" | "placed" | "chosen";
@@ -56,4 +58,15 @@ export interface VoteIdea {
   ideaId: Idea["id"];
   voteCount: number;
   voted: boolean;
+}
+
+// Représente les valeurs du formulaire dans les modals
+export interface IdeaFormValues {
+  stepId: number | null;
+  type: IdeaType;
+  title: string;
+  url: string;
+  note: string;
+  pricePerNight: string;
+  dateRange: DateRange | undefined;
 }
