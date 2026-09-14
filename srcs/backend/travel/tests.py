@@ -431,16 +431,20 @@ class TravelViewTest(APITestCase):
 
     def test_list_returns_only_my_travels(self):
         self.client.force_authenticate(user=self.traveler)
+
         response = self.client.get(reverse("travel-list"))
+        
         (self.assertEqual(response.status_code, 200),)
         (self.assertEqual(len(response.data), 1),)
         self.assertEqual(response.data[0]["id"], self.mon_voyage.id)
 
     def test_cant_access_travel_with_no_participation(self):
         self.client.force_authenticate(user=self.traveler)
+
         response = self.client.get(
             reverse("travel-detail", kwargs={"pk": self.autre_voyage.id})
         )
+
         self.assertEqual(response.status_code, 404)
 
 
