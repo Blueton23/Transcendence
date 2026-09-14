@@ -12,7 +12,7 @@ const stateStyles = {
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center gap-2 rounded-full border px-[15px] py-2.5 font-bold text-sm cursor-pointer";
+  "inline-flex items-center justify-center gap-2 rounded-full border px-[15px] py-2.5 font-bold text-sm cursor-pointer disabled:cursor-default disabled:bg-surface-soft disabled:text-muted";
 
 function Chip({
   children,
