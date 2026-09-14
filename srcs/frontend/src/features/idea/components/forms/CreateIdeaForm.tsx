@@ -1,8 +1,9 @@
-import { TypeSelector } from "@/features/idea/components/modal/create-idea/TypeSelector";
-import { DatePicker } from "@/shared/ui/DatePicker";
-import type { StepOption } from "@/features/idea/components/modal/create-idea/CreateIdeaModal";
+import { TypeSelector } from "@/features/idea/components/forms/TypeSelector";
+import type { StepOption } from "@/features/idea/components/modal/CreateIdeaModal";
 import type { Dispatch, SetStateAction } from "react";
 import type { IdeaFormValues } from "@/features/idea/types";
+import { DateField } from "@/features/idea/components/forms/DateField";
+import { AccommodationFields } from "@/features/idea/components/forms/AccommodationFields";
 import Text from "@/shared/ui/Text";
 import Select from "@/shared/ui/Select";
 import Input from "@/shared/ui/Input";
@@ -41,6 +42,10 @@ export function IdeaForm({ steps, values, setValues }: IdeaFormProps) {
           </option>
         ))}
       </Select>
+
+      {values.stepId !== null && !isAccommodation && (
+        <DateField values={values} setValues={setValues} />
+      )}
 
       <TypeSelector
         typeActiveFilter={values.type}
@@ -98,37 +103,7 @@ export function IdeaForm({ steps, values, setValues }: IdeaFormProps) {
       />
 
       {isAccommodation && (
-        <>
-          <Text size="sm" className="mb-1">
-            Dates du séjour
-          </Text>
-
-          <DatePicker
-            selected={values.dateRange}
-            onSelect={(dateRange) =>
-              setValues((current) => ({
-                ...current,
-                dateRange,
-              }))
-            }
-          />
-
-          <Text size="sm" className="mt-3 mb-1">
-            Prix par nuit
-          </Text>
-
-          <Input
-            type="number"
-            value={values.pricePerNight}
-            onChange={(event) =>
-              setValues((current) => ({
-                ...current,
-                pricePerNight: event.target.value,
-              }))
-            }
-            className="mb-3"
-          />
-        </>
+        <AccommodationFields values={values} setValues={setValues} />
       )}
     </>
   );
