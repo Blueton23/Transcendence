@@ -1,25 +1,34 @@
 from typing import ClassVar
 
+from django.db import transaction
 from rest_framework.generics import (
-    ListAPIView,
     ListCreateAPIView,
-    RetrieveAPIView,
+    RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
 
 from .mixins import ParticipantScopedMixin
-from .models import Step, Travel
+from .models import Participation, ParticipationStatus, Step, Travel
 from .permissions import IsTravelParticipant
 from .serializers import StepSerializer, TravelSerializer
 
 
-class TravelListView(ParticipantScopedMixin, ListAPIView):
+class TravelListView(ParticipantScopedMixin, ListCreateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            travel = serializer.save()
+            Participation.objects.create(
+                traveler=self.request.user,
+                travel=travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
 
-class TravelDetailView(ParticipantScopedMixin, RetrieveAPIView):
+
+class TravelDetailView(ParticipantScopedMixin, RetrieveUpdateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 

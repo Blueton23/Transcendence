@@ -447,6 +447,46 @@ class TravelViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_create_travel_makes_traveler_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-list"),
+            {
+                "title": "Nouveau voyage",
+                "start_date": "2026-08-01",
+                "end_date": "2026-08-05",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        nouveau_voyage_id = response.data["id"]
+        self.assertTrue(
+            Participation.objects.filter(
+                travel_id=nouveau_voyage_id,
+                traveler=self.traveler,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        )
+
+    def test_traveler_sees_new_travel_in_list(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        self.client.post(
+            reverse("travel-list"),
+            {
+                "title": "Nouvelle aventure",
+                "start_date": "2026-08-06",
+                "end_date": "2026-08-12",
+            },
+        )
+
+        response = self.client.get(reverse("travel-list"))
+
+        self.assertEqual(len(response.data), 2)
+        titles = [t["title"] for t in response.data]
+        self.assertIn("Nouvelle aventure", titles)
+
 
 class StepViewTest(APITestCase):
     def setUp(self):
