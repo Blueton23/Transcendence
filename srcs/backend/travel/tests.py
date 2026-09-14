@@ -2,6 +2,8 @@ import datetime
 
 from django.db import IntegrityError, transaction
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.test import APITestCase
 
 from travel.models import (
     Participation,
@@ -10,7 +12,10 @@ from travel.models import (
     Travel,
     TravelStatus,
 )
+from travel.serializers import StepSerializer, TravelSerializer
 from traveler.models import Traveler
+
+# --- Model tests ---
 
 
 class TravelModelTest(TestCase):
@@ -268,3 +273,337 @@ class StepModelTest(TestCase):
 
         self.assertEqual(self.travel.start_date, datetime.date(2026, 5, 25))
         self.assertEqual(self.travel.end_date, datetime.date(2026, 6, 15))
+
+
+# --- Serializer tests ---
+
+
+class TravelSerializerTest(TestCase):
+    def setUp(self):
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+    def test_rejects_end_date_before_start_date(self):
+        serializer = TravelSerializer(
+            data={
+                "title": "France Road Trip",
+                "start_date": "2026-10-12",
+                "end_date": "2026-10-11",
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("end_date", serializer.errors)
+
+    def test_seriaized_has_expected_keys(self):
+        travel = Travel.objects.create(
+            title="Road Trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        data = TravelSerializer(travel).data
+
+        expected_keys = {
+            "id",
+            "travelers",
+            "title",
+            "start_date",
+            "end_date",
+            "nights",
+            "invite_token",
+            "status",
+            "created_at",
+            "updated_at",
+        }
+        self.assertEqual(set(data.keys()), expected_keys)
+
+    def test_nights_is_computed(self):
+        travel = Travel.objects.create(
+            title="France Road Trip",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        self.assertEqual(TravelSerializer(travel).data["nights"], 8)
+
+    def test_travelers_includes_only_accepted_participation(self):
+        accepted_traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        invited_traveler = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="password123"
+        )
+        Participation.objects.create(
+            traveler=accepted_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        Participation.objects.create(
+            traveler=invited_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.INVITED,
+        )
+        travelers = TravelSerializer(self.travel).data["travelers"]
+
+        self.assertEqual(len(travelers), 1)
+        self.assertEqual(travelers[0]["id"], accepted_traveler.id)
+
+
+class StepSerializerTest(TestCase):
+    def setUp(self):
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+
+    def test_rejects_end_date_before_start_date(self):
+        serializer = StepSerializer(
+            data={
+                "start_date": "2026-10-12",
+                "end_date": "2026-10-11",
+                "localisation": "Test",
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("end_date", serializer.errors)
+
+    def test_seriaized_has_expected_keys(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        data = StepSerializer(step).data
+
+        expected_keys = {
+            "id",
+            "travel",
+            "priority",
+            "start_date",
+            "end_date",
+            "nights",
+            "idea_count",
+            "localisation",
+            "latitude",
+            "longitude",
+            "created_at",
+            "updated_at",
+        }
+        self.assertEqual(set(data.keys()), expected_keys)
+
+    def test_nights_is_computed(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        self.assertEqual(StepSerializer(step).data["nights"], 2)
+
+
+# --- View tests ---
+
+
+class TravelViewTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.mon_voyage = Travel.objects.create(
+            title="Mon voyage",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.autre_voyage = Travel.objects.create(
+            title="Voyage de quelqu'un d'autre",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 15),
+        )
+
+    def test_list_returns_only_my_travels(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(reverse("travel-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], self.mon_voyage.id)
+
+    def test_cant_access_travel_with_no_participation(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse("travel-detail", kwargs={"pk": self.autre_voyage.id})
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_create_travel_makes_traveler_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-list"),
+            {
+                "title": "Nouveau voyage",
+                "start_date": "2026-08-01",
+                "end_date": "2026-08-05",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        nouveau_voyage_id = response.data["id"]
+        self.assertTrue(
+            Participation.objects.filter(
+                travel_id=nouveau_voyage_id,
+                traveler=self.traveler,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        )
+
+    def test_traveler_sees_new_travel_in_list(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        self.client.post(
+            reverse("travel-list"),
+            {
+                "title": "Nouvelle aventure",
+                "start_date": "2026-08-06",
+                "end_date": "2026-08-12",
+            },
+        )
+
+        response = self.client.get(reverse("travel-list"))
+
+        self.assertEqual(len(response.data), 2)
+        titles = [t["title"] for t in response.data]
+        self.assertIn("Nouvelle aventure", titles)
+
+    # Test for LeaveTravelView
+    def test_traveler_leaves_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-leave", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        self.assertEqual(response.status_code, 204)
+        participation = Participation.objects.get(
+            travel=self.mon_voyage, traveler=self.traveler
+        )
+        self.assertEqual(participation.status, ParticipationStatus.LEFT)
+        self.assertIsNotNone(participation.left_at)
+
+    def test_traveler_travels_in_list_after_leaving(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        self.client.post(
+            reverse("travel-leave", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        response = self.client.get(reverse("travel-list"))
+
+        self.assertEqual(len(response.data), 0)
+        titles = [t["title"] for t in response.data]
+        self.assertNotIn("Mon voyage", titles)
+
+
+class StepViewTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.mon_voyage = Travel.objects.create(
+            title="Mon voyage",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.mon_step = Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 3),
+        )
+
+        self.autre_voyage = Travel.objects.create(
+            title="Voyage de quelqu'un d'autre",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 15),
+        )
+
+        Step.objects.create(
+            travel=self.autre_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 7, 3),
+            end_date=datetime.date(2026, 7, 4),
+        )
+
+    def test_list_returns_only_steps_of_this_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], self.mon_step.id)
+
+    def test_soft_delete_instead_of_hard_delete(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.delete(
+            reverse(
+                "step-detail",
+                kwargs={"travel_id": self.mon_voyage.id, "pk": self.mon_step.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 204)
+        self.mon_step.refresh_from_db()
+        self.assertIsNotNone(self.mon_step.deleted_at)
+        self.assertTrue(Step.objects.filter(id=self.mon_step.id).exists())
+
+    def test_create_succeeded_step_add_to_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id}),
+            {
+                "start_date": "2026-06-10",
+                "end_date": "2026-06-12",
+                "localisation": "Nice",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["travel"], self.mon_voyage.id)
+
+    def test_create_forbidden_if_not_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("step-list", kwargs={"travel_id": self.autre_voyage.id}),
+            {
+                "start_date": "2026-06-10",
+                "end_date": "2026-06-12",
+                "localisation": "Nice",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Step.objects.filter(localisation="Nice").count(), 0)
