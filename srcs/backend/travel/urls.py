@@ -1,6 +1,12 @@
 from django.urls import path
 
-from .views import StepDetailView, StepListView, TravelDetailView, TravelListView
+from .views import (
+    LeaveTravelView,
+    StepDetailView,
+    StepListView,
+    TravelDetailView,
+    TravelListView,
+)
 
 urlpatterns = [
     path("", TravelListView.as_view(), name="travel-list"),
@@ -9,4 +15,5 @@ urlpatterns = [
     path(
         "<int:travel_id>/steps/<int:pk>/", StepDetailView.as_view(), name="step-detail"
     ),
+    path("<int:travel_id>/leave/", LeaveTravelView.as_view(), name="travel-leave"),
 ]

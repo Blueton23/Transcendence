@@ -1,12 +1,17 @@
 from typing import ClassVar
 
 from django.db import transaction
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from rest_framework import status
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
     RetrieveUpdateDestroyAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .mixins import ParticipantScopedMixin
 from .models import Participation, ParticipationStatus, Step, Travel
@@ -55,3 +60,21 @@ class StepDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
 
     def perform_destroy(self, instance):
         instance.soft_delete()
+        # TODO: message system a rajouter dans la chat + bouton "restaurer"une fois l-app chat prete
+
+
+class LeaveTravelView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request, travel_id):
+        participation = get_object_or_404(
+            Participation,
+            travel_id=travel_id,
+            traveler=request.user,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        participation.status = ParticipationStatus.LEFT
+        participation.left_at = timezone.now()
+        participation.save()
+        # TODO: message system a rajouter dans la chat + bouton "restaurer"une fois l-app chat prete
+        return Response(status=status.HTTP_204_NO_CONTENT)

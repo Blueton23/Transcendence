@@ -487,6 +487,34 @@ class TravelViewTest(APITestCase):
         titles = [t["title"] for t in response.data]
         self.assertIn("Nouvelle aventure", titles)
 
+    # Test for LeaveTravelView
+    def test_traveler_leaves_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-leave", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        self.assertEqual(response.status_code, 204)
+        participation = Participation.objects.get(
+            travel=self.mon_voyage, traveler=self.traveler
+        )
+        self.assertEqual(participation.status, ParticipationStatus.LEFT)
+        self.assertIsNotNone(participation.left_at)
+
+    def test_traveler_travels_in_list_after_leaving(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        self.client.post(
+            reverse("travel-leave", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        response = self.client.get(reverse("travel-list"))
+
+        self.assertEqual(len(response.data), 0)
+        titles = [t["title"] for t in response.data]
+        self.assertNotIn("Mon voyage", titles)
+
 
 class StepViewTest(APITestCase):
     def setUp(self):
