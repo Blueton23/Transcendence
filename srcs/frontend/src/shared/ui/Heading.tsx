@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type HeadingSize = "sm" | "md" | "lg";
+type HeadingSize = "xs" | "sm" | "md" | "lg";
 
 interface HeadingProps {
   children: ReactNode;
@@ -10,6 +10,7 @@ interface HeadingProps {
 }
 
 const sizeStyles = {
+  xs: "text-xs md:text-sm",
   sm: "text-base md:text-lg", // 18px sous-titre
   md: "text-lg md:text-xl", // 22px titre de carte/modale
   lg: "text-xl md:text-2xl", // 32px titre de page
