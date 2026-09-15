@@ -97,10 +97,7 @@ export function StepCard({
         <Heading level={2}>{step.localisation}</Heading>
       </div>
       <div className="flex items-center">
-        <StepDescription
-          step={step}
-          ideaPreview={ideaPreview}
-        />
+        <StepDescription step={step} ideaPreview={ideaPreview} />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
       <StepOptionsButton />

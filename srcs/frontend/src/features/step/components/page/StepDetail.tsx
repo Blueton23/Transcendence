@@ -28,11 +28,7 @@ export function StepDetail({
     <div className="flex flex-col gap-6">
       <StepDetailHeader onBack={onBack} />
 
-      <StepInfo
-        step={step}
-        dateLabel={dateLabel}
-        hasNights={hasNights}
-      />
+      <StepInfo step={step} dateLabel={dateLabel} hasNights={hasNights} />
       <Divider />
       {hasNights && <AccommodationSection />}
       <IdeaSection step={step} travel={travel} />

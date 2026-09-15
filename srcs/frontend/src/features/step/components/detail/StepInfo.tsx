@@ -9,11 +9,7 @@ interface StepInfoProps {
   hasNights: boolean;
 }
 
-export function StepInfo({
-  step,
-  dateLabel,
-  hasNights,
-}: StepInfoProps) {
+export function StepInfo({ step, dateLabel, hasNights }: StepInfoProps) {
   return (
     <div>
       <div className="flex items-center gap-4">

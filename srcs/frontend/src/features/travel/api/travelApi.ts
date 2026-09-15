@@ -1,21 +1,16 @@
 import type { Travel } from "@/features/travel/types";
 
-// TODO(branchement): fonction en dur pour le moment. À terme : async, prend travelId en param, fetch réel et mapping API
-// pour convertir les champs Decimal de DRF en number
-export function getTravel(): Travel {
-  return {
-    id: 1,
-    title: "Road trip Suisse",
-    startDate: "2026-07-12",
-    endDate: "2026-07-16",
-    travelers: [
-      { id: 1, initials: "CP", name: "Charlotte P." },
-      { id: 2, initials: "DL", name: "Damien L." },
-      { id: 3, initials: "SY", name: "Sofia Y." },
-    ],
-    inviteToken: "suisse-roadtrip-2026",
-    status: "current",
-    createdAt: "2026-09-02T16:17:00Z",
-    updatedAt: "2026-09-02T16:17:00Z",
-  };
+const API_BASE_URL = "/api";
+
+export async function getTravel(travelId: number): Promise<Travel> {
+  const response = await fetch(`${API_BASE_URL}/travels/${travelId}/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result.message || "aucun voyage trouvé");
+  }
+  return result;
 }
