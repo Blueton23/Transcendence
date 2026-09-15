@@ -67,6 +67,7 @@ class TravelSerializer(serializers.ModelSerializer):
 class StepSerializer(serializers.ModelSerializer):
     nights = serializers.SerializerMethodField()
     idea_count = serializers.SerializerMethodField()
+    travel_id = serializers.IntegerField(read_only=True)
 
     def get_nights(self, obj):
         return (obj.end_date - obj.start_date).days
@@ -83,7 +84,7 @@ class StepSerializer(serializers.ModelSerializer):
         model = Step
         fields: ClassVar[list[str]] = [
             "id",
-            "travel",
+            "travel_id",
             "priority",
             "start_date",
             "end_date",
@@ -97,7 +98,7 @@ class StepSerializer(serializers.ModelSerializer):
         ]
         read_only_fields: ClassVar[list[str]] = [
             "id",
-            "travel",
+            "travel_id",
             "created_at",
             "updated_at",
         ]

@@ -380,7 +380,7 @@ class StepSerializerTest(TestCase):
 
         expected_keys = {
             "id",
-            "travel",
+            "travel_id",
             "priority",
             "start_date",
             "end_date",
@@ -591,7 +591,7 @@ class StepViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["travel"], self.mon_voyage.id)
+        self.assertEqual(response.data["travel_id"], self.mon_voyage.id)
 
     def test_create_forbidden_if_not_participant(self):
         self.client.force_authenticate(user=self.traveler)
