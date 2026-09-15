@@ -6,14 +6,12 @@ import type { Step } from "@/features/step/types";
 interface StepInfoProps {
   step: Step;
   dateLabel: string;
-  nights: number;
   hasNights: boolean;
 }
 
 export function StepInfo({
   step,
   dateLabel,
-  nights,
   hasNights,
 }: StepInfoProps) {
   return (
@@ -25,7 +23,7 @@ export function StepInfo({
             {step.localisation}
           </Heading>
           <Text font="mono" tone="muted" size="sm">
-            {dateLabel} · {hasNights ? `${nights} NUITS` : "PAS DE NUIT"}
+            {dateLabel} · {hasNights ? `${step.nights} NUITS` : "PAS DE NUIT"}
           </Text>
         </div>
       </div>

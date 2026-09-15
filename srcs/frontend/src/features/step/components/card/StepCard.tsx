@@ -8,7 +8,6 @@ import MenuItem from "@/shared/ui/MenuItem";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import { useState } from "react";
 import Divider from "@/shared/ui/Divider";
-import { computeNights } from "@/features/travel/utils/computeNights";
 
 //TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
 // pas un champ stocke dans Step
@@ -16,7 +15,6 @@ interface StepCardProps {
   step: Step;
   dateLabel: string;
   ideaPreview?: StepIdeaPreview;
-  ideaCount: number;
   onClick?: () => void;
 }
 
@@ -64,9 +62,7 @@ function StepOptionsButton() {
 function StepDescription({
   step,
   ideaPreview,
-  ideaCount,
-}: Pick<StepCardProps, "step" | "ideaPreview" | "ideaCount">) {
-  const nights = computeNights(step.startDate, step.endDate);
+}: Pick<StepCardProps, "step" | "ideaPreview">) {
   return (
     <Text tone="muted" size="sm">
       {ideaPreview && (
@@ -77,7 +73,7 @@ function StepDescription({
           {" · "}
         </>
       )}
-      {formatNights(nights)} · {ideaCount} idées épinglées
+      {formatNights(step.nights)} · {step.ideaCount} idées épinglées
     </Text>
   );
 }
@@ -87,7 +83,6 @@ export function StepCard({
   step,
   dateLabel,
   ideaPreview,
-  ideaCount,
   onClick,
 }: StepCardProps) {
   return (
@@ -105,7 +100,6 @@ export function StepCard({
         <StepDescription
           step={step}
           ideaPreview={ideaPreview}
-          ideaCount={ideaCount}
         />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
