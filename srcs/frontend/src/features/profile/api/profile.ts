@@ -1,4 +1,4 @@
-import type { SignupData, SignupResponse } from "../types";
+import type { SignupData, SignupResponse, ModifyProfileData, ModifyProfileResponse } from "../types";
 import { getCsrfToken } from "../../auth/api/auth";
 import { getCookie } from "../../../shared/api/cookies";
 
@@ -55,6 +55,41 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
       //      result.detail || JSON.stringify(result),
       getApiErrorMessage(result),
     );
+  }
+
+  return result;
+}
+
+
+export async function modifyProfile(
+  userId: number,
+  data: ModifyProfileData,
+): Promise<ModifyProfileResponse> {
+  await getCsrfToken(); //virer SDU ?
+
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/travelers/${userId}/`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(result));
   }
 
   return result;
