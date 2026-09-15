@@ -5,11 +5,12 @@ export interface Step {
   travelId: number;
   startDate: string;
   endDate: string;
+  nights: number;
+  ideaCount: number;
   priority: number | null;
   localisation: string;
   latitude: number;
   longitude: number;
-  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
