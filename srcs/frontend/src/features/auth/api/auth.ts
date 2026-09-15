@@ -1,4 +1,5 @@
 import type { AuthResponse, LoginData } from "../types";
+import { getCookie } from "../../../shared/api/cookies";
 
 const API_BASE_URL = "/api";
 
@@ -11,19 +12,6 @@ export async function getCsrfToken(): Promise<void> {
   if (!response.ok) {
     throw new Error("Impossible d'initialiser la protection CSRF.");
   }
-}
-
-export function getCookie(name: string): string | null {
-  const cookies = document.cookie.split(";");
-
-  for (const cookie of cookies) {
-    const [key, ...value] = cookie.trim().split("=");
-
-    if (key === name) {
-      return decodeURIComponent(value.join("="));
-    }
-  }
-  return null;
 }
 
 export async function login(data: LoginData): Promise<AuthResponse> {
