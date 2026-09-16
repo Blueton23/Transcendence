@@ -1,5 +1,6 @@
 import type { Travel } from "@/features/travel/types";
 import { getCookie } from "@/shared/api/cookies";
+import { getApiErrorMessage } from "@/shared/api/errors";
 
 const API_BASE_URL = "/api";
 
@@ -11,7 +12,7 @@ export async function getTravel(travelId: number): Promise<Travel> {
 
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(result.message || "aucun voyage trouvé");
+    throw new Error(getApiErrorMessage(result) || "aucun voyage trouvé");
   }
   return result;
 }
@@ -34,6 +35,8 @@ export async function leaveTravel(travelId: number): Promise<void> {
 
   if (!response.ok) {
     const result = await response.json();
-    throw new Error(result.message || "impossible de quitter le voyage");
+    throw new Error(
+      getApiErrorMessage(result) || "impossible de quitter le voyage",
+    );
   }
 }
