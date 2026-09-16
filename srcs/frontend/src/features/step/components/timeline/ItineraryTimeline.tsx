@@ -10,6 +10,7 @@ export interface ItineraryTimelineProps {
   segments: Segment[];
   dateLabels: string[];
   onDetailView: (step: Step) => void;
+  refetch: () => void;
 }
 
 export function ItineraryTimeline({
@@ -17,12 +18,13 @@ export function ItineraryTimeline({
   segments,
   dateLabels,
   onDetailView,
+  refetch,
 }: ItineraryTimelineProps) {
   return (
     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
       {steps.map((step, index) => (
         <Fragment key={step.id}>
-          {index > 0 && (
+          {index > 0 && segments[index - 1] && (
             <Fragment>
               <span aria-hidden="true" />
               <SegmentRow segment={segments[index - 1]} />
@@ -32,8 +34,8 @@ export function ItineraryTimeline({
           <StepCard
             step={step}
             dateLabel={dateLabels[index]}
-            ideaCount={2}
             onClick={() => onDetailView(step)}
+            refetch={refetch}
           />
         </Fragment>
       ))}
