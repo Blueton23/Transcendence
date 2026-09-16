@@ -1,5 +1,6 @@
 import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
+import Text from "@/shared/ui/Text";
 import { DatePicker } from "@/shared/ui/DatePicker";
 import { type DateRange } from "@daypicker/react";
 import { useRef } from "react";
@@ -14,6 +15,7 @@ interface DatePanelProps {
   onClose: () => void;
   onSubmit: () => void;
   isSubmitting: boolean;
+  error: string | null;
 }
 
 export function DatesPanel({
@@ -24,6 +26,7 @@ export function DatesPanel({
   onSubmit,
   onClose,
   isSubmitting,
+  error,
 }: DatePanelProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(cardRef, onClose);
@@ -62,6 +65,7 @@ export function DatesPanel({
         <Button onClick={onSubmit} variant="primary" disabled={isSubmitting}>
           {isSubmitting ? "Ajout..." : "Ajouter l'étape"}
         </Button>
+        {error && <Text tone="accent">{error}</Text>}
       </Card>
     </div>
   );

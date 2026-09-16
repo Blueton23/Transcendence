@@ -26,15 +26,16 @@ export function AddStepForm({ travelId, refetch }: AddStepFromProps) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<DateRange>();
   const [noOvernight, setNoOvernight] = useState(false);
-  const { submit, isSubmitting, error } = useSubmitAction(() =>
-    createStep(travelId, {
+  const { submit, isSubmitting, error } = useSubmitAction(() => {
+    if (!selected?.from || !selected?.to) {
+      throw new Error("Sélectionne des dates avant de valider.");
+    }
+    return createStep(travelId, {
       localisation: query,
       startDate: toApiDateString(selected.from),
       endDate: toApiDateString(selected.to),
-    }),
-  );
-
-  if (error) return <p>{error}</p>;
+    });
+  });
 
   const filtered = results.filter((lieu) =>
     lieu.toLowerCase().includes(query.toLowerCase()),
@@ -90,6 +91,7 @@ export function AddStepForm({ travelId, refetch }: AddStepFromProps) {
           onSubmit={handleOnSubmit}
           onClose={() => setOpenPanel(null)}
           isSubmitting={isSubmitting}
+          error={error}
         />
       )}
     </div>
