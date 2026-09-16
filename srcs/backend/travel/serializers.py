@@ -28,6 +28,25 @@ def validate_date_within_travel(travel, instance, attrs):
         raise serializers.ValidationError(errors)
 
 
+def validate_no_dates_overlap(travel, instance, attrs):
+    start = attrs.get("start_date", getattr(instance, "start_date", None))
+    end = attrs.get("end_date", getattr(instance, "end_date", None))
+    if start == end:
+        return
+
+    conflicts = (
+        Step.objects.alive()
+        .filter(
+            travel=travel,
+            start_date__lt=end,
+            end_date__gt=start,
+        )
+        .exclude(pk=instance.pk if instance else None)
+    )
+    if conflicts.exists():
+        raise serializers.ValidationError({"start_date": "Overlaps with anoter step"})
+
+
 class TravelSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     travelers = serializers.SerializerMethodField()
@@ -97,6 +116,7 @@ class StepSerializer(serializers.ModelSerializer):
             travel_id = self.context["view"].kwargs["travel_id"]
             travel = get_object_or_404(Travel, pk=travel_id)
         validate_date_within_travel(travel, self.instance, attrs)
+        validate_no_dates_overlap(travel, self.instance, attrs)
         return attrs
 
     class Meta:

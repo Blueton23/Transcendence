@@ -635,3 +635,17 @@ class StepViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("end_date", response.data["details"])
+
+    def test_rejects_dates_overlaping(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id}),
+            {
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-04",
+                "localisation": "Lyon",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", response.data["details"])
