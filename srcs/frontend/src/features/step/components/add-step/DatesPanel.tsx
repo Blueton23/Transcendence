@@ -6,8 +6,10 @@ import { type DateRange } from "@daypicker/react";
 import { useRef } from "react";
 import { useOnClickOutside } from "@/shared/hooks/useOnClickOutside";
 import { useEscapeKey } from "@/shared/hooks/useEscapeKey";
+import type { Travel } from "@/features/travel/types";
 
 interface DatePanelProps {
+  travel: Travel;
   selected: DateRange | undefined;
   onSelect: (range: DateRange | undefined) => void;
   noOvernight: boolean;
@@ -19,6 +21,7 @@ interface DatePanelProps {
 }
 
 export function DatesPanel({
+  travel,
   selected,
   onSelect,
   noOvernight,
@@ -31,6 +34,11 @@ export function DatesPanel({
   const cardRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(cardRef, onClose);
   useEscapeKey(onClose);
+
+  const disabled = [
+    { before: new Date(travel.startDate) },
+    { after: new Date(travel.endDate) },
+  ];
 
   const handleDateSelect = (range: DateRange | undefined) => {
     if (noOvernight && range?.from) {
@@ -50,8 +58,7 @@ export function DatesPanel({
           selected={selected}
           onSelect={handleDateSelect}
           singleDay={noOvernight}
-          // TODO(branchement): borner aussi aux dates du voyage (travel.startDate/endDate) une fois Travel branché
-          // TODO(branchement): exclure les dates déjà prises par d'autres étapes (sauf étapes "pas de nuit")
+          disabled={disabled}
         />
         <label className="flex items-center gap-2 font-sans text-md font-semibold">
           <input

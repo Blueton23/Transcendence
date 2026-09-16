@@ -6,6 +6,7 @@ import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { createStep } from "@/features/step/api/stepApi";
 import { toApiDateString } from "@/features/step/utils/stepDates";
+import type { Travel } from "@/features/travel/types";
 
 // TODO(branchement): remplacer results en dur par l'autocomplete de l'API géocodage
 const results = [
@@ -17,11 +18,11 @@ const results = [
 type OpenPanel = "place" | "calendar" | null;
 
 interface AddStepFromProps {
-  travelId: number;
+  travel: Travel;
   refetch: () => void;
 }
 
-export function AddStepForm({ travelId, refetch }: AddStepFromProps) {
+export function AddStepForm({ travel, refetch }: AddStepFromProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<DateRange>();
@@ -30,7 +31,7 @@ export function AddStepForm({ travelId, refetch }: AddStepFromProps) {
     if (!selected?.from || !selected?.to) {
       throw new Error("Sélectionne des dates avant de valider.");
     }
-    return createStep(travelId, {
+    return createStep(travel.id, {
       localisation: query,
       startDate: toApiDateString(selected.from),
       endDate: toApiDateString(selected.to),
@@ -84,6 +85,7 @@ export function AddStepForm({ travelId, refetch }: AddStepFromProps) {
       )}
       {openPanel === "calendar" && (
         <DatesPanel
+          travel={travel}
           selected={selected}
           onSelect={setSelected}
           noOvernight={noOvernight}

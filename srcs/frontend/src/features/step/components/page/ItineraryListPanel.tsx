@@ -3,11 +3,12 @@ import type { Step } from "@/features/step/types";
 import { ItineraryTimeline } from "@/features/step/components/timeline/ItineraryTimeline";
 import { TotalSegment } from "../timeline/TotalSegment";
 import { AddStepForm } from "@/features/step/components/add-step";
+import type { Travel } from "@/features/travel/types";
 
 interface ItineraryListPanelProps {
   steps: Step[];
   segments: Segment[];
-  travelId: number;
+  travel: Travel;
   dateLabels: string[];
   onDetailView: (step: Step) => void;
   refetch: () => void;
@@ -16,14 +17,14 @@ interface ItineraryListPanelProps {
 export function ItineraryListPanel({
   steps,
   segments,
-  travelId,
+  travel,
   dateLabels,
   onDetailView,
   refetch,
 }: ItineraryListPanelProps) {
   return (
     <>
-      <AddStepForm travelId={travelId} refetch={refetch} />
+      <AddStepForm travel={travel} refetch={refetch} />
       <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pb-20 md:pb-0">
         <ItineraryTimeline
           steps={steps}

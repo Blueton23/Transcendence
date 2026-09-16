@@ -69,7 +69,7 @@ function ItineraryPage() {
             <ItineraryListPanel
               steps={steps}
               segments={segments}
-              travelId={travelId}
+              travel={travel}
               dateLabels={dateLabels}
               onDetailView={setDetailView}
               refetch={refetch}

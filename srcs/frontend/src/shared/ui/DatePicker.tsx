@@ -41,6 +41,7 @@ export function DatePicker({
       navLayout="around"
       selected={selected}
       onSelect={onSelect}
+      disabled={disabled}
     />
   );
 }
