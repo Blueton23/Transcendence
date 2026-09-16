@@ -8,8 +8,8 @@ import { ToggleMobileButton } from "@/features/step/components/mobile/ToggleMobi
 export interface ItineraryHeaderProps {
   travel: Travel;
   segments: Segment[];
-  firstStep: Step;
-  lastStep: Step;
+  firstStep?: Step;
+  lastStep?: Step;
   mobileView: "list" | "map";
   onToggle: (view: "list" | "map") => void;
   isDetailView: boolean;

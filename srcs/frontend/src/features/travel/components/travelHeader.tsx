@@ -16,8 +16,8 @@ import { useNavigate } from "react-router";
 
 interface TravelHeaderProps {
   travel: Travel;
-  firstStep: Step;
-  lastStep: Step;
+  firstStep?: Step;
+  lastStep?: Step;
   totalKms: number;
 }
 
@@ -79,12 +79,14 @@ export function TravelHeader({
   const DatesLabel = computeTravelDates(travel.startDate, travel.endDate);
   return (
     <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-6">
-      <Text
-        font="mono"
-        tone="secondary"
-        size="sm"
-        className="text-inverse! uppercase"
-      >{`${firstStep.localisation} → ${lastStep.localisation}`}</Text>
+      {firstStep && lastStep && (
+        <Text
+          font="mono"
+          tone="secondary"
+          size="sm"
+          className="text-inverse! uppercase"
+        >{`${firstStep.localisation} → ${lastStep.localisation}`}</Text>
+      )}
       <Heading level={1} size="lg" className="text-inverse!">
         {travel.title}
       </Heading>
