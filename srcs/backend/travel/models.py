@@ -2,10 +2,10 @@ import secrets
 from typing import ClassVar
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.utils import timezone
-from django.core.exceptions import ValidationError
 
 from common.models import TimeStampedModel
 
@@ -113,7 +113,7 @@ class Step(TimeStampedModel):
     objects = StepQuerySet.as_manager()  # for soft delete convenience
 
     class Meta:
-        ordering: ClassVar[list] = ["start_date", "end_date", "priority"]
+        ordering: ClassVar[list] = ["start_date", "end_date", "priority", "created_at"]
         constraints: ClassVar[list] = [
             CheckConstraint(
                 check=Q(end_date__gte=models.F("start_date")),
@@ -163,8 +163,9 @@ class Step(TimeStampedModel):
 
     def clean(self):
         if self.travel_id and self.start_date and self.end_date:
-            validate_no_dates_overlap(self.travel, self.start_date, self.end_date, self.pk)
-
+            validate_no_dates_overlap(
+                self.travel, self.start_date, self.end_date, self.pk
+            )
 
 
 def validate_no_dates_overlap(travel, start, end, exclude_pk=None):
@@ -178,4 +179,4 @@ def validate_no_dates_overlap(travel, start, end, exclude_pk=None):
         .exclude(pk=exclude_pk)
     )
     if conflicts.exists():
-        raise ValidationError({"start_date": "Overlaps with anoter step"})
+        raise ValidationError({"start_date": "Overlaps with another step"})
