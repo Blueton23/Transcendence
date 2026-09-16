@@ -47,13 +47,15 @@ function StepOptionsButton({
   stepId,
   travelId,
 }: StepOptionsButtonProps) {
-  const { submit, isSubmitting, error } = useSubmitAction(() =>
+  // rajouter error une fois que bandeau error en place
+  const { submit, isSubmitting } = useSubmitAction(() =>
     deleteStep(travelId, stepId),
   );
 
   const [isOpen, setIsOpen] = useState(false);
 
-  if (error) return <p>{error}</p>;
+  //A rajouter un bandeau d'erreur en cas d'erreur pour eviter le remplacement de la card
+  //if (error) return <p>{error}</p>;
 
   const handleOnSubmit = async () => {
     const result = await submit();
