@@ -1,4 +1,3 @@
-import { getCsrfToken } from "@/features/auth/api/auth";
 import type { Step, CreateStepData } from "@/features/step/types";
 import { getCookie } from "@/shared/api/cookies";
 
@@ -21,7 +20,6 @@ export async function createStep(
   travelId: number,
   data: CreateStepData,
 ): Promise<Step> {
-  await getCsrfToken();
 
   const csrfToken = getCookie("csrftoken");
 
@@ -50,7 +48,6 @@ export async function deleteStep(
   travelId: number,
   stepId: number,
 ): Promise<void> {
-  await getCsrfToken();
 
   const csrfToken = getCookie("csrftoken");
 
