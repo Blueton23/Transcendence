@@ -1,12 +1,12 @@
-
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 
 import { modifyProfile } from "../api/profile";
 import { useAuth } from "../../auth/context/useAuth";
 
-import  Button  from "../../../shared/ui/Button";
-import  Input  from "../../../shared/ui/Input";
+import Button from "../../../shared/ui/Button";
+import Input from "../../../shared/ui/Input";
+import Avatar from "../../../shared/ui/Avatar";
 
 interface ModifyProps {
   onSuccess: () => void;
@@ -38,9 +38,7 @@ function Modify({ onSuccess }: ModifyProps) {
     });
   }, [currentUser]);
 
-  function handleChange(
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setForm((previous) => ({
@@ -49,9 +47,7 @@ function Modify({ onSuccess }: ModifyProps) {
     }));
   }
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     setError(null);
@@ -75,11 +71,7 @@ function Modify({ onSuccess }: ModifyProps) {
 
       onSuccess();
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Une erreur est survenue.",
-      );
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setIsSubmitting(false);
     }
@@ -95,10 +87,45 @@ function Modify({ onSuccess }: ModifyProps) {
 
   return (
     <div className="w-full">
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col gap-4"
-      >
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <div className="flex w-24 justify-center">
+          <Avatar size="lg" color="1">
+            {currentUser.firstName?.charAt(0).toUpperCase()}
+            {currentUser.lastName?.charAt(0).toUpperCase()}
+          </Avatar>
+        </div>
+
+        {/* Nom d'utilisateur */}
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Pseudo
+          </span>
+
+          <Input
+            name="username"
+            type="text"
+            value={form.username}
+            onChange={handleChange}
+            variant="mono"
+            required
+          />
+        </label>
+
+        {/* Email */}
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Email
+          </span>
+
+          <Input
+            name="email"
+            type="email"
+            value={form.email}
+            onChange={handleChange}
+            required
+          />
+        </label>
+
         {/* Prénom / Nom */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-2">
@@ -130,40 +157,9 @@ function Modify({ onSuccess }: ModifyProps) {
           </label>
         </div>
 
-        {/* Nom d'utilisateur */}
-        <label className="flex flex-col gap-2">
-          <span className="text-sm font-semibold text-text-secondary">
-            Nom d'utilisateur
-          </span>
-
-          <Input
-            name="username"
-            type="text"
-            value={form.username}
-            onChange={handleChange}
-            variant="mono"
-            required
-          />
-        </label>
-
-        {/* Email */}
-        <label className="flex flex-col gap-2">
-          <span className="text-sm font-semibold text-text-secondary">
-            Email
-          </span>
-
-          <Input
-            name="email"
-            type="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
-        </label>
-
         {/* Erreur */}
         {error && (
-          <p className="whitespace-pre-line text-sm font-medium text-red-500">
+          <p className="text-sm font-medium whitespace-pre-line text-red-500">
             {error}
           </p>
         )}

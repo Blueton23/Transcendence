@@ -1,4 +1,9 @@
-import type { SignupData, SignupResponse, ModifyProfileData, ModifyProfileResponse } from "../types";
+import type {
+  SignupData,
+  SignupResponse,
+  ModifyProfileData,
+  ModifyProfileResponse,
+} from "../types";
 import { getCsrfToken } from "../../auth/api/auth";
 import { getCookie } from "../../../shared/api/cookies";
 
@@ -60,7 +65,6 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
   return result;
 }
 
-
 export async function modifyProfile(
   userId: number,
   data: ModifyProfileData,
@@ -73,18 +77,15 @@ export async function modifyProfile(
     throw new Error("Token CSRF introuvable.");
   }
 
-  const response = await fetch(
-    `${API_BASE_URL}/travelers/${userId}/`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
-      },
-      body: JSON.stringify(data),
+  const response = await fetch(`${API_BASE_URL}/travelers/${userId}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
     },
-  );
+    body: JSON.stringify(data),
+  });
 
   const result = await response.json();
 
