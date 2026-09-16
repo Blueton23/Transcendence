@@ -21,3 +21,11 @@ export interface StepIdeaPreview {
   label: string;
   status: "proposed" | "selected" | "reserved";
 }
+
+export interface CreateStepData {
+  startDate: string;
+  endDate: string;
+  localisation: string;
+  latitude?: number | null;
+  longitude?: number | null;
+}

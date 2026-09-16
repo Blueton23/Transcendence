@@ -6,10 +6,10 @@ export function useSteps(travelId: number) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refetchTrigger, setRefetchTrigger] = useState(0);
 
   useEffect(() => {
     async function loadSteps() {
-      setIsLoading(true);
       setError(null);
       try {
         const result = await getSteps(travelId);
@@ -21,7 +21,11 @@ export function useSteps(travelId: number) {
       }
     }
     loadSteps();
-  }, [travelId]);
+  }, [travelId, refetchTrigger]);
 
-  return { steps, isLoading, error };
+  function refetch() {
+    setRefetchTrigger((n) => n + 1);
+  }
+
+  return { steps, isLoading, error, refetch };
 }

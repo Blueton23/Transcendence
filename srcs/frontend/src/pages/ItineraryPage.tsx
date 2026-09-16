@@ -27,6 +27,7 @@ function ItineraryPage() {
     steps,
     isLoading: isLoadingSteps,
     error: errorSteps,
+    refetch,
   } = useSteps(travelId);
   const segments = getSegments();
   const dateLabels = computeDateLabels(steps);
@@ -67,8 +68,10 @@ function ItineraryPage() {
             <ItineraryListPanel
               steps={steps}
               segments={segments}
+              travelId={travelId}
               dateLabels={dateLabels}
               onDetailView={setDetailView}
+              refetch={refetch}
             />
           </div>
         )}

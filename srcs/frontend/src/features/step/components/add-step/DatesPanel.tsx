@@ -13,6 +13,7 @@ interface DatePanelProps {
   onNoOvernightChange: (checked: boolean) => void;
   onClose: () => void;
   onSubmit: () => void;
+  isSubmitting: boolean;
 }
 
 export function DatesPanel({
@@ -22,6 +23,7 @@ export function DatesPanel({
   onNoOvernightChange,
   onSubmit,
   onClose,
+  isSubmitting,
 }: DatePanelProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(cardRef, onClose);
@@ -57,8 +59,8 @@ export function DatesPanel({
           />{" "}
           je ne passe pas de nuit ici
         </label>
-        <Button onClick={onSubmit} variant="primary">
-          Ajouter l'étape
+        <Button onClick={onSubmit} variant="primary" disabled={isSubmitting}>
+          {isSubmitting ? "Ajout..." : "Ajouter l'étape"}
         </Button>
       </Card>
     </div>
