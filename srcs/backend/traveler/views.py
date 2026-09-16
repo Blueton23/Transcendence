@@ -13,6 +13,7 @@ from rest_framework.views import APIView
 from .serializers import (
     LoginSerializer,
     TravelerCreateSerializer,
+    TravelerUpdatePasswordSerializer,
     TravelerUpdateSerializer,
 )
 
@@ -189,6 +190,39 @@ class CsrfTokenView(APIView):
         return Response(
             {
                 "message": "CSRF token initialized.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+class TravelerUpdatePasswordView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        serializer = TravelerUpdatePasswordSerializer(
+            data=request.data,
+            context={
+                "request": request,
+            },
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        traveler = request.user
+
+        traveler.set_password(
+            serializer.validated_data["password"],
+        )
+        traveler.save()
+
+        login(request, traveler)
+
+        return Response(
+            {
+                "detail": "Mot de passe modifié avec succès.",
             },
             status=status.HTTP_200_OK,
         )

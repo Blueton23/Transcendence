@@ -4,6 +4,8 @@ import type { FormEvent } from "react";
 import { modifyProfile } from "../api/profile";
 import { useAuth } from "../../auth/context/useAuth";
 
+import ModifyPassword from "./ModifyPassword";
+
 import Button from "../../../shared/ui/Button";
 import Input from "../../../shared/ui/Input";
 import Avatar from "../../../shared/ui/Avatar";
@@ -88,6 +90,7 @@ function Modify({ onSuccess }: ModifyProps) {
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        {/* Avatar */}
         <div className="flex w-24 justify-center">
           <Avatar size="lg" color="1">
             {currentUser.firstName?.charAt(0).toUpperCase()}
@@ -156,7 +159,7 @@ function Modify({ onSuccess }: ModifyProps) {
             />
           </label>
         </div>
-
+        
         {/* Erreur */}
         {error && (
           <p className="text-sm font-medium whitespace-pre-line text-red-500">
@@ -178,6 +181,8 @@ function Modify({ onSuccess }: ModifyProps) {
           </Button>
         </div>
       </form>
+      {/* Password */}
+      <ModifyPassword/>
     </div>
   );
 }

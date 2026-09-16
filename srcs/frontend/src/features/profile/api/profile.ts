@@ -3,6 +3,8 @@ import type {
   SignupResponse,
   ModifyProfileData,
   ModifyProfileResponse,
+  ModifyPasswordData,
+  ModifyPasswordResponse,
 } from "../types";
 import { getCsrfToken } from "../../auth/api/auth";
 import { getCookie } from "../../../shared/api/cookies";
@@ -69,7 +71,7 @@ export async function modifyProfile(
   userId: number,
   data: ModifyProfileData,
 ): Promise<ModifyProfileResponse> {
-  await getCsrfToken(); //virer SDU ?
+  await getCsrfToken();
 
   const csrfToken = getCookie("csrftoken");
 
@@ -79,6 +81,35 @@ export async function modifyProfile(
 
   const response = await fetch(`${API_BASE_URL}/travelers/${userId}/`, {
     method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(result));
+  }
+
+  return result;
+}
+
+export async function modifyPassword(
+  userId: number,
+  data: ModifyPasswordData,
+): Promise<ModifyPasswordResponse> {
+
+  const csrfToken = getCookie("csrftoken");
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/travelers/update-password/`, {
+    method: "POST",
     credentials: "include",
     headers: {
       "Content-Type": "application/json",

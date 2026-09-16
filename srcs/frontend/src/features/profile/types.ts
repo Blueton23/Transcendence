@@ -17,9 +17,16 @@ export interface ModifyProfileData {
   firstName?: string;
   lastName?: string;
   email?: string;
-  //SDU cf pour les autres data surtout password
 }
 
 export interface ModifyProfileResponse {
   traveler: User;
+}
+
+export interface ModifyPasswordData {
+  password: string;
+}
+
+export interface ModifyPasswordResponse {
+  detail: string;
 }
