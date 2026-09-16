@@ -10,6 +10,9 @@ import { useState } from "react";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import MenuItem from "@/shared/ui/MenuItem";
 import Divider from "@/shared/ui/Divider";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+import { leaveTravel } from "@/features/travel/api/travelApi";
+import { useNavigate } from "react-router";
 
 interface TravelHeaderProps {
   travel: Travel;
@@ -18,8 +21,20 @@ interface TravelHeaderProps {
   totalKms: number;
 }
 
-function TravelOptionsButton() {
+function TravelOptionsButton({ travelId }: { travelId: number }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    leaveTravel(travelId),
+  );
+
+  const handleOnSubmit = async () => {
+    const result = await submit();
+    if (result.success) navigate("/trip");
+  };
+
+  if (error) return <p>{error}</p>;
+
   return (
     <div
       className="absolute top-4 right-4"
@@ -41,7 +56,12 @@ function TravelOptionsButton() {
           <MenuItem icon="users">Gérer les voyageurs</MenuItem>
           <MenuItem icon="cal">Changer les dates</MenuItem>
           <Divider />
-          <MenuItem icon="arrow" tone="danger">
+          <MenuItem
+            onClick={handleOnSubmit}
+            disabled={isSubmitting}
+            icon="arrow"
+            tone="danger"
+          >
             Quitter le voyage
           </MenuItem>
         </DropdownMenu>
@@ -81,7 +101,7 @@ export function TravelHeader({
           tone="inverse"
         >{`${totalKms} kms`}</Tag>
       </div>
-      <TravelOptionsButton />
+      <TravelOptionsButton travelId={travel.id} />
     </div>
   );
 }

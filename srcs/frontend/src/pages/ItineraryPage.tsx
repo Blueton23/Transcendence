@@ -10,6 +10,7 @@ import type { Step } from "@/features/step/types";
 import { TripActionsButton } from "@/features/step/components/page/TripActionsButton";
 import { useSteps } from "@/features/step/hooks/useSteps";
 import { useParams } from "react-router";
+import { Navigate } from "react-router";
 
 //TODO(branchement):
 // + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
@@ -37,8 +38,8 @@ function ItineraryPage() {
   const isLoading = isLoadingTravel || isLoadingSteps;
   const error = errorTravel || errorSteps;
   if (isLoading) return null;
-  if (error) return <p>{error}</p>;
-
+  if (error) return <Navigate to="/trip" replace />;
+  if (!travel) return null;
   const selectedStepIndex = detailView
     ? steps.findIndex((step) => step.id === detailView.id)
     : -1;

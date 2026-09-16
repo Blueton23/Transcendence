@@ -50,6 +50,7 @@ function StepOptionsButton({
   const { submit, isSubmitting, error } = useSubmitAction(() =>
     deleteStep(travelId, stepId),
   );
+
   const [isOpen, setIsOpen] = useState(false);
 
   if (error) return <p>{error}</p>;

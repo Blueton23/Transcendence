@@ -1,4 +1,5 @@
 import type { Travel } from "@/features/travel/types";
+import { getCookie } from "@/shared/api/cookies";
 
 const API_BASE_URL = "/api";
 
@@ -13,4 +14,26 @@ export async function getTravel(travelId: number): Promise<Travel> {
     throw new Error(result.message || "aucun voyage trouvé");
   }
   return result;
+}
+
+export async function leaveTravel(travelId: number): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/travels/${travelId}/leave/`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+  });
+
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(result.message || "impossible de quitter le voyage");
+  }
 }

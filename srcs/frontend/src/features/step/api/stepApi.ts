@@ -20,7 +20,6 @@ export async function createStep(
   travelId: number,
   data: CreateStepData,
 ): Promise<Step> {
-
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
@@ -48,7 +47,6 @@ export async function deleteStep(
   travelId: number,
   stepId: number,
 ): Promise<void> {
-
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
