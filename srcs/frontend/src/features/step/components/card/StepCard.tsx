@@ -8,6 +8,8 @@ import MenuItem from "@/shared/ui/MenuItem";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import { useState } from "react";
 import Divider from "@/shared/ui/Divider";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+import { deleteStep } from "@/features/step/api/stepApi";
 
 //TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
 // pas un champ stocke dans Step
@@ -16,6 +18,7 @@ interface StepCardProps {
   dateLabel: string;
   ideaPreview?: StepIdeaPreview;
   onClick?: () => void;
+  refetch: () => void;
 }
 
 const ideaPreviewTones = {
@@ -33,8 +36,28 @@ function formatNights(nights: number): string {
   return `${nights} nuits`;
 }
 
-function StepOptionsButton() {
+interface StepOptionsButtonProps {
+  refetch: () => void;
+  stepId: number;
+  travelId: number;
+}
+
+function StepOptionsButton({
+  refetch,
+  stepId,
+  travelId,
+}: StepOptionsButtonProps) {
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    deleteStep(travelId, stepId),
+  );
   const [isOpen, setIsOpen] = useState(false);
+
+  if (error) return <p>{error}</p>;
+
+  const handleOnSubmit = async () => {
+    const result = await submit();
+    if (result.success) refetch();
+  };
   return (
     <div className={StepOptionsStyle} onClick={(e) => e.stopPropagation()}>
       <IconButton
@@ -50,7 +73,12 @@ function StepOptionsButton() {
         >
           <MenuItem icon="edit">Modifier étape</MenuItem>
           <Divider />
-          <MenuItem icon="x" tone="danger">
+          <MenuItem
+            icon="x"
+            tone="danger"
+            onClick={handleOnSubmit}
+            disabled={isSubmitting}
+          >
             Supprimer l'étape
           </MenuItem>
         </DropdownMenu>
@@ -84,6 +112,7 @@ export function StepCard({
   dateLabel,
   ideaPreview,
   onClick,
+  refetch,
 }: StepCardProps) {
   return (
     <Card
@@ -100,7 +129,11 @@ export function StepCard({
         <StepDescription step={step} ideaPreview={ideaPreview} />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
-      <StepOptionsButton />
+      <StepOptionsButton
+        stepId={step.id}
+        travelId={step.travelId}
+        refetch={refetch}
+      />
     </Card>
   );
 }
