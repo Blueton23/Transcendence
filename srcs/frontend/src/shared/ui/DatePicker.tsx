@@ -11,6 +11,7 @@ interface DatePickerProps {
   defaultMonth?: Date;
   startMonth?: Date;
   endMonth?: Date;
+  markedDays?: Date[];
 }
 
 export function DatePicker({
@@ -20,6 +21,7 @@ export function DatePicker({
   defaultMonth,
   startMonth,
   endMonth,
+  markedDays,
   singleDay = false,
 }: DatePickerProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -38,6 +40,8 @@ export function DatePicker({
         defaultMonth={defaultMonth}
         startMonth={startMonth}
         endMonth={endMonth}
+        modifiers={{ marked: markedDays }}
+        modifiersClassNames={{ marked: "rdp-marked" }}
       />
     );
   }
@@ -54,6 +58,8 @@ export function DatePicker({
       defaultMonth={defaultMonth}
       startMonth={startMonth}
       endMonth={endMonth}
+      modifiers={{ marked: markedDays }}
+      modifiersClassNames={{ marked: "rdp-marked" }}
     />
   );
 }

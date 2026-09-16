@@ -305,6 +305,22 @@
     var(--rdp-animation_timing) forwards;
 }
 
+.rdp-marked {
+  position: relative;
+}
+
+.rdp-marked::after {
+  content: "";
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--rdp-accent-color);
+}
+
 @keyframes rdp-fade_in {
   from {
     opacity: 0;

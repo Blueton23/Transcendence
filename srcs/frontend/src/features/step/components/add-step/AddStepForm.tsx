@@ -7,6 +7,7 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { createStep } from "@/features/step/api/stepApi";
 import { toApiDateString } from "@/features/step/utils/stepDates";
 import type { Travel } from "@/features/travel/types";
+import type { Step } from "@/features/step/types";
 
 // TODO(branchement): remplacer results en dur par l'autocomplete de l'API géocodage
 const results = [
@@ -18,11 +19,12 @@ const results = [
 type OpenPanel = "place" | "calendar" | null;
 
 interface AddStepFromProps {
+  steps: Step[];
   travel: Travel;
   refetch: () => void;
 }
 
-export function AddStepForm({ travel, refetch }: AddStepFromProps) {
+export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<DateRange>();
@@ -85,6 +87,7 @@ export function AddStepForm({ travel, refetch }: AddStepFromProps) {
       )}
       {openPanel === "calendar" && (
         <DatesPanel
+          steps={steps}
           travel={travel}
           selected={selected}
           onSelect={setSelected}

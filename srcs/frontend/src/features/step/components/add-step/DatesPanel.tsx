@@ -7,8 +7,10 @@ import { useRef } from "react";
 import { useOnClickOutside } from "@/shared/hooks/useOnClickOutside";
 import { useEscapeKey } from "@/shared/hooks/useEscapeKey";
 import type { Travel } from "@/features/travel/types";
+import type { Step } from "@/features/step/types";
 
 interface DatePanelProps {
+  steps: Step[];
   travel: Travel;
   selected: DateRange | undefined;
   onSelect: (range: DateRange | undefined) => void;
@@ -21,6 +23,7 @@ interface DatePanelProps {
 }
 
 export function DatesPanel({
+  steps,
   travel,
   selected,
   onSelect,
@@ -35,9 +38,20 @@ export function DatesPanel({
   useOnClickOutside(cardRef, onClose);
   useEscapeKey(onClose);
 
+  const noNightDays = steps
+    .filter((steps) => steps.startDate === steps.endDate)
+    .map((step) => new Date(step.startDate));
+  const takenDates = steps
+    .filter((step) => step.startDate !== step.endDate)
+    .map((step) => ({
+      after: new Date(step.startDate),
+      before: new Date(step.endDate),
+    }));
+
   const disabled = [
     { before: new Date(travel.startDate) },
     { after: new Date(travel.endDate) },
+    ...takenDates,
   ];
 
   const handleDateSelect = (range: DateRange | undefined) => {
@@ -61,6 +75,7 @@ export function DatesPanel({
           disabled={disabled}
           startMonth={new Date(travel.startDate)}
           endMonth={new Date(travel.endDate)}
+          markedDays={noNightDays}
         />
         <label className="flex items-center gap-2 font-sans text-md font-semibold">
           <input
