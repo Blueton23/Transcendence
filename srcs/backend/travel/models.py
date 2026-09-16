@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 from common.models import TimeStampedModel
 
@@ -159,3 +160,22 @@ class Step(TimeStampedModel):
     def restore(self) -> None:
         self.deleted_at = None
         self.save(update_fields=["deleted_at", "updated_at"])
+
+    def clean(self):
+        if self.travel_id and self.start_date and self.end_date:
+            validate_no_dates_overlap(self.travel, self.start_date, self.end_date, self.pk)
+
+
+
+def validate_no_dates_overlap(travel, start, end, exclude_pk=None):
+    conflicts = (
+        Step.objects.alive()
+        .filter(
+            travel=travel,
+            start_date__lt=end,
+            end_date__gt=start,
+        )
+        .exclude(pk=exclude_pk)
+    )
+    if conflicts.exists():
+        raise ValidationError({"start_date": "Overlaps with anoter step"})
