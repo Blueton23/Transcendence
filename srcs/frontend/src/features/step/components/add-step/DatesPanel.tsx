@@ -59,6 +59,8 @@ export function DatesPanel({
           onSelect={handleDateSelect}
           singleDay={noOvernight}
           disabled={disabled}
+          startMonth={new Date(travel.startDate)}
+          endMonth={new Date(travel.endDate)}
         />
         <label className="flex items-center gap-2 font-sans text-md font-semibold">
           <input
