@@ -274,10 +274,18 @@ function DesignSystem() {
 
       <Section name="Input" role="Champ de saisie sur une ligne.">
         <Specimen label='variant="default" (défaut) — texte courant'>
-          <Input className="max-w-xs" placeholder="Nom du lieu" />
+          <Input placeholder="Nom du lieu" />
         </Specimen>
         <Specimen label='variant="mono" — dates, montants'>
-          <Input className="max-w-xs" variant="mono" placeholder="12.08.2026" />
+          <Input variant="mono" placeholder="12.08.2026" />
+        </Specimen>
+        <Specimen label="avec icône — action dans le champ">
+          <Input
+            placeholder="17.09.2026"
+            icon={<Icon name="cal" size={18} />}
+            iconLabel="Ouvrir le calendrier"
+            onIconClick={() => console.log("Ouvrir le calendrier")}
+          />
         </Specimen>
       </Section>
 
