@@ -32,7 +32,7 @@ function Input({
   return (
     <div className={`relative w-full ${className}`}>
       <input
-        className={`${baseStyle} ${variantStyle} ${icon ? "pr-10" : ""} ${inputClassName}`}
+        className={`${baseStyle} ${variantStyle} ${icon ? "pl-10" : ""} ${inputClassName}`}
         {...rest}
       />
       {icon && (
@@ -40,7 +40,7 @@ function Input({
           type="button"
           aria-label={iconLabel}
           onClick={onIconClick}
-          className="absolute top-1/2 right-4 -translate-y-1/2 cursor-pointer"
+          className="absolute top-1/2 left-4 -translate-y-1/2 cursor-pointer"
         >
           {icon}
         </button>
