@@ -19,4 +19,5 @@ export const iconColor: Partial<Record<IconName, IconBadgeColor>> = {
   edit: "ink",
   pinplus: "brand",
   pin: "brand",
+  arrow: "brand",
 };
