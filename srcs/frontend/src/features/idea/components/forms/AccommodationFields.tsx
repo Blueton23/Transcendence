@@ -76,6 +76,7 @@ export function AccommodationFields({
 
       <Input
         type="number"
+        min={0}
         value={values.pricePerNight}
         onChange={(event) =>
           setValues((current) => ({
