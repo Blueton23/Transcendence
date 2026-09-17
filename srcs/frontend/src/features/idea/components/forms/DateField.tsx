@@ -52,5 +52,5 @@ export function DateField({ values, setValues }: DateFieldProps) {
 }
 
 /*
-Fonction qui active un champ date lors d'un choix de step dans "Epingler une "
+Fonction qui active un champ date lors d'un choix de step dans "Epingler une idée"
 */
