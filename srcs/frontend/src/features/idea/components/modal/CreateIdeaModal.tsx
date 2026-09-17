@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
-import { IdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
+import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import type { StepOption } from "@/features/idea/types";
 import Modal from "@/shared/ui/Modal";
@@ -42,7 +42,7 @@ export function CreateIdeaModal({
           onClose();
         }}
       >
-        <IdeaForm steps={steps} values={values} setValues={setValues} />
+        <CreateIdeaForm steps={steps} values={values} setValues={setValues} />
 
         <Button
           type="submit"

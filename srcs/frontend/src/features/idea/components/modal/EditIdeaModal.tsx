@@ -4,7 +4,7 @@ import type {
   EditIdeaInput,
   IdeaFormValues,
 } from "@/features/idea/types";
-import { IdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
+import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import type { StepOption } from "@/features/idea/types";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import Modal from "@/shared/ui/Modal";
@@ -60,7 +60,7 @@ export function EditIdeaModal({
           onClose();
         }}
       >
-        <IdeaForm steps={steps} values={values} setValues={setValues} />
+        <CreateIdeaForm steps={steps} values={values} setValues={setValues} />
 
         <Button
           type="submit"

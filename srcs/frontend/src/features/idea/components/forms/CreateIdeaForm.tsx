@@ -14,7 +14,7 @@ interface IdeaFormProps {
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
 }
 
-export function IdeaForm({ steps, values, setValues }: IdeaFormProps) {
+export function CreateIdeaForm({ steps, values, setValues }: IdeaFormProps) {
   const isAccommodation = values.type === "accommodation";
 
   return (
