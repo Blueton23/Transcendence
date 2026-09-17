@@ -194,6 +194,7 @@ class CsrfTokenView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
 class TravelerUpdatePasswordView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 

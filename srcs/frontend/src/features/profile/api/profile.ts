@@ -102,7 +102,6 @@ export async function modifyPassword(
   userId: number,
   data: ModifyPasswordData,
 ): Promise<ModifyPasswordResponse> {
-
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
     throw new Error("Token CSRF introuvable.");

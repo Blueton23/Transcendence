@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { FormEvent } from "react";
 
 import { modifyProfile } from "../api/profile";
@@ -21,24 +21,11 @@ function Modify({ onSuccess }: ModifyProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
+    firstName: currentUser?.firstName ?? "",
+    lastName: currentUser?.lastName ?? "",
+    username: currentUser?.username ?? "",
+    email: currentUser?.email ?? "",
   });
-
-  useEffect(() => {
-    if (!currentUser) {
-      return;
-    }
-
-    setForm({
-      firstName: currentUser.firstName,
-      lastName: currentUser.lastName,
-      username: currentUser.username,
-      email: currentUser.email,
-    });
-  }, [currentUser]);
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -159,7 +146,7 @@ function Modify({ onSuccess }: ModifyProps) {
             />
           </label>
         </div>
-        
+
         {/* Erreur */}
         {error && (
           <p className="text-sm font-medium whitespace-pre-line text-red-500">
@@ -182,7 +169,7 @@ function Modify({ onSuccess }: ModifyProps) {
         </div>
       </form>
       {/* Password */}
-      <ModifyPassword/>
+      <ModifyPassword />
     </div>
   );
 }

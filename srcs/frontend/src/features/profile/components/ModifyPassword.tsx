@@ -7,7 +7,6 @@ import { useAuth } from "../../auth/context/useAuth";
 import Button from "../../../shared/ui/Button";
 import Input from "../../../shared/ui/Input";
 
-
 export function ModifyPassword() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -36,15 +35,12 @@ export function ModifyPassword() {
         password: form.password,
       });
 
-
-//      onSuccess();
+      //      onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setIsSubmitting(false);
     }
-
-
 
     //recuperer l erreur
     setIsSubmitting(false);
@@ -68,13 +64,11 @@ export function ModifyPassword() {
           />
         </label>
 
-
         {error && (
           <p className="text-sm font-medium whitespace-pre-line text-red-500">
             {error}
           </p>
         )}
-
 
         <div className="mt-3">
           <Button
@@ -83,12 +77,9 @@ export function ModifyPassword() {
             className="w-full rounded-full py-3"
             disabled={isSubmitting}
           >
-            {isSubmitting
-              ? "Enregistrement..."
-              : "Changer le password"}
+            {isSubmitting ? "Enregistrement..." : "Changer le password"}
           </Button>
         </div>
-       
       </form>
     </div>
   );
