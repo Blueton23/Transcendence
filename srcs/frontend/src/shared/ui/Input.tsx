@@ -4,6 +4,7 @@ type InputVariant = "default" | "mono";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   variant?: InputVariant;
+  inputClassName?: string;
   icon?: ReactNode;
   onIconClick?: () => void;
   iconLabel?: string;
@@ -23,14 +24,15 @@ function Input({
   onIconClick,
   iconLabel = "Action",
   className = "",
+  inputClassName = "",
   ...rest
 }: InputProps) {
   const variantStyle = variantStyles[variant];
 
   return (
-    <div className="relative w-full">
+    <div className={`relative w-full ${className}`}>
       <input
-        className={`${baseStyle} ${variantStyle} ${icon ? "pr-10" : ""} ${className}`}
+        className={`${baseStyle} ${variantStyle} ${icon ? "pr-10" : ""} ${inputClassName}`}
         {...rest}
       />
       {icon && (
