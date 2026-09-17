@@ -99,7 +99,6 @@ export async function modifyProfile(
 }
 
 export async function modifyPassword(
-  userId: number,
   data: ModifyPasswordData,
 ): Promise<ModifyPasswordResponse> {
   const csrfToken = getCookie("csrftoken");

@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 
 import { modifyPassword } from "../api/profile";
-import { useAuth } from "../../auth/context/useAuth";
 
 import Button from "../../../shared/ui/Button";
 import Input from "../../../shared/ui/Input";
@@ -10,7 +9,6 @@ import Input from "../../../shared/ui/Input";
 export function ModifyPassword() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { currentUser } = useAuth();
   const [form, setForm] = useState({ password: "" });
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -31,7 +29,7 @@ export function ModifyPassword() {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     try {
-      await modifyPassword(currentUser.id, {
+      await modifyPassword({
         password: form.password,
       });
 
