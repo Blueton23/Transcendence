@@ -1,5 +1,6 @@
 import datetime
 
+from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.utils import timezone
@@ -44,14 +45,18 @@ class IdeaModelTest(TestCase):
         self.assertIsNone(idea.step_id)
         self.assertIsNone(idea.chosen_by_id)
         self.assertIsNone(idea.chosen_at)
-        self.assertIsNone(idea.note)
-        self.assertIsNone(idea.url)
+        self.assertEqual(idea.note, "")
+        self.assertEqual(idea.url, "")
         self.assertTrue(idea.is_in_pool)
         self.assertIsNotNone(idea.created_at)
         self.assertIsNotNone(idea.updated_at)
 
     def test_idea_attached_to_step_is_not_in_pool(self):
-        idea = self._make_idea(step=self.step)
+        idea = self._make_idea(
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.start_date,
+        )
         self.assertFalse(idea.is_in_pool)
         self.assertIn(idea, self.step.ideas.all())
 
@@ -76,14 +81,48 @@ class IdeaModelTest(TestCase):
 
         self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
-    def test_step_removal_sends_idea_back_to_pool(self):
-        idea = self._make_idea(step=self.step)
+    def test_step_hard_delete_sends_idea_back_to_pool(self):
+        idea = self._make_idea(
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.start_date,
+        )
 
         self.step.delete()
         idea.refresh_from_db()
 
         self.assertIsNone(idea.step_id)
         self.assertTrue(idea.is_in_pool)
+        self.assertIsNone(idea.start_date)
+        self.assertIsNone(idea.end_date)
+
+    def test_step_soft_delete_sends_idea_back_to_pool(self):
+        idea = self._make_idea(
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.start_date,
+        )
+
+        self.step.soft_delete()
+        idea.refresh_from_db()
+
+        self.assertEqual(idea.step_id, self.step.id)
+        self.assertTrue(idea.is_in_pool)
+        self.assertIn(idea, Idea.objects.pool())
+
+    def test_step_restore_brings_idea_back_out_of_pool(self):
+        idea = self._make_idea(
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.start_date,
+        )
+        self.step.soft_delete()
+
+        self.step.restore()
+        idea.refresh_from_db()
+
+        self.assertFalse(idea.is_in_pool)
+        self.assertNotIn(idea, Idea.objects.pool())
 
     def test_chosen_by_set_null_on_traveler_removal(self):
         chooser = Traveler.objects.create_user(
@@ -92,8 +131,11 @@ class IdeaModelTest(TestCase):
             password="password123",
         )
         idea = self._make_idea(
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.end_date,
             chosen_by=chooser,
-            status=IdeaStatus.CHOSEN,
             chosen_at=timezone.now(),
         )
 
@@ -103,12 +145,12 @@ class IdeaModelTest(TestCase):
         self.assertIsNone(idea.chosen_by_id)
         self.assertEqual(idea.status, IdeaStatus.CHOSEN)
 
-    def test_departure_before_arrival_raises_integrity_error(self):
-        with self.assertRaises(IntegrityError), transaction.atomic():
+    def test_end_before_start_raises_validation_error(self):
+        with self.assertRaises(ValidationError):
             self._make_idea(
                 type=IdeaType.LODGING,
-                arrival_date=datetime.date(2026, 6, 10),
-                departure_date=datetime.date(2026, 6, 8),
+                start_date=datetime.date(2026, 6, 10),
+                end_date=datetime.date(2026, 6, 8),
             )
 
     def test_lodging_dates_in_order_are_allowed(self):
@@ -116,15 +158,106 @@ class IdeaModelTest(TestCase):
             type=IdeaType.LODGING,
             title="Camping du lac",
             price_per_night="24.00",
-            arrival_date=datetime.date(2026, 6, 8),
-            departure_date=datetime.date(2026, 6, 10),
+            start_date=datetime.date(2026, 6, 8),
+            end_date=datetime.date(2026, 6, 10),
         )
         self.assertEqual(str(idea.price_per_night), "24.00")
 
     def test_missing_lodging_dates_bypass_the_constraint(self):
         idea = self._make_idea(type=IdeaType.LODGING)
-        self.assertIsNone(idea.arrival_date)
-        self.assertIsNone(idea.departure_date)
+        self.assertIsNone(idea.start_date)
+        self.assertIsNone(idea.end_date)
+
+    def test_step_from_another_travel_is_rejected(self):
+        other_travel = Travel.objects.create(
+            title="Other trip",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 10),
+        )
+        other_step = Step.objects.create(
+            travel=other_travel,
+            localisation="Paris",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 4),
+        )
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                step=other_step,
+                start_date=other_step.start_date,
+                end_date=other_step.start_date,
+            )
+
+    def test_non_lodging_cannot_have_price_per_night(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(price_per_night="10.00")
+
+    def test_negative_price_per_night_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(type=IdeaType.LODGING, price_per_night="-1.00")
+
+    def test_non_lodging_idea_in_pool_cannot_have_dates(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                start_date=datetime.date(2026, 6, 2),
+                end_date=datetime.date(2026, 6, 2),
+            )
+
+    def test_non_lodging_idea_placed_must_have_matching_single_day_dates(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                step=self.step,
+                start_date=self.step.start_date,
+                end_date=self.step.end_date,
+            )
+
+    def test_chosen_requires_lodging_type(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                step=self.step,
+                start_date=self.step.start_date,
+                end_date=self.step.start_date,
+                chosen_at=timezone.now(),
+            )
+
+    def test_chosen_requires_being_placed_on_a_step(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(type=IdeaType.LODGING, chosen_at=timezone.now())
+
+    def test_overlapping_chosen_lodgings_on_same_step_are_rejected(self):
+        self._make_idea(
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+            chosen_at=timezone.now(),
+        )
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                title="Autre hebergement",
+                type=IdeaType.LODGING,
+                step=self.step,
+                start_date=datetime.date(2026, 6, 3),
+                end_date=datetime.date(2026, 6, 5),
+                chosen_at=timezone.now(),
+            )
+
+    def test_non_overlapping_chosen_lodgings_on_same_step_are_allowed(self):
+        self._make_idea(
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 3),
+            chosen_at=timezone.now(),
+        )
+        second = self._make_idea(
+            title="Autre hebergement",
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 5),
+            chosen_at=timezone.now(),
+        )
+        self.assertEqual(second.status, IdeaStatus.CHOSEN)
 
     def test_note_and_url_are_optional(self):
         idea = self._make_idea(
@@ -144,7 +277,11 @@ class IdeaModelTest(TestCase):
 
     def test_pool_queryset_filters_out_stepped_ideas(self):
         pooled = self._make_idea()
-        self._make_idea(step=self.step)
+        self._make_idea(
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.start_date,
+        )
 
         self.assertEqual(list(Idea.objects.pool()), [pooled])
 

@@ -1,7 +1,7 @@
 from django.utils import timezone
 from faker import Faker
 
-from idea.models import Idea, IdeaStatus, IdeaType, Reaction
+from idea.models import Idea, IdeaType, Reaction
 
 
 def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> list:
@@ -18,19 +18,21 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
                 step = fake.random_element(elements=steps)
 
             lodging = idea_type == IdeaType.LODGING
-            arrival = (
-                fake.date_between(start_date="today", end_date="+30d")
-                if lodging
-                else None
-            )
-            departure = (
-                fake.date_between(start_date=arrival, end_date="+40d")
-                if lodging
-                else None
+            # Seul un hebergement place sur une etape peut etre chosen.
+            chosen = (
+                lodging and step is not None and fake.boolean(chance_of_getting_true=30)
             )
 
-            status = fake.random_element(elements=IdeaStatus.values)
-            chosen = status == IdeaStatus.CHOSEN
+            if lodging:
+                start = fake.date_between(start_date="today", end_date="+30d")
+                end = fake.date_between(start_date=start, end_date="+40d")
+            elif step is not None:
+                start = end = fake.date_between(
+                    start_date=step.start_date, end_date=step.end_date
+                )
+            else:
+                start = end = None
+
             ideas.append(
                 Idea.objects.create(
                     travel=travel,
@@ -42,10 +44,9 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
                     chosen_at=fake.past_datetime(tzinfo=tz) if chosen else None,
                     title=fake.catch_phrase(),
                     type=idea_type,
-                    status=status,
                     localisation=fake.city() if fake.boolean() else "",
-                    note=fake.sentence() if fake.boolean() else None,
-                    url=fake.url() if fake.boolean() else None,
+                    note=fake.sentence() if fake.boolean() else "",
+                    url=fake.url() if fake.boolean() else "",
                     latitude=round(fake.latitude(), 6),
                     longitude=round(fake.longitude(), 6),
                     price_per_night=fake.pydecimal(
@@ -53,8 +54,8 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
                     )
                     if lodging
                     else None,
-                    arrival_date=arrival,
-                    departure_date=departure,
+                    start_date=start,
+                    end_date=end,
                 )
             )
     return ideas

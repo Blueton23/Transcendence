@@ -19,7 +19,7 @@ class IdeaAdmin(admin.ModelAdmin):
         "status",
         "traveler",
     )
-    list_filter = ("type", "status", "travel")
+    list_filter = ("type", "travel")
     search_fields = ("title", "localisation")
     readonly_fields = ("created_at", "updated_at")
     inlines = (ReactionInline,)
