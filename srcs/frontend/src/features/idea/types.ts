@@ -70,3 +70,9 @@ export interface IdeaFormValues {
   pricePerNight: string;
   dateRange: DateRange | undefined;
 }
+
+// Exemple pour la mock en dur
+export interface StepOption {
+  id: number;
+  name: string;
+}

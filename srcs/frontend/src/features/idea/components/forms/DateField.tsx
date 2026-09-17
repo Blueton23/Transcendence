@@ -50,3 +50,7 @@ export function DateField({ values, setValues }: DateFieldProps) {
     </div>
   );
 }
+
+/*
+Fonction qui active un champ date lors d'un choix de step dans "Epingler une "
+*/

@@ -1,7 +1,7 @@
 import type { Idea } from "@/features/idea/types";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
 import { ideaIcons } from "@/features/idea/utils/ideaIcons";
-import type { StepOption } from "@/features/idea/components/modal/CreateIdeaModal";
+import type { StepOption } from "@/features/idea/types";
 import Text from "@/shared/ui/Text";
 import Select from "@/shared/ui/Select";
 import Input from "@/shared/ui/Input";

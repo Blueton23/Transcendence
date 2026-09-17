@@ -1,5 +1,5 @@
 import { TypeSelector } from "@/features/idea/components/forms/TypeSelector";
-import type { StepOption } from "@/features/idea/components/modal/CreateIdeaModal";
+import type { StepOption } from "@/features/idea/types";
 import type { Dispatch, SetStateAction } from "react";
 import type { IdeaFormValues } from "@/features/idea/types";
 import { DateField } from "@/features/idea/components/forms/DateField";

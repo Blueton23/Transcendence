@@ -2,13 +2,9 @@ import { useState } from "react";
 import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
 import { IdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
+import type { StepOption } from "@/features/idea/types";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
-
-export interface StepOption {
-  id: number;
-  name: string;
-}
 
 export interface CreateIdeaModalProps {
   steps: StepOption[];
