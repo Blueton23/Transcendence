@@ -7,12 +7,18 @@ export function filterIdeas(
 ) {
   let filteredIdeas = ideas;
 
+  {
+    /* Filtre type */
+  }
   if (typeActiveFilter !== "all") {
     filteredIdeas = filteredIdeas.filter(
       (idea) => idea.type === typeActiveFilter,
     );
   }
 
+  {
+    /* Filtre étape */
+  }
   if (stepActiveFilter === "none") {
     filteredIdeas = filteredIdeas.filter((idea) => idea.stepId === null);
   } else if (stepActiveFilter !== "all") {

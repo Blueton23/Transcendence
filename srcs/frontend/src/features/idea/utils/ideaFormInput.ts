@@ -29,6 +29,11 @@ export function ideaFormInput(
     latitude: location.latitude,
     longitude: location.longitude,
 
+    date:
+      !isAccommodation && values.stepId !== null && values.dateRange?.from
+        ? formatDateToISO(values.dateRange.from)
+        : null,
+
     pricePerNight:
       isAccommodation && values.pricePerNight !== ""
         ? Number(values.pricePerNight)

@@ -9,6 +9,7 @@ interface PinIdeaButtonProps {
 export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
   return (
     <>
+      {/* Gère le mobile */}
       <div className="md:hidden">
         <IconButton
           icon={<Icon name="pinplus" size={18} />}
@@ -18,6 +19,7 @@ export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
         />
       </div>
 
+      {/* Gère le desktop */}
       <div className="hidden md:block">
         <Button
           variant="primary"

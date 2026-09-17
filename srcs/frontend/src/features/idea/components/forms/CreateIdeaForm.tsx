@@ -44,7 +44,15 @@ export function CreateIdeaForm({ steps, values, setValues }: IdeaFormProps) {
       </Select>
 
       {values.stepId !== null && !isAccommodation && (
-        <DateField values={values} setValues={setValues} />
+        <DateField
+          dateRange={values.dateRange}
+          setDateRange={(dateRange) =>
+            setValues((current) => ({
+              ...current,
+              dateRange,
+            }))
+          }
+        />
       )}
 
       <TypeSelector

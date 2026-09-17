@@ -2,6 +2,8 @@ import type { Idea } from "@/features/idea/types";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
 import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import type { StepOption } from "@/features/idea/types";
+import type { DateRange } from "@daypicker/react";
+import { DateField } from "@/features/idea/components/forms/DateField";
 import Text from "@/shared/ui/Text";
 import Select from "@/shared/ui/Select";
 import Input from "@/shared/ui/Input";
@@ -14,6 +16,9 @@ interface PlaceIdeaFormProps {
 
   stepId: number | null;
   setStepId: (stepId: number | null) => void;
+
+  dateRange: DateRange | undefined;
+  setDateRange: (dateRange: DateRange | undefined) => void;
 }
 
 export function PlaceIdeaForm({
@@ -21,6 +26,8 @@ export function PlaceIdeaForm({
   steps,
   stepId,
   setStepId,
+  dateRange,
+  setDateRange,
 }: PlaceIdeaFormProps) {
   const isAccommodation = idea.type === "accommodation";
 
@@ -47,6 +54,10 @@ export function PlaceIdeaForm({
           </option>
         ))}
       </Select>
+
+      {stepId !== null && idea.type !== "accommodation" && (
+        <DateField dateRange={dateRange} setDateRange={setDateRange} />
+      )}
 
       <Text size="sm" className="mb-1">
         Type

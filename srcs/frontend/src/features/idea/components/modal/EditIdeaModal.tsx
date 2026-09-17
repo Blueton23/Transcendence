@@ -32,12 +32,19 @@ export function EditIdeaModal({
     pricePerNight: idea.pricePerNight?.toString() ?? "",
 
     dateRange:
-      !idea.arrivalDate && !idea.departureDate
-        ? undefined
-        : {
-            from: idea.arrivalDate ? new Date(idea.arrivalDate) : undefined,
-            to: idea.departureDate ? new Date(idea.departureDate) : undefined,
-          },
+      idea.type === "accommodation"
+        ? !idea.arrivalDate && !idea.departureDate
+          ? undefined
+          : {
+              from: idea.arrivalDate ? new Date(idea.arrivalDate) : undefined,
+              to: idea.departureDate ? new Date(idea.departureDate) : undefined,
+            }
+        : idea.date
+          ? {
+              from: new Date(idea.date),
+              to: undefined,
+            }
+          : undefined,
   }));
 
   return (
@@ -66,7 +73,14 @@ export function EditIdeaModal({
           type="submit"
           variant="primary"
           className="w-full"
-          disabled={values.title.trim() === ""}
+          disabled={
+            values.title.trim() === "" ||
+            (values.type === "accommodation" &&
+              (!values.dateRange?.from || !values.dateRange?.to)) ||
+            (values.type !== "accommodation" &&
+              values.stepId !== null &&
+              !values.dateRange?.from)
+          }
         >
           Enregistrer
         </Button>

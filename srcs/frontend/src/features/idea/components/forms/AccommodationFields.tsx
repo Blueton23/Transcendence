@@ -25,16 +25,15 @@ export function AccommodationFields({
           </Text>
 
           <Input
-            readOnly
             value={
               values.dateRange?.from
                 ? values.dateRange.from.toLocaleDateString("fr-CH")
                 : ""
             }
-            onClick={() => setDatePickerOpen(true)}
+            icon={<Icon name="cal" size={18} />}
+            iconLabel="Choisir les dates"
+            onIconClick={() => setDatePickerOpen(true)}
           />
-
-          <Icon name="cal" size={18} />
         </div>
 
         <div>
@@ -43,16 +42,15 @@ export function AccommodationFields({
           </Text>
 
           <Input
-            readOnly
             value={
               values.dateRange?.to
                 ? values.dateRange.to.toLocaleDateString("fr-CH")
                 : ""
             }
-            onClick={() => setDatePickerOpen(true)}
+            icon={<Icon name="cal" size={18} />}
+            iconLabel="Choisir les dates"
+            onIconClick={() => setDatePickerOpen(true)}
           />
-
-          <Icon name="cal" size={18} />
         </div>
       </div>
 

@@ -1,16 +1,16 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
-import type { IdeaFormValues } from "@/features/idea/types";
+import { useState } from "react";
 import { DatePicker } from "@/shared/ui/DatePicker";
+import type { DateRange } from "@daypicker/react";
 import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import Input from "@/shared/ui/Input";
 
 interface DateFieldProps {
-  values: IdeaFormValues;
-  setValues: Dispatch<SetStateAction<IdeaFormValues>>;
+  dateRange: DateRange | undefined;
+  setDateRange: (dateRange: DateRange | undefined) => void;
 }
 
-export function DateField({ values, setValues }: DateFieldProps) {
+export function DateField({ dateRange, setDateRange }: DateFieldProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
 
   return (
@@ -20,28 +20,22 @@ export function DateField({ values, setValues }: DateFieldProps) {
       </Text>
 
       <Input
-        readOnly
         value={
-          values.dateRange?.from
-            ? values.dateRange.from.toLocaleDateString("fr-CH")
-            : ""
+          dateRange?.from ? dateRange.from.toLocaleDateString("fr-CH") : ""
         }
-        onClick={() => setDatePickerOpen(true)}
+        icon={<Icon name="cal" size={18} />}
+        iconLabel="Ouvrir le calendrier"
+        onIconClick={() => setDatePickerOpen(true)}
       />
-
-      <Icon name="cal" size={18} />
 
       {datePickerOpen && (
         <DatePicker
           singleDay
-          selected={values.dateRange}
-          onSelect={(dateRange) => {
-            setValues((current) => ({
-              ...current,
-              dateRange,
-            }));
+          selected={dateRange}
+          onSelect={(newDateRange) => {
+            setDateRange(newDateRange);
 
-            if (dateRange?.from) {
+            if (newDateRange?.from) {
               setDatePickerOpen(false);
             }
           }}

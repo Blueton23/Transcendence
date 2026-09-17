@@ -48,7 +48,11 @@ export function CreateIdeaModal({
           type="submit"
           variant="primary"
           className="w-full"
-          disabled={values.title.trim() === ""}
+          disabled={
+            values.title.trim() === "" ||
+            ((values.stepId !== null || values.type === "accommodation") &&
+              (!values.dateRange?.from || !values.dateRange?.to))
+          }
         >
           Enregistrer
         </Button>

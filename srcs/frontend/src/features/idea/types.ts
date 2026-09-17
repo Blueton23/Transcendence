@@ -20,6 +20,7 @@ export interface Idea {
   localisation: string | null;
   latitude: number | null;
   longitude: number | null;
+  date: string | null;
   pricePerNight: number | null;
   arrivalDate: string | null;
   departureDate: string | null;
@@ -38,6 +39,7 @@ export interface CreateIdeaInput {
   localisation: string | null;
   latitude: number | null;
   longitude: number | null;
+  date: string | null;
   pricePerNight: number | null;
   arrivalDate: string | null;
   departureDate: string | null;
@@ -48,6 +50,7 @@ export interface CreateIdeaInput {
 // Représente ce que l’utilisateur saisit dans la modal “Placer”
 export interface PlaceIdeaInput {
   stepId: number | null;
+  date: string | null;
 }
 
 // Représente ce que l’utilisateur saisit dans la modal “Modifier”

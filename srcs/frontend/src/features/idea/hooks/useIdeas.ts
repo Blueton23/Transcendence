@@ -16,12 +16,13 @@ import {
   deleteIdea,
 } from "@/features/idea/api/api.ideas";
 
-//gère plusieurs idées
 export function useIdeas() {
   const [ideas, setIdeas] = useState<Idea[]>(() => getIdeas());
   const [voted, setVoted] = useState<VoteIdea[]>(() => getIdeaVotes());
 
-  // fonction qui gère la création d'idée
+  {
+    /* Gère la création d'idée */
+  }
   function handleCreateIdea(input: CreateIdeaInput) {
     const newIdea = createIdea(input);
 
@@ -37,19 +38,22 @@ export function useIdeas() {
     ]);
   }
 
-  // fonction qui gère le placement d'idée
-  function handlePlaceIdea(ideaId: Idea["id"], stepId: number | null) {
-    const input: PlaceIdeaInput = { stepId };
+  {
+    /* Gère le placement d'idée */
+  }
+  function handlePlaceIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
     placeIdea(ideaId, input);
 
     setIdeas((currentIdeas) =>
       currentIdeas.map((idea) =>
-        idea.id === ideaId ? { ...idea, stepId } : idea,
+        idea.id === ideaId ? { ...idea, ...input } : idea,
       ),
     );
   }
 
-  // fonction qui gère la suppression d'idée
+  {
+    /* Gère la suppression d'idée */
+  }
   function handleDeleteIdea(ideaId: Idea["id"]) {
     deleteIdea(ideaId);
 
@@ -58,7 +62,9 @@ export function useIdeas() {
     );
   }
 
-  // fonction qui gère la modification d'idée
+  {
+    /* Gère la modification d'idée */
+  }
   function handleEditIdea(ideaId: Idea["id"], input: EditIdeaInput) {
     editIdea(ideaId, input);
 
@@ -75,7 +81,9 @@ export function useIdeas() {
     );
   }
 
-  // fonction qui gère le vote
+  {
+    /* Gère le vote */
+  }
   function handleVote(ideaId: Idea["id"]) {
     voteIdea(ideaId);
 
@@ -92,7 +100,6 @@ export function useIdeas() {
     );
   }
 
-  // retourne tableau d'idées
   return {
     ideas,
     handleCreateIdea,
