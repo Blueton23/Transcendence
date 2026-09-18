@@ -127,10 +127,13 @@ class Idea(TimeStampedModel, ValidatedModel):
         if bool(self.start_date) != bool(self.end_date):
             errors["end_date"] = "Both dates must be set together, or neither."
         elif self.start_date and self.end_date:
-            if self.is_in_pool and self.type != IdeaType.LODGING:
-                errors["start_date"] = "An idea in the pool cannot have dates."
-            elif self.type != IdeaType.LODGING and self.start_date != self.end_date:
-                errors["end_date"] = "A non-lodging idea only spans a single day."
+            if self.type != IdeaType.LODGING:
+                if self.is_in_pool:
+                    errors["start_date"] = "An idea in the pool cannot have dates."
+                elif self.start_date != self.end_date:
+                    errors["end_date"] = "A non-lodging idea only spans a single day."
+        elif self.type == IdeaType.LODGING:
+            errors["start_date"] = "A lodging must always have dates."
         elif not self.is_in_pool:
             errors["start_date"] = "An idea placed on a step must have dates."
 

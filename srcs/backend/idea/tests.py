@@ -163,10 +163,9 @@ class IdeaModelTest(TestCase):
         )
         self.assertEqual(str(idea.price_per_night), "24.00")
 
-    def test_missing_lodging_dates_bypass_the_constraint(self):
-        idea = self._make_idea(type=IdeaType.LODGING)
-        self.assertIsNone(idea.start_date)
-        self.assertIsNone(idea.end_date)
+    def test_lodging_without_dates_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(type=IdeaType.LODGING)
 
     def test_step_from_another_travel_is_rejected(self):
         other_travel = Travel.objects.create(
@@ -221,7 +220,12 @@ class IdeaModelTest(TestCase):
 
     def test_chosen_requires_being_placed_on_a_step(self):
         with self.assertRaises(ValidationError):
-            self._make_idea(type=IdeaType.LODGING, chosen_at=timezone.now())
+            self._make_idea(
+                type=IdeaType.LODGING,
+                start_date=datetime.date(2026, 6, 2),
+                end_date=datetime.date(2026, 6, 4),
+                chosen_at=timezone.now(),
+            )
 
     def test_overlapping_chosen_lodgings_on_same_step_are_rejected(self):
         self._make_idea(
