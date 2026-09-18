@@ -8,7 +8,8 @@ import MenuItem from "@/shared/ui/MenuItem";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import { useState } from "react";
 import Divider from "@/shared/ui/Divider";
-import { computeNights } from "@/features/travel/utils/computeNights";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+import { deleteStep } from "@/features/step/api/stepApi";
 
 //TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
 // pas un champ stocke dans Step
@@ -16,8 +17,8 @@ interface StepCardProps {
   step: Step;
   dateLabel: string;
   ideaPreview?: StepIdeaPreview;
-  ideaCount: number;
   onClick?: () => void;
+  refetch: () => void;
 }
 
 const ideaPreviewTones = {
@@ -35,8 +36,31 @@ function formatNights(nights: number): string {
   return `${nights} nuits`;
 }
 
-function StepOptionsButton() {
+interface StepOptionsButtonProps {
+  refetch: () => void;
+  stepId: number;
+  travelId: number;
+}
+
+function StepOptionsButton({
+  refetch,
+  stepId,
+  travelId,
+}: StepOptionsButtonProps) {
+  // rajouter error une fois que bandeau error en place
+  const { submit, isSubmitting } = useSubmitAction(() =>
+    deleteStep(travelId, stepId),
+  );
+
   const [isOpen, setIsOpen] = useState(false);
+
+  //A rajouter un bandeau d'erreur en cas d'erreur pour eviter le remplacement de la card
+  //if (error) return <p>{error}</p>;
+
+  const handleOnSubmit = async () => {
+    const result = await submit();
+    if (result.success) refetch();
+  };
   return (
     <div className={StepOptionsStyle} onClick={(e) => e.stopPropagation()}>
       <IconButton
@@ -52,7 +76,12 @@ function StepOptionsButton() {
         >
           <MenuItem icon="edit">Modifier étape</MenuItem>
           <Divider />
-          <MenuItem icon="x" tone="danger">
+          <MenuItem
+            icon="x"
+            tone="danger"
+            onClick={handleOnSubmit}
+            disabled={isSubmitting}
+          >
             Supprimer l'étape
           </MenuItem>
         </DropdownMenu>
@@ -64,9 +93,7 @@ function StepOptionsButton() {
 function StepDescription({
   step,
   ideaPreview,
-  ideaCount,
-}: Pick<StepCardProps, "step" | "ideaPreview" | "ideaCount">) {
-  const nights = computeNights(step.startDate, step.endDate);
+}: Pick<StepCardProps, "step" | "ideaPreview">) {
   return (
     <Text tone="muted" size="sm">
       {ideaPreview && (
@@ -77,7 +104,7 @@ function StepDescription({
           {" · "}
         </>
       )}
-      {formatNights(nights)} · {ideaCount} idées épinglées
+      {formatNights(step.nights)} · {step.ideaCount} idées épinglées
     </Text>
   );
 }
@@ -87,8 +114,8 @@ export function StepCard({
   step,
   dateLabel,
   ideaPreview,
-  ideaCount,
   onClick,
+  refetch,
 }: StepCardProps) {
   return (
     <Card
@@ -102,14 +129,14 @@ export function StepCard({
         <Heading level={2}>{step.localisation}</Heading>
       </div>
       <div className="flex items-center">
-        <StepDescription
-          step={step}
-          ideaPreview={ideaPreview}
-          ideaCount={ideaCount}
-        />
+        <StepDescription step={step} ideaPreview={ideaPreview} />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
-      <StepOptionsButton />
+      <StepOptionsButton
+        stepId={step.id}
+        travelId={step.travelId}
+        refetch={refetch}
+      />
     </Card>
   );
 }

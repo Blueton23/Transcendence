@@ -380,7 +380,7 @@ class StepSerializerTest(TestCase):
 
         expected_keys = {
             "id",
-            "travel",
+            "travel_id",
             "priority",
             "start_date",
             "end_date",
@@ -591,7 +591,7 @@ class StepViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["travel"], self.mon_voyage.id)
+        self.assertEqual(response.data["travel_id"], self.mon_voyage.id)
 
     def test_create_forbidden_if_not_participant(self):
         self.client.force_authenticate(user=self.traveler)
@@ -607,3 +607,45 @@ class StepViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 403)
         self.assertEqual(Step.objects.filter(localisation="Nice").count(), 0)
+
+    def test_rejects_start_date_before_travel_start_date(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id}),
+            {
+                "start_date": "2026-05-02",
+                "end_date": "2026-06-14",
+                "localisation": "Lyon",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", response.data["details"])
+
+    def test_rejects_end_date_after_travel_end_date(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id}),
+            {
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-17",
+                "localisation": "Lyon",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("end_date", response.data["details"])
+
+    def test_rejects_dates_overlaping(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id}),
+            {
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-04",
+                "localisation": "Lyon",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", response.data["details"])

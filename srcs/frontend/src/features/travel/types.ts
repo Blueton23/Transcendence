@@ -1,9 +1,10 @@
 export interface Travel {
   id: number;
+  travelers: { id: number; initials: string; name: string }[];
   title: string;
   startDate: string;
   endDate: string;
-  travelers: { id: number; initials: string; name: string }[];
+  nights: number;
   inviteToken: string;
   status: "current" | "finished";
   createdAt: string;

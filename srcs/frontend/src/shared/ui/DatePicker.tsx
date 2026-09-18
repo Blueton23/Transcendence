@@ -8,12 +8,20 @@ interface DatePickerProps {
   onSelect: (range: DateRange | undefined) => void;
   disabled?: Matcher | Matcher[];
   singleDay?: boolean;
+  defaultMonth?: Date;
+  startMonth?: Date;
+  endMonth?: Date;
+  markedDays?: Date[];
 }
 
 export function DatePicker({
   selected,
   onSelect,
   disabled,
+  defaultMonth,
+  startMonth,
+  endMonth,
+  markedDays,
   singleDay = false,
 }: DatePickerProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
@@ -29,6 +37,11 @@ export function DatePicker({
           onSelect(date ? { from: date, to: date } : undefined)
         }
         disabled={disabled}
+        defaultMonth={defaultMonth}
+        startMonth={startMonth}
+        endMonth={endMonth}
+        modifiers={{ marked: markedDays }}
+        modifiersClassNames={{ marked: "rdp-marked" }}
       />
     );
   }
@@ -41,6 +54,12 @@ export function DatePicker({
       navLayout="around"
       selected={selected}
       onSelect={onSelect}
+      disabled={disabled}
+      defaultMonth={defaultMonth}
+      startMonth={startMonth}
+      endMonth={endMonth}
+      modifiers={{ marked: markedDays }}
+      modifiersClassNames={{ marked: "rdp-marked" }}
     />
   );
 }

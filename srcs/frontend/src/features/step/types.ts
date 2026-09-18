@@ -5,11 +5,12 @@ export interface Step {
   travelId: number;
   startDate: string;
   endDate: string;
+  nights: number;
+  ideaCount: number;
   priority: number | null;
   localisation: string;
   latitude: number;
   longitude: number;
-  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,4 +20,12 @@ export interface Step {
 export interface StepIdeaPreview {
   label: string;
   status: "proposed" | "selected" | "reserved";
+}
+
+export interface CreateStepData {
+  startDate: string;
+  endDate: string;
+  localisation: string;
+  latitude?: number | null;
+  longitude?: number | null;
 }

@@ -1,47 +1,77 @@
-import type { Step } from "@/features/step/types";
+import type { Step, CreateStepData } from "@/features/step/types";
+import { getCookie } from "@/shared/api/cookies";
+import { getApiErrorMessage } from "@/shared/api/errors";
 
-//TODO(branchement): fonction en dur pour le moment. A terme: async, rprend travelId en param, fetch reel et mapping API
-// pour convertir les champs Decimal de DRF en number
-export function getSteps(): Step[] {
-  return [
-    {
-      id: 1,
-      travelId: 1,
-      startDate: "2026-07-12",
-      endDate: "2026-07-12",
-      priority: null,
-      localisation: "Montreux",
-      latitude: 46.4312,
-      longitude: 6.9107,
-      deletedAt: null,
-      createdAt: "2026-08-10T15:27:00Z",
-      updatedAt: "2026-09-08T12:31:00Z",
+const API_BASE_URL = "/api";
+
+export async function getSteps(travelId: number): Promise<Step[]> {
+  const response = await fetch(`${API_BASE_URL}/travels/${travelId}/steps/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(result) || "aucune étape enregistrée");
+  }
+  return result;
+}
+
+export async function createStep(
+  travelId: number,
+  data: CreateStepData,
+): Promise<Step> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
+
+  const response = await fetch(`${API_BASE_URL}/travels/${travelId}/steps/`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
     },
+    body: JSON.stringify(data),
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      getApiErrorMessage(result) || "impossible de créer l'étape",
+    );
+  }
+  return result;
+}
+
+export async function deleteStep(
+  travelId: number,
+  stepId: number,
+): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/travels/${travelId}/steps/${stepId}/`,
     {
-      id: 2,
-      travelId: 1,
-      startDate: "2026-07-12",
-      endDate: "2026-07-14",
-      priority: null,
-      localisation: "Interlaken",
-      latitude: 46.6833,
-      longitude: 7.85,
-      deletedAt: null,
-      createdAt: "2026-08-10T18:16:00Z",
-      updatedAt: "2026-09-08T12:31:00Z",
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
     },
-    {
-      id: 3,
-      travelId: 1,
-      startDate: "2026-07-14",
-      endDate: "2026-07-16",
-      priority: null,
-      localisation: "Zermatt",
-      latitude: 46.0207,
-      longitude: 7.7491,
-      deletedAt: null,
-      createdAt: "2026-08-10T18:19:00Z",
-      updatedAt: "2026-09-08T12:32:00Z",
-    },
-  ];
+  );
+
+  if (!response.ok) {
+    const result = await response.json();
+    throw new Error(
+      getApiErrorMessage(result) || "impossible de supprimer l'étape",
+    );
+  }
 }

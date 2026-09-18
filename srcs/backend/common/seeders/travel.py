@@ -1,5 +1,3 @@
-from collections import Counter, defaultdict
-
 from faker import Faker
 
 from travel.models import Participation, ParticipationStatus, Step, Travel
@@ -49,29 +47,19 @@ def seed_participations(
 def seed_steps(fake: Faker, travels: list, per_travel: int) -> list:
     steps = []
     for travel in travels:
-        date_ranges = []
+        # Chaque etape commence au plus tot la ou la precedente finit :
+        # pas de chevauchement, mais des trous possibles entre les etapes.
+        current = travel.start_date
         for _ in range(per_travel):
             start_date = fake.date_between_dates(
-                date_start=travel.start_date, date_end=travel.end_date
+                date_start=current, date_end=travel.end_date
             )
             end_date = fake.date_between_dates(
                 date_start=start_date, date_end=travel.end_date
             )
-            date_ranges.append((start_date, end_date))
-
-        # priority ne sert qu'a departager des etapes qui partagent la meme plage
-        range_counts = Counter(date_ranges)
-        assigned = defaultdict(int)
-        for start_date, end_date in date_ranges:
-            key = (start_date, end_date)
-            priority = None
-            if range_counts[key] > 1:
-                assigned[key] += 1
-                priority = assigned[key]
             steps.append(
                 Step.objects.create(
                     travel=travel,
-                    priority=priority,
                     start_date=start_date,
                     end_date=end_date,
                     localisation=fake.city(),
@@ -79,4 +67,5 @@ def seed_steps(fake: Faker, travels: list, per_travel: int) -> list:
                     longitude=round(fake.longitude(), 6),
                 )
             )
+            current = end_date
     return steps
