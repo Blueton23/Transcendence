@@ -5,21 +5,30 @@ import IconButton from "@/shared/ui/IconButton";
 
 interface PlaceSearchFieldProps {
   value: string;
+  variant?: "white" | "beige";
   onChange: ChangeEventHandler<HTMLInputElement>;
   onBlur: FocusEventHandler<HTMLInputElement>;
   onFocus: FocusEventHandler<HTMLInputElement>;
   onCalendarClick: () => void;
 }
 
+const variantStyle = {
+  white: "bg-surface-control",
+  beige: "bg-surface",
+};
+
 export function PlaceSearchField({
   value,
+  variant = "beige",
   onChange,
   onBlur,
   onFocus,
   onCalendarClick,
 }: PlaceSearchFieldProps) {
   return (
-    <div className="flex items-center gap-2 rounded-md bg-surface px-3 py-2">
+    <div
+      className={`flex items-center gap-2 rounded-md px-3 py-2 ${variantStyle[variant]}`}
+    >
       <Icon name="pin" className="text-brand-primary" />
       <input
         value={value}

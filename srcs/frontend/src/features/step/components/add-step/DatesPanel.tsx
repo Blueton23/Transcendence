@@ -17,9 +17,9 @@ interface DatePanelProps {
   noOvernight: boolean;
   onNoOvernightChange: (checked: boolean) => void;
   onClose: () => void;
-  onSubmit: () => void;
-  isSubmitting: boolean;
-  error: string | null;
+  onSubmit?: () => void;
+  isSubmitting?: boolean;
+  error?: string | null;
 }
 
 export function DatesPanel({
@@ -86,9 +86,11 @@ export function DatesPanel({
           />{" "}
           je ne passe pas de nuit ici
         </label>
-        <Button onClick={onSubmit} variant="primary" disabled={isSubmitting}>
-          {isSubmitting ? "Ajout..." : "Ajouter l'étape"}
-        </Button>
+        {onSubmit && (
+          <Button onClick={onSubmit} variant="primary" disabled={isSubmitting}>
+            {isSubmitting ? "Ajout..." : "Ajouter l'étape"}
+          </Button>
+        )}
         {error && <Text tone="accent">{error}</Text>}
       </Card>
     </div>
