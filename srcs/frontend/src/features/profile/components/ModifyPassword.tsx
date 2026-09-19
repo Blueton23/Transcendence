@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyPassword } from "../api/profile";
 
@@ -7,9 +8,11 @@ import Button from "../../../shared/ui/Button";
 import Input from "../../../shared/ui/Input";
 
 export function ModifyPassword() {
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({ password: "" });
+
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    modifyPassword({ password: form.password }),
+  );
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -22,26 +25,11 @@ export function ModifyPassword() {
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
-    //ajouter les test de password
-    setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    try {
-      await modifyPassword({
-        password: form.password,
-      });
-
-      //      onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
-    } finally {
-      setIsSubmitting(false);
+    const result = await submit();
+    if (result.success) {
+      //onSuccess();
     }
-
-    //recuperer l erreur
-    setIsSubmitting(false);
   }
 
   return (

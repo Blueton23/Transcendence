@@ -22,6 +22,10 @@ urlpatterns = [
     path("auth/me/", MeView.as_view(), name="auth-me"),
     path("travelers/create/", TravelerCreateView.as_view(), name="traveler-create"),
     path("ping/", TravelerPingView.as_view(), name="traveler-ping"),
-    path("travelers/update-password/", TravelerUpdatePasswordView.as_view(), name="traveler-update-password"),
+    path(
+        "travelers/update-password/",
+        TravelerUpdatePasswordView.as_view(),
+        name="traveler-update-password",
+    ),
     path("travelers/update/", TravelerUpdateView.as_view(), name="traveler-update"),
 ]

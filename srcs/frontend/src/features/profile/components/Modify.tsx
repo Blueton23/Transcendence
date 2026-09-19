@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 
 import { modifyProfile } from "../api/profile";
 import { useAuth } from "../../auth/context/useAuth";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import ModifyPassword from "./ModifyPassword";
 
@@ -17,15 +18,21 @@ interface ModifyProps {
 function Modify({ onSuccess }: ModifyProps) {
   const { currentUser, setCurrentUser } = useAuth();
 
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [form, setForm] = useState({
     firstName: currentUser?.firstName ?? "",
     lastName: currentUser?.lastName ?? "",
     username: currentUser?.username ?? "",
     email: currentUser?.email ?? "",
   });
+
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    modifyProfile({
+      firstName: form.firstName,
+      lastName: form.lastName,
+      username: form.username,
+      email: form.email,
+    }),
+  );
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -39,30 +46,14 @@ function Modify({ onSuccess }: ModifyProps) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError(null);
-
     if (!currentUser) {
-      setError("Utilisateur non connecté.");
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      const response = await modifyProfile({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        username: form.username,
-        email: form.email,
-      });
-
-      setCurrentUser(response.traveler);
-
+    const result = await submit();
+    if (result.success && result.data) {
+      setCurrentUser(result.data.traveler);
       onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 

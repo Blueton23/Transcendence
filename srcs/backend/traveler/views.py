@@ -46,12 +46,7 @@ class TravelerCreateView(APIView):
 
     def post(self, request: Request) -> Response:
         serializer = TravelerSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer.is_valid(raise_exception=True)
 
         traveler = Traveler(
             username=serializer.validated_data["username"],
@@ -82,12 +77,7 @@ class TravelerUpdateView(APIView):
             data=request.data,
             partial=True,
         )
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer.is_valid(raise_exception=True)
 
         traveler = serializer.save()
 
@@ -97,6 +87,7 @@ class TravelerUpdateView(APIView):
             },
             status=status.HTTP_200_OK,
         )
+
 
 class TravelerUpdatePasswordView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
@@ -108,12 +99,7 @@ class TravelerUpdatePasswordView(APIView):
                 "request": request,
             },
         )
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer.is_valid(raise_exception=True)
 
         traveler = request.user
 
@@ -131,17 +117,13 @@ class TravelerUpdatePasswordView(APIView):
             status=status.HTTP_200_OK,
         )
 
+
 class LoginView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def post(self, request: Request) -> Response:
         serializer = LoginSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer.is_valid(raise_exception=True)
 
         username = serializer.validated_data["username"]
         password = serializer.validated_data["password"]
@@ -208,5 +190,3 @@ class CsrfTokenView(APIView):
             },
             status=status.HTTP_200_OK,
         )
-
-

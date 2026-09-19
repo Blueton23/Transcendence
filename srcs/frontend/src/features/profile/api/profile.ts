@@ -36,7 +36,6 @@ function getApiErrorMessage(result: unknown): string {
 }
 
 export async function signup(data: SignupData): Promise<SignupResponse> {
-
   await getCsrfToken();
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
@@ -62,8 +61,9 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
   return result;
 }
 
-export async function modifyProfile( data: ModifyProfileData ): Promise<ModifyProfileResponse> {
-
+export async function modifyProfile(
+  data: ModifyProfileData,
+): Promise<ModifyProfileResponse> {
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
     throw new Error("Token CSRF introuvable.");
@@ -88,8 +88,9 @@ export async function modifyProfile( data: ModifyProfileData ): Promise<ModifyPr
   return result;
 }
 
-export async function modifyPassword( data: ModifyPasswordData ): Promise<ModifyPasswordResponse> {
-
+export async function modifyPassword(
+  data: ModifyPasswordData,
+): Promise<ModifyPasswordResponse> {
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
     throw new Error("Token CSRF introuvable.");
