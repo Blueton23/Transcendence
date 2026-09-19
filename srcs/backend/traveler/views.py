@@ -12,7 +12,8 @@ from rest_framework.views import APIView
 
 from .serializers import (
     LoginSerializer,
-    TravelerCreateSerializer,
+    TravelerSerializer,
+    TravelerUpdatePasswordSerializer,
     TravelerUpdateSerializer,
 )
 
@@ -44,13 +45,8 @@ class TravelerCreateView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def post(self, request: Request) -> Response:
-        serializer = TravelerCreateSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer = TravelerSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
         traveler = Traveler(
             username=serializer.validated_data["username"],
@@ -64,7 +60,7 @@ class TravelerCreateView(APIView):
 
         return Response(
             {
-                "traveler": TravelerCreateSerializer(traveler).data,
+                "traveler": TravelerSerializer(traveler).data,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -73,37 +69,15 @@ class TravelerCreateView(APIView):
 class TravelerUpdateView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
-    def patch(self, request: Request, pk: int) -> Response:
-
-        try:
-            traveler = Traveler.objects.get(pk=pk)
-        except Traveler.DoesNotExist:
-            return Response(
-                {
-                    "detail": "Utilisateur introuvable.",
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        if request.user.id != traveler.id:
-            return Response(
-                {
-                    "detail": "Vous ne pouvez modifier que votre propre profil.",
-                },
-                status=status.HTTP_403_FORBIDDEN,
-            )
+    def patch(self, request: Request) -> Response:
+        traveler = request.user
 
         serializer = TravelerUpdateSerializer(
             traveler,
             data=request.data,
             partial=True,
         )
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer.is_valid(raise_exception=True)
 
         traveler = serializer.save()
 
@@ -115,17 +89,41 @@ class TravelerUpdateView(APIView):
         )
 
 
+class TravelerUpdatePasswordView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        serializer = TravelerUpdatePasswordSerializer(
+            data=request.data,
+            context={
+                "request": request,
+            },
+        )
+        serializer.is_valid(raise_exception=True)
+
+        traveler = request.user
+
+        traveler.set_password(
+            serializer.validated_data["password"],
+        )
+        traveler.save()
+
+        login(request, traveler)
+
+        return Response(
+            {
+                "detail": "Mot de passe modifié avec succès.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
 class LoginView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def post(self, request: Request) -> Response:
         serializer = LoginSerializer(data=request.data)
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        serializer.is_valid(raise_exception=True)
 
         username = serializer.validated_data["username"]
         password = serializer.validated_data["password"]
@@ -148,7 +146,7 @@ class LoginView(APIView):
 
         return Response(
             {
-                "traveler": TravelerCreateSerializer(traveler).data,
+                "traveler": TravelerSerializer(traveler).data,
             },
             status=status.HTTP_200_OK,
         )
@@ -160,7 +158,7 @@ class MeView(APIView):
     def get(self, request: Request) -> Response:
         return Response(
             {
-                "traveler": TravelerCreateSerializer(request.user).data,
+                "traveler": TravelerSerializer(request.user).data,
             },
             status=status.HTTP_200_OK,
         )

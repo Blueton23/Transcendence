@@ -7,7 +7,7 @@ from rest_framework import serializers
 from .models import Traveler
 
 
-class TravelerCreateSerializer(serializers.ModelSerializer):
+class TravelerSerializer(serializers.ModelSerializer):
     password = serializers.CharField(
         write_only=True,
         required=True,
@@ -69,3 +69,19 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(
         write_only=True,
     )
+
+
+class TravelerUpdatePasswordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Traveler
+
+        fields: ClassVar[list[str]] = [
+            "id",
+            "password",
+            "updated_at",
+        ]
+
+        read_only_fields: ClassVar[list[str]] = [
+            "id",
+            "updated_at",
+        ]
