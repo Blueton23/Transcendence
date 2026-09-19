@@ -74,25 +74,8 @@ class TravelerCreateView(APIView):
 class TravelerUpdateView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
-    def patch(self, request: Request, pk: int) -> Response:
-
-        try:
-            traveler = Traveler.objects.get(pk=pk)
-        except Traveler.DoesNotExist:
-            return Response(
-                {
-                    "detail": "Utilisateur introuvable.",
-                },
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        if request.user.id != traveler.id:
-            return Response(
-                {
-                    "detail": "Vous ne pouvez modifier que votre propre profil.",
-                },
-                status=status.HTTP_403_FORBIDDEN,
-            )
+    def patch(self, request: Request) -> Response:
+        traveler = request.user
 
         serializer = TravelerUpdateSerializer(
             traveler,

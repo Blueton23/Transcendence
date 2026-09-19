@@ -49,7 +49,7 @@ function Modify({ onSuccess }: ModifyProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await modifyProfile(currentUser.id, {
+      const response = await modifyProfile({
         firstName: form.firstName,
         lastName: form.lastName,
         username: form.username,

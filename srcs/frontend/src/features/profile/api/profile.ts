@@ -36,15 +36,14 @@ function getApiErrorMessage(result: unknown): string {
 }
 
 export async function signup(data: SignupData): Promise<SignupResponse> {
+
   await getCsrfToken();
-
   const csrfToken = getCookie("csrftoken");
-
   if (!csrfToken) {
     throw new Error("Token CSRF introuvable.");
   }
 
-  const response = await fetch(`${API_BASE_URL}/travelers/`, {
+  const response = await fetch(`${API_BASE_URL}/travelers/create/`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -57,29 +56,20 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(
-      //      result.detail || "Impossible de créer le compte.",
-      //      result.detail || JSON.stringify(result),
-      getApiErrorMessage(result),
-    );
+    throw new Error(getApiErrorMessage(result));
   }
 
   return result;
 }
 
-export async function modifyProfile(
-  userId: number,
-  data: ModifyProfileData,
-): Promise<ModifyProfileResponse> {
-  await getCsrfToken();
+export async function modifyProfile( data: ModifyProfileData ): Promise<ModifyProfileResponse> {
 
   const csrfToken = getCookie("csrftoken");
-
   if (!csrfToken) {
     throw new Error("Token CSRF introuvable.");
   }
 
-  const response = await fetch(`${API_BASE_URL}/travelers/${userId}/`, {
+  const response = await fetch(`${API_BASE_URL}/travelers/update/`, {
     method: "PATCH",
     credentials: "include",
     headers: {
@@ -98,9 +88,8 @@ export async function modifyProfile(
   return result;
 }
 
-export async function modifyPassword(
-  data: ModifyPasswordData,
-): Promise<ModifyPasswordResponse> {
+export async function modifyPassword( data: ModifyPasswordData ): Promise<ModifyPasswordResponse> {
+
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
     throw new Error("Token CSRF introuvable.");
