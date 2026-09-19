@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 
 from .serializers import (
     LoginSerializer,
-    TravelerCreateSerializer,
+    TravelerSerializer,
     TravelerUpdatePasswordSerializer,
     TravelerUpdateSerializer,
 )
@@ -45,7 +45,7 @@ class TravelerCreateView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def post(self, request: Request) -> Response:
-        serializer = TravelerCreateSerializer(data=request.data)
+        serializer = TravelerSerializer(data=request.data)
 
         if not serializer.is_valid():
             return Response(
@@ -65,7 +65,7 @@ class TravelerCreateView(APIView):
 
         return Response(
             {
-                "traveler": TravelerCreateSerializer(traveler).data,
+                "traveler": TravelerSerializer(traveler).data,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -115,6 +115,38 @@ class TravelerUpdateView(APIView):
             status=status.HTTP_200_OK,
         )
 
+class TravelerUpdatePasswordView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        serializer = TravelerUpdatePasswordSerializer(
+            data=request.data,
+            context={
+                "request": request,
+            },
+        )
+
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        traveler = request.user
+
+        traveler.set_password(
+            serializer.validated_data["password"],
+        )
+        traveler.save()
+
+        login(request, traveler)
+
+        return Response(
+            {
+                "detail": "Mot de passe modifié avec succès.",
+            },
+            status=status.HTTP_200_OK,
+        )
 
 class LoginView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
@@ -149,7 +181,7 @@ class LoginView(APIView):
 
         return Response(
             {
-                "traveler": TravelerCreateSerializer(traveler).data,
+                "traveler": TravelerSerializer(traveler).data,
             },
             status=status.HTTP_200_OK,
         )
@@ -161,7 +193,7 @@ class MeView(APIView):
     def get(self, request: Request) -> Response:
         return Response(
             {
-                "traveler": TravelerCreateSerializer(request.user).data,
+                "traveler": TravelerSerializer(request.user).data,
             },
             status=status.HTTP_200_OK,
         )
@@ -195,35 +227,3 @@ class CsrfTokenView(APIView):
         )
 
 
-class TravelerUpdatePasswordView(APIView):
-    permission_classes: ClassVar[list] = [IsAuthenticated]
-
-    def post(self, request: Request) -> Response:
-        serializer = TravelerUpdatePasswordSerializer(
-            data=request.data,
-            context={
-                "request": request,
-            },
-        )
-
-        if not serializer.is_valid():
-            return Response(
-                serializer.errors,
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        traveler = request.user
-
-        traveler.set_password(
-            serializer.validated_data["password"],
-        )
-        traveler.save()
-
-        login(request, traveler)
-
-        return Response(
-            {
-                "detail": "Mot de passe modifié avec succès.",
-            },
-            status=status.HTTP_200_OK,
-        )
