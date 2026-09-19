@@ -11,6 +11,7 @@ import { TripActionsButton } from "@/features/step/components/page/TripActionsBu
 import { useSteps } from "@/features/step/hooks/useSteps";
 import { useParams } from "react-router";
 import { Navigate } from "react-router";
+import { ModifyStepModal } from "@/features/step/components/modal/ModifyStep";
 
 //TODO(branchement):
 // + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
@@ -34,6 +35,8 @@ function ItineraryPage() {
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const [detailView, setDetailView] = useState<Step | null>(null);
+
+  const [stepToModify, setStepToModify] = useState<Step | null>(null);
 
   const isLoading = isLoadingTravel || isLoadingSteps;
   const error = errorTravel || errorSteps;
@@ -62,6 +65,7 @@ function ItineraryPage() {
             step={detailView}
             dateLabel={dateLabels[selectedStepIndex]}
             onBack={() => setDetailView(null)}
+            onModify={() => setStepToModify(detailView)}
             travel={travel}
           />
         ) : (
@@ -73,11 +77,20 @@ function ItineraryPage() {
               dateLabels={dateLabels}
               onDetailView={setDetailView}
               refetch={refetch}
+              onModifyStep={setStepToModify}
             />
           </div>
         )}
         <TripActionsButton />
       </ItineraryLayout>
+      {stepToModify && (
+        <ModifyStepModal
+          step={stepToModify}
+          steps={steps}
+          travel={travel}
+          onClose={() => setStepToModify(null)}
+        />
+      )}
     </div>
   );
 }

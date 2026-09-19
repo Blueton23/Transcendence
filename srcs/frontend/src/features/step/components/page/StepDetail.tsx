@@ -11,6 +11,7 @@ interface StepDetailProps {
   dateLabel: string;
   travel: Travel;
   // ideas: Idea[];
+  onModify: () => void;
   onBack: () => void;
 }
 
@@ -18,6 +19,7 @@ interface StepDetailProps {
 export function StepDetail({
   step,
   dateLabel,
+  onModify,
   onBack,
   travel,
 }: StepDetailProps) {
@@ -26,7 +28,7 @@ export function StepDetail({
 
   return (
     <div className="flex flex-col gap-6">
-      <StepDetailHeader onBack={onBack} />
+      <StepDetailHeader onBack={onBack} onModify={onModify} />
 
       <StepInfo step={step} dateLabel={dateLabel} hasNights={hasNights} />
       <Divider />

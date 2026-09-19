@@ -17,6 +17,7 @@ interface StepCardProps {
   step: Step;
   dateLabel: string;
   ideaPreview?: StepIdeaPreview;
+  onModify: () => void;
   onClick?: () => void;
   refetch: () => void;
 }
@@ -37,12 +38,14 @@ function formatNights(nights: number): string {
 }
 
 interface StepOptionsButtonProps {
+  onModify: () => void;
   refetch: () => void;
   stepId: number;
   travelId: number;
 }
 
 function StepOptionsButton({
+  onModify,
   refetch,
   stepId,
   travelId,
@@ -74,7 +77,9 @@ function StepOptionsButton({
           onClose={() => setIsOpen(false)}
           className="top-full right-0 mt-2"
         >
-          <MenuItem icon="edit">Modifier étape</MenuItem>
+          <MenuItem onClick={onModify} icon="edit">
+            Modifier étape
+          </MenuItem>
           <Divider />
           <MenuItem
             icon="x"
@@ -115,6 +120,7 @@ export function StepCard({
   dateLabel,
   ideaPreview,
   onClick,
+  onModify,
   refetch,
 }: StepCardProps) {
   return (
@@ -133,6 +139,7 @@ export function StepCard({
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
       <StepOptionsButton
+        onModify={onModify}
         stepId={step.id}
         travelId={step.travelId}
         refetch={refetch}

@@ -11,6 +11,7 @@ interface ItineraryListPanelProps {
   travel: Travel;
   dateLabels: string[];
   onDetailView: (step: Step) => void;
+  onModifyStep: (step: Step) => void;
   refetch: () => void;
 }
 
@@ -20,6 +21,7 @@ export function ItineraryListPanel({
   travel,
   dateLabels,
   onDetailView,
+  onModifyStep,
   refetch,
 }: ItineraryListPanelProps) {
   return (
@@ -31,6 +33,7 @@ export function ItineraryListPanel({
           segments={segments}
           dateLabels={dateLabels}
           onDetailView={onDetailView}
+          onModifyStep={onModifyStep}
           refetch={refetch}
         />
         <TotalSegment segments={segments} />
