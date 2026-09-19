@@ -1,8 +1,9 @@
 from typing import ClassVar
 
+from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
-from .models import ParticipationStatus, Step, Travel
+from .models import ParticipationStatus, Step, Travel, validate_no_dates_overlap
 
 
 def validate_date_range(instance, attrs):
@@ -13,6 +14,18 @@ def validate_date_range(instance, attrs):
             {"end_date": "Must be on or after the start date."}
         )
     return attrs
+
+
+def validate_date_within_travel(travel, instance, attrs):
+    start = attrs.get("start_date", getattr(instance, "start_date", None))
+    end = attrs.get("end_date", getattr(instance, "end_date", None))
+    errors = {}
+    if start and start < travel.start_date:
+        errors["start_date"] = "Must be within the travel dates"
+    if end and end > travel.end_date:
+        errors["end_date"] = "Must be within the travel dates"
+    if errors:
+        raise serializers.ValidationError(errors)
 
 
 class TravelSerializer(serializers.ModelSerializer):
@@ -67,6 +80,7 @@ class TravelSerializer(serializers.ModelSerializer):
 class StepSerializer(serializers.ModelSerializer):
     nights = serializers.SerializerMethodField()
     idea_count = serializers.SerializerMethodField()
+    travel_id = serializers.IntegerField(read_only=True)
 
     def get_nights(self, obj):
         return (obj.end_date - obj.start_date).days
@@ -77,13 +91,24 @@ class StepSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validate_date_range(self.instance, attrs)
+        if self.instance:
+            travel = self.instance.travel
+        else:
+            travel_id = self.context["view"].kwargs["travel_id"]
+            travel = get_object_or_404(Travel, pk=travel_id)
+        validate_date_within_travel(travel, self.instance, attrs)
+        start = attrs.get("start_date", getattr(self.instance, "start_date", None))
+        end = attrs.get("end_date", getattr(self.instance, "end_date", None))
+        validate_no_dates_overlap(
+            travel, start, end, self.instance.pk if self.instance else None
+        )
         return attrs
 
     class Meta:
         model = Step
         fields: ClassVar[list[str]] = [
             "id",
-            "travel",
+            "travel_id",
             "priority",
             "start_date",
             "end_date",
@@ -97,7 +122,7 @@ class StepSerializer(serializers.ModelSerializer):
         ]
         read_only_fields: ClassVar[list[str]] = [
             "id",
-            "travel",
+            "travel_id",
             "created_at",
             "updated_at",
         ]

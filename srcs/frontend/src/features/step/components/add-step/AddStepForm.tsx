@@ -3,6 +3,11 @@ import { PlaceSearchField } from "./PlaceSearchField";
 import { PlaceSuggestions } from "./PlaceSuggestions";
 import { type DateRange } from "@daypicker/react";
 import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+import { createStep } from "@/features/step/api/stepApi";
+import { toApiDateString } from "@/features/step/utils/stepDates";
+import type { Travel } from "@/features/travel/types";
+import type { Step } from "@/features/step/types";
 
 // TODO(branchement): remplacer results en dur par l'autocomplete de l'API géocodage
 const results = [
@@ -13,11 +18,27 @@ const results = [
 
 type OpenPanel = "place" | "calendar" | null;
 
-export function AddStepForm() {
+interface AddStepFromProps {
+  steps: Step[];
+  travel: Travel;
+  refetch: () => void;
+}
+
+export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<DateRange>();
   const [noOvernight, setNoOvernight] = useState(false);
+  const { submit, isSubmitting, error } = useSubmitAction(() => {
+    if (!selected?.from || !selected?.to) {
+      throw new Error("Sélectionne des dates avant de valider.");
+    }
+    return createStep(travel.id, {
+      localisation: query,
+      startDate: toApiDateString(selected.from),
+      endDate: toApiDateString(selected.to),
+    });
+  });
 
   const filtered = results.filter((lieu) =>
     lieu.toLowerCase().includes(query.toLowerCase()),
@@ -28,10 +49,15 @@ export function AddStepForm() {
     setOpenPanel(null);
   };
 
-  const handleOnSubmit = () => {
-    // TODO(branchement): appeler l'API pour créer l'étape (lieu + dates + noOvernight)
-    console.log({ query, selected, noOvernight });
-    setOpenPanel(null);
+  const handleOnSubmit = async () => {
+    const result = await submit();
+    if (result.success) {
+      setOpenPanel(null);
+      refetch();
+      setQuery("");
+      setSelected(undefined);
+      setNoOvernight(false);
+    }
   };
 
   const handleNoOvernightChange = (checked: boolean) => {
@@ -61,12 +87,16 @@ export function AddStepForm() {
       )}
       {openPanel === "calendar" && (
         <DatesPanel
+          steps={steps}
+          travel={travel}
           selected={selected}
           onSelect={setSelected}
           noOvernight={noOvernight}
           onNoOvernightChange={handleNoOvernightChange}
           onSubmit={handleOnSubmit}
           onClose={() => setOpenPanel(null)}
+          isSubmitting={isSubmitting}
+          error={error}
         />
       )}
     </div>

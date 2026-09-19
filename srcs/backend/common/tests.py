@@ -7,6 +7,7 @@ from django.core.management.base import CommandError
 from django.test import TestCase
 
 from common.seeders.clear import clear_seed_data
+from idea.models import Idea, Reaction
 from travel.models import Participation, Step, Travel
 from traveler.models import Friendship
 
@@ -20,6 +21,8 @@ def _seed(**kwargs):
         "travels": 3,
         "participations": 5,
         "steps_per_travel": 2,
+        "ideas_per_travel": 3,
+        "reactions": 5,
     }
     defaults.update(kwargs)
     call_command("seed", stdout=StringIO(), **defaults)
@@ -35,6 +38,8 @@ class ClearSeedDataTest(TestCase):
         self.assertEqual(Traveler.objects.count(), 0)
         self.assertEqual(Friendship.objects.count(), 0)
         self.assertEqual(Participation.objects.count(), 0)
+        self.assertEqual(Reaction.objects.count(), 0)
+        self.assertEqual(Idea.objects.count(), 0)
         self.assertEqual(Step.objects.count(), 0)
         self.assertEqual(Travel.objects.count(), 0)
         self.assertEqual(
@@ -42,6 +47,8 @@ class ClearSeedDataTest(TestCase):
             {
                 "friendships",
                 "participations",
+                "reactions",
+                "ideas",
                 "steps",
                 "travels",
                 "travelers",

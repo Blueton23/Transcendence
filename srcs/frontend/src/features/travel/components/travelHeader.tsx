@@ -1,5 +1,4 @@
 import type { Step } from "@/features/step/types";
-import { computeNights } from "@/features/travel/utils/computeNights";
 import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
 import type { Travel } from "@/features/travel/types";
 import Heading from "@/shared/ui/Heading";
@@ -11,16 +10,31 @@ import { useState } from "react";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import MenuItem from "@/shared/ui/MenuItem";
 import Divider from "@/shared/ui/Divider";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+import { leaveTravel } from "@/features/travel/api/travelApi";
+import { useNavigate } from "react-router";
 
 interface TravelHeaderProps {
   travel: Travel;
-  firstStep: Step;
-  lastStep: Step;
+  firstStep?: Step;
+  lastStep?: Step;
   totalKms: number;
 }
 
-function TravelOptionsButton() {
+function TravelOptionsButton({ travelId }: { travelId: number }) {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    leaveTravel(travelId),
+  );
+
+  const handleOnSubmit = async () => {
+    const result = await submit();
+    if (result.success) navigate("/trip");
+  };
+
+  if (error) return <p>{error}</p>;
+
   return (
     <div
       className="absolute top-4 right-4"
@@ -42,7 +56,12 @@ function TravelOptionsButton() {
           <MenuItem icon="users">Gérer les voyageurs</MenuItem>
           <MenuItem icon="cal">Changer les dates</MenuItem>
           <Divider />
-          <MenuItem icon="arrow" tone="danger">
+          <MenuItem
+            onClick={handleOnSubmit}
+            disabled={isSubmitting}
+            icon="arrow"
+            tone="danger"
+          >
             Quitter le voyage
           </MenuItem>
         </DropdownMenu>
@@ -57,16 +76,17 @@ export function TravelHeader({
   lastStep,
   totalKms,
 }: TravelHeaderProps) {
-  const NbNights = computeNights(travel.startDate, travel.endDate);
   const DatesLabel = computeTravelDates(travel.startDate, travel.endDate);
   return (
     <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-6">
-      <Text
-        font="mono"
-        tone="secondary"
-        size="sm"
-        className="text-inverse! uppercase"
-      >{`${firstStep.localisation} → ${lastStep.localisation}`}</Text>
+      {firstStep && lastStep && (
+        <Text
+          font="mono"
+          tone="secondary"
+          size="sm"
+          className="text-inverse! uppercase"
+        >{`${firstStep.localisation} → ${lastStep.localisation}`}</Text>
+      )}
       <Heading level={1} size="lg" className="text-inverse!">
         {travel.title}
       </Heading>
@@ -77,13 +97,13 @@ export function TravelHeader({
         <Tag
           icon={<Icon name="moon" size={14} />}
           tone="inverse"
-        >{`${NbNights} nuits`}</Tag>
+        >{`${travel.nights} nuits`}</Tag>
         <Tag
           icon={<Icon name="car" size={14} />}
           tone="inverse"
         >{`${totalKms} kms`}</Tag>
       </div>
-      <TravelOptionsButton />
+      <TravelOptionsButton travelId={travel.id} />
     </div>
   );
 }

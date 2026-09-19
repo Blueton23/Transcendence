@@ -7,6 +7,7 @@ interface MenuItemProps {
   children: ReactNode;
   onClick?: () => void;
   tone?: "default" | "danger";
+  disabled?: boolean;
 }
 
 const toneStyles = {
@@ -21,11 +22,13 @@ function MenuItem({
   children,
   onClick,
   tone = "default",
+  disabled = false,
 }: MenuItemProps) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={`${baseStyle} ${toneStyles[tone]}`}
     >
       <Icon name={icon} size={16} />

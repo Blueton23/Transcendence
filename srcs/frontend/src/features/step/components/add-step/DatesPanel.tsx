@@ -1,31 +1,58 @@
 import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
+import Text from "@/shared/ui/Text";
 import { DatePicker } from "@/shared/ui/DatePicker";
 import { type DateRange } from "@daypicker/react";
 import { useRef } from "react";
 import { useOnClickOutside } from "@/shared/hooks/useOnClickOutside";
 import { useEscapeKey } from "@/shared/hooks/useEscapeKey";
+import type { Travel } from "@/features/travel/types";
+import type { Step } from "@/features/step/types";
 
 interface DatePanelProps {
+  steps: Step[];
+  travel: Travel;
   selected: DateRange | undefined;
   onSelect: (range: DateRange | undefined) => void;
   noOvernight: boolean;
   onNoOvernightChange: (checked: boolean) => void;
   onClose: () => void;
   onSubmit: () => void;
+  isSubmitting: boolean;
+  error: string | null;
 }
 
 export function DatesPanel({
+  steps,
+  travel,
   selected,
   onSelect,
   noOvernight,
   onNoOvernightChange,
   onSubmit,
   onClose,
+  isSubmitting,
+  error,
 }: DatePanelProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(cardRef, onClose);
   useEscapeKey(onClose);
+
+  const noNightDays = steps
+    .filter((steps) => steps.startDate === steps.endDate)
+    .map((step) => new Date(step.startDate));
+  const takenDates = steps
+    .filter((step) => step.startDate !== step.endDate)
+    .map((step) => ({
+      after: new Date(step.startDate),
+      before: new Date(step.endDate),
+    }));
+
+  const disabled = [
+    { before: new Date(travel.startDate) },
+    { after: new Date(travel.endDate) },
+    ...takenDates,
+  ];
 
   const handleDateSelect = (range: DateRange | undefined) => {
     if (noOvernight && range?.from) {
@@ -45,8 +72,10 @@ export function DatesPanel({
           selected={selected}
           onSelect={handleDateSelect}
           singleDay={noOvernight}
-          // TODO(branchement): borner aussi aux dates du voyage (travel.startDate/endDate) une fois Travel branché
-          // TODO(branchement): exclure les dates déjà prises par d'autres étapes (sauf étapes "pas de nuit")
+          disabled={disabled}
+          startMonth={new Date(travel.startDate)}
+          endMonth={new Date(travel.endDate)}
+          markedDays={noNightDays}
         />
         <label className="flex items-center gap-2 font-sans text-md font-semibold">
           <input
@@ -57,9 +86,10 @@ export function DatesPanel({
           />{" "}
           je ne passe pas de nuit ici
         </label>
-        <Button onClick={onSubmit} variant="primary">
-          Ajouter l'étape
+        <Button onClick={onSubmit} variant="primary" disabled={isSubmitting}>
+          {isSubmitting ? "Ajout..." : "Ajouter l'étape"}
         </Button>
+        {error && <Text tone="accent">{error}</Text>}
       </Card>
     </div>
   );
