@@ -9,6 +9,7 @@ from idea.models import Idea, IdeaStatus, IdeaType, Reaction
 from travel.models import Step, Travel
 from traveler.models import Traveler
 
+from idea.serializers import IdeaSerializer
 
 class IdeaModelTest(TestCase):
     def setUp(self):
@@ -349,3 +350,112 @@ class ReactionModelTest(TestCase):
     def test_no_updated_at_field(self):
         field_names = {f.name for f in Reaction._meta.get_fields()}
         self.assertNotIn("updated_at", field_names)
+
+# --- Serializer tests ---
+
+#========================================================================#
+
+# Une idée ne peut pas exister sans un traveler et un travel
+
+class IdeaSerializerTest(TestCase):
+    # Crée un Traveler et un Travel
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="Jean",
+            email="jean@exemple.com",
+            password="password123",
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+#========================================================================#
+
+# Test 1 : Crées une Idea dans la base de données de test (sérialisation)
+# - data -> Sérialise l'objet Idea en données (lit l'objet)
+# - expected_keys -> Les champs exact reçu du serializer
+
+    def test_serialized_idea_has_expected_data(self):
+        idea = Idea.objects.create(
+            travel= self.travel,
+            traveler= self.traveler,
+            title="Pizzeria",
+            type=IdeaType.RESTAURANT,
+        )
+
+        data = IdeaSerializer(idea).data
+
+        expected_keys = {
+            "id",
+            "travel_id",
+            "traveler_id",
+            "step_id",
+            "chosen_by_id",
+            "title",
+            "type",
+            "status",
+            "localisation",
+            "note",
+            "url",
+            "latitude",
+            "longitude",
+            "price_per_night",
+            "start_date",
+            "end_date",
+            "chosen_at",
+            "created_at",
+            "updated_at"
+        }
+        self.assertEqual(set(data.keys()), expected_keys)
+
+        self.assertEqual(data["traveler_id"], self.traveler.id)
+        self.assertEqual(data["travel_id"], self.travel.id)
+        self.assertEqual(data["title"], "Pizzeria")
+        self.assertEqual(data["type"], IdeaType.RESTAURANT)
+        self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
+
+#========================================================================#
+
+# Test 2 : Désérialisation + validation
+# - serializer -> Passe les données au serializer
+# - is_valid / validated_data -> Vérifie que les données sont valides
+
+    def test_valid_idea_data(self):
+        data = {
+            "title": "Brasserie",
+            "type": IdeaType.RESTAURANT,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["title"], "Brasserie")
+        self.assertEqual(serializer.validated_data["type"], IdeaType.RESTAURANT)
+
+#========================================================================#
+
+# Test 3 : Désérialisation + validation + sauvegarde
+# - serializer.save -> Crée réellement l'Idea à partir des données validées
+
+    def test_create_idea_with_serializer(self):
+        data = {
+            "title": "Brasserie",
+            "type": IdeaType.RESTAURANT,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+
+        idea = serializer.save(
+            travel= self.travel,
+            traveler= self.traveler,
+        )
+
+        self.assertEqual(idea.title, "Brasserie")
+        self.assertEqual(idea.travel_id, self.travel.id)
+        self.assertEqual(idea.traveler_id, self.traveler.id)
+
+#========================================================================#
