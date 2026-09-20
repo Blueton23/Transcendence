@@ -366,9 +366,15 @@ class IdeaSerializerTest(TestCase):
             password="password123",
         )
         self.travel = Travel.objects.create(
-            title="Road trip",
+            title="Road trip Suisse",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 10),
+        )
+        self.step = Step.objects.create(
+            travel=self.travel,
+            localisation="Vouvry",
+            start_date=datetime.date(2026, 6, 3),
+            end_date=datetime.date(2026, 6, 3),
         )
 
 #========================================================================#
@@ -381,9 +387,9 @@ class IdeaSerializerTest(TestCase):
         idea = Idea.objects.create(
             travel= self.travel,
             traveler= self.traveler,
-            title="Pizzeria",
+            title="Brasserie",
             type=IdeaType.RESTAURANT,
-        )
+            )
 
         data = IdeaSerializer(idea).data
 
@@ -407,12 +413,12 @@ class IdeaSerializerTest(TestCase):
             "chosen_at",
             "created_at",
             "updated_at"
-        }
+            }
         self.assertEqual(set(data.keys()), expected_keys)
 
         self.assertEqual(data["traveler_id"], self.traveler.id)
         self.assertEqual(data["travel_id"], self.travel.id)
-        self.assertEqual(data["title"], "Pizzeria")
+        self.assertEqual(data["title"], "Brasserie")
         self.assertEqual(data["type"], IdeaType.RESTAURANT)
         self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
 
@@ -426,7 +432,7 @@ class IdeaSerializerTest(TestCase):
         data = {
             "title": "Brasserie",
             "type": IdeaType.RESTAURANT,
-        }
+            }
 
         serializer = IdeaSerializer(data=data)
 
@@ -443,6 +449,32 @@ class IdeaSerializerTest(TestCase):
         data = {
             "title": "Brasserie",
             "type": IdeaType.RESTAURANT,
+            }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+
+        idea = serializer.save(
+            travel= self.travel,
+            traveler= self.traveler,
+            )
+
+        self.assertEqual(idea.title, "Brasserie")
+        self.assertEqual(idea.travel_id, self.travel.id)
+        self.assertEqual(idea.traveler_id, self.traveler.id)
+
+#========================================================================#
+
+# Test 4 : Validation de la step_id
+
+    def test_valid_step_id(self):
+        data = {
+            "title": "Brasserie",
+            "type": IdeaType.RESTAURANT,
+            "step_id": self.step.id,
+            "start_date": "2026-06-03",
+            "end_date": "2026-06-03"
         }
 
         serializer = IdeaSerializer(data=data)
@@ -452,10 +484,83 @@ class IdeaSerializerTest(TestCase):
         idea = serializer.save(
             travel= self.travel,
             traveler= self.traveler,
+            )
+
+        self.assertEqual(idea.step, self.step)
+
+#========================================================================#
+
+# Test 5 : Validaton si step est null = pool générale
+
+    def test_step_id_null(self):
+        data = {
+            "title": "Brasserie",
+            "type": IdeaType.RESTAURANT,
+            "step_id": None,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        
+        idea = serializer.save(
+            travel= self.travel,
+            traveler= self.traveler,
         )
 
-        self.assertEqual(idea.title, "Brasserie")
-        self.assertEqual(idea.travel_id, self.travel.id)
-        self.assertEqual(idea.traveler_id, self.traveler.id)
+        self.assertIsNone(idea.step)
+
+#========================================================================#
+
+# Test 6 : Test d'erreur, si la step_id n'existe pas = refus
+# - assertFalse -> retourne false donc pas de save
+
+    def test_step_id_not_exist(self):
+        data = {
+            "title": "Brasserie",
+            "type": IdeaType.RESTAURANT,
+            "step_id": self.step.id + 9999,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("step_id", serializer.errors)
+
+#========================================================================#
+
+# Test 7 : Step existant, mais appartenant à un autre Travel = refus
+
+    def test_rejects_step_from_another_travel(self):
+        other_travel = Travel.objects.create(
+            title="Road trip France",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+
+        other_step = Step.objects.create(
+            travel=other_travel,
+            localisation="Paris",
+            start_date=datetime.date(2026, 7, 3),
+            end_date=datetime.date(2026, 7, 3),
+        )
+
+        data = {
+            "title": "Pizzeria",
+            "type": IdeaType.RESTAURANT,
+            "step_id": other_step.id,
+            "start_date": "2026-07-03",
+            "end_date": "2026-07-03"
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+
+        with self.assertRaises(ValidationError):
+            serializer.save(
+                travel= self.travel,
+                traveler= self.traveler,
+            )
 
 #========================================================================#
