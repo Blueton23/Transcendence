@@ -7,7 +7,7 @@ import type {
   ModifyPasswordResponse,
 } from "../types";
 import { getCsrfToken } from "../../auth/api/auth";
-import { getCookie } from "../../../shared/api/cookies";
+import { getCookie } from "@/shared/api/cookies";
 
 const API_BASE_URL = "/api";
 

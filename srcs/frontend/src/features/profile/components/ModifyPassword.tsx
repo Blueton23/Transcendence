@@ -4,8 +4,8 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyPassword } from "../api/profile";
 
-import Button from "../../../shared/ui/Button";
-import Input from "../../../shared/ui/Input";
+import Button from "@/shared/ui/Button";
+import Input from "@/shared/ui/Input";
 
 export function ModifyPassword() {
   const [form, setForm] = useState({

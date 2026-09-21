@@ -1,6 +1,6 @@
-import Heading from "../../../shared/ui/Heading";
-import Text from "../../../shared/ui/Text";
-import Avatar from "../../../shared/ui/Avatar";
+import Heading from "@/shared/ui/Heading";
+import Text from "@/shared/ui/Text";
+import Avatar from "@/shared/ui/Avatar";
 
 import { useAuth } from "../../auth/context/useAuth";
 

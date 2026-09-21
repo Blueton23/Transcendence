@@ -7,9 +7,9 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import ModifyPassword from "./ModifyPassword";
 
-import Button from "../../../shared/ui/Button";
-import Input from "../../../shared/ui/Input";
-import Avatar from "../../../shared/ui/Avatar";
+import Button from "@/shared/ui/Button";
+import Input from "@/shared/ui/Input";
+import Avatar from "@/shared/ui/Avatar";
 
 interface ModifyProps {
   onSuccess: () => void;
