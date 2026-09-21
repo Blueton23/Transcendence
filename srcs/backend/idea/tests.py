@@ -396,6 +396,8 @@ class IdeaSerializerTest(TestCase):
         )
 
 #========================================================================#
+# BLOC 1 : SÉRIALISATION, DÉSÉRIALISATION ET VALIDATION
+#========================================================================#
 
 # Test 1 : Sérialisation Idea -> data, les champs et valeurs sortent correctement
 
@@ -479,6 +481,10 @@ class IdeaSerializerTest(TestCase):
 
 #========================================================================#
 
+#========================================================================#
+# BLOC 2 : VALIDATION DE STEP_ID
+#========================================================================#
+
 # Test 4 : Validation de la step_id, l’ID devient le bon objet Step
 
     def test_valid_step_id(self):
@@ -539,6 +545,10 @@ class IdeaSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("step_id", serializer.errors)
 
+#========================================================================#
+
+#========================================================================#
+# BLOC 3 : VÉRIFICATION DES CHAMPS READ-ONLY
 #========================================================================#
 
 # Test 7 : Step d’un autre Travel, accepté par le serializer, puis refusé par le modèle au save
@@ -723,5 +733,22 @@ class IdeaSerializerTest(TestCase):
         )
 
         self.assertIsNotNone(idea.updated_at)
+
+#========================================================================#
+
+#========================================================================#
+# BLOC 4 :  TYPES D'IDEA
+#========================================================================#
+
+
+
+
+
+
+
+
+
+
+
 
 #========================================================================#
