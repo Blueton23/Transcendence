@@ -2,7 +2,13 @@
 
 from typing import ClassVar
 
-from django.contrib.auth import authenticate, get_user_model, login, logout
+from django.contrib.auth import (
+    authenticate,
+    get_user_model,
+    login,
+    logout,
+    update_session_auth_hash,
+)
 from django.middleware.csrf import get_token
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -101,14 +107,10 @@ class TravelerUpdatePasswordView(APIView):
         )
         serializer.is_valid(raise_exception=True)
 
-        traveler = request.user
+        password_change_form = serializer.validated_data["_password_change_form"]
 
-        traveler.set_password(
-            serializer.validated_data["password"],
-        )
-        traveler.save()
-
-        login(request, traveler)
+        password_change_form.save()
+        update_session_auth_hash(request, request.user)
 
         return Response(
             {

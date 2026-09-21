@@ -8,10 +8,14 @@ import Button from "../../../shared/ui/Button";
 import Input from "../../../shared/ui/Input";
 
 export function ModifyPassword() {
-  const [form, setForm] = useState({ password: "" });
+  const [form, setForm] = useState({
+    oldPassword: "",
+    newPassword1: "",
+    newPassword2: "",
+  });
 
   const { submit, isSubmitting, error } = useSubmitAction(() =>
-    modifyPassword({ password: form.password }),
+    modifyPassword(form),
   );
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -28,7 +32,11 @@ export function ModifyPassword() {
 
     const result = await submit();
     if (result.success) {
-      //onSuccess();
+      setForm({
+        oldPassword: "",
+        newPassword1: "",
+        newPassword2: "",
+      });
     }
   }
 
@@ -37,15 +45,48 @@ export function ModifyPassword() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Nouveau Password
+            Ancien mot de passe
           </span>
 
           <Input
-            name="password"
+            name="oldPassword"
             type="password"
-            value={form.password}
+            value={form.oldPassword}
             onChange={handleChange}
             variant="mono"
+            autoComplete="current-password"
+            required
+          />
+        </label>
+
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Nouveau mot de passe
+          </span>
+
+          <Input
+            name="newPassword1"
+            type="password"
+            value={form.newPassword1}
+            onChange={handleChange}
+            variant="mono"
+            autoComplete="new-password"
+            required
+          />
+        </label>
+
+        <label className="flex flex-col gap-2">
+          <span className="text-sm font-semibold text-text-secondary">
+            Confirmer le nouveau mot de passe
+          </span>
+
+          <Input
+            name="newPassword2"
+            type="password"
+            value={form.newPassword2}
+            onChange={handleChange}
+            variant="mono"
+            autoComplete="new-password"
             required
           />
         </label>
@@ -63,7 +104,7 @@ export function ModifyPassword() {
             className="w-full rounded-full py-3"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Enregistrement..." : "Changer le password"}
+            {isSubmitting ? "Enregistrement..." : "Changer le mot de passe"}
           </Button>
         </div>
       </form>

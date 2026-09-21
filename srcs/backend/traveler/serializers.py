@@ -2,6 +2,7 @@
 
 from typing import ClassVar
 
+from django.contrib.auth.forms import PasswordChangeForm
 from rest_framework import serializers
 
 from .models import Traveler
@@ -71,17 +72,34 @@ class LoginSerializer(serializers.Serializer):
     )
 
 
-class TravelerUpdatePasswordSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Traveler
+class TravelerUpdatePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(
+        write_only=True,
+    )
 
-        fields: ClassVar[list[str]] = [
-            "id",
-            "password",
-            "updated_at",
-        ]
+    new_password_1 = serializers.CharField(
+        write_only=True,
+    )
 
-        read_only_fields: ClassVar[list[str]] = [
-            "id",
-            "updated_at",
-        ]
+    new_password_2 = serializers.CharField(
+        write_only=True,
+    )
+
+    def validate(self, attrs: dict[str, str]) -> dict[str, str]:
+        request = self.context["request"]
+
+        form = PasswordChangeForm(
+            user=request.user,
+            data={
+                "old_password": attrs["old_password"],
+                "new_password1": attrs["new_password_1"],
+                "new_password2": attrs["new_password_2"],
+            },
+        )
+
+        if not form.is_valid():
+            raise serializers.ValidationError(form.errors)
+
+        attrs["_password_change_form"] = form
+
+        return attrs

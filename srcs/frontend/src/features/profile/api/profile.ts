@@ -16,23 +16,54 @@ function getApiErrorMessage(result: unknown): string {
   if (typeof result === "string") {
     return result;
   }
-  if (typeof result === "object" && result !== null) {
-    const errors = result as Record<string, unknown>;
 
-    if (typeof errors.detail === "string") {
-      return errors.detail;
-    }
-    return Object.entries(errors)
-      .map(([field, message]) => {
-        if (Array.isArray(message)) {
-          return `${field} : ${message.join(", ")}`;
-        }
-
-        return `${field} : ${String(message)}`;
-      })
-      .join("\n");
+  if (typeof result !== "object" || result === null) {
+    return "Une erreur est survenue.";
   }
-  return "Impossible de créer le compte.";
+
+  const errors = result as Record<string, unknown>;
+
+  if (typeof errors.detail === "string") {
+    return errors.detail;
+  }
+
+  return Object.entries(errors)
+    .map(([field, message]) => {
+      if (Array.isArray(message)) {
+        return `${field} : ${message
+          .map((item) => formatErrorMessage(item))
+          .join(", ")}`;
+      }
+
+      return `${field} : ${formatErrorMessage(message)}`;
+    })
+    .join("\n");
+}
+
+function formatErrorMessage(value: unknown): string {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => formatErrorMessage(item)).join(", ");
+  }
+
+  if (typeof value === "object" && value !== null) {
+    const object = value as Record<string, unknown>;
+
+    if (typeof object.message === "string") {
+      return object.message;
+    }
+
+    return Object.entries(object)
+      .map(([key, nestedValue]) => {
+        return `${key} : ${formatErrorMessage(nestedValue)}`;
+      })
+      .join(", ");
+  }
+
+  return String(value);
 }
 
 export async function signup(data: SignupData): Promise<SignupResponse> {

@@ -24,7 +24,9 @@ export interface ModifyProfileResponse {
 }
 
 export interface ModifyPasswordData {
-  password: string;
+  oldPassword: string;
+  newPassword1: string;
+  newPassword2: string;
 }
 
 export interface ModifyPasswordResponse {
