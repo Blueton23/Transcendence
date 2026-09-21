@@ -2,7 +2,6 @@ import { useState } from "react";
 import type { Step } from "@/features/step/types";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
-import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 import { PlaceSearchField } from "@/features/step/components/add-step/PlaceSearchField";
 import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
@@ -85,50 +84,60 @@ export function ModifyStepModal({
 
   return (
     <Modal icon="pinplus" title="Modifier l'étape" onClose={onClose}>
-      <Heading>Lieu et date</Heading>
-      <PlaceSearchField
-        variant="white"
-        value={query}
-        dateLabel={formatDateRange(selected)}
-        onChange={(e) => setQuery(e.target.value)}
-        onBlur={() =>
-          setOpenPanel((current) => (current === "place" ? null : current))
-        }
-        onFocus={() => setOpenPanel("place")}
-        onCalendarClick={() => {
-          setOpenPanel((current) =>
-            current === "calendar" ? null : "calendar",
-          );
-        }}
-      />
-      {openPanel === "place" && query !== "" && (
-        <PlaceSuggestions items={filtered} onSelect={handleSelect} />
-      )}
-      {openPanel === "calendar" && (
-        <DatesPanel
-          steps={steps}
-          travel={travel}
-          selected={selected}
-          className="relative"
-          onSelect={setSelected}
-          noOvernight={noOvernight}
-          onNoOvernightChange={handleNoOvernightChange}
-          onClose={() => setOpenPanel(null)}
-        />
-      )}
-      <Button
-        onClick={handleOnSubmit}
-        disabled={isSubmitting}
-        onMouseDown={(e) => e.stopPropagation()}
-        type="submit"
-        variant="primary"
-        className="w-full"
-      >
-        {isSubmitting
-          ? "Modifications en cours"
-          : "Enregistrer les modifications"}
-      </Button>
-      {error && <Text tone="accent">{error}</Text>}
+      <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-2">
+          <Text tone="secondary" className="font-semibold">
+            Lieu et dates
+          </Text>
+          <div className="relative">
+            <PlaceSearchField
+              variant="white"
+              value={query}
+              dateLabel={formatDateRange(selected)}
+              onChange={(e) => setQuery(e.target.value)}
+              onBlur={() =>
+                setOpenPanel((current) =>
+                  current === "place" ? null : current,
+                )
+              }
+              onFocus={() => setOpenPanel("place")}
+              onCalendarClick={() => {
+                setOpenPanel((current) =>
+                  current === "calendar" ? null : "calendar",
+                );
+              }}
+            />
+          </div>
+        </div>
+        {openPanel === "place" && query !== "" && (
+          <PlaceSuggestions items={filtered} onSelect={handleSelect} />
+        )}
+        {openPanel === "calendar" && (
+          <DatesPanel
+            steps={steps.filter((step) => step.id !== step.id)}
+            travel={travel}
+            selected={selected}
+            className="relative"
+            onSelect={setSelected}
+            noOvernight={noOvernight}
+            onNoOvernightChange={handleNoOvernightChange}
+            onClose={() => setOpenPanel(null)}
+          />
+        )}
+        <Button
+          onClick={handleOnSubmit}
+          disabled={isSubmitting}
+          onMouseDown={(e) => e.stopPropagation()}
+          type="submit"
+          variant="primary"
+          className="w-full"
+        >
+          {isSubmitting
+            ? "Modifications en cours"
+            : "Enregistrer les modifications"}
+        </Button>
+        {error && <Text tone="accent">{error}</Text>}
+      </div>
     </Modal>
   );
 }

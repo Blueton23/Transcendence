@@ -99,6 +99,9 @@ export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
           error={error}
         />
       )}
+      {openPanel === "calendar" && (
+        <div className="fixed inset-0 z-10 bg-scrim md:hidden" />
+      )}
     </div>
   );
 }

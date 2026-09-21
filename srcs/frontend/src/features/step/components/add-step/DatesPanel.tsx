@@ -68,26 +68,31 @@ export function DatesPanel({
     <div ref={cardRef}>
       <Card
         variant="default"
-        className={`z-10 mt-2 flex flex-col gap-4 p-6 ${className}`}
+        className={`z-20 mt-2 flex flex-col gap-4 p-6 ${className}`}
       >
-        <DatePicker
-          selected={selected}
-          onSelect={handleDateSelect}
-          singleDay={noOvernight}
-          disabled={disabled}
-          startMonth={new Date(travel.startDate)}
-          endMonth={new Date(travel.endDate)}
-          markedDays={noNightDays}
-        />
-        <label className="flex items-center gap-2 font-sans text-md font-semibold">
-          <input
-            type="checkbox"
-            checked={noOvernight}
-            onChange={(event) => onNoOvernightChange(event.target.checked)}
-            className="h-4 w-4 accent-brand-primary"
-          />{" "}
-          je ne passe pas de nuit ici
-        </label>
+        <div className="flex justify-center">
+          <div className="flex flex-col gap-2">
+            <DatePicker
+              selected={selected}
+              onSelect={handleDateSelect}
+              singleDay={noOvernight}
+              disabled={disabled}
+              startMonth={new Date(travel.startDate)}
+              endMonth={new Date(travel.endDate)}
+              markedDays={noNightDays}
+            />
+
+            <label className="flex items-center gap-2 font-sans text-md font-semibold">
+              <input
+                type="checkbox"
+                checked={noOvernight}
+                onChange={(event) => onNoOvernightChange(event.target.checked)}
+                className="h-4 w-4 accent-brand-primary"
+              />{" "}
+              je ne passe pas de nuit ici
+            </label>
+          </div>
+        </div>
         {onSubmit && (
           <Button onClick={onSubmit} variant="primary" disabled={isSubmitting}>
             {isSubmitting ? "Ajout..." : "Ajouter l'étape"}

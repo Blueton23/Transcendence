@@ -2,7 +2,6 @@ import Icon from "@/shared/ui/Icon";
 import Divider from "@/shared/ui/Divider";
 import { type ChangeEventHandler, type FocusEventHandler } from "react";
 import IconButton from "@/shared/ui/IconButton";
-import Button from "@/shared/ui/Button";
 
 interface PlaceSearchFieldProps {
   value: string;
@@ -43,14 +42,15 @@ export function PlaceSearchField({
       ></input>
       <Divider orientation="vertical" />
       {dateLabel ? (
-        <Button
-          variant="ghost"
-          icon={<Icon name="cal" />}
+        <button
+          type="button"
+          className="flex cursor-pointer items-center gap-2 p-1 text-sm font-semibold text-text md:p-2"
           onClick={onCalendarClick}
           onMouseDown={(event) => event.stopPropagation()}
         >
+          <Icon name="cal" />
           {dateLabel}
-        </Button>
+        </button>
       ) : (
         <IconButton
           icon={<Icon name="cal" />}
