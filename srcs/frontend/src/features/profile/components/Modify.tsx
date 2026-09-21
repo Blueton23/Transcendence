@@ -1,15 +1,14 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
-
-import { modifyProfile } from "../api/profile";
-import { useAuth } from "../../auth/context/useAuth";
-import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
-
-import ModifyPassword from "./ModifyPassword";
+import type { ChangeEvent, FormEvent } from "react";
 
 import Button from "@/shared/ui/Button";
 import Input from "@/shared/ui/Input";
 import Avatar from "@/shared/ui/Avatar";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+
+import { modifyProfile } from "../api/profile";
+import { useAuth } from "../../auth/context/useAuth";
+import ModifyPassword from "./ModifyPassword";
 
 interface ModifyProps {
   onSuccess: () => void;
@@ -26,15 +25,10 @@ function Modify({ onSuccess }: ModifyProps) {
   });
 
   const { submit, isSubmitting, error } = useSubmitAction(() =>
-    modifyProfile({
-      firstName: form.firstName,
-      lastName: form.lastName,
-      username: form.username,
-      email: form.email,
-    }),
+    modifyProfile(form),
   );
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setForm((previous) => ({
@@ -46,23 +40,11 @@ function Modify({ onSuccess }: ModifyProps) {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!currentUser) {
-      return;
-    }
-
     const result = await submit();
     if (result.success && result.data) {
       setCurrentUser(result.data.traveler);
       onSuccess();
     }
-  }
-
-  if (!currentUser) {
-    return (
-      <p className="text-sm font-medium text-text-secondary">
-        Vous devez être connecté pour modifier votre profil.
-      </p>
-    );
   }
 
   return (

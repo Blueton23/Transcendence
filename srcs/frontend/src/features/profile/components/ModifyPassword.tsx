@@ -1,24 +1,27 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
+
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
-
-import { modifyPassword } from "../api/profile";
-
 import Button from "@/shared/ui/Button";
 import Input from "@/shared/ui/Input";
 
+import { modifyPassword } from "../api/profile";
+import type { ModifyPasswordData } from "../types";
+
+const INITIAL_FORM: ModifyPasswordData = {
+  oldPassword: "",
+  newPassword1: "",
+  newPassword2: "",
+};
+
 export function ModifyPassword() {
-  const [form, setForm] = useState({
-    oldPassword: "",
-    newPassword1: "",
-    newPassword2: "",
-  });
+  const [form, setForm] = useState<ModifyPasswordData>(INITIAL_FORM);
 
   const { submit, isSubmitting, error } = useSubmitAction(() =>
     modifyPassword(form),
   );
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setForm((previous) => ({
@@ -32,11 +35,7 @@ export function ModifyPassword() {
 
     const result = await submit();
     if (result.success) {
-      setForm({
-        oldPassword: "",
-        newPassword1: "",
-        newPassword2: "",
-      });
+      setForm(INITIAL_FORM);
     }
   }
 
