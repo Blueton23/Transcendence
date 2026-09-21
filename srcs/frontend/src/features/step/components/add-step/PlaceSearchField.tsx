@@ -10,7 +10,7 @@ interface PlaceSearchFieldProps {
   onChange: ChangeEventHandler<HTMLInputElement>;
   onBlur: FocusEventHandler<HTMLInputElement>;
   onFocus: FocusEventHandler<HTMLInputElement>;
-  onCalendarClick: () => void;
+  onCalendarClick?: () => void;
 }
 
 const variantStyle = {
@@ -40,26 +40,30 @@ export function PlaceSearchField({
         className="flex-1 text-sm text-text outline-none placeholder:text-muted"
         placeholder="Où vous arrêtez-vous ensuite ?"
       ></input>
-      <Divider orientation="vertical" />
-      {dateLabel ? (
-        <button
-          type="button"
-          className="flex cursor-pointer items-center gap-2 p-1 text-sm font-semibold text-text md:p-2"
-          onClick={onCalendarClick}
-          onMouseDown={(event) => event.stopPropagation()}
-        >
-          <Icon name="cal" />
-          {dateLabel}
-        </button>
-      ) : (
-        <IconButton
-          icon={<Icon name="cal" />}
-          label="cal"
-          variant="ghost"
-          disabled={value === ""}
-          onClick={onCalendarClick}
-          onMouseDown={(event) => event.stopPropagation()}
-        />
+      {onCalendarClick && (
+        <>
+          <Divider orientation="vertical" />
+          {dateLabel ? (
+            <button
+              type="button"
+              className="flex cursor-pointer items-center gap-2 p-1 text-sm font-semibold text-text md:p-2"
+              onClick={onCalendarClick}
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              <Icon name="cal" />
+              {dateLabel}
+            </button>
+          ) : (
+            <IconButton
+              icon={<Icon name="cal" />}
+              label="cal"
+              variant="ghost"
+              disabled={value === ""}
+              onClick={onCalendarClick}
+              onMouseDown={(event) => event.stopPropagation()}
+            />
+          )}
+        </>
       )}
     </div>
   );

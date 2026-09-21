@@ -11,7 +11,7 @@ import { TripActionsButton } from "@/features/step/components/page/TripActionsBu
 import { useSteps } from "@/features/step/hooks/useSteps";
 import { useParams } from "react-router";
 import { Navigate } from "react-router";
-import { ModifyStepModal } from "@/features/step/components/modal/ModifyStep";
+import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 
 //TODO(branchement):
 // + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
@@ -85,7 +85,7 @@ function ItineraryPage() {
         <TripActionsButton />
       </ItineraryLayout>
       {stepToModify && (
-        <ModifyStepModal
+        <StepFormModal
           step={stepToModify}
           steps={steps}
           travel={travel}
