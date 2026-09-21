@@ -34,7 +34,8 @@ function ItineraryPage() {
   const segments = getSegments();
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
-  const [detailView, setDetailView] = useState<Step | null>(null);
+  const [detailStepId, setDetailStepId] = useState<number | null>(null);
+  const detailView = steps.find((step) => step.id === detailStepId) ?? null;
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
 
@@ -64,7 +65,7 @@ function ItineraryPage() {
           <StepDetail
             step={detailView}
             dateLabel={dateLabels[selectedStepIndex]}
-            onBack={() => setDetailView(null)}
+            onBack={() => setDetailStepId(null)}
             onModify={() => setStepToModify(detailView)}
             travel={travel}
           />
@@ -75,7 +76,7 @@ function ItineraryPage() {
               segments={segments}
               travel={travel}
               dateLabels={dateLabels}
-              onDetailView={setDetailView}
+              onDetailView={(step) => setDetailStepId(step.id)}
               refetch={refetch}
               onModifyStep={setStepToModify}
             />
@@ -88,6 +89,7 @@ function ItineraryPage() {
           step={stepToModify}
           steps={steps}
           travel={travel}
+          refetch={refetch}
           onClose={() => setStepToModify(null)}
         />
       )}

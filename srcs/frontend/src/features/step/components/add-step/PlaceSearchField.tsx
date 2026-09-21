@@ -2,10 +2,12 @@ import Icon from "@/shared/ui/Icon";
 import Divider from "@/shared/ui/Divider";
 import { type ChangeEventHandler, type FocusEventHandler } from "react";
 import IconButton from "@/shared/ui/IconButton";
+import Button from "@/shared/ui/Button";
 
 interface PlaceSearchFieldProps {
   value: string;
   variant?: "white" | "beige";
+  dateLabel?: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
   onBlur: FocusEventHandler<HTMLInputElement>;
   onFocus: FocusEventHandler<HTMLInputElement>;
@@ -20,6 +22,7 @@ const variantStyle = {
 export function PlaceSearchField({
   value,
   variant = "beige",
+  dateLabel = "",
   onChange,
   onBlur,
   onFocus,
@@ -39,14 +42,25 @@ export function PlaceSearchField({
         placeholder="Où vous arrêtez-vous ensuite ?"
       ></input>
       <Divider orientation="vertical" />
-      <IconButton
-        icon={<Icon name="cal" />}
-        label="cal"
-        variant="ghost"
-        disabled={value === ""}
-        onClick={onCalendarClick}
-        onMouseDown={(event) => event.stopPropagation()}
-      />
+      {dateLabel ? (
+        <Button
+          variant="ghost"
+          icon={<Icon name="cal" />}
+          onClick={onCalendarClick}
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          {dateLabel}
+        </Button>
+      ) : (
+        <IconButton
+          icon={<Icon name="cal" />}
+          label="cal"
+          variant="ghost"
+          disabled={value === ""}
+          onClick={onCalendarClick}
+          onMouseDown={(event) => event.stopPropagation()}
+        />
+      )}
     </div>
   );
 }

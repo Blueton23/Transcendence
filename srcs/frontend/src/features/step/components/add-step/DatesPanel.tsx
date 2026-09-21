@@ -13,6 +13,7 @@ interface DatePanelProps {
   steps: Step[];
   travel: Travel;
   selected: DateRange | undefined;
+  className?: string;
   onSelect: (range: DateRange | undefined) => void;
   noOvernight: boolean;
   onNoOvernightChange: (checked: boolean) => void;
@@ -26,6 +27,7 @@ export function DatesPanel({
   steps,
   travel,
   selected,
+  className = "absolute right-0",
   onSelect,
   noOvernight,
   onNoOvernightChange,
@@ -66,7 +68,7 @@ export function DatesPanel({
     <div ref={cardRef}>
       <Card
         variant="default"
-        className="absolute right-0 z-10 mt-2 flex flex-col gap-4 p-6"
+        className={`z-10 mt-2 flex flex-col gap-4 p-6 ${className}`}
       >
         <DatePicker
           selected={selected}

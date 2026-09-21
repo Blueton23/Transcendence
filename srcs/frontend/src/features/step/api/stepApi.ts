@@ -46,6 +46,39 @@ export async function createStep(
   return result;
 }
 
+export async function updateStep(
+  travelId: number,
+  stepId: number,
+  data: CreateStepData,
+): Promise<Step> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/travels/${travelId}/steps/${stepId}/`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify(data),
+    },
+  );
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      getApiErrorMessage(result) || "impossible de créer l'étape",
+    );
+  }
+  return result;
+}
+
 export async function deleteStep(
   travelId: number,
   stepId: number,
