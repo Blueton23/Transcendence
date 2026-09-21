@@ -42,6 +42,8 @@ interface StepOptionsButtonProps {
   refetch: () => void;
   stepId: number;
   travelId: number;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }
 
 function StepOptionsButton({
@@ -49,13 +51,13 @@ function StepOptionsButton({
   refetch,
   stepId,
   travelId,
+  isOpen,
+  setIsOpen,
 }: StepOptionsButtonProps) {
   // rajouter error une fois que bandeau error en place
   const { submit, isSubmitting } = useSubmitAction(() =>
     deleteStep(travelId, stepId),
   );
-
-  const [isOpen, setIsOpen] = useState(false);
 
   //A rajouter un bandeau d'erreur en cas d'erreur pour eviter le remplacement de la card
   //if (error) return <p>{error}</p>;
@@ -69,7 +71,7 @@ function StepOptionsButton({
       <IconButton
         icon={<Icon name="dots" size={16} />}
         label="Options"
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={() => setIsOpen(!isOpen)}
         onMouseDown={(e) => e.stopPropagation()}
       />
       {isOpen && (
@@ -123,11 +125,13 @@ export function StepCard({
   onModify,
   refetch,
 }: StepCardProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Card
       variant="default"
       interactive={true}
-      className="group relative flex-1"
+      className={`group relative flex-1 ${isOpen ? "z-20" : ""}`}
       onClick={onClick}
     >
       <Text font="mono">{dateLabel}</Text>
@@ -143,6 +147,8 @@ export function StepCard({
         stepId={step.id}
         travelId={step.travelId}
         refetch={refetch}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
       />
     </Card>
   );
