@@ -47,6 +47,10 @@ function Modify({ onSuccess }: ModifyProps) {
     }
   }
 
+  if (!currentUser) {
+    return null;
+  }
+
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
