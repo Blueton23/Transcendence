@@ -1,4 +1,5 @@
 import datetime
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
@@ -547,10 +548,6 @@ class IdeaSerializerTest(TestCase):
 
 #========================================================================#
 
-#========================================================================#
-# BLOC 3 : VÉRIFICATION DES CHAMPS READ-ONLY
-#========================================================================#
-
 # Test 7 : Step d’un autre Travel, accepté par le serializer, puis refusé par le modèle au save
 
     def test_rejects_step_from_another_travel(self):
@@ -572,6 +569,10 @@ class IdeaSerializerTest(TestCase):
                 travel=self.travel,
             )
 
+#========================================================================#
+
+#========================================================================#
+# BLOC 3 : VÉRIFICATION DES CHAMPS READ-ONLY
 #========================================================================#
 
 # Test 8 : Vérifie que travel envoyé par le frontend est ignoré
@@ -599,7 +600,7 @@ class IdeaSerializerTest(TestCase):
 
 # Test 9 : Vérifie que traveler envoyé par le frontend est ignoré
 
-    def test_traveler_id_is_ready_only(self):
+    def test_traveler_id_is_read_only(self):
         data = {
             "title": "Pizzeria",
             "type": IdeaType.RESTAURANT,
@@ -737,18 +738,106 @@ class IdeaSerializerTest(TestCase):
 #========================================================================#
 
 #========================================================================#
-# BLOC 4 :  TYPES D'IDEA
+# BLOC 4 :  TYPES D'IDEE
 #========================================================================#
 
+# Test 15 : Validation des types d'idée
 
+    def test_valid_idea_types(self):
+        valid_types = [
+            IdeaType.RESTAURANT,
+            IdeaType.LODGING,
+            IdeaType.ACTIVITY,
+            IdeaType.SIGHT,
+        ]
 
+        for idea_type in valid_types:
+            with self.subTest(idea_type=idea_type):
+                data = {
+                    "title": "Test",
+                    "type": idea_type,
+                }
 
+                serializer = IdeaSerializer(data=data)
 
+                self.assertTrue(serializer.is_valid())
+                self.assertEqual(serializer.validated_data["type"], idea_type)
 
+#========================================================================#
 
+# Test 16 : Refus d'un type d'idée inconnu
 
+    def test_invalid_idea_types(self):
+        data = {
+            "title": "Test",
+            "type": "invalid_types",
+        }
 
+        serializer = IdeaSerializer(data=data)
 
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("type", serializer.errors)
 
+#========================================================================#
+
+#========================================================================#
+# BLOC 5 : CHAMPS MODIFIABLES / OPTIONNELS
+#========================================================================#
+
+# Test 17 : Validation des champs - localisation, note, url
+
+    def test_optional_text_valid(self):
+        data = {
+            "title": "Pizzeria",
+            "type": IdeaType.RESTAURANT,
+            "localisation": "Valais",
+            "note": "Réserver le restaurant",
+            "url": "http://pizzeria.ch"
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["localisation"], "Valais")
+        self.assertEqual(serializer.validated_data["note"], "Réserver le restaurant")
+        self.assertEqual(serializer.validated_data["url"], "http://pizzeria.ch")
+
+#========================================================================#
+
+# Test 18 : Validation des champs - latitude, longitude
+
+    def test_coordinates_valid(self):
+        data = {
+            "title": "Pizzeria",
+            "type": IdeaType.RESTAURANT,
+            "localisation": "Valais",
+            "longitude": "56.789643",
+            "latitude": "7.678976",
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["longitude"], Decimal("56.789643"))
+        self.assertEqual(serializer.validated_data["latitude"], Decimal("7.678976"))
+
+#========================================================================#
+
+# Test 19 : Validation - longitude  latitude en null
+
+    def test_coordinates_null(self):
+        data = {
+            "title": "Pizzeria",
+            "type": IdeaType.RESTAURANT,
+            "localisation": "Valais",
+            "longitude": None,
+            "latitude": None,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["longitude"])
+        self.assertIsNone(serializer.validated_data["latitude"])
 
 #========================================================================#
