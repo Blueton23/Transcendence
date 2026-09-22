@@ -1,9 +1,7 @@
-import type { Step } from "@/features/step/types";
 import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
 import type { Travel } from "@/features/travel/types";
 import Heading from "@/shared/ui/Heading";
 import Tag from "@/shared/ui/Tag";
-import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import IconButton from "@/shared/ui/IconButton";
 import { useState } from "react";
@@ -16,8 +14,6 @@ import { useNavigate } from "react-router";
 
 interface TravelHeaderProps {
   travel: Travel;
-  firstStep?: Step;
-  lastStep?: Step;
   totalKms: number;
 }
 
@@ -70,27 +66,14 @@ function TravelOptionsButton({ travelId }: { travelId: number }) {
   );
 }
 
-export function TravelHeader({
-  travel,
-  firstStep,
-  lastStep,
-  totalKms,
-}: TravelHeaderProps) {
+export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
   const DatesLabel = computeTravelDates(travel.startDate, travel.endDate);
   return (
-    <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-6">
-      {firstStep && lastStep && (
-        <Text
-          font="mono"
-          tone="secondary"
-          size="sm"
-          className="text-inverse! uppercase"
-        >{`${firstStep.localisation} → ${lastStep.localisation}`}</Text>
-      )}
+    <div className="relative flex flex-col gap-5 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] px-3.5 py-5 md:gap-3 md:p-6">
       <Heading level={1} size="lg" className="text-inverse!">
         {travel.title}
       </Heading>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-nowrap gap-2">
         <Tag tone="inverse" className="border-error/80! bg-error/30!">
           {DatesLabel}
         </Tag>

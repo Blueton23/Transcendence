@@ -52,8 +52,6 @@ function ItineraryPage() {
     <div className="flex h-full min-h-0 flex-col gap-4 p-4">
       <ItineraryHeader
         travel={travel}
-        firstStep={steps[0]}
-        lastStep={steps[steps.length - 1]}
         segments={segments}
         mobileView={mobileView}
         onToggle={setMobileView}
