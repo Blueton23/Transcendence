@@ -15,7 +15,7 @@
   --font-accent: "Caveat", cursive;
 
   --text-2xs: 0.4375rem; /* 7px — initiales avatar xs, très compact */
-  --text-1xs: 0.6475rem;
+  --text-1xs: 0.6rem;
   --text-xs: 0.75rem; /* 12px — badges, labels mono */
   --text-sm: 0.8125rem; /* 13px - buttons*/
   --text-md: 0.875rem; /* 14px — corps de texte*/

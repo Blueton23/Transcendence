@@ -12,6 +12,7 @@ import { useSteps } from "@/features/step/hooks/useSteps";
 import { useParams } from "react-router";
 import { Navigate } from "react-router";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
+import { StickyHeader } from "@/shared/ui/StickyHeader";
 
 //TODO(branchement):
 // + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
@@ -49,15 +50,18 @@ function ItineraryPage() {
     : -1;
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-4">
-      <ItineraryHeader
-        travel={travel}
-        segments={segments}
-        mobileView={mobileView}
-        onToggle={setMobileView}
-        isDetailView={detailView !== null}
-      />
-
+    <div className="flex flex-col gap-4 px-4 pb-0 md:h-full md:pb-4">
+      <StickyHeader>
+        <ItineraryHeader
+          travel={travel}
+          steps={steps}
+          segments={segments}
+          mobileView={mobileView}
+          onToggle={setMobileView}
+          refetch={refetch}
+          isDetailView={detailView !== null}
+        />
+      </StickyHeader>
       <ItineraryLayout mobileView={mobileView}>
         {detailView ? (
           <StepDetail
@@ -68,7 +72,7 @@ function ItineraryPage() {
             travel={travel}
           />
         ) : (
-          <div className="flex min-h-0 flex-1 flex-col gap-4">
+          <div className="flex flex-col gap-4 md:min-h-0 md:flex-1">
             <ItineraryListPanel
               steps={steps}
               segments={segments}
