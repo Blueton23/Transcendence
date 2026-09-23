@@ -86,9 +86,11 @@ export function StepFormModal({
 
   const handleNoOvernightChange = (checked: boolean) => {
     setNoOvernight(checked);
-    if (checked && selected?.from) {
-      setSelected({ from: selected.from, to: selected.from });
-    }
+    setSelected(
+      checked && selected?.from
+        ? { from: selected.from, to: selected.from }
+        : undefined,
+    );
   };
 
   return (
