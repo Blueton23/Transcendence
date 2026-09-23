@@ -8,6 +8,7 @@ import { useOnClickOutside } from "@/shared/hooks/useOnClickOutside";
 import { useEscapeKey } from "@/shared/hooks/useEscapeKey";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
+import { canEndOn, canStartOn } from "@/features/step/utils/stepAvailability";
 
 interface DatePanelProps {
   steps: Step[];
@@ -43,25 +44,33 @@ export function DatesPanel({
   const noNightDays = steps
     .filter((steps) => steps.startDate === steps.endDate)
     .map((step) => new Date(step.startDate));
-  const takenDates = steps
-    .filter((step) => step.startDate !== step.endDate)
-    .map((step) => ({
-      after: new Date(step.startDate),
-      before: new Date(step.endDate),
-    }));
 
-  const disabled = [
-    { before: new Date(travel.startDate) },
-    { after: new Date(travel.endDate) },
-    ...takenDates,
-  ];
+  const startDateChosen =
+    !noOvernight && !selected?.to ? selected?.from : undefined;
+  const disabled = (date: Date) => {
+    if (!startDateChosen) return !canStartOn(date, steps, travel, noOvernight);
+    if (date.getTime() === startDateChosen.getTime()) return false;
+    if (date < startDateChosen)
+      return !canStartOn(date, steps, travel, noOvernight);
+    return !canEndOn(date, startDateChosen, steps, travel);
+  };
 
   const handleDateSelect = (range: DateRange | undefined) => {
     if (noOvernight && range?.from) {
       onSelect({ from: range.from, to: range.from });
-    } else {
-      onSelect(range);
+      return;
     }
+    if (startDateChosen && range?.from && range.to) {
+      if (range.from.getTime() === range.to.getTime()) {
+        onSelect(undefined);
+        return;
+      }
+      if (range.from < startDateChosen) {
+        onSelect({ from: range.from, to: undefined });
+        return;
+      }
+    }
+    onSelect(range);
   };
 
   return (
