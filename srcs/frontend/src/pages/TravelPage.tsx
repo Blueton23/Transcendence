@@ -7,9 +7,17 @@ import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
+import Text from "@/shared/ui/Text";
 
 function TravelPage() {
-  const { travels } = useTravels();
+  const { travels, isLoading, error } = useTravels();
+  if (isLoading) return null;
+  if (error)
+    return (
+      <Text tone="accent" className="p-4">
+        {error}
+      </Text>
+    );
 
   const nextTravel = getNextTravel(travels);
 
