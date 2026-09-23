@@ -16,9 +16,9 @@ function TravelPage() {
   const segments = getSegments();
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-4">
-      <div className="flex">
-        <Heading>Mes Voyages</Heading>
+    <div className="flex h-full min-h-0 flex-col gap-4 p-4 md:p-8">
+      <div className="flex items-center justify-between">
+        <Heading size="lg">Mes Voyages</Heading>
         <Button variant="primary" icon={<Icon name="plus" size={18} />}>
           Nouveau voyage
         </Button>
@@ -27,10 +27,10 @@ function TravelPage() {
         <CurrentTripCard travel={nextTravel} segments={segments} />
       )}
       <Card variant="default">
-        Notification, je sais pas encore comment ca doit etre connecte
+        Notification: je sais pas encore comment ca sera connecte
       </Card>
       <div className="flex flex-row">
-        <TravelList travels={travels} />
+        <TravelList travels={travels.filter((t) => t.id !== nextTravel?.id)} />
       </div>
     </div>
   );
