@@ -7,6 +7,10 @@ export function formatDayLabel(date: Date): string {
     .replace(".", "");
 }
 
+function formatDay(date: Date): string {
+  return new Intl.DateTimeFormat("fr-CH", { day: "numeric" }).format(date);
+}
+
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("fr-CH", { day: "numeric", month: "2-digit" })
     .format(date)
@@ -28,7 +32,12 @@ export function computeDateLabels(steps: Step[]): string[] {
     if (step.startDate === step.endDate) {
       return formatDate(startDate);
     }
-    return `${formatDate(startDate)}-${formatDate(endDate)}`;
+    const sameMonth =
+      startDate.getMonth() === endDate.getMonth() &&
+      startDate.getFullYear() === endDate.getFullYear();
+    return sameMonth
+      ? `${formatDay(startDate)} - ${formatDate(endDate)}`
+      : `${formatDate(startDate)} - ${formatDate(endDate)}`;
   });
 }
 
