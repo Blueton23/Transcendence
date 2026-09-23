@@ -1,8 +1,10 @@
 from typing import ClassVar
 
 from rest_framework import serializers
+
 from idea.models import Idea
 from travel.models import Step
+
 
 class IdeaSerializer(serializers.ModelSerializer):
     travel_id = serializers.IntegerField(read_only=True)
@@ -38,7 +40,7 @@ class IdeaSerializer(serializers.ModelSerializer):
             "end_date",
             "chosen_at",
             "created_at",
-            "updated_at"
+            "updated_at",
         ]
         read_only_fields: ClassVar[list[str]] = [
             "id",
@@ -50,5 +52,3 @@ class IdeaSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-
-

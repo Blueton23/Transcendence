@@ -7,10 +7,10 @@ from django.test import TestCase
 from django.utils import timezone
 
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
+from idea.serializers import IdeaSerializer
 from travel.models import Step, Travel
 from traveler.models import Traveler
 
-from idea.serializers import IdeaSerializer
 
 class IdeaModelTest(TestCase):
     def setUp(self):
@@ -60,6 +60,7 @@ class IdeaModelTest(TestCase):
             end_date=self.step.start_date,
         )
         self.assertFalse(idea.is_in_pool)
+        self.assertEqual(idea.status, IdeaStatus.PLACED)
         self.assertIn(idea, self.step.ideas.all())
 
     def test_related_name_ideas_on_travel_and_traveler(self):
@@ -147,6 +148,31 @@ class IdeaModelTest(TestCase):
         self.assertIsNone(idea.chosen_by_id)
         self.assertEqual(idea.status, IdeaStatus.CHOSEN)
 
+    def test_step_hard_delete_clears_chosen_lodging(self):
+        chooser = Traveler.objects.create_user(
+            username="bob",
+            email="bob@example.com",
+            password="password123",
+        )
+
+        idea = self._make_idea(
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.end_date,
+            chosen_by=chooser,
+            chosen_at=timezone.now(),
+        )
+
+        self.step.delete()
+        idea.refresh_from_db()
+
+        self.assertIsNone(idea.chosen_by)
+        self.assertIsNone(idea.chosen_at)
+
+        self.assertEqual(idea.start_date, self.step.start_date)
+        self.assertEqual(idea.end_date, self.step.end_date)
+
     def test_end_before_start_raises_validation_error(self):
         with self.assertRaises(ValidationError):
             self._make_idea(
@@ -154,6 +180,38 @@ class IdeaModelTest(TestCase):
                 start_date=datetime.date(2026, 6, 10),
                 end_date=datetime.date(2026, 6, 8),
             )
+
+    def test_database_rejects_end_date_before_start_date(self):
+        idea = self._make_idea(
+            type=IdeaType.LODGING,
+            start_date=datetime.date(2026, 6, 8),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Idea.objects.filter(pk=idea.pk).update(
+                end_date=datetime.date(2026, 6, 7),
+            )
+
+    def test_only_one_date_is_rejected(self):
+        date_cases = [
+            {
+                "start_date": datetime.date(2026, 6, 3),
+                "end_date": None,
+            },
+            {
+                "start_date": None,
+                "end_date": datetime.date(2026, 6, 3),
+            },
+        ]
+
+        for date_case in date_cases:
+            with self.subTest(date_case=date_case):
+                with self.assertRaises(ValidationError):
+                    self._make_idea(
+                        type=IdeaType.LODGING,
+                        **date_case,
+                    )
 
     def test_lodging_dates_in_order_are_allowed(self):
         idea = self._make_idea(
@@ -211,6 +269,13 @@ class IdeaModelTest(TestCase):
                 end_date=self.step.end_date,
             )
 
+    def test_non_lodging_placed_without_dates_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                type=IdeaType.RESTAURANT,
+                step=self.step,
+            )
+
     def test_chosen_requires_lodging_type(self):
         with self.assertRaises(ValidationError):
             self._make_idea(
@@ -264,6 +329,20 @@ class IdeaModelTest(TestCase):
             chosen_at=timezone.now(),
         )
         self.assertEqual(second.status, IdeaStatus.CHOSEN)
+
+    def test_chosen_lodging_does_not_overlap_with_itself(self):
+        idea = self._make_idea(
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+            chosen_at=timezone.now(),
+        )
+
+        idea.title = "Hotel modifié"
+        idea.save()
+
+        self.assertEqual(idea.title, "Hotel modifié")
 
     def test_note_and_url_are_optional(self):
         idea = self._make_idea(
@@ -352,11 +431,24 @@ class ReactionModelTest(TestCase):
         field_names = {f.name for f in Reaction._meta.get_fields()}
         self.assertNotIn("updated_at", field_names)
 
+    def test_str_representation(self):
+        reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        self.assertEqual(
+            str(reaction),
+            f"{self.traveler} <3 {self.idea}",
+        )
+
+
 # --- Serializer tests ---
 
-#========================================================================#
+# ========================================================================#
 
 # Une idée ne peut pas exister sans un traveler et un travel
+
 
 class IdeaSerializerTest(TestCase):
     def setUp(self):
@@ -396,19 +488,19 @@ class IdeaSerializerTest(TestCase):
             end_date=datetime.date(2026, 7, 3),
         )
 
-#========================================================================#
-# BLOC 1 : SÉRIALISATION, DÉSÉRIALISATION ET VALIDATION
-#========================================================================#
+    # ========================================================================#
+    # BLOC 1 : SÉRIALISATION, DÉSÉRIALISATION ET VALIDATION
+    # ========================================================================#
 
-# Test 1 : Sérialisation Idea -> data, les champs et valeurs sortent correctement
+    # Test 1 : Sérialisation Idea -> data, les champs et valeurs sortent correctement
 
     def test_serialized_idea_has_expected_data(self):
         idea = Idea.objects.create(
-            travel= self.travel,
-            traveler= self.traveler,
+            travel=self.travel,
+            traveler=self.traveler,
             title="Brasserie",
             type=IdeaType.RESTAURANT,
-            )
+        )
 
         data = IdeaSerializer(idea).data
 
@@ -431,8 +523,8 @@ class IdeaSerializerTest(TestCase):
             "end_date",
             "chosen_at",
             "created_at",
-            "updated_at"
-            }
+            "updated_at",
+        }
         self.assertEqual(set(data.keys()), expected_keys)
 
         self.assertEqual(data["traveler_id"], self.traveler.id)
@@ -441,15 +533,15 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(data["type"], IdeaType.RESTAURANT)
         self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 2 : Désérialisation + validation, les données entrantes sont acceptées
+    # Test 2 : Désérialisation + validation, les données entrantes sont acceptées
 
     def test_valid_idea_data(self):
         data = {
             "title": "Brasserie",
             "type": IdeaType.RESTAURANT,
-            }
+        }
 
         serializer = IdeaSerializer(data=data)
 
@@ -457,44 +549,14 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["title"], "Brasserie")
         self.assertEqual(serializer.validated_data["type"], IdeaType.RESTAURANT)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 3 : Désérialisation + création, les données deviennent une Idea sauvegardée
+    # Test 3 : Désérialisation + création, les données deviennent une Idea sauvegardée
 
     def test_create_idea_with_serializer(self):
         data = {
             "title": "Brasserie",
             "type": IdeaType.RESTAURANT,
-            }
-
-        serializer = IdeaSerializer(data=data)
-
-        self.assertTrue(serializer.is_valid())
-
-        idea = serializer.save(
-            traveler=self.traveler,
-            travel=self.travel,
-            )
-
-        self.assertEqual(idea.title, "Brasserie")
-        self.assertEqual(idea.travel_id, self.travel.id)
-        self.assertEqual(idea.traveler_id, self.traveler.id)
-
-#========================================================================#
-
-#========================================================================#
-# BLOC 2 : VALIDATION DE STEP_ID
-#========================================================================#
-
-# Test 4 : Validation de la step_id, l’ID devient le bon objet Step
-
-    def test_valid_step_id(self):
-        data = {
-            "title": "Brasserie",
-            "type": IdeaType.RESTAURANT,
-            "step_id": self.step.id,
-            "start_date": "2026-06-03",
-            "end_date": "2026-06-03"
         }
 
         serializer = IdeaSerializer(data=data)
@@ -504,13 +566,43 @@ class IdeaSerializerTest(TestCase):
         idea = serializer.save(
             traveler=self.traveler,
             travel=self.travel,
-            )
+        )
+
+        self.assertEqual(idea.title, "Brasserie")
+        self.assertEqual(idea.travel_id, self.travel.id)
+        self.assertEqual(idea.traveler_id, self.traveler.id)
+
+    # ========================================================================#
+
+    # ========================================================================#
+    # BLOC 2 : VALIDATION DE STEP_ID
+    # ========================================================================#
+
+    # Test 4 : Validation de la step_id, l’ID devient le bon objet Step
+
+    def test_valid_step_id(self):
+        data = {
+            "title": "Brasserie",
+            "type": IdeaType.RESTAURANT,
+            "step_id": self.step.id,
+            "start_date": "2026-06-03",
+            "end_date": "2026-06-03",
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+
+        idea = serializer.save(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
 
         self.assertEqual(idea.step, self.step)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 5 : Validaton si step est null, Idea dans le pool
+    # Test 5 : Validaton si step est null, Idea dans le pool
 
     def test_step_id_null(self):
         data = {
@@ -522,7 +614,7 @@ class IdeaSerializerTest(TestCase):
         serializer = IdeaSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
-        
+
         idea = serializer.save(
             traveler=self.traveler,
             travel=self.travel,
@@ -530,9 +622,9 @@ class IdeaSerializerTest(TestCase):
 
         self.assertIsNone(idea.step)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 6 : step_id inexistant, refus pendant is_valid
+    # Test 6 : step_id inexistant, refus pendant is_valid
 
     def test_step_id_not_exist(self):
         data = {
@@ -546,9 +638,9 @@ class IdeaSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("step_id", serializer.errors)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 7 : Step d’un autre Travel, accepté par le serializer, puis refusé par le modèle au save
+    # Test 7 : Step d’un autre Travel, accepté par le serializer, puis refusé par le modèle au save
 
     def test_rejects_step_from_another_travel(self):
         data = {
@@ -556,7 +648,7 @@ class IdeaSerializerTest(TestCase):
             "type": IdeaType.RESTAURANT,
             "step_id": self.other_step.id,
             "start_date": "2026-07-03",
-            "end_date": "2026-07-03"
+            "end_date": "2026-07-03",
         }
 
         serializer = IdeaSerializer(data=data)
@@ -569,13 +661,29 @@ class IdeaSerializerTest(TestCase):
                 travel=self.travel,
             )
 
-#========================================================================#
+    # ========================================================================#
 
-#========================================================================#
-# BLOC 3 : VÉRIFICATION DES CHAMPS READ-ONLY
-#========================================================================#
+    # ========================================================================#
+    # BLOC 3 : VÉRIFICATION DES CHAMPS READ-ONLY
+    # ========================================================================#
 
-# Test 8 : Vérifie que travel envoyé par le frontend est ignoré
+    # Test : Vérifie que id envoyé par le frontend est ignoré
+
+    def test_id_is_read_only(self):
+        data = {
+            "id": 1,
+            "title": "Pizzeria",
+            "type": IdeaType.RESTAURANT,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertNotIn("id", serializer.validated_data)
+
+    # ========================================================================#
+
+    # Test 8 : Vérifie que travel envoyé par le frontend est ignoré
 
     def test_travel_id_is_read_only(self):
         data = {
@@ -596,9 +704,9 @@ class IdeaSerializerTest(TestCase):
 
         self.assertEqual(idea.travel, self.travel)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 9 : Vérifie que traveler envoyé par le frontend est ignoré
+    # Test 9 : Vérifie que traveler envoyé par le frontend est ignoré
 
     def test_traveler_id_is_read_only(self):
         data = {
@@ -616,12 +724,12 @@ class IdeaSerializerTest(TestCase):
             traveler=self.traveler,
             travel=self.travel,
         )
-        
+
         self.assertEqual(idea.traveler, self.traveler)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 10 : Vérifie que chosen_by_id envoyé par le frontend est ignoré
+    # Test 10 : Vérifie que chosen_by_id envoyé par le frontend est ignoré
 
     def test_chosen_by_id_is_read_only(self):
         data = {
@@ -642,9 +750,9 @@ class IdeaSerializerTest(TestCase):
 
         self.assertIsNone(idea.chosen_by)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 11 : Vérifie que chosen_at envoyé par le frontend est ignoré
+    # Test 11 : Vérifie que chosen_at envoyé par le frontend est ignoré
 
     def test_chosen_at_is_read_only(self):
         data = {
@@ -665,9 +773,9 @@ class IdeaSerializerTest(TestCase):
 
         self.assertIsNone(idea.chosen_at)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 12 : Vérifie que status envoyé par le frontend est ignoré
+    # Test 12 : Vérifie que status envoyé par le frontend est ignoré
 
     def test_status_is_read_only(self):
         data = {
@@ -681,7 +789,6 @@ class IdeaSerializerTest(TestCase):
         self.assertTrue(serializer.is_valid())
         self.assertNotIn("status", serializer.validated_data)
 
-
         idea = serializer.save(
             traveler=self.traveler,
             travel=self.travel,
@@ -689,9 +796,9 @@ class IdeaSerializerTest(TestCase):
 
         self.assertEqual(idea.status, IdeaStatus.SUGGESTED)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 13 : Vérifie que created_at envoyé par le frontend est ignoré
+    # Test 13 : Vérifie que created_at envoyé par le frontend est ignoré
 
     def test_created_at_is_read_only(self):
         data = {
@@ -712,9 +819,9 @@ class IdeaSerializerTest(TestCase):
 
         self.assertIsNotNone(idea.created_at)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 14 : Vérifie que updated_at envoyé par le frontend est ignoré
+    # Test 14 : Vérifie que updated_at envoyé par le frontend est ignoré
 
     def test_updated_at_is_read_only(self):
         data = {
@@ -735,13 +842,13 @@ class IdeaSerializerTest(TestCase):
 
         self.assertIsNotNone(idea.updated_at)
 
-#========================================================================#
+    # ========================================================================#
 
-#========================================================================#
-# BLOC 4 :  TYPES D'IDEE
-#========================================================================#
+    # ========================================================================#
+    # BLOC 4 :  TYPES D'IDEE
+    # ========================================================================#
 
-# Test 15 : Validation des types d'idée
+    # Test 15 : Validation des types d'idée
 
     def test_valid_idea_types(self):
         valid_types = [
@@ -763,9 +870,9 @@ class IdeaSerializerTest(TestCase):
                 self.assertTrue(serializer.is_valid())
                 self.assertEqual(serializer.validated_data["type"], idea_type)
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 16 : Refus d'un type d'idée inconnu
+    # Test 16 : Refus d'un type d'idée inconnu
 
     def test_invalid_idea_types(self):
         data = {
@@ -778,13 +885,13 @@ class IdeaSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("type", serializer.errors)
 
-#========================================================================#
+    # ========================================================================#
 
-#========================================================================#
-# BLOC 5 : CHAMPS MODIFIABLES / OPTIONNELS
-#========================================================================#
+    # ========================================================================#
+    # BLOC 5 : CHAMPS MODIFIABLES / OPTIONNELS
+    # ========================================================================#
 
-# Test 17 : Validation des champs - localisation, note, url
+    # Test 17 : Validation des champs - localisation, note, url
 
     def test_optional_text_valid(self):
         data = {
@@ -792,7 +899,7 @@ class IdeaSerializerTest(TestCase):
             "type": IdeaType.RESTAURANT,
             "localisation": "Valais",
             "note": "Réserver le restaurant",
-            "url": "http://pizzeria.ch"
+            "url": "http://pizzeria.ch",
         }
 
         serializer = IdeaSerializer(data=data)
@@ -802,9 +909,13 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["note"], "Réserver le restaurant")
         self.assertEqual(serializer.validated_data["url"], "http://pizzeria.ch")
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 18 : Validation des champs - latitude, longitude
+    # ========================================================================#
+    # BLOC 6 : CONVERSION DES CHAMPS SPÉCIAUX
+    # ========================================================================#
+
+    # Test 18 : Validation des champs - latitude, longitude
 
     def test_coordinates_valid(self):
         data = {
@@ -821,9 +932,9 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["longitude"], Decimal("56.789643"))
         self.assertEqual(serializer.validated_data["latitude"], Decimal("7.678976"))
 
-#========================================================================#
+    # ========================================================================#
 
-# Test 19 : Validation - longitude  latitude en null
+    # Test 19 : Validation - longitude, latitude en null
 
     def test_coordinates_null(self):
         data = {
@@ -840,4 +951,91 @@ class IdeaSerializerTest(TestCase):
         self.assertIsNone(serializer.validated_data["longitude"])
         self.assertIsNone(serializer.validated_data["latitude"])
 
-#========================================================================#
+    # ========================================================================#
+
+    # Test 20 : Validation - prix par nuit
+
+    def test_valid_price_per_night(self):
+        data = {
+            "title": "Hotel",
+            "type": IdeaType.LODGING,
+            "price_per_night": "43.70",
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data["price_per_night"], Decimal("43.70"))
+
+    # ========================================================================#
+
+    # Test 21 : Validation - prix par nuit est null
+
+    def test_valid_price_per_night_is_null(self):
+        data = {
+            "title": "Hotel",
+            "type": IdeaType.LODGING,
+            "price_per_night": None,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertIsNone(serializer.validated_data["price_per_night"])
+
+    # ========================================================================#
+
+    # Test 22 : Validation - start_date et end_date
+
+    def test_valid_start_date_and_end_date(self):
+        data = {
+            "title": "Hotel",
+            "type": IdeaType.LODGING,
+            "start_date": "2026-06-03",
+            "end_date": "2026-06-05",
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertTrue(serializer.is_valid())
+        self.assertEqual(
+            serializer.validated_data["start_date"], datetime.date(2026, 6, 3)
+        )
+        self.assertEqual(
+            serializer.validated_data["end_date"], datetime.date(2026, 6, 5)
+        )
+
+    # ========================================================================#
+
+    # ========================================================================#
+    # BLOC 7 : CHAMPS OBLIGATOIRE
+    # ========================================================================#
+
+    # Test 23 : Invalide si le titre n'existe pas
+
+    def test_title_is_required(self):
+        data = {
+            "type": IdeaType.RESTAURANT,
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("title", serializer.errors)
+
+    # ========================================================================#
+
+    # Test 24 : Invalide si type n'existe pas
+
+    def test_type_is_required(self):
+        data = {
+            "title": "Pizzeria",
+        }
+
+        serializer = IdeaSerializer(data=data)
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("type", serializer.errors)
+
+
+# ========================================================================#
