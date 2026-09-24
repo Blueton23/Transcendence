@@ -206,12 +206,11 @@ class IdeaModelTest(TestCase):
         ]
 
         for date_case in date_cases:
-            with self.subTest(date_case=date_case):
-                with self.assertRaises(ValidationError):
-                    self._make_idea(
-                        type=IdeaType.LODGING,
-                        **date_case,
-                    )
+            with self.subTest(date_case=date_case), self.assertRaises(ValidationError):
+                self._make_idea(
+                    type=IdeaType.LODGING,
+                    **date_case,
+                )
 
     def test_lodging_dates_in_order_are_allowed(self):
         idea = self._make_idea(
