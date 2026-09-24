@@ -17,6 +17,7 @@ interface StepCardProps {
   step: Step;
   dateLabel: string;
   ideaPreview?: StepIdeaPreview;
+  onModify: () => void;
   onClick?: () => void;
   refetch: () => void;
 }
@@ -37,22 +38,26 @@ function formatNights(nights: number): string {
 }
 
 interface StepOptionsButtonProps {
+  onModify: () => void;
   refetch: () => void;
   stepId: number;
   travelId: number;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }
 
 function StepOptionsButton({
+  onModify,
   refetch,
   stepId,
   travelId,
+  isOpen,
+  setIsOpen,
 }: StepOptionsButtonProps) {
   // rajouter error une fois que bandeau error en place
   const { submit, isSubmitting } = useSubmitAction(() =>
     deleteStep(travelId, stepId),
   );
-
-  const [isOpen, setIsOpen] = useState(false);
 
   //A rajouter un bandeau d'erreur en cas d'erreur pour eviter le remplacement de la card
   //if (error) return <p>{error}</p>;
@@ -66,7 +71,7 @@ function StepOptionsButton({
       <IconButton
         icon={<Icon name="dots" size={16} />}
         label="Options"
-        onClick={() => setIsOpen((v) => !v)}
+        onClick={() => setIsOpen(!isOpen)}
         onMouseDown={(e) => e.stopPropagation()}
       />
       {isOpen && (
@@ -74,7 +79,9 @@ function StepOptionsButton({
           onClose={() => setIsOpen(false)}
           className="top-full right-0 mt-2"
         >
-          <MenuItem icon="edit">Modifier étape</MenuItem>
+          <MenuItem onClick={onModify} icon="edit">
+            Modifier étape
+          </MenuItem>
           <Divider />
           <MenuItem
             icon="x"
@@ -115,13 +122,16 @@ export function StepCard({
   dateLabel,
   ideaPreview,
   onClick,
+  onModify,
   refetch,
 }: StepCardProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Card
       variant="default"
       interactive={true}
-      className="group relative flex-1"
+      className={`group relative flex-1 ${isOpen ? "z-20" : ""}`}
       onClick={onClick}
     >
       <Text font="mono">{dateLabel}</Text>
@@ -133,9 +143,12 @@ export function StepCard({
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
       <StepOptionsButton
+        onModify={onModify}
         stepId={step.id}
         travelId={step.travelId}
         refetch={refetch}
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
       />
     </Card>
   );
