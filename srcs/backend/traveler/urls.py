@@ -10,6 +10,7 @@ from .views import (
     MeView,
     TravelerCreateView,
     TravelerPingView,
+    TravelerUpdatePasswordView,
     TravelerUpdateView,
 )
 
@@ -19,7 +20,12 @@ urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="auth-login"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
-    path("travelers/", TravelerCreateView.as_view(), name="traveler-create"),
+    path("travelers/create/", TravelerCreateView.as_view(), name="traveler-create"),
     path("ping/", TravelerPingView.as_view(), name="traveler-ping"),
-    path("travelers/<int:pk>/", TravelerUpdateView.as_view(), name="traveler-update"),
+    path(
+        "travelers/update-password/",
+        TravelerUpdatePasswordView.as_view(),
+        name="traveler-update-password",
+    ),
+    path("travelers/update/", TravelerUpdateView.as_view(), name="traveler-update"),
 ]

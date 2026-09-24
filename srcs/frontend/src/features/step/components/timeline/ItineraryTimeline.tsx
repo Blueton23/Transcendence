@@ -10,6 +10,7 @@ export interface ItineraryTimelineProps {
   segments: Segment[];
   dateLabels: string[];
   onDetailView: (step: Step) => void;
+  onModifyStep: (step: Step) => void;
   refetch: () => void;
 }
 
@@ -18,6 +19,7 @@ export function ItineraryTimeline({
   segments,
   dateLabels,
   onDetailView,
+  onModifyStep,
   refetch,
 }: ItineraryTimelineProps) {
   return (
@@ -35,6 +37,7 @@ export function ItineraryTimeline({
             step={step}
             dateLabel={dateLabels[index]}
             onClick={() => onDetailView(step)}
+            onModify={() => onModifyStep(step)}
             refetch={refetch}
           />
         </Fragment>

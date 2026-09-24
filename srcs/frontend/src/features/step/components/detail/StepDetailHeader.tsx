@@ -3,7 +3,13 @@ import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
 import Button from "@/shared/ui/Button";
 
-export function StepDetailHeader({ onBack }: { onBack: () => void }) {
+export function StepDetailHeader({
+  onBack,
+  onModify,
+}: {
+  onBack: () => void;
+  onModify: () => void;
+}) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center gap-5">
@@ -15,7 +21,11 @@ export function StepDetailHeader({ onBack }: { onBack: () => void }) {
         />
         <Heading size="md">Détail d'étape</Heading>
       </div>
-      <Button variant="ghost" icon={<Icon name="edit" size={16} />}>
+      <Button
+        onClick={onModify}
+        variant="ghost"
+        icon={<Icon name="edit" size={16} />}
+      >
         Modifier
       </Button>
     </div>

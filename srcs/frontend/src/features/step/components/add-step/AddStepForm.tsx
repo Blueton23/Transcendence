@@ -5,7 +5,10 @@ import { type DateRange } from "@daypicker/react";
 import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { createStep } from "@/features/step/api/stepApi";
-import { toApiDateString } from "@/features/step/utils/stepDates";
+import {
+  formatDateRange,
+  toApiDateString,
+} from "@/features/step/utils/stepDates";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
 
@@ -33,6 +36,7 @@ export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
     if (!selected?.from || !selected?.to) {
       throw new Error("Sélectionne des dates avant de valider.");
     }
+    if (!query.trim()) throw new Error("Indique un lieu avant de valider.");
     return createStep(travel.id, {
       localisation: query,
       startDate: toApiDateString(selected.from),
@@ -62,15 +66,18 @@ export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
 
   const handleNoOvernightChange = (checked: boolean) => {
     setNoOvernight(checked);
-    if (checked && selected?.from) {
-      setSelected({ from: selected.from, to: selected.from });
-    }
+    setSelected(
+      checked && selected?.from
+        ? { from: selected.from, to: selected.from }
+        : undefined,
+    );
   };
 
   return (
     <div className="relative">
       <PlaceSearchField
         value={query}
+        dateLabel={formatDateRange(selected)}
         onChange={(e) => setQuery(e.target.value)}
         onBlur={() =>
           setOpenPanel((current) => (current === "place" ? null : current))
@@ -98,6 +105,9 @@ export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
           isSubmitting={isSubmitting}
           error={error}
         />
+      )}
+      {openPanel === "calendar" && (
+        <div className="fixed inset-0 z-10 bg-scrim md:hidden" />
       )}
     </div>
   );
