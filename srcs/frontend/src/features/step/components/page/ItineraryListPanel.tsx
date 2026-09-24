@@ -11,6 +11,7 @@ interface ItineraryListPanelProps {
   travel: Travel;
   dateLabels: string[];
   onDetailView: (step: Step) => void;
+  onModifyStep: (step: Step) => void;
   refetch: () => void;
 }
 
@@ -20,17 +21,21 @@ export function ItineraryListPanel({
   travel,
   dateLabels,
   onDetailView,
+  onModifyStep,
   refetch,
 }: ItineraryListPanelProps) {
   return (
     <>
-      <AddStepForm steps={steps} travel={travel} refetch={refetch} />
-      <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto pb-20 md:pb-0">
+      <div className="hidden md:block">
+        <AddStepForm steps={steps} travel={travel} refetch={refetch} />
+      </div>
+      <div className="flex flex-col gap-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
         <ItineraryTimeline
           steps={steps}
           segments={segments}
           dateLabels={dateLabels}
           onDetailView={onDetailView}
+          onModifyStep={onModifyStep}
           refetch={refetch}
         />
         <TotalSegment segments={segments} />

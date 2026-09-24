@@ -50,6 +50,7 @@ export function DatePicker({
     <DayPicker
       locale={fr}
       mode="range"
+      resetOnSelect
       numberOfMonths={isDesktop ? 2 : 1}
       navLayout="around"
       selected={selected}

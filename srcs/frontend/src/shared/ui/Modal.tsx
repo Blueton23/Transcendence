@@ -14,8 +14,14 @@ interface ModalProps {
   icon: IconName;
   title: string;
   subtitle?: ReactNode;
+  size?: "default" | "narrow";
   onClose: () => void;
 }
+
+const widthStyles = {
+  default: "md:max-w-2xl",
+  narrow: "md:max-w-[36rem]",
+};
 
 type ModalHeaderProps = Omit<ModalProps, "children">;
 
@@ -49,16 +55,26 @@ function ModalHeader({ icon, title, subtitle, onClose }: ModalHeaderProps) {
 const cardBase = "flex flex-col w-full bg-surface-raised";
 const cardMobile = "h-dvh";
 const cardDesktop =
-  "md:h-auto md:max-h-[90dvh] md:max-w-2xl md:rounded-lg md:shadow-lg md:overflow-hidden";
+  "md:h-auto md:max-h-[90dvh] md:rounded-lg md:shadow-lg md:overflow-hidden";
 
-function Modal({ icon, title, subtitle, children, onClose }: ModalProps) {
+function Modal({
+  icon,
+  title,
+  subtitle,
+  size = "default",
+  children,
+  onClose,
+}: ModalProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   useOnClickOutside(cardRef, onClose);
   useEscapeKey(onClose);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim">
-      <div ref={cardRef} className={`${cardBase} ${cardDesktop} ${cardMobile}`}>
+      <div
+        ref={cardRef}
+        className={`${cardBase} ${cardDesktop} ${cardMobile} ${widthStyles[size]}`}
+      >
         <ModalHeader
           icon={icon}
           title={title}
