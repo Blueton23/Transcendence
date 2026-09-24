@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 
 import { login } from "../api/auth";
 import { useAuth } from "../context/useAuth";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import Button from "../../../shared/ui/Button";
 import Card from "../../../shared/ui/Card";
@@ -16,30 +17,17 @@ function Login() {
   const { setCurrentUser } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    login({ username, password }),
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError(null);
-    setIsSubmitting(true);
-
-    try {
-      const response = await login({
-        username,
-        password,
-      });
-
-      setCurrentUser(response.traveler);
-
+    const result = await submit();
+    if (result.success && result.data) {
+      setCurrentUser(result.data.traveler);
       navigate("/profile");
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Impossible de se connecter.",
-      );
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
