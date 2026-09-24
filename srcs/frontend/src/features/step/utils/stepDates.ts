@@ -1,9 +1,14 @@
+import type { DateRange } from "@daypicker/react";
 import type { Step } from "../types";
 
 export function formatDayLabel(date: Date): string {
   return new Intl.DateTimeFormat("fr-CH", { weekday: "short", day: "numeric" })
     .format(date)
     .replace(".", "");
+}
+
+function formatDay(date: Date): string {
+  return new Intl.DateTimeFormat("fr-CH", { day: "numeric" }).format(date);
 }
 
 export function formatDate(date: Date): string {
@@ -27,6 +32,32 @@ export function computeDateLabels(steps: Step[]): string[] {
     if (step.startDate === step.endDate) {
       return formatDate(startDate);
     }
-    return `${formatDate(startDate)}-${formatDate(endDate)}`;
+    const sameMonth =
+      startDate.getMonth() === endDate.getMonth() &&
+      startDate.getFullYear() === endDate.getFullYear();
+    return sameMonth
+      ? `${formatDay(startDate)} - ${formatDate(endDate)}`
+      : `${formatDate(startDate)} - ${formatDate(endDate)}`;
   });
+}
+
+function formatDayDate(date: Date): string {
+  return new Intl.DateTimeFormat("fr-CH", { day: "numeric" })
+    .format(date)
+    .replace(".", "");
+}
+
+function formatDayMonth(date: Date): string {
+  return new Intl.DateTimeFormat("fr-CH", { day: "numeric", month: "short" })
+    .format(date)
+    .replace(".", "");
+}
+
+export function formatDateRange(range: DateRange | undefined): string {
+  if (!range?.from) return "Choisir les dates";
+  if (!range.to || range.from.getTime() === range.to.getTime())
+    return formatDayMonth(range.from);
+  if (range.from.getMonth() === range.to.getMonth())
+    return `${formatDayDate(range.from)} → ${formatDayMonth(range.to)}`;
+  return `${formatDayMonth(range.from)} → ${formatDayMonth(range.to)}`;
 }

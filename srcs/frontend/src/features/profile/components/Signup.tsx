@@ -7,9 +7,9 @@ import { signup } from "../api/profile";
 import { login } from "../../auth/api/auth";
 import { useAuth } from "../../auth/context/useAuth";
 
-import Button from "../../../shared/ui/Button";
-import Heading from "../../../shared/ui/Heading";
-import Input from "../../../shared/ui/Input";
+import Button from "@/shared/ui/Button";
+import Heading from "@/shared/ui/Heading";
+import Input from "@/shared/ui/Input";
 
 function Signup() {
   const navigate = useNavigate();
