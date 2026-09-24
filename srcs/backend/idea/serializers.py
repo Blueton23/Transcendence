@@ -1,5 +1,7 @@
 from typing import ClassVar
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
 from idea.models import Idea, Reaction
@@ -18,6 +20,13 @@ class IdeaSerializer(serializers.ModelSerializer):
     )
 
     chosen_by_id = serializers.IntegerField(read_only=True)
+
+    def save(self, **kwargs):
+        try:
+            return super().save(**kwargs)
+        except DjangoValidationError as exc:
+            detail = getattr(exc, "message_dict", exc.messages)
+            raise serializers.ValidationError(detail) from exc
 
     class Meta:
         model = Idea
@@ -60,6 +69,15 @@ class IdeaSerializer(serializers.ModelSerializer):
 class ReactionSerializer(serializers.ModelSerializer):
     traveler_id = serializers.IntegerField(read_only=True)
     idea_id = serializers.IntegerField(read_only=True)
+
+    def save(self, **kwargs):
+        try:
+            with transaction.atomic():
+                return super().save(**kwargs)
+        except IntegrityError as exc:
+            raise serializers.ValidationError(
+                {"reaction": "You have already reacted to this idea."}
+            ) from exc
 
     class Meta:
         model = Reaction

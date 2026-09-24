@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.utils import timezone
+from rest_framework.serializers import ValidationError as DRFValidationError
 
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
@@ -639,11 +640,13 @@ class IdeaSerializerTest(TestCase):
 
         self.assertTrue(serializer.is_valid())
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(DRFValidationError) as context:
             serializer.save(
                 traveler=self.traveler,
                 travel=self.travel,
             )
+
+        self.assertIn("step", context.exception.detail)
 
     # ========================================================================#
 
@@ -1090,3 +1093,22 @@ class ReactionSerializerTest(TestCase):
         self.assertEqual(reaction.idea, self.idea)
         self.assertNotEqual(reaction.id, 999)
         self.assertIsNotNone(reaction.created_at)
+
+    # Test : Evite qu'un user vote deux fois sur la meme idée
+    def test_duplicate_reaction_error(self):
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        serializer = ReactionSerializer(data={})
+
+        self.assertTrue(serializer.is_valid())
+
+        with self.assertRaises(DRFValidationError) as context:
+            serializer.save(
+                traveler=self.traveler,
+                idea=self.idea,
+            )
+
+        self.assertIn("reaction", context.exception.detail)
