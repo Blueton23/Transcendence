@@ -1,31 +1,34 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 import { signup } from "../api/profile";
-
 import { login } from "../../auth/api/auth";
 import { useAuth } from "../../auth/context/useAuth";
+import type { SignupData } from "../types";
 
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import Button from "@/shared/ui/Button";
 import Heading from "@/shared/ui/Heading";
 import Input from "@/shared/ui/Input";
 
+const INITIAL_FORM: SignupData = {
+  firstName: "",
+  lastName: "",
+  username: "",
+  email: "",
+  password: "",
+  passwordConfirmation: "",
+};
+
 function Signup() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    password: "",
-    passwordConfirmation: "",
-  });
+  const [form, setForm] = useState<SignupData>(INITIAL_FORM);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  const { submit, isSubmitting, error } = useSubmitAction(() => signup(form));
+
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setForm((previous) => ({
@@ -37,41 +40,16 @@ function Signup() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError(null);
+    const result = await submit();
 
-    if (form.password !== form.passwordConfirmation) {
-      setError("Les mots de passe ne correspondent pas.");
-      return;
-    }
-
-    if (form.password.length < 8) {
-      setError("Le mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await signup({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        username: form.username,
-        email: form.email,
-        password: form.password,
-      });
-
-      const loginResponse = await login({
+    if (result.success && result.data) {
+      const loginResult = await login({
         username: form.username,
         password: form.password,
       });
 
-      setCurrentUser(loginResponse.traveler);
-
+      setCurrentUser(loginResult.traveler);
       navigate("/profile");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 

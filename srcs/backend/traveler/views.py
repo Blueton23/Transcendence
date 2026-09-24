@@ -18,6 +18,7 @@ from rest_framework.views import APIView
 
 from .serializers import (
     LoginSerializer,
+    TravelerCreateSerializer,
     TravelerSerializer,
     TravelerUpdatePasswordSerializer,
     TravelerUpdateSerializer,
@@ -51,7 +52,7 @@ class TravelerCreateView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def post(self, request: Request) -> Response:
-        serializer = TravelerSerializer(data=request.data)
+        serializer = TravelerCreateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         traveler = Traveler(
@@ -61,7 +62,9 @@ class TravelerCreateView(APIView):
             email=serializer.validated_data["email"],
         )
 
-        traveler.set_password(serializer.validated_data["password"])
+        traveler.set_password(
+            serializer.validated_data["password"],
+        )
         traveler.save()
 
         return Response(
