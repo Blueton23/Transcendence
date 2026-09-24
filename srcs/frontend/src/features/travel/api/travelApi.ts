@@ -17,6 +17,19 @@ export async function getTravel(travelId: number): Promise<Travel> {
   return result;
 }
 
+export async function getTravels(): Promise<Travel[]> {
+  const response = await fetch(`${API_BASE_URL}/travels/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(result) || "aucun voyage trouvé");
+  }
+  return result;
+}
+
 export async function leaveTravel(travelId: number): Promise<void> {
   const csrfToken = getCookie("csrftoken");
 

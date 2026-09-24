@@ -1,0 +1,46 @@
+import { getSegments } from "@/features/step/api/segmentApi";
+import { CurrentTripCard } from "@/features/travel/components/CurrentTripCard";
+import { TravelList } from "@/features/travel/components/TravelList";
+import { useTravels } from "@/features/travel/hooks/useTravel";
+import { getNextTravel } from "@/features/travel/utils/getNextTravel";
+import Button from "@/shared/ui/Button";
+import Card from "@/shared/ui/Card";
+import Heading from "@/shared/ui/Heading";
+import Icon from "@/shared/ui/Icon";
+import Text from "@/shared/ui/Text";
+
+function TravelPage() {
+  const { travels, isLoading, error } = useTravels();
+  if (isLoading) return null;
+  if (error)
+    return (
+      <Text tone="accent" className="p-4">
+        {error}
+      </Text>
+    );
+
+  const nextTravel = getNextTravel(travels);
+
+  const segments = getSegments();
+
+  return (
+    <div className="flex h-full min-h-0 flex-col gap-4 p-4 md:p-8">
+      <div className="flex items-center justify-between">
+        <Heading size="lg">Mes Voyages</Heading>
+        <Button variant="primary" icon={<Icon name="plus" size={18} />}>
+          Nouveau voyage
+        </Button>
+      </div>
+      {nextTravel && (
+        <CurrentTripCard travel={nextTravel} segments={segments} />
+      )}
+      <Card variant="default">
+        Notification: je sais pas encore comment ca sera connecte
+      </Card>
+      <div className="flex flex-row">
+        <TravelList travels={travels.filter((t) => t.id !== nextTravel?.id)} />
+      </div>
+    </div>
+  );
+}
+export default TravelPage;

@@ -10,6 +10,7 @@ import { useState } from "react";
 import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { deleteStep } from "@/features/step/api/stepApi";
+import { formatNights } from "@/shared/utils/formatNights";
 
 //TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
 // pas un champ stocke dans Step
@@ -30,12 +31,6 @@ const ideaPreviewTones = {
 
 const StepOptionsStyle =
   "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
-
-function formatNights(nights: number): string {
-  if (nights === 0) return "Pas de nuit";
-  if (nights === 1) return "1 nuit";
-  return `${nights} nuits`;
-}
 
 interface StepOptionsButtonProps {
   onModify: () => void;
