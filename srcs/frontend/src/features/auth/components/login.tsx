@@ -12,6 +12,7 @@ import Heading from "@/shared/ui/Heading";
 import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
 import IconBadge from "@/shared/ui/IconBadge";
+import Icon from "@/shared/ui/Icon";
 
 function Login() {
   const navigate = useNavigate();
@@ -56,14 +57,21 @@ function Login() {
                   htmlFor="username"
                   className="text-sm font-medium text-text-secondary"
                 >
-                  Nom d'utilisateur
+                  Pseudo
                 </label>
 
                 <Input
                   id="username"
                   type="text"
                   name="username"
-                  placeholder="Nom d'utilisateur"
+                  icon={
+                    <Icon
+                      name="user"
+                      size={18}
+                      className="text-brand-primary"
+                    />
+                  }
+                  placeholder="Charlotte.p"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
                   autoComplete="username"
@@ -83,7 +91,15 @@ function Login() {
                   id="password"
                   type="password"
                   name="password"
-                  placeholder="Mot de passe"
+                  placeholder="••••••••"
+                  icon={
+                    <Icon
+                      name="lock"
+                      size={18}
+                      className="text-brand-primary"
+                    />
+                  }
+                  iconLabel="Mot de passe"
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="current-password"
