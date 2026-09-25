@@ -1,4 +1,3 @@
-from django.utils import timezone
 from faker import Faker
 
 from idea.models import IdeaType
@@ -17,7 +16,6 @@ IDEA_TYPE_TO_CATEGORY = {
 def seed_spendings(
     fake: Faker, travelers: list, travels: list, per_travel: int
 ) -> list:
-    tz = timezone.get_current_timezone()
     spendings = []
     for travel in travels:
         # Le payeur est de preference un participant du voyage.
@@ -60,7 +58,9 @@ def seed_spendings(
                     idea=idea,
                     category=category,
                     amount=fake.pydecimal(left_digits=3, right_digits=2, positive=True),
-                    paid_date=fake.past_datetime(tzinfo=tz)
+                    paid_date=fake.date_between_dates(
+                        date_start=travel.start_date, date_end=travel.end_date
+                    )
                     if fake.boolean(chance_of_getting_true=80)
                     else None,
                 )

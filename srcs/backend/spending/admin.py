@@ -13,6 +13,8 @@ class SpendingAdmin(admin.ModelAdmin):
         "idea",
         "paid_date",
     )
+    # Les __str__ de step et idea affichent leur travel : on evite le N+1.
+    list_select_related = ("travel", "traveler", "step__travel", "idea__travel")
     list_filter = ("category", "travel")
     search_fields = ("travel__title", "traveler__username")
     readonly_fields = ("created_at", "updated_at")

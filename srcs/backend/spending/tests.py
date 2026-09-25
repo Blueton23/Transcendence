@@ -105,3 +105,48 @@ class SpendingModelTest(TestCase):
         self.idea.delete()
         spending.refresh_from_db()
         self.assertIsNone(spending.idea_id)
+
+    def test_step_must_match_idea_step(self):
+        other_step = Step.objects.create(
+            travel=self.travel,
+            localisation="Grenoble",
+            start_date=datetime.date(2026, 6, 5),
+            end_date=datetime.date(2026, 6, 6),
+        )
+        placed_idea = Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            step=self.step,
+            title="Musee",
+            type=IdeaType.SIGHT,
+            start_date=datetime.date(2026, 6, 3),
+            end_date=datetime.date(2026, 6, 3),
+        )
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_spending(idea=placed_idea, step=other_step)
+        self.assertIn("step", ctx.exception.message_dict)
+
+        spending = self._make_spending(idea=placed_idea, step=self.step)
+        self.assertEqual(spending.step, self.step)
+
+    def test_step_allowed_when_idea_is_in_pool(self):
+        spending = self._make_spending(idea=self.idea, step=self.step)
+        self.assertEqual(spending.step, self.step)
+
+    def test_invalid_category_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_spending(category="z")
+
+    def test_travel_deletion_cascades(self):
+        self._make_spending()
+        self.travel.delete()
+        self.assertFalse(Spending.objects.exists())
+
+    def test_str(self):
+        spending = self._make_spending()
+        self.assertEqual(str(spending), "Fuel - 42.50 (Road trip)")
+
+    def test_paid_date_is_a_date(self):
+        spending = self._make_spending(paid_date=datetime.date(2026, 6, 3))
+        spending.refresh_from_db()
+        self.assertEqual(spending.paid_date, datetime.date(2026, 6, 3))

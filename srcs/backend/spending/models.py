@@ -54,7 +54,7 @@ class Spending(TimeStampedModel, ValidatedModel):
         decimal_places=2,
         validators=[MinValueValidator(0)],
     )
-    paid_date = models.DateTimeField(null=True, blank=True)
+    paid_date = models.DateField(null=True, blank=True)
 
     class Meta:
         ordering: ClassVar[list] = ["-created_at"]
@@ -71,6 +71,13 @@ class Spending(TimeStampedModel, ValidatedModel):
 
         if self.idea_id and self.travel_id and self.idea.travel_id != self.travel_id:
             errors["idea"] = "The idea must belong to the same travel as the spending."
+        elif (
+            self.idea_id
+            and self.step_id
+            and self.idea.step_id
+            and self.idea.step_id != self.step_id
+        ):
+            errors["step"] = "The step must match the step of the linked idea."
 
         if errors:
             raise ValidationError(errors)
