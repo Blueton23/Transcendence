@@ -1161,6 +1161,13 @@ class IdeaViewTest(APITestCase):
             end_date=datetime.date(2026, 7, 10),
         )
 
+        self.other_step = Step.objects.create(
+            travel=self.other_travel,
+            localisation="Paris",
+            start_date=datetime.date(2026, 7, 3),
+            end_date=datetime.date(2026, 7, 3),
+        )
+
         Idea.objects.create(
             traveler=self.traveler,
             travel=self.other_travel,
@@ -1170,7 +1177,7 @@ class IdeaViewTest(APITestCase):
 
     # ========================================================================#
 
-    # Test : GET -> récupérer des données
+    # Test : GET lecture réussie -> récupérer des données
     def test_list_returns_only_ideas_of_this_travel(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1187,7 +1194,7 @@ class IdeaViewTest(APITestCase):
 
     # ========================================================================#
 
-    # Test : POST -> créer une ressource
+    # Test : POST création réussie -> créer une ressource
     def test_create_idea_travel_and_traveler(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1209,5 +1216,54 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(idea.travel, self.travel)
         self.assertEqual(idea.traveler, self.traveler)
         self.assertEqual(idea.title, "Fondue")
+
+    # ========================================================================#
+
+    # Test : POST -> connecté mais pas autorisé
+    def test_create_forbidden_if_not_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.other_travel.id},
+            ),
+            {
+                "title": "Fondue",
+                "type": IdeaType.RESTAURANT,
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.assertFalse(
+            Idea.objects.filter(
+                travel=self.other_travel,
+                title="Fondue",
+            ).exists()
+        )
+
+    # ========================================================================#
+
+    # Test : POST données invalide -> step appartient a un autre travel
+    def test_rejects_step_from_another_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            ),
+            {
+                "title": "Pizzeria",
+                "type": IdeaType.RESTAURANT,
+                "step_id": self.other_step.id,
+                "start_date": "2026-07-03",
+                "end_date": "2026-07-03",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("step", response.data["details"])
 
     # ========================================================================#
