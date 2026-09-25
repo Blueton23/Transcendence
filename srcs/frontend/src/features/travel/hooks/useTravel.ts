@@ -1,5 +1,5 @@
 import type { Travel } from "@/features/travel/types";
-import { getTravel } from "@/features/travel/api/travelApi";
+import { getTravel, getTravels } from "@/features/travel/api/travelApi";
 import { useState, useEffect } from "react";
 
 export function useTravel(travelId: number) {
@@ -24,4 +24,28 @@ export function useTravel(travelId: number) {
   }, [travelId]);
 
   return { travel, isLoading, error };
+}
+
+export function useTravels() {
+  const [travels, setTravels] = useState<Travel[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadTravels() {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const result = await getTravels();
+        setTravels(result);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Erreur");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadTravels();
+  }, []);
+
+  return { travels, isLoading, error };
 }

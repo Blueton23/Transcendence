@@ -19,19 +19,29 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
 
             lodging = idea_type == IdeaType.LODGING
             # Seul un hebergement place sur une etape peut etre chosen.
-            chosen = (
-                lodging and step is not None and fake.boolean(chance_of_getting_true=30)
-            )
-
             if lodging:
                 start = fake.date_between(start_date="today", end_date="+30d")
                 end = fake.date_between(start_date=start, end_date="+40d")
             elif step is not None:
                 start = end = fake.date_between(
-                    start_date=step.start_date, end_date=step.end_date
+                    start_date=step.start_date,
+                    end_date=step.end_date,
                 )
             else:
                 start = end = None
+
+            chosen = False
+
+            if lodging and step is not None and fake.boolean(chance_of_getting_true=30):
+                overlaps = Idea.objects.filter(
+                    step=step,
+                    type=IdeaType.LODGING,
+                    chosen_at__isnull=False,
+                    start_date__lte=end,
+                    end_date__gte=start,
+                ).exists()
+
+                chosen = not overlaps
 
             ideas.append(
                 Idea.objects.create(
