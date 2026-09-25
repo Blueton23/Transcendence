@@ -4,12 +4,19 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from rest_framework.serializers import ValidationError as DRFValidationError
+from rest_framework.test import APITestCase
 
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
-from travel.models import Step, Travel
+from travel.models import (
+    Participation,
+    ParticipationStatus,
+    Step,
+    Travel,
+)
 from traveler.models import Traveler
 
 
@@ -1112,3 +1119,95 @@ class ReactionSerializerTest(TestCase):
             )
 
         self.assertIn("reaction", context.exception.detail)
+
+    # ========================================================================#
+
+
+# ========================================================================#
+# --- Idée -> views tests --- #
+# ========================================================================#
+
+
+class IdeaViewTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="Jean",
+            email="jean@exemple.com",
+            password="password123",
+        )
+
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Restaurant japonais",
+            type=IdeaType.RESTAURANT,
+        )
+
+        self.other_travel = Travel.objects.create(
+            title="Road trip France",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+
+        Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            title="Restaurant français",
+            type=IdeaType.RESTAURANT,
+        )
+
+    # ========================================================================#
+
+    # Test : GET -> récupérer des données
+    def test_list_returns_only_ideas_of_this_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], self.idea.id)
+
+    # ========================================================================#
+
+    # Test : POST -> créer une ressource
+    def test_create_idea_travel_and_traveler(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            ),
+            {
+                "title": "Fondue",
+                "type": IdeaType.RESTAURANT,
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        idea = Idea.objects.get(id=response.data["id"])
+
+        self.assertEqual(idea.travel, self.travel)
+        self.assertEqual(idea.traveler, self.traveler)
+        self.assertEqual(idea.title, "Fondue")
+
+    # ========================================================================#
