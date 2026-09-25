@@ -3,6 +3,7 @@ from faker import Faker
 
 from common.seeders.clear import clear_seed_data
 from common.seeders.idea import seed_ideas, seed_reactions
+from common.seeders.spending import seed_spendings
 from common.seeders.travel import seed_participations, seed_steps, seed_travels
 from common.seeders.traveler import seed_friendships, seed_travelers
 
@@ -20,6 +21,7 @@ class Command(BaseCommand):
         parser.add_argument("--steps-per-travel", type=int, default=4)
         parser.add_argument("--ideas-per-travel", type=int, default=6)
         parser.add_argument("--reactions", type=int, default=40)
+        parser.add_argument("--spendings-per-travel", type=int, default=5)
         parser.add_argument(
             "--fresh",
             action="store_true",
@@ -55,5 +57,10 @@ class Command(BaseCommand):
 
         reactions = seed_reactions(fake, travelers, ideas, options["reactions"])
         self.stdout.write(f"Created {len(reactions)} reactions.")
+
+        spendings = seed_spendings(
+            fake, travelers, travels, options["spendings_per_travel"]
+        )
+        self.stdout.write(f"Created {len(spendings)} spendings.")
 
         self.stdout.write(self.style.SUCCESS("Seed complete."))
