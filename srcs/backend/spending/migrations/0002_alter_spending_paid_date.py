@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('spending', '0001_initial'),
+        ("spending", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='spending',
-            name='paid_date',
+            model_name="spending",
+            name="paid_date",
             field=models.DateField(blank=True, null=True),
         ),
     ]
