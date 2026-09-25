@@ -220,6 +220,18 @@ class IdeaModelTest(TestCase):
                     **date_case,
                 )
 
+    def test_idea_dates_outside_step_are_rejected(self):
+        outside_date = self.step.end_date + datetime.timedelta(days=1)
+
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                step=self.step,
+                start_date=outside_date,
+                end_date=outside_date,
+            )
+
+        self.assertIn("step", context.exception.message_dict)
+
     def test_lodging_dates_in_order_are_allowed(self):
         idea = self._make_idea(
             type=IdeaType.LODGING,
@@ -315,7 +327,7 @@ class IdeaModelTest(TestCase):
                 type=IdeaType.LODGING,
                 step=self.step,
                 start_date=datetime.date(2026, 6, 3),
-                end_date=datetime.date(2026, 6, 5),
+                end_date=datetime.date(2026, 6, 4),
                 chosen_at=timezone.now(),
             )
 
@@ -332,7 +344,7 @@ class IdeaModelTest(TestCase):
             type=IdeaType.LODGING,
             step=self.step,
             start_date=datetime.date(2026, 6, 4),
-            end_date=datetime.date(2026, 6, 5),
+            end_date=datetime.date(2026, 6, 4),
             chosen_at=timezone.now(),
         )
         self.assertEqual(second.status, IdeaStatus.CHOSEN)
