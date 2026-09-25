@@ -1,31 +1,37 @@
 import { useState } from "react";
-import type { FormEvent } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 import { signup } from "../api/profile";
-
 import { login } from "../../auth/api/auth";
 import { useAuth } from "../../auth/context/useAuth";
+import type { SignupData } from "../types";
 
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import Button from "@/shared/ui/Button";
 import Heading from "@/shared/ui/Heading";
 import Input from "@/shared/ui/Input";
+import Icon from "@/shared/ui/Icon";
+import IconBadge from "@/shared/ui/IconBadge";
+import Text from "@/shared/ui/Text";
+
+const INITIAL_FORM: SignupData = {
+  firstName: "",
+  lastName: "",
+  username: "",
+  email: "",
+  password: "",
+  passwordConfirmation: "",
+};
 
 function Signup() {
   const navigate = useNavigate();
   const { setCurrentUser } = useAuth();
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    username: "",
-    email: "",
-    password: "",
-    passwordConfirmation: "",
-  });
+  const [form, setForm] = useState<SignupData>(INITIAL_FORM);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+  const { submit, isSubmitting, error } = useSubmitAction(() => signup(form));
+
+  function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
 
     setForm((previous) => ({
@@ -37,55 +43,30 @@ function Signup() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    setError(null);
+    const result = await submit();
 
-    if (form.password !== form.passwordConfirmation) {
-      setError("Les mots de passe ne correspondent pas.");
-      return;
-    }
-
-    if (form.password.length < 8) {
-      setError("Le mot de passe doit contenir au moins 8 caractères.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await signup({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        username: form.username,
-        email: form.email,
-        password: form.password,
-      });
-
-      const loginResponse = await login({
+    if (result.success && result.data) {
+      const loginResult = await login({
         username: form.username,
         password: form.password,
       });
 
-      setCurrentUser(loginResponse.traveler);
-
+      setCurrentUser(loginResult.traveler);
       navigate("/profile");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
   return (
     <div className="w-full">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-surface">
-          <span className="text-xl">✦</span>
-        </div>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <IconBadge color="purple" name="mtn" />
 
-        <Heading level={2} size="md">
+        <Heading level={1} size="lg">
           Créer un compte
         </Heading>
+
+        <Text tone="secondary">Rejoignez vos futurs road trips</Text>
       </div>
 
       {/* Formulaire */}
@@ -99,6 +80,10 @@ function Signup() {
 
             <Input
               name="firstName"
+              icon={
+                <Icon name="user" size={18} className="text-brand-primary" />
+              }
+              placeholder="Charlotte"
               type="text"
               value={form.firstName}
               onChange={handleChange}
@@ -113,6 +98,10 @@ function Signup() {
 
             <Input
               name="lastName"
+              icon={
+                <Icon name="user" size={18} className="text-brand-primary" />
+              }
+              placeholder="Petit"
               type="text"
               value={form.lastName}
               onChange={handleChange}
@@ -121,14 +110,16 @@ function Signup() {
           </label>
         </div>
 
-        {/* Nom d'utilisateur */}
+        {/* Pseudo */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Nom d'utilisateur
+            Pseudo
           </span>
 
           <Input
             name="username"
+            icon={<Icon name="user" size={18} className="text-brand-primary" />}
+            placeholder="charlotte.p"
             type="text"
             value={form.username}
             onChange={handleChange}
@@ -145,6 +136,10 @@ function Signup() {
 
           <Input
             name="email"
+            icon={
+              <Icon name="email" size={18} className="text-brand-primary" />
+            }
+            placeholder="charlotte@peripl.com"
             type="email"
             value={form.email}
             onChange={handleChange}
@@ -160,6 +155,8 @@ function Signup() {
 
           <Input
             name="password"
+            icon={<Icon name="lock" size={18} className="text-brand-primary" />}
+            placeholder="••••••••"
             type="password"
             value={form.password}
             onChange={handleChange}
@@ -177,6 +174,8 @@ function Signup() {
 
           <Input
             name="passwordConfirmation"
+            icon={<Icon name="lock" size={18} className="text-brand-primary" />}
+            placeholder="••••••••"
             type="password"
             value={form.passwordConfirmation}
             onChange={handleChange}
@@ -199,6 +198,18 @@ function Signup() {
           >
             {isSubmitting ? "Création..." : "Créer mon compte"}
           </Button>
+        </div>
+        {/* Lien vers la connexion */}
+        <div className="flex items-center justify-center gap-1 text-sm">
+          <Text tone="muted">Déjà un compte ?</Text>
+
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="font-medium text-brand-primary hover:underline"
+          >
+            Se connecter
+          </button>
         </div>
       </form>
     </div>
