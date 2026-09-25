@@ -1130,6 +1130,7 @@ class ReactionSerializerTest(TestCase):
 
 class IdeaViewTest(APITestCase):
     def setUp(self):
+        # Travel principale
         self.traveler = Traveler.objects.create_user(
             username="Jean",
             email="jean@exemple.com",
@@ -1154,7 +1155,7 @@ class IdeaViewTest(APITestCase):
             title="Restaurant japonais",
             type=IdeaType.RESTAURANT,
         )
-
+        # Autre Travel
         self.other_travel = Travel.objects.create(
             title="Road trip France",
             start_date=datetime.date(2026, 7, 2),
@@ -1177,6 +1178,10 @@ class IdeaViewTest(APITestCase):
 
     # ========================================================================#
 
+    # ========================================================================#
+    # Bloc 1 : Tests idea-list
+    # ========================================================================#
+
     # Test : GET lecture réussie -> récupérer des données
     def test_list_returns_only_ideas_of_this_travel(self):
         self.client.force_authenticate(user=self.traveler)
@@ -1191,8 +1196,6 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["id"], self.idea.id)
-
-    # ========================================================================#
 
     # Test : POST création réussie -> créer une ressource
     def test_create_idea_travel_and_traveler(self):
@@ -1216,8 +1219,6 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(idea.travel, self.travel)
         self.assertEqual(idea.traveler, self.traveler)
         self.assertEqual(idea.title, "Fondue")
-
-    # ========================================================================#
 
     # Test : POST -> connecté mais pas autorisé
     def test_create_forbidden_if_not_participant(self):
@@ -1243,8 +1244,6 @@ class IdeaViewTest(APITestCase):
             ).exists()
         )
 
-    # ========================================================================#
-
     # Test : POST données invalide -> step appartient a un autre travel
     def test_rejects_step_from_another_travel(self):
         self.client.force_authenticate(user=self.traveler)
@@ -1267,3 +1266,175 @@ class IdeaViewTest(APITestCase):
         self.assertIn("step", response.data["details"])
 
     # ========================================================================#
+
+    # ========================================================================#
+    # Bloc 2 : Tests idea-detail
+    # ========================================================================#
+
+    # Test : GET -> récupérer l'idée du travel
+    def test_retrieve_idea_from_this_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.idea.id)
+        self.assertEqual(response.data["title"], self.idea.title)
+
+    # Test : GET objet introuvable ou inaccessible -> récupère l'idée avec le mauvais travel
+    def test_retrieve_idea_with_wrong_travel(self):
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "idea-detail",
+                kwargs={"travel_id": self.other_travel.id, "pk": self.idea.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    # Test : PATCH -> Le créateur de l'idée peut la modifier
+    def test_owner_can_patch_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Restaurant japonais modifié",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais modifié")
+
+    # Test : PATCH connecté mais pas autorisé
+    def test_non_owner_cannot_patch_idea(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=other_traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Titre modifié par Paul",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais")
+
+    # Test : PATCH -> nouvelles données rendent l'idée invalide
+    def test_owner_patch_invalid(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={"travel_id": self.travel.id, "pk": self.idea.id},
+            ),
+            {
+                "type": IdeaType.LODGING,
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+    # Test : DELETE -> suppression réussie
+    def test_delete_idea_by_owner(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id
+                }
+            )
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertFalse(
+            Idea.objects.filter(id=idea_id).exists()
+        )
+
+    # Test : DELETE -> connecté mais pas autorisé
+    def test_non_owner_cannot_delete_idea(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+        
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=other_traveler)
+
+        idea_id = self.idea.id
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id
+                }
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
