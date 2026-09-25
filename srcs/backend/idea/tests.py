@@ -270,8 +270,15 @@ class IdeaModelTest(TestCase):
             self._make_idea(price_per_night="10.00")
 
     def test_negative_price_per_night_is_rejected(self):
-        with self.assertRaises(ValidationError):
-            self._make_idea(type=IdeaType.LODGING, price_per_night="-1.00")
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                type=IdeaType.LODGING,
+                price_per_night="-1.00",
+                start_date=datetime.date(2026, 6, 8),
+                end_date=datetime.date(2026, 6, 10),
+            )
+
+        self.assertIn("price_per_night", context.exception.message_dict)
 
     def test_non_lodging_idea_in_pool_cannot_have_dates(self):
         with self.assertRaises(ValidationError):
@@ -553,19 +560,6 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(data["type"], IdeaType.RESTAURANT)
         self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
 
-    # Test : Désérialisation + validation, les données entrantes sont acceptées
-    def test_valid_idea_data(self):
-        data = {
-            "title": "Brasserie",
-            "type": IdeaType.RESTAURANT,
-        }
-
-        serializer = IdeaSerializer(data=data)
-
-        self.assertTrue(serializer.is_valid())
-        self.assertEqual(serializer.validated_data["title"], "Brasserie")
-        self.assertEqual(serializer.validated_data["type"], IdeaType.RESTAURANT)
-
     # Test : Désérialisation + création, les données deviennent une Idea sauvegardée
     def test_create_idea_with_serializer(self):
         data = {
@@ -576,6 +570,9 @@ class IdeaSerializerTest(TestCase):
         serializer = IdeaSerializer(data=data)
 
         self.assertTrue(serializer.is_valid())
+
+        self.assertEqual(serializer.validated_data["title"], "Brasserie")
+        self.assertEqual(serializer.validated_data["type"], IdeaType.RESTAURANT)
 
         idea = serializer.save(
             traveler=self.traveler,
@@ -1057,18 +1054,12 @@ class ReactionSerializerTest(TestCase):
         self.assertEqual(data["idea_id"], self.idea.id)
         self.assertIsNotNone(data["created_at"])
 
-    # Test : Entrée vide acceptée par le frontend
-    def test_reaction_serializer_accepts_empty_input(self):
-        serializer = ReactionSerializer(data={})
-
-        self.assertTrue(serializer.is_valid())
-        self.assertEqual(serializer.validated_data, {})
-
     # Test : Création d’une réaction via le serializer
     def test_create_reaction_with_serializer(self):
         serializer = ReactionSerializer(data={})
 
         self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data, {})
 
         reaction = serializer.save(
             traveler=self.traveler,
@@ -1321,7 +1312,7 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(response.status_code, 404)
 
     # Test : PATCH -> Le créateur de l'idée peut la modifier
-    def test_owner_can_patch_idea(self):
+    def test_creator_can_patch_idea(self):
         self.client.force_authenticate(user=self.traveler)
 
         response = self.client.patch(
@@ -1342,8 +1333,8 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Restaurant japonais modifié")
 
-    # Test : PATCH connecté mais pas autorisé
-    def test_non_owner_cannot_patch_idea(self):
+    # Test : PATCH connecté et autorisé
+    def test_other_participant_can_patch_idea(self):
         other_traveler = Traveler.objects.create_user(
             username="Paul",
             email="paul@exemple.com",
@@ -1371,13 +1362,13 @@ class IdeaViewTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
 
         self.idea.refresh_from_db()
-        self.assertEqual(self.idea.title, "Restaurant japonais")
+        self.assertEqual(self.idea.title, "Titre modifié par Paul")
 
     # Test : PATCH -> nouvelles données rendent l'idée invalide
-    def test_owner_patch_invalid(self):
+    def test_participant_cannot_patch_with_invalid_data(self):
         self.client.force_authenticate(user=self.traveler)
 
         response = self.client.patch(
@@ -1397,35 +1388,29 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
 
     # Test : DELETE -> suppression réussie
-    def test_delete_idea_by_owner(self):
+    def test_creator_can_delete_idea(self):
         self.client.force_authenticate(user=self.traveler)
 
         idea_id = self.idea.id
 
         response = self.client.delete(
             reverse(
-                "idea-detail",
-                kwargs={
-                    "travel_id": self.travel.id,
-                    "pk": self.idea.id
-                }
+                "idea-detail", kwargs={"travel_id": self.travel.id, "pk": self.idea.id}
             )
         )
 
         self.assertEqual(response.status_code, 204)
 
-        self.assertFalse(
-            Idea.objects.filter(id=idea_id).exists()
-        )
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
-    # Test : DELETE -> connecté mais pas autorisé
-    def test_non_owner_cannot_delete_idea(self):
+    # Test : DELETE -> un autre participant accepté peut supprimer l'idée
+    def test_other_participant_can_delete_idea(self):
         other_traveler = Traveler.objects.create_user(
             username="Paul",
             email="paul@exemple.com",
             password="password123",
         )
-        
+
         Participation.objects.create(
             traveler=other_traveler,
             travel=self.travel,
@@ -1438,15 +1423,10 @@ class IdeaViewTest(APITestCase):
 
         response = self.client.delete(
             reverse(
-                "idea-detail",
-                kwargs={
-                    "travel_id": self.travel.id,
-                    "pk": self.idea.id
-                }
+                "idea-detail", kwargs={"travel_id": self.travel.id, "pk": self.idea.id}
             )
         )
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 204)
 
-        self.assertTrue(Idea.objects.filter(id=idea_id).exists())
-
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())

@@ -4,7 +4,6 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.permissions import IsAuthenticated
 
 from idea.models import Idea
-from idea.permissions import IsIdeaOwnerOrReadOnly
 from idea.serializers import IdeaSerializer
 from travel.mixins import ParticipantScopedMixin
 from travel.permissions import IsTravelParticipant
@@ -36,7 +35,6 @@ class IdeaDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
     participation_path = "travel__participations"
     permission_classes: ClassVar[list] = [
         IsAuthenticated,
-        IsIdeaOwnerOrReadOnly,
     ]
 
     def get_queryset(self):
