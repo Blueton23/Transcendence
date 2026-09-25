@@ -14,7 +14,7 @@ class IdeaSerializer(serializers.ModelSerializer):
 
     step_id = serializers.PrimaryKeyRelatedField(
         source="step",
-        queryset=Step.objects.all(),
+        queryset=Step.objects.alive(),
         allow_null=True,
         required=False,
     )

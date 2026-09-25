@@ -1123,7 +1123,8 @@ class ReactionSerializerTest(TestCase):
 
         self.assertIn("reaction", context.exception.detail)
 
-    # ========================================================================#
+
+# ========================================================================#
 
 
 # ========================================================================#
@@ -1268,6 +1269,34 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("step", response.data["details"])
 
+    # Test : POST -> une étape dans la corbeille ne peut pas recevoir une nouvelle idée
+    def test_rejects_trashed_step(self):
+        trashed_step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        trashed_step.soft_delete()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            ),
+            {
+                "title": "Idée sur étape supprimée",
+                "type": IdeaType.RESTAURANT,
+                "step_id": trashed_step.id,
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("step_id", response.data["details"])
+        self.assertFalse(Idea.objects.filter(title="Idée sur étape supprimée").exists())
+
     # ========================================================================#
 
     # ========================================================================#
@@ -1367,6 +1396,57 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Titre modifié par Paul")
 
+    # Test : PATCH -> un utilisateur non participant ne peut pas modifier l'idée
+    def test_non_participant_cannot_patch_idea(self):
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Modification interdite",
+            },
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais")
+
+    # Test : PUT -> remplace par une nouvelle donnée valide
+    def test_participant_can_put_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.put(
+            reverse(
+                "idea-detail",
+                kwargs={"travel_id": self.travel.id, "pk": self.idea.id},
+            ),
+            {
+                "title": "Randonnée",
+                "type": IdeaType.ACTIVITY,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Randonnée")
+        self.assertEqual(self.idea.type, IdeaType.ACTIVITY)
+        self.assertEqual(self.idea.travel, self.travel)
+        self.assertEqual(self.idea.traveler, self.traveler)
+
     # Test : PATCH -> nouvelles données rendent l'idée invalide
     def test_participant_cannot_patch_with_invalid_data(self):
         self.client.force_authenticate(user=self.traveler)
@@ -1430,3 +1510,40 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(response.status_code, 204)
 
         self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+
+# ========================================================================#
+
+# ========================================================================#
+# --- Reaction -> views tests --- #
+# ========================================================================#
+
+
+class ReactionViewTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="Jean",
+            email="jean@exemple.com",
+            password="password123",
+        )
+
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Restaurant japonais",
+            type=IdeaType.RESTAURANT,
+        )
+
+    # ========================================================================#
