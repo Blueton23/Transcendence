@@ -24,8 +24,8 @@ class Command(BaseCommand):
     def handle(self, *args: object, **options: object) -> None:
         if not options["yes"]:
             answer = input(
-                "This deletes every travel, step, participation, friendship and "
-                "traveler. Continue? [y/N] "
+                "This deletes every travel, step, spending, participation, "
+                "friendship and traveler. Continue? [y/N] "
             )
             if answer.strip().lower() != "y":
                 raise CommandError("Aborted.")
