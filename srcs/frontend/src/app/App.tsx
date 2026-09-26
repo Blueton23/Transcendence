@@ -13,6 +13,7 @@ import LoginPage from "../pages/LoginPage";
 import HomePage from "../pages/HomePage";
 import ItineraryPage from "../pages/ItineraryPage";
 import { IdeasPage } from "@/pages/IdeasPage";
+import TravelPage from "@/pages/TravelPage";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
@@ -30,7 +31,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/trip" element={<PlaceHolder label="trip" />} />
+          <Route path="/trip" element={<TravelPage />} />
           <Route path="/trip/:id">
             <Route index element={<Navigate to="itinerary" replace />} />
             <Route path="itinerary" element={<ItineraryPage />} />
