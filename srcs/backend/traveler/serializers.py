@@ -10,6 +10,8 @@ from .models import Traveler
 
 
 class TravelerSerializer(serializers.ModelSerializer):
+    profile_picture_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Traveler
 
@@ -32,6 +34,17 @@ class TravelerSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_profile_picture_url(self, obj: Traveler) -> str | None:
+        if not obj.profile_picture:
+            return None
+
+        request = self.context.get("request")
+
+        if request:
+            return request.build_absolute_uri(obj.profile_picture.url)
+
+        return obj.profile_picture.url
 
 
 class TravelerCreateSerializer(serializers.ModelSerializer):
@@ -71,6 +84,8 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
 
 
 class TravelerUpdateSerializer(serializers.ModelSerializer):
+    profile_picture_url = serializers.SerializerMethodField()
+
     class Meta:
         model = Traveler
 
@@ -93,6 +108,17 @@ class TravelerUpdateSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def get_profile_picture_url(self, obj: Traveler) -> str | None:
+        if not obj.profile_picture:
+            return None
+
+        request = self.context.get("request")
+
+        if request:
+            return request.build_absolute_uri(obj.profile_picture.url)
+
+        return obj.profile_picture.url
 
 
 class LoginSerializer(serializers.Serializer):
@@ -133,3 +159,20 @@ class TravelerUpdatePasswordSerializer(serializers.Serializer):
         attrs["_password_change_form"] = form
 
         return attrs
+
+
+class TravelerUpdateProfilePictureSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Traveler
+
+        fields: ClassVar[list[str]] = [
+            "profile_picture",
+        ]
+
+    def validate_profile_picture(self, value):
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError(
+                "La photo de profil ne doit pas dépasser 5 Mo."
+            )
+
+        return value

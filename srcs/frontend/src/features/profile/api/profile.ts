@@ -5,7 +5,9 @@ import type {
   ModifyProfileResponse,
   ModifyPasswordData,
   ModifyPasswordResponse,
+  ModifyProfilePictureResponse,
 } from "../types";
+
 import { getCsrfToken } from "../../auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
 import { getApiErrorMessage } from "@/shared/api/errors";
@@ -82,6 +84,40 @@ export async function modifyPassword(
     },
     body: JSON.stringify(data),
   });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(getApiErrorMessage(result));
+  }
+
+  return result;
+}
+
+export async function modifyProfilePicture(
+  file: File,
+): Promise<ModifyProfilePictureResponse> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
+
+  const formData = new FormData();
+
+  formData.append("profile_picture", file);
+
+  const response = await fetch(
+    `${API_BASE_URL}/travelers/update-profile-picture/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      body: formData,
+    },
+  );
 
   const result = await response.json();
 
