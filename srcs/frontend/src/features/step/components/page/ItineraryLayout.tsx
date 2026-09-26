@@ -1,9 +1,5 @@
 import type { ReactNode } from "react";
-import Card from "@/shared/ui/Card";
-
-function MapPlaceholder() {
-  return <Card className="min-h-64 md:h-full">I am a map</Card>;
-}
+import { ItineraryMap } from "@/features/map/components/ItineraryMap";
 
 interface ItineraryLayoutProps {
   mobileView: "list" | "map";
@@ -22,7 +18,7 @@ export function ItineraryLayout({
         {children}
       </div>
       <div className={`md:block ${mobileView === "map" ? "block" : "hidden"}`}>
-        <MapPlaceholder />
+        <ItineraryMap />
       </div>
     </div>
   );
