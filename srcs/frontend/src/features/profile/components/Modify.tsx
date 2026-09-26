@@ -62,7 +62,7 @@ function Modify({ onSuccess }: ModifyProps) {
           </Avatar>
         </div>
 
-        {/* Nom d'utilisateur */}
+        {/* Pseudo */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
             Pseudo

@@ -2,6 +2,7 @@
 
 from typing import ClassVar
 
+from django.contrib.auth import password_validation
 from django.contrib.auth.forms import PasswordChangeForm
 from rest_framework import serializers
 
@@ -9,12 +10,6 @@ from .models import Traveler
 
 
 class TravelerSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(
-        write_only=True,
-        required=True,
-        min_length=8,
-    )
-
     class Meta:
         model = Traveler
 
@@ -24,7 +19,6 @@ class TravelerSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "password",
             "profile_picture_url",
             "is_online",
             "created_at",
@@ -38,6 +32,42 @@ class TravelerSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class TravelerCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True,
+    )
+
+    password_confirmation = serializers.CharField(
+        write_only=True,
+    )
+
+    class Meta:
+        model = Traveler
+
+        fields: ClassVar[list[str]] = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password",
+            "password_confirmation",
+        ]
+
+    def validate(self, attrs: dict[str, str]) -> dict[str, str]:
+        if attrs["password"] != attrs["password_confirmation"]:
+            raise serializers.ValidationError(
+                {
+                    "password_confirmation": "Les mots de passe ne correspondent pas.",
+                }
+            )
+
+        password_validation.validate_password(
+            attrs["password"],
+        )
+
+        return attrs
 
 
 class TravelerUpdateSerializer(serializers.ModelSerializer):
