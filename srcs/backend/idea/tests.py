@@ -470,8 +470,6 @@ class ReactionModelTest(TestCase):
 
 
 # ========================================================================#
-
-# ========================================================================#
 # --- Idée -> Serializer tests --- #
 # ========================================================================#
 
@@ -584,8 +582,6 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(idea.traveler_id, self.traveler.id)
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 2 : Validation step_id
     # ========================================================================#
 
@@ -663,8 +659,6 @@ class IdeaSerializerTest(TestCase):
             )
 
         self.assertIn("step", context.exception.detail)
-
-    # ========================================================================#
 
     # ========================================================================#
     # Bloc 3 : Vérification des champs read-only
@@ -824,8 +818,6 @@ class IdeaSerializerTest(TestCase):
         self.assertIsNotNone(idea.updated_at)
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 4 :  Type d'idée
     # ========================================================================#
 
@@ -863,8 +855,6 @@ class IdeaSerializerTest(TestCase):
         self.assertIn("type", serializer.errors)
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 5 : Champs modifiables / optionnels
     # ========================================================================#
 
@@ -884,8 +874,6 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["localisation"], "Valais")
         self.assertEqual(serializer.validated_data["note"], "Réserver le restaurant")
         self.assertEqual(serializer.validated_data["url"], "http://pizzeria.ch")
-
-    # ========================================================================#
 
     # ========================================================================#
     # Bloc 6 : Conversion des champs speciaux
@@ -969,8 +957,6 @@ class IdeaSerializerTest(TestCase):
         )
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 7 : Champs obligatoire
     # ========================================================================#
 
@@ -998,8 +984,6 @@ class IdeaSerializerTest(TestCase):
 
 
 # ========================================================================#
-
-# ========================================================================#
 # --- Reaction -> Serializer tests --- #
 # ========================================================================#
 
@@ -1024,8 +1008,6 @@ class ReactionSerializerTest(TestCase):
             title="Japonais",
             type=IdeaType.RESTAURANT,
         )
-
-    # ========================================================================#
 
     # ========================================================================#
     # Bloc 8 : Tests complet reaction
@@ -1125,9 +1107,6 @@ class ReactionSerializerTest(TestCase):
 
 
 # ========================================================================#
-
-
-# ========================================================================#
 # --- Idée -> views tests --- #
 # ========================================================================#
 
@@ -1181,12 +1160,12 @@ class IdeaViewTest(APITestCase):
         )
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 1 : Tests idea-list
     # ========================================================================#
 
-    # Test : GET -> lecture réussie, récupérer la liste d'idées
+    # GET
+
+    # Test : lecture réussie, récupérer la liste d'idées
     def test_list_returns_only_ideas_of_this_travel(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1201,7 +1180,7 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["id"], self.idea.id)
 
-    # Test : GET -> traveler non connecté ne peut pas consulter la liste des idées d’un voyage
+    # Test : traveler non connecté ne peut pas consulter la liste des idées d’un voyage
     def test_list_forbidden_if_not_authenticated(self):
         response = self.client.get(
             reverse("idea-list", kwargs={"travel_id": self.travel.id})
@@ -1209,7 +1188,7 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    # Test : GET -> un non-participant au travel ne peut pas lister les idées du voyage
+    # Test : non-participant au travel ne peut pas lister les idées du voyage
     def test_list_forbidden_if_not_participant(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1219,15 +1198,14 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 403)
 
-    # Test : GET/POST -> une participation non ACCEPTED ne donne pas accès
-    def test_list_and_create_forbidden_if_participation_not_accepted(self):
+    # Test : une participation non ACCEPTED ne permet pas de lister les idées
+    def test_list_forbidden_if_participation_not_accepted(self):
         self.client.force_authenticate(user=self.traveler)
 
         participation = Participation.objects.get(
             traveler=self.traveler,
             travel=self.travel,
         )
-        url = reverse("idea-list", kwargs={"travel_id": self.travel.id})
 
         for participation_status in (
             ParticipationStatus.INVITED,
@@ -1238,20 +1216,20 @@ class IdeaViewTest(APITestCase):
                 participation.status = participation_status
                 participation.save(update_fields=["status"])
 
-                response = self.client.get(url)
-                self.assertEqual(response.status_code, 403)
-
-                idea_count_before = Idea.objects.count()
-
-                response = self.client.post(
-                    url,
-                    {"title": "Fondue", "type": IdeaType.RESTAURANT},
+                response = self.client.get(
+                    reverse(
+                        "idea-list",
+                        kwargs={"travel_id": self.travel.id},
+                    )
                 )
 
                 self.assertEqual(response.status_code, 403)
-                self.assertEqual(Idea.objects.count(), idea_count_before)
 
-    # Test : POST -> création réussie, créer une idée
+    # ========================================================================#
+
+    # POST
+
+    # Test : création réussie, créer une idée
     def test_create_idea_travel_and_traveler(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1274,7 +1252,29 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(idea.traveler, self.traveler)
         self.assertEqual(idea.title, "Fondue")
 
-    # Test : POST -> non-participant au travel ne peut pas créer une idée
+    # Test : un traveler non connecté ne peut pas créer une idée
+    def test_create_forbidden_if_not_authenticated(self):
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            ),
+            {
+                "title": "Fondue",
+                "type": IdeaType.RESTAURANT,
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.assertFalse(
+            Idea.objects.filter(
+                travel=self.travel,
+                title="Fondue",
+            ).exists()
+        )
+
+    # Test : non-participant au travel ne peut pas créer une idée
     def test_create_forbidden_if_not_participant(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1298,22 +1298,45 @@ class IdeaViewTest(APITestCase):
             ).exists()
         )
 
-    # Test : POST -> traveler non-connecté ne peut pas créer une idée
-    def test_create_idea_if_not_authentificate(self):
-        idea_count_before = Idea.objects.count()
+    # Test : une participation non ACCEPTED ne permet pas de créer une idée
+    def test_create_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
 
-        response = self.client.post(
-            reverse("idea-list", kwargs={"travel_id": self.travel.id}),
-            {
-                "title": "Fondue",
-                "type": IdeaType.RESTAURANT,
-            },
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
         )
 
-        self.assertEqual(response.status_code, 403)
-        self.assertEqual(Idea.objects.count(), idea_count_before)
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
 
-    # Test : POST -> données invalide, step appartient a un autre travel
+                response = self.client.post(
+                    reverse(
+                        "idea-list",
+                        kwargs={"travel_id": self.travel.id},
+                    ),
+                    {
+                        "title": "Fondue",
+                        "type": IdeaType.RESTAURANT,
+                    },
+                )
+
+                self.assertEqual(response.status_code, 403)
+
+                self.assertFalse(
+                    Idea.objects.filter(
+                        travel=self.travel,
+                        title="Fondue",
+                    ).exists()
+                )
+
+    # Test : données invalide, step appartient a un autre travel
     def test_rejects_step_from_another_travel(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1334,7 +1357,7 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("step", response.data["details"])
 
-    # Test : POST -> une étape dans la corbeille ne peut pas recevoir une nouvelle idée
+    # Test : une étape dans la corbeille ne peut pas recevoir une nouvelle idée
     def test_rejects_trashed_step(self):
         trashed_step = Step.objects.create(
             travel=self.travel,
@@ -1363,12 +1386,12 @@ class IdeaViewTest(APITestCase):
         self.assertFalse(Idea.objects.filter(title="Idée sur étape supprimée").exists())
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 2 : Tests idea-detail
     # ========================================================================#
 
-    # Test : GET -> récupérer l'idée du travel
+    # GET
+
+    # Test : récupérer l'idée du travel
     def test_retrieve_idea_from_this_travel(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1386,7 +1409,7 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(response.data["id"], self.idea.id)
         self.assertEqual(response.data["title"], self.idea.title)
 
-    # Test : GET objet introuvable ou inaccessible -> récupère l'idée avec le mauvais travel
+    # Test : récupère l'idée avec le mauvais travel
     def test_retrieve_idea_with_wrong_travel(self):
         Participation.objects.create(
             traveler=self.traveler,
@@ -1405,7 +1428,74 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    # Test : PATCH -> Le créateur de l'idée peut la modifier
+    # Test : traveler non connecté ne peut pas consulter une idée
+    def test_retrieve_forbidden_if_not_authenticated(self):
+        response = self.client.get(
+            reverse(
+                "idea-detail",
+                kwargs={"travel_id": self.travel.id, "pk": self.idea.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    # Test : non-participant ne peut pas consulter une idée du voyage
+    def test_non_participant_cannot_retrieve_idea(self):
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
+
+        response = self.client.get(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    # Test : une participation non ACCEPTED ne permet pas de consulter une idée
+    def test_retrieve_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.get(
+                    reverse(
+                        "idea-detail",
+                        kwargs={
+                            "travel_id": self.travel.id,
+                            "pk": self.idea.id,
+                        },
+                    )
+                )
+
+                self.assertEqual(response.status_code, 404)
+
+    # ========================================================================#
+
+    # PATCH
+
+    # Test : Le créateur de l'idée peut la modifier
     def test_creator_can_patch_idea(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1427,7 +1517,7 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Restaurant japonais modifié")
 
-    # Test : PATCH connecté et autorisé
+    # Test : un autre participant du travel peut modifier n'importe quelle idée
     def test_other_participant_can_patch_idea(self):
         other_traveler = Traveler.objects.create_user(
             username="Paul",
@@ -1461,7 +1551,7 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Titre modifié par Paul")
 
-    # Test : PATCH -> un utilisateur non participant ne peut pas modifier l'idée
+    # Test : un traveler non participant ne peut pas modifier l'idée
     def test_non_participant_cannot_patch_idea(self):
         outsider = Traveler.objects.create_user(
             username="Pierre",
@@ -1489,7 +1579,31 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Restaurant japonais")
 
-    # Test : PUT -> remplace par une nouvelle donnée valide
+    # Test : nouvelles données rendent l'idée invalide
+    def test_participant_cannot_patch_with_invalid_data(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={"travel_id": self.travel.id, "pk": self.idea.id},
+            ),
+            {
+                "type": IdeaType.LODGING,
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+    # ========================================================================#
+
+    # PUT
+
+    # Test : un participant au travel peut modifier complètement une idée
     def test_participant_can_put_idea(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1512,11 +1626,39 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(self.idea.travel, self.travel)
         self.assertEqual(self.idea.traveler, self.traveler)
 
-    # Test : PATCH -> nouvelles données rendent l'idée invalide
-    def test_participant_cannot_patch_with_invalid_data(self):
-        self.client.force_authenticate(user=self.traveler)
+    # Test : un traveler non participant ne peut pas modifier complètement l'idée
+    def test_non_participant_cannot_put_idea(self):
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+    
+        self.client.force_authenticate(user=outsider)
+    
+        response = self.client.put(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Modification interdite",
+            },
+        )
+    
+        self.assertEqual(response.status_code, 404)
+    
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais")
 
-        response = self.client.patch(
+    # Test : nouvelles données rendent l'idée invalide
+    def test_participant_cannot_put_with_invalid_data(self):
+        self.client.force_authenticate(user=self.traveler)
+    
+        response = self.client.put(
             reverse(
                 "idea-detail",
                 kwargs={"travel_id": self.travel.id, "pk": self.idea.id},
@@ -1525,14 +1667,18 @@ class IdeaViewTest(APITestCase):
                 "type": IdeaType.LODGING,
             },
         )
-
+    
         self.assertEqual(response.status_code, 400)
         self.assertIn("start_date", response.data["details"])
-
+    
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
 
-    # Test : DELETE -> suppression réussie
+    # ========================================================================#
+
+    # DELETE
+
+    # Test : suppression réussie
     def test_creator_can_delete_idea(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1548,7 +1694,7 @@ class IdeaViewTest(APITestCase):
 
         self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
-    # Test : DELETE -> un autre participant accepté peut supprimer l'idée
+    # Test : un autre participant accepté peut supprimer l'idée
     def test_other_participant_can_delete_idea(self):
         other_traveler = Traveler.objects.create_user(
             username="Paul",
@@ -1576,8 +1722,6 @@ class IdeaViewTest(APITestCase):
 
         self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
-
-# ========================================================================#
 
 # ========================================================================#
 # --- Reaction -> views tests --- #
