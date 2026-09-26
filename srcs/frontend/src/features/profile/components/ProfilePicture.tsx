@@ -56,7 +56,7 @@ function ProfilePicture() {
   return (
     <div className="flex flex-col items-center gap-3">
       <img
-        src={currentUser.profilePictureUrl}
+        src={currentUser.profilePictureUrl ?? undefined}
         alt="Photo de profil"
         className="square-full h-24 w-24 object-cover"
       />
@@ -71,7 +71,7 @@ function ProfilePicture() {
 
       <Button
         type="button"
-        variant="secondary"
+        variant="primary"
         onClick={handleSelectPicture}
         disabled={isSubmitting}
       >
