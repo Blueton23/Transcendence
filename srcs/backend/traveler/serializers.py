@@ -176,3 +176,23 @@ class TravelerUpdateProfilePictureSerializer(serializers.ModelSerializer):
             )
 
         return value
+
+    def update(self, instance, validated_data):
+        old_picture_name = (
+            instance.profile_picture.name if instance.profile_picture else None
+        )
+
+        instance = super().update(instance, validated_data)
+
+        new_picture_name = (
+            instance.profile_picture.name if instance.profile_picture else None
+        )
+
+        if (
+            old_picture_name
+            and old_picture_name != new_picture_name
+            and old_picture_name != "profile_pictures/profil.png"
+        ):
+            instance.profile_picture.storage.delete(old_picture_name)
+
+        return instance

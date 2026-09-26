@@ -1,7 +1,6 @@
 import { useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 
-import Avatar from "@/shared/ui/Avatar";
 import Button from "@/shared/ui/Button";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
@@ -54,23 +53,13 @@ function ProfilePicture() {
     return null;
   }
 
-  const initials =
-    `${currentUser.firstName?.charAt(0) ?? ""}${currentUser.lastName?.charAt(0) ?? ""}`
-      .toUpperCase();
-
   return (
     <div className="flex flex-col items-center gap-3">
-      {currentUser.profilePictureUrl ? (
-        <img
-          src={currentUser.profilePictureUrl}
-          alt="Photo de profil"
-          className="h-24 w-24 rounded-full object-cover"
-        />
-      ) : (
-        <Avatar size="lg" color="1">
-          {initials}
-        </Avatar>
-      )}
+      <img
+        src={currentUser.profilePictureUrl}
+        alt="Photo de profil"
+        className="square-full h-24 w-24 object-cover"
+      />
 
       <input
         ref={fileInputRef}
@@ -91,9 +80,7 @@ function ProfilePicture() {
 
       {selectedFile && (
         <div className="flex flex-col items-center gap-2">
-          <p className="text-sm text-text-secondary">
-            {selectedFile.name}
-          </p>
+          <p className="text-sm text-text-secondary">{selectedFile.name}</p>
 
           <Button
             type="button"
@@ -106,11 +93,7 @@ function ProfilePicture() {
         </div>
       )}
 
-      {error && (
-        <p className="text-sm font-medium text-red-500">
-          {error}
-        </p>
-      )}
+      {error && <p className="text-sm font-medium text-red-500">{error}</p>}
     </div>
   );
 }
