@@ -22,7 +22,7 @@ class TravelerModelTest(TestCase):
             password="password123",
         )
         self.assertFalse(traveler.is_online)
-        self.assertIsNone(traveler.profile_picture)
+        self.assertFalse(traveler.profile_picture)
         self.assertIsNotNone(traveler.created_at)
         self.assertIsNotNone(traveler.updated_at)
 
