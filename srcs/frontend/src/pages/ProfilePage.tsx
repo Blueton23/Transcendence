@@ -15,11 +15,13 @@ function ProfilePage() {
     <div className="flex w-full flex-col gap-6 p-8">
       <div className="flex w-full items-center justify-between">
         <ProfileInfo />
-        <img
-          src={currentUser.profilePictureUrl ?? undefined}
-          alt="Photo de profil"
-          className="square-full h-15 w-15 object-cover"
-        />
+        {currentUser && (
+          <img
+            src={currentUser.profilePictureUrl ?? undefined}
+            alt="Photo de profil"
+            className="square-full h-15 w-15 object-cover"
+          />
+        )}
         <Button
           type="button"
           variant="primary"
