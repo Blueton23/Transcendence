@@ -1186,7 +1186,7 @@ class IdeaViewTest(APITestCase):
     # Bloc 1 : Tests idea-list
     # ========================================================================#
 
-    # Test : GET lecture réussie -> récupérer des données
+    # Test : GET -> lecture réussie, récupérer la liste d'idées
     def test_list_returns_only_ideas_of_this_travel(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1201,7 +1201,57 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["id"], self.idea.id)
 
-    # Test : POST création réussie -> créer une ressource
+    # Test : GET -> traveler non connecté ne peut pas consulter la liste des idées d’un voyage
+    def test_list_forbidden_if_not_authenticated(self):
+        response = self.client.get(
+            reverse("idea-list", kwargs={"travel_id": self.travel.id})
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    # Test : GET -> un non-participant au travel ne peut pas lister les idées du voyage
+    def test_list_forbidden_if_not_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse("idea-list", kwargs={"travel_id": self.other_travel.id})
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    # Test : GET/POST -> une participation non ACCEPTED ne donne pas accès
+    def test_list_and_create_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+        url = reverse("idea-list", kwargs={"travel_id": self.travel.id})
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 403)
+
+                idea_count_before = Idea.objects.count()
+
+                response = self.client.post(
+                    url,
+                    {"title": "Fondue", "type": IdeaType.RESTAURANT},
+                )
+
+                self.assertEqual(response.status_code, 403)
+                self.assertEqual(Idea.objects.count(), idea_count_before)
+
+    # Test : POST -> création réussie, créer une idée
     def test_create_idea_travel_and_traveler(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1224,7 +1274,7 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(idea.traveler, self.traveler)
         self.assertEqual(idea.title, "Fondue")
 
-    # Test : POST -> connecté mais pas autorisé
+    # Test : POST -> non-participant au travel ne peut pas créer une idée
     def test_create_forbidden_if_not_participant(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1248,7 +1298,22 @@ class IdeaViewTest(APITestCase):
             ).exists()
         )
 
-    # Test : POST données invalide -> step appartient a un autre travel
+    # Test : POST -> traveler non-connecté ne peut pas créer une idée
+    def test_create_idea_if_not_authentificate(self):
+        idea_count_before = Idea.objects.count()
+
+        response = self.client.post(
+            reverse("idea-list", kwargs={"travel_id": self.travel.id}),
+            {
+                "title": "Fondue",
+                "type": IdeaType.RESTAURANT,
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Idea.objects.count(), idea_count_before)
+
+    # Test : POST -> données invalide, step appartient a un autre travel
     def test_rejects_step_from_another_travel(self):
         self.client.force_authenticate(user=self.traveler)
 
