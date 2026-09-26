@@ -1579,6 +1579,62 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Restaurant japonais")
 
+    # Test : traveler non connecté ne peut pas modifier une idée
+    def test_patch_forbidden_if_not_authenticated(self):
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Modification interdite",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais")
+
+    # Test : une participation non ACCEPTED ne permet pas de modifier une idée
+    def test_patch_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.patch(
+                    reverse(
+                        "idea-detail",
+                        kwargs={
+                            "travel_id": self.travel.id,
+                            "pk": self.idea.id,
+                        },
+                    ),
+                    {
+                        "title": "Modification interdite",
+                    },
+                )
+
+                self.assertEqual(response.status_code, 404)
+
+                self.idea.refresh_from_db()
+                self.assertEqual(self.idea.title, "Restaurant japonais")
+
     # Test : nouvelles données rendent l'idée invalide
     def test_participant_cannot_patch_with_invalid_data(self):
         self.client.force_authenticate(user=self.traveler)
@@ -1598,6 +1654,58 @@ class IdeaViewTest(APITestCase):
 
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+    # Test : une idée ne peut pas être modifiée via un autre voyage
+    def test_cannot_patch_idea_with_wrong_travel(self):
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.other_travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Modification interdite",
+            },
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais")
+        self.assertEqual(self.idea.travel, self.travel)
+
+    # Test : une idée inexistante ne peut pas être modifiée
+    def test_cannot_patch_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            ),
+            {
+                "title": "Modification impossible",
+            },
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
     # ========================================================================#
 
@@ -1633,9 +1741,9 @@ class IdeaViewTest(APITestCase):
             email="pierre@exemple.com",
             password="password123",
         )
-    
+
         self.client.force_authenticate(user=outsider)
-    
+
         response = self.client.put(
             reverse(
                 "idea-detail",
@@ -1646,33 +1754,150 @@ class IdeaViewTest(APITestCase):
             ),
             {
                 "title": "Modification interdite",
+                "type": IdeaType.RESTAURANT,
             },
         )
-    
+
         self.assertEqual(response.status_code, 404)
-    
+
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Restaurant japonais")
+
+    # Test : un traveler non connecté ne peut pas modifier complètement une idée
+    def test_put_forbidden_if_not_authenticated(self):
+        response = self.client.put(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Modification interdite",
+                "type": IdeaType.ACTIVITY,
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais")
+        self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+    # Test : une participation non ACCEPTED ne permet pas de modifier complètement une idée
+    def test_put_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.put(
+                    reverse(
+                        "idea-detail",
+                        kwargs={
+                            "travel_id": self.travel.id,
+                            "pk": self.idea.id,
+                        },
+                    ),
+                    {
+                        "title": "Modification interdite",
+                        "type": IdeaType.ACTIVITY,
+                    },
+                )
+
+                self.assertEqual(response.status_code, 404)
+
+                self.idea.refresh_from_db()
+                self.assertEqual(self.idea.title, "Restaurant japonais")
+                self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+    # Test : une idée ne peut pas être modifiée complètement via un autre voyage
+    def test_cannot_put_idea_with_wrong_travel(self):
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.put(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.other_travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Modification interdite",
+                "type": IdeaType.ACTIVITY,
+            },
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais")
+        self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+        self.assertEqual(self.idea.travel, self.travel)
 
     # Test : nouvelles données rendent l'idée invalide
     def test_participant_cannot_put_with_invalid_data(self):
         self.client.force_authenticate(user=self.traveler)
-    
+
         response = self.client.put(
             reverse(
                 "idea-detail",
                 kwargs={"travel_id": self.travel.id, "pk": self.idea.id},
             ),
             {
+                "title": "Restaurant japonais",
                 "type": IdeaType.LODGING,
             },
         )
-    
+
         self.assertEqual(response.status_code, 400)
         self.assertIn("start_date", response.data["details"])
-    
+
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+    # Test : une idée inexistante ne peut pas être modifiée complètement
+    def test_cannot_put_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        response = self.client.put(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            ),
+            {
+                "title": "Modification impossible",
+                "type": IdeaType.ACTIVITY,
+            },
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
     # ========================================================================#
 
@@ -1720,6 +1945,126 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 204)
 
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+    # Test : un traveler non connecté ne peut pas supprimer une idée
+    def test_delete_forbidden_if_not_authenticated(self):
+        idea_id = self.idea.id
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
+    # Test : un traveler non participant ne peut pas supprimer une idée
+    def test_non_participant_cannot_delete_idea(self):
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
+
+        idea_id = self.idea.id
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
+    # Test : une participation non ACCEPTED ne permet pas de supprimer une idée
+    def test_delete_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        idea_id = self.idea.id
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.delete(
+                    reverse(
+                        "idea-detail",
+                        kwargs={
+                            "travel_id": self.travel.id,
+                            "pk": idea_id,
+                        },
+                    )
+                )
+
+                self.assertEqual(response.status_code, 404)
+                self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
+    # Test : une idée ne peut pas être supprimée via un autre voyage
+    def test_cannot_delete_idea_with_wrong_travel(self):
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.other_travel.id,
+                    "pk": idea_id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
+    # Test : une idée inexistante ne peut pas être supprimée
+    def test_cannot_delete_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
         self.assertFalse(Idea.objects.filter(id=idea_id).exists())
 
 
