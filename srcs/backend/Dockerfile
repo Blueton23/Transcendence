@@ -28,7 +28,7 @@ RUN     chmod +x /entrypoint.sh
 
 RUN     groupadd -o -g $GID appgroup && \
         useradd -o -u $UID -g appgroup -m appuser && \
-        mkdir -p /app/staticfiles /app/mediafiles && \
+        mkdir -p /app/staticfiles /app/mediafiles/profile_pictures && \
         chown -R appuser:appgroup /app
 
 EXPOSE  8000
