@@ -83,6 +83,42 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
         return attrs
 
 
+class TravelerCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(
+        write_only=True,
+    )
+
+    password_confirmation = serializers.CharField(
+        write_only=True,
+    )
+
+    class Meta:
+        model = Traveler
+
+        fields: ClassVar[list[str]] = [
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password",
+            "password_confirmation",
+        ]
+
+    def validate(self, attrs: dict[str, str]) -> dict[str, str]:
+        if attrs["password"] != attrs["password_confirmation"]:
+            raise serializers.ValidationError(
+                {
+                    "password_confirmation": "Les mots de passe ne correspondent pas.",
+                }
+            )
+
+        password_validation.validate_password(
+            attrs["password"],
+        )
+
+        return attrs
+
+
 class TravelerUpdateSerializer(serializers.ModelSerializer):
     profile_picture_url = serializers.SerializerMethodField()
 
