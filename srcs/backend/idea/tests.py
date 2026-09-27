@@ -1458,6 +1458,32 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Titre modifié par Paul")
 
+    # Test : les champs protégés envoyés via le detail sont ignorés
+    def test_cannot_patch_protected_fields_via_detail(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "chosen_at": "2026-06-04T10:00:00Z",
+                "chosen_by_id": self.traveler.id,
+                "status": IdeaStatus.CHOSEN,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertEqual(self.idea.status, IdeaStatus.SUGGESTED)
+
     # Test : un participant peut placer une idée dans une étape du voyage
     def test_participant_can_place_idea_on_step(self):
         step = Step.objects.create(
@@ -2209,6 +2235,600 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
         self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
         self.assertFalse(self.idea.is_in_pool)
+
+    # Test : un hébergement déjà choisi ne peut pas retourner au pool directement
+    def test_cannot_return_chosen_lodging_to_pool_directly(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.chosen_by = self.traveler
+        self.idea.chosen_at = timezone.now()
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.step, step)
+        self.assertIsNotNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+
+    # ========================================================================#
+    # Bloc 3 : Tests idea-choice -> POST
+    # ========================================================================#
+
+    # Tests réussi
+    # ========================================================================#
+
+    # Test : un participant peut choisir un hébergement placé sur une étape
+    def test_participant_can_choose_lodging(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.idea.id)
+        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertIsNotNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+
+    # Test : un autre participant peut choisir, sans imposer les données du choix
+    def test_other_participant_can_choose_lodging_ignoring_request_data(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        title = self.idea.title
+
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=other_traveler)
+
+        before_choice = timezone.now()
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "chosen_by_id": self.traveler.id,
+                "chosen_at": "2000-01-01T10:00:00Z",
+                "title": "Titre imposé dans la requête",
+            },
+            format="json",
+        )
+
+        after_choice = timezone.now()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.idea.id)
+        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["chosen_by_id"], other_traveler.id)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, other_traveler)
+        self.assertIsNotNone(self.idea.chosen_at)
+        self.assertGreaterEqual(self.idea.chosen_at, before_choice)
+        self.assertLessEqual(self.idea.chosen_at, after_choice)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+        self.assertEqual(self.idea.traveler, self.traveler)
+        self.assertEqual(self.idea.title, title)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+
+    # Test : un choix répété conserve l'auteur et les dates du premier choix
+    def test_repeated_choice_preserves_first_choice(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        url = reverse(
+            "idea-choice",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertIsNotNone(self.idea.chosen_at)
+
+        chosen_at = self.idea.chosen_at
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=other_traveler)
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertEqual(self.idea.chosen_at, chosen_at)
+        self.assertEqual(self.idea.updated_at, updated_at)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+
+    # Tests echec : Traveler non connecté
+    # ========================================================================#
+
+    # Test : un traveler non connecté ne peut pas choisir un hébergement
+    def test_choice_forbidden_if_not_authenticated(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Tests echec : Traveler non-participant
+    # ========================================================================#
+
+    # Test : un non-participant ne peut pas choisir un hébergement
+    def test_non_participant_cannot_choose_lodging(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Tests echec : Participation non ACCEPTED
+    # ========================================================================#
+
+    # Test : une participation non ACCEPTED ne permet pas de choisir un hébergement
+    def test_choice_forbidden_if_participation_not_accepted(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        url = reverse(
+            "idea-choice",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with (
+                self.subTest(participation_status=participation_status),
+                transaction.atomic(),
+            ):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.post(url)
+
+                self.assertEqual(response.status_code, 404)
+
+                self.idea.refresh_from_db()
+                self.assertIsNone(self.idea.chosen_by)
+                self.assertIsNone(self.idea.chosen_at)
+                self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+                self.assertEqual(self.idea.updated_at, updated_at)
+
+                transaction.set_rollback(True)
+
+    # Tests echec : Ressource ciblée
+    # ========================================================================#
+
+    # Test : un hébergement ne peut pas être choisi via un autre voyage
+    def test_cannot_choose_lodging_with_wrong_travel(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.other_travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.travel, self.travel)
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Test : une idée inexistante ne peut pas être choisie
+    def test_cannot_choose_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+    # Tests echec : Données invalides
+    # ========================================================================#
+
+    # Test : une idée non hébergement placée sur une étape ne peut pas être choisie
+    def test_cannot_choose_non_lodging_idea(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 4)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Test : un hébergement encore dans le pool ne peut pas être choisi
+    def test_cannot_choose_lodging_still_in_pool(self):
+        self.idea.type = IdeaType.LODGING
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertTrue(self.idea.is_in_pool)
+
+    # Test : un hébergement sur une étape à la corbeille ne peut pas être choisi
+    def test_cannot_choose_lodging_on_trashed_step(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        step.soft_delete()
+        self.idea.refresh_from_db()
+
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.SUGGESTED)
+        self.assertTrue(self.idea.is_in_pool)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Test : un hébergement qui chevauche un hébergement déjà choisi ne peut pas être choisi
+    def test_choosing_overlapping_lodging_via_endpoint_is_rejected(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 8),
+        )
+
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel déjà choisi",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            chosen_by=self.traveler,
+            chosen_at=timezone.now(),
+        )
+
+        second = Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Autre hôtel",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 5),
+            end_date=datetime.date(2026, 6, 7),
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": second.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        second.refresh_from_db()
+        self.assertIsNone(second.chosen_by)
+        self.assertIsNone(second.chosen_at)
 
 
 # ========================================================================#
