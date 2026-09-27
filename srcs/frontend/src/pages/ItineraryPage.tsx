@@ -50,7 +50,7 @@ function ItineraryPage() {
     : -1;
 
   return (
-    <div className="flex flex-col gap-4 px-4 pb-0 md:h-full md:pb-4">
+    <div className="flex flex-1 flex-col gap-4 px-4 pb-0 md:h-full md:pb-4 md:flex-none">
       <StickyHeader>
         <ItineraryHeader
           travel={travel}
