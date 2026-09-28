@@ -50,7 +50,7 @@ function ItineraryPage() {
     : -1;
 
   return (
-    <div className="flex flex-1 flex-col gap-4 px-4 pb-0 md:h-full md:pb-4 md:flex-none">
+    <div className="flex flex-1 flex-col gap-4 px-4 pb-0 md:h-full md:flex-none md:pb-4">
       <StickyHeader>
         <ItineraryHeader
           travel={travel}
@@ -62,7 +62,7 @@ function ItineraryPage() {
           isDetailView={detailView !== null}
         />
       </StickyHeader>
-      <ItineraryLayout mobileView={mobileView}>
+      <ItineraryLayout mobileView={mobileView} steps={steps}>
         {detailView ? (
           <StepDetail
             step={detailView}
