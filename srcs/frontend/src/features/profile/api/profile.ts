@@ -52,7 +52,7 @@ export async function modifyProfile(
     body: JSON.stringify(data),
   });
 
-  return parseResponse<SignupResponse>(response);
+  return parseResponse<ModifyProfileResponse>(response);
 }
 
 export async function modifyPassword(
@@ -73,7 +73,7 @@ export async function modifyPassword(
     body: JSON.stringify(data),
   });
 
-  return parseResponse<SignupResponse>(response);
+  return parseResponse<ModifyProfileResponse>(response);
 }
 
 export async function modifyProfilePicture(
@@ -101,5 +101,5 @@ export async function modifyProfilePicture(
     },
   );
 
-  return parseResponse<SignupResponse>(response);
+  return parseResponse<ModifyProfilePictureResponse>(response);
 }
