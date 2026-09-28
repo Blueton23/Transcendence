@@ -33,3 +33,7 @@ export interface ModifyPasswordData {
 export interface ModifyPasswordResponse {
   detail: string;
 }
+
+export interface ModifyProfilePictureResponse {
+  traveler: User;
+}

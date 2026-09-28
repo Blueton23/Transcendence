@@ -5,10 +5,12 @@ import type {
   ModifyProfileResponse,
   ModifyPasswordData,
   ModifyPasswordResponse,
+  ModifyProfilePictureResponse,
 } from "../types";
+
 import { getCsrfToken } from "../../auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
-import { getApiErrorMessage } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/errors";
 
 const API_BASE_URL = "/api";
 
@@ -29,13 +31,7 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getApiErrorMessage(result));
-  }
-
-  return result;
+  return parseResponse<SignupResponse>(response);
 }
 
 export async function modifyProfile(
@@ -56,13 +52,7 @@ export async function modifyProfile(
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getApiErrorMessage(result));
-  }
-
-  return result;
+  return parseResponse<ModifyProfileResponse>(response);
 }
 
 export async function modifyPassword(
@@ -83,11 +73,33 @@ export async function modifyPassword(
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
+  return parseResponse<ModifyPasswordResponse>(response);
+}
 
-  if (!response.ok) {
-    throw new Error(getApiErrorMessage(result));
+export async function modifyProfilePicture(
+  file: File,
+): Promise<ModifyProfilePictureResponse> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
   }
 
-  return result;
+  const formData = new FormData();
+
+  formData.append("profile_picture", file);
+
+  const response = await fetch(
+    `${API_BASE_URL}/travelers/update-profile-picture/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+      body: formData,
+    },
+  );
+
+  return parseResponse<ModifyProfilePictureResponse>(response);
 }
