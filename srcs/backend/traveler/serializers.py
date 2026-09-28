@@ -76,9 +76,16 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
                 }
             )
 
-        password_validation.validate_password(
-            attrs["password"],
-        )
+        try:
+            password_validation.validate_password(
+                attrs["password"],
+            )
+        except password_validation.ValidationError as exc:
+            raise serializers.ValidationError(
+                {
+                    "password": exc.messages,
+                }
+            ) from exc
 
         return attrs
 
