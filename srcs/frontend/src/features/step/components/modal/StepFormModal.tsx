@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { Step } from "@/features/step/types";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
@@ -7,20 +6,9 @@ import { PlaceSearchField } from "@/features/step/components/add-step/PlaceSearc
 import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
 import type { Travel } from "@/features/travel/types";
 import { PlaceSuggestions } from "@/features/step/components/add-step/PlaceSuggestions";
-import type { DateRange } from "@daypicker/react";
-import {
-  formatDateRange,
-  toApiDateString,
-} from "@/features/step/utils/stepDates";
-import { createStep, updateStep } from "@/features/step/api/stepApi";
-import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+import { formatDateRange } from "@/features/step/utils/stepDates";
 import { StepDateField } from "@/features/step/components/modal/StepDateField";
-
-const results = [
-  "Zinal, Valais, Suisse",
-  "Zermatt, Valais, Suisse",
-  "Montreux, Vaud, Suisse",
-];
+import { UseStepForm } from "@/features/step/hooks/useStepForm";
 
 export interface StepFormModalProps {
   step?: Step;
@@ -37,62 +25,14 @@ export function StepFormModal({
   onClose,
   refetch,
 }: StepFormModalProps) {
-  type OpenPanel = "place" | "calendar" | null;
-
-  const [query, setQuery] = useState(step?.localisation ?? "");
-  const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
-  const [selected, setSelected] = useState<DateRange | undefined>(
-    step
-      ? {
-          from: new Date(step.startDate),
-          to: new Date(step.endDate),
-        }
-      : undefined,
-  );
-  const [noOvernight, setNoOvernight] = useState(
-    step ? step.startDate === step.endDate : false,
-  );
-  const filtered = results.filter((lieu) =>
-    lieu.toLowerCase().includes(query.toLowerCase()),
-  );
-
-  const { submit, isSubmitting, error } = useSubmitAction(() => {
-    if (!selected?.from || !selected?.to) {
-      throw new Error("Sélectionne des dates avant de valider.");
-    }
-    if (!query.trim()) throw new Error("Indique un lieu avant de valider.");
-    const data = {
-      localisation: query,
-      startDate: toApiDateString(selected.from),
-      endDate: toApiDateString(selected.to),
-    };
-    return step
-      ? updateStep(travel.id, step.id, data)
-      : createStep(travel.id, data);
-  });
-
-  const handleOnSubmit = async () => {
-    const result = await submit();
-    if (result.success) {
+  const form = UseStepForm({
+    step,
+    travel,
+    onSuccess: () => {
       refetch();
       onClose();
-    }
-  };
-
-  const handleSelect = (lieu: string) => {
-    setQuery(lieu);
-    setOpenPanel(null);
-  };
-
-  const handleNoOvernightChange = (checked: boolean) => {
-    setNoOvernight(checked);
-    setSelected(
-      checked && selected?.from
-        ? { from: selected.from, to: selected.from }
-        : undefined,
-    );
-  };
-
+    },
+  });
   return (
     <Modal
       icon="pinplus"
@@ -108,55 +48,59 @@ export function StepFormModal({
           <div className="relative">
             <PlaceSearchField
               variant="white"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              value={form.query}
+              onChange={(e) => form.changeQuery(e.target.value)}
               onBlur={() =>
-                setOpenPanel((current) =>
+                form.setOpenPanel((current) =>
                   current === "place" ? null : current,
                 )
               }
-              onFocus={() => setOpenPanel("place")}
+              onFocus={() => form.setOpenPanel("place")}
             />
-            {openPanel === "place" && query !== "" && (
-              <PlaceSuggestions items={filtered} onSelect={handleSelect} />
+            {form.openPanel === "place" && form.query !== "" && (
+              <PlaceSuggestions
+                items={form.suggestions}
+                isLoading={form.isLoading}
+                onSelect={form.selectPlace}
+              />
             )}
           </div>
         </div>
         <StepDateField
-          label={formatDateRange(selected)}
+          label={formatDateRange(form.selected)}
           onClick={() =>
-            setOpenPanel((current) =>
+            form.setOpenPanel((current) =>
               current === "calendar" ? null : "calendar",
             )
           }
         />
-        {openPanel === "calendar" && (
+        {form.openPanel === "calendar" && (
           <DatesPanel
             steps={steps.filter((s) => s.id !== step?.id)}
             travel={travel}
-            selected={selected}
+            selected={form.selected}
             className="relative"
-            onSelect={setSelected}
-            noOvernight={noOvernight}
-            onNoOvernightChange={handleNoOvernightChange}
-            onClose={() => setOpenPanel(null)}
+            onSelect={form.setSelected}
+            noOvernight={form.noOvernight}
+            onNoOvernightChange={form.changeNoOvernight}
+            onClose={() => form.setOpenPanel(null)}
           />
         )}
         <Button
-          onClick={handleOnSubmit}
-          disabled={isSubmitting}
+          onClick={form.handleSubmit}
+          disabled={form.isSubmitting}
           onMouseDown={(e) => e.stopPropagation()}
           type="submit"
           variant="primary"
           className="w-full"
         >
-          {isSubmitting
+          {form.isSubmitting
             ? "Modifications en cours"
             : step
               ? "Enregistrer les modifications"
               : "Ajouter l'étape"}
         </Button>
-        {error && <Text tone="accent">{error}</Text>}
+        {form.error && <Text tone="accent">{form.error}</Text>}
       </div>
     </Modal>
   );

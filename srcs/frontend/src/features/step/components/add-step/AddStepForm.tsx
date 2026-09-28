@@ -1,25 +1,10 @@
-import { useState } from "react";
 import { PlaceSearchField } from "./PlaceSearchField";
 import { PlaceSuggestions } from "./PlaceSuggestions";
-import { type DateRange } from "@daypicker/react";
 import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
-import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
-import { createStep } from "@/features/step/api/stepApi";
-import {
-  formatDateRange,
-  toApiDateString,
-} from "@/features/step/utils/stepDates";
+import { formatDateRange } from "@/features/step/utils/stepDates";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
-
-// TODO(branchement): remplacer results en dur par l'autocomplete de l'API géocodage
-const results = [
-  "Zinal, Valais, Suisse",
-  "Zermatt, Valais, Suisse",
-  "Montreux, Vaud, Suisse",
-];
-
-type OpenPanel = "place" | "calendar" | null;
+import { UseStepForm } from "@/features/step/hooks/useStepForm";
 
 interface AddStepFromProps {
   steps: Step[];
@@ -28,85 +13,46 @@ interface AddStepFromProps {
 }
 
 export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
-  const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
-  const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<DateRange>();
-  const [noOvernight, setNoOvernight] = useState(false);
-  const { submit, isSubmitting, error } = useSubmitAction(() => {
-    if (!selected?.from || !selected?.to) {
-      throw new Error("Sélectionne des dates avant de valider.");
-    }
-    if (!query.trim()) throw new Error("Indique un lieu avant de valider.");
-    return createStep(travel.id, {
-      localisation: query,
-      startDate: toApiDateString(selected.from),
-      endDate: toApiDateString(selected.to),
-    });
-  });
-
-  const filtered = results.filter((lieu) =>
-    lieu.toLowerCase().includes(query.toLowerCase()),
-  );
-
-  const handleSelect = (lieu: string) => {
-    setQuery(lieu);
-    setOpenPanel(null);
-  };
-
-  const handleOnSubmit = async () => {
-    const result = await submit();
-    if (result.success) {
-      setOpenPanel(null);
-      refetch();
-      setQuery("");
-      setSelected(undefined);
-      setNoOvernight(false);
-    }
-  };
-
-  const handleNoOvernightChange = (checked: boolean) => {
-    setNoOvernight(checked);
-    setSelected(
-      checked && selected?.from
-        ? { from: selected.from, to: selected.from }
-        : undefined,
-    );
-  };
+  const form = UseStepForm({ travel, onSuccess: refetch });
 
   return (
     <div className="relative">
       <PlaceSearchField
-        value={query}
-        dateLabel={formatDateRange(selected)}
-        onChange={(e) => setQuery(e.target.value)}
+        value={form.query}
+        dateLabel={formatDateRange(form.selected)}
+        onChange={(e) => form.changeQuery(e.target.value)}
         onBlur={() =>
-          setOpenPanel((current) => (current === "place" ? null : current))
+          form.setOpenPanel((current) => (current === "place" ? null : current))
         }
-        onFocus={() => setOpenPanel("place")}
+        onFocus={() => form.setOpenPanel("place")}
         onCalendarClick={() => {
-          setOpenPanel((current) =>
+          form.setOpenPanel((current) =>
             current === "calendar" ? null : "calendar",
           );
         }}
       />
-      {openPanel === "place" && query !== "" && (
-        <PlaceSuggestions items={filtered} onSelect={handleSelect} />
+      {form.openPanel === "place" && form.query !== "" && (
+        <PlaceSuggestions
+          items={form.suggestions}
+          isLoading={form.isLoading}
+          onSelect={form.selectPlace}
+        />
       )}
-      {openPanel === "calendar" && (
+      {form.openPanel === "calendar" && (
         <DatesPanel
           steps={steps}
           travel={travel}
-          selected={selected}
-          onSelect={setSelected}
-          noOvernight={noOvernight}
-          onNoOvernightChange={handleNoOvernightChange}
-          onSubmit={handleOnSubmit}
-          onClose={() => setOpenPanel(null)}
-          isSubmitting={isSubmitting}
-          error={error}
+          selected={form.selected}
+          onSelect={form.setSelected}
+          noOvernight={form.noOvernight}
+          onNoOvernightChange={form.changeNoOvernight}
+          onSubmit={form.handleSubmit}
+          onClose={() => form.setOpenPanel(null)}
+          isSubmitting={form.isSubmitting}
+          error={form.error}
         />
       )}
-      {openPanel === "calendar" && (
+      {form.openPanel === "calendar" && (
         <div className="fixed inset-0 z-10 bg-scrim md:hidden" />
       )}
     </div>
