@@ -10,7 +10,7 @@ import type {
 
 import { getCsrfToken } from "../../auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
-import { getApiErrorMessage } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/errors";
 
 const API_BASE_URL = "/api";
 
@@ -31,13 +31,7 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getApiErrorMessage(result));
-  }
-
-  return result;
+  return parseResponse<SignupResponse>(response);
 }
 
 export async function modifyProfile(
@@ -58,13 +52,7 @@ export async function modifyProfile(
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getApiErrorMessage(result));
-  }
-
-  return result;
+  return parseResponse<SignupResponse>(response);
 }
 
 export async function modifyPassword(
@@ -85,13 +73,7 @@ export async function modifyPassword(
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getApiErrorMessage(result));
-  }
-
-  return result;
+  return parseResponse<SignupResponse>(response);
 }
 
 export async function modifyProfilePicture(
@@ -119,11 +101,5 @@ export async function modifyProfilePicture(
     },
   );
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getApiErrorMessage(result));
-  }
-
-  return result;
+  return parseResponse<SignupResponse>(response);
 }
