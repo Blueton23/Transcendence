@@ -73,7 +73,7 @@ export async function modifyPassword(
     body: JSON.stringify(data),
   });
 
-  return parseResponse<ModifyProfileResponse>(response);
+  return parseResponse<ModifyPasswordResponse>(response);
 }
 
 export async function modifyProfilePicture(
