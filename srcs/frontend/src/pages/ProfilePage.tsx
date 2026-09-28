@@ -17,7 +17,7 @@ function ProfilePage() {
         <ProfileInfo />
         {currentUser && (
           <img
-            src={currentUser.profilePictureUrl ?? undefined}
+            src={currentUser.profilePicture ?? undefined}
             alt="Photo de profil"
             className="square-full h-15 w-15 object-cover"
           />

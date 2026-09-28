@@ -10,7 +10,7 @@ from .models import Traveler
 
 
 class TravelerSerializer(serializers.ModelSerializer):
-    profile_picture_url = serializers.SerializerMethodField()
+    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = Traveler
@@ -21,7 +21,7 @@ class TravelerSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "profile_picture_url",
+            "profile_picture",
             "is_online",
             "created_at",
             "updated_at",
@@ -29,13 +29,13 @@ class TravelerSerializer(serializers.ModelSerializer):
 
         read_only_fields: ClassVar[list[str]] = [
             "id",
-            "profile_picture_url",
+            "profile_picture",
             "is_online",
             "created_at",
             "updated_at",
         ]
 
-    def get_profile_picture_url(self, obj: Traveler) -> str | None:
+    def get_profile_picture(self, obj: Traveler) -> str | None:
         if not obj.profile_picture:
             return None
 
@@ -84,7 +84,7 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
 
 
 class TravelerUpdateSerializer(serializers.ModelSerializer):
-    profile_picture_url = serializers.SerializerMethodField()
+    profile_picture = serializers.SerializerMethodField()
 
     class Meta:
         model = Traveler
@@ -95,7 +95,7 @@ class TravelerUpdateSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "email",
-            "profile_picture_url",
+            "profile_picture",
             "is_online",
             "created_at",
             "updated_at",
@@ -103,13 +103,13 @@ class TravelerUpdateSerializer(serializers.ModelSerializer):
 
         read_only_fields: ClassVar[list[str]] = [
             "id",
-            "profile_picture_url",
+            "profile_picture",
             "is_online",
             "created_at",
             "updated_at",
         ]
 
-    def get_profile_picture_url(self, obj: Traveler) -> str | None:
+    def get_profile_picture(self, obj: Traveler) -> str | None:
         if not obj.profile_picture:
             return None
 

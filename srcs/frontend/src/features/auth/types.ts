@@ -4,7 +4,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  profilePictureUrl: string | null;
+  profilePicture: string | null;
   isOnline: boolean;
   createdAt: string;
   updatedAt: string;

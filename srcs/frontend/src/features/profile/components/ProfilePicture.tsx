@@ -56,7 +56,7 @@ function ProfilePicture() {
   return (
     <div className="flex flex-col items-center gap-3">
       <img
-        src={currentUser.profilePictureUrl ?? undefined}
+        src={currentUser.profilePicture ?? undefined}
         alt="Photo de profil"
         className="square-full h-24 w-24 object-cover"
       />
