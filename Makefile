@@ -53,6 +53,9 @@ fclean:
 
 re: fclean up
 
+smoke:
+	./scripts/smoke.sh
+
 #######################################
 
 # Commandes db
@@ -133,7 +136,7 @@ lint:
 
 #######################################
 
-.PHONY: up down start stop restart build ps images volumes logs clean fclean re \
+.PHONY: up down start stop restart build ps images volumes logs clean fclean re smoke \
 	psql test-db \
 	makemigrations check-migrations migrate startapp createsuperuser seed unseed shell check test format-back format-check-back \
 	lint-back lint-fix-back check-back fix-back format-front format-check-front front-install
