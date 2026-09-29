@@ -12,7 +12,13 @@ from common.models import TimeStampedModel
 
 class Traveler(AbstractUser, TimeStampedModel):
     email = models.EmailField("email address", unique=True)
-    profile_picture_url = models.URLField(blank=True, null=True)
+
+    profile_picture = models.ImageField(
+        upload_to="profile_pictures/",
+        blank=True,
+        null=True,
+    )
+
     is_online = models.BooleanField(default=False)
 
     class Meta:

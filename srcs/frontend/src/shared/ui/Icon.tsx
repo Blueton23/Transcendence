@@ -20,6 +20,7 @@ export const iconNames = [
   "compass",
   "dots",
   "edit",
+  "email",
   "ext",
   "fork",
   "heart",
@@ -27,6 +28,7 @@ export const iconNames = [
   "home",
   "inbox",
   "info",
+  "lock",
   "map",
   "moon",
   "moon-off",
@@ -47,7 +49,6 @@ export const iconNames = [
   "van",
   "wallet",
   "wifi-off",
-  "edit",
   "x",
 ] as const;
 

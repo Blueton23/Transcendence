@@ -9,6 +9,7 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { modifyProfile } from "../api/profile";
 import { useAuth } from "../../auth/context/useAuth";
 import ModifyPassword from "./ModifyPassword";
+import ProfilePicture from "./ProfilePicture";
 
 interface ModifyProps {
   onSuccess: () => void;
@@ -62,8 +63,9 @@ function Modify({ onSuccess }: ModifyProps) {
           </Avatar>
         </div>
 
-        {/* Nom d'utilisateur */}
+        {/* Pseudo */}
         <label className="flex flex-col gap-2">
+          <ProfilePicture />
           <span className="text-sm font-semibold text-text-secondary">
             Pseudo
           </span>
