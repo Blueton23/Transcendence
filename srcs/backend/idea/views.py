@@ -13,10 +13,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from idea.models import Idea
-from idea.serializers import IdeaSerializer
+from idea.serializers import IdeaSerializer, ReactionSerializer
 from travel.mixins import ParticipantScopedMixin
 from travel.models import Step
 from travel.permissions import IsTravelParticipant
+
+# ---Idea---#
 
 
 # Liste plusieurs objets (GET, POST)
@@ -51,7 +53,7 @@ class IdeaDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
 
-# Choisir un hébergement placé sur une étape
+# Choisir un hébergement placé sur une étape (POST)
 class IdeaChoiceView(ParticipantScopedMixin, GenericAPIView):
     queryset = Idea.objects.all()
     serializer_class = IdeaSerializer
@@ -92,3 +94,43 @@ class IdeaChoiceView(ParticipantScopedMixin, GenericAPIView):
             self.get_serializer(idea).data,
             status=status.HTTP_200_OK,
         )
+
+
+# ========================================================================#
+
+# ---Reaction---#
+
+
+# Réagir à une idée du voyage (POST/DELETE)
+class ReactionView(ParticipantScopedMixin, GenericAPIView):
+    queryset = Idea.objects.all()
+    serializer_class = ReactionSerializer
+    participation_path = "travel__participations"
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get_queryset(self):
+        return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
+
+    def post(self, request, travel_id, pk):
+        idea = self.get_object()
+
+        serializer = self.get_serializer(data={})
+        serializer.is_valid(raise_exception=True)
+        serializer.save(
+            traveler=request.user,
+            idea=idea,
+        )
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED,
+        )
+
+    def delete(self, request, travel_id, pk):
+        idea = self.get_object()
+
+        idea.reactions.filter(
+            traveler=request.user,
+        ).delete()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)

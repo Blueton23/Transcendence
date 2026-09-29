@@ -2838,6 +2838,7 @@ class IdeaViewTest(APITestCase):
 
 class ReactionViewTest(APITestCase):
     def setUp(self):
+        # Traveler principale
         self.traveler = Traveler.objects.create_user(
             username="Jean",
             email="jean@exemple.com",
@@ -2863,4 +2864,323 @@ class ReactionViewTest(APITestCase):
             type=IdeaType.RESTAURANT,
         )
 
+        # Non-participant
+        self.outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        # Autre travel
+        self.other_travel = Travel.objects.create(
+            title="Road trip France",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+
+    # Tests réussi
     # ========================================================================#
+
+    # Test : un participant accepté peut réagir à une idée du voyage
+    def test_participant_can_create_reaction(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["traveler_id"], self.traveler.id)
+        self.assertEqual(response.data["idea_id"], self.idea.id)
+
+        reaction = Reaction.objects.get(id=response.data["id"])
+
+        self.assertEqual(reaction.traveler, self.traveler)
+        self.assertEqual(reaction.idea, self.idea)
+        self.assertIsNotNone(reaction.created_at)
+        self.assertEqual(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).count(),
+            1,
+        )
+
+    # Test : deux participants peuvent réagir à la même idée
+    def test_other_participant_can_react_ignoring_request_data(self):
+        first_reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        created_at = first_reaction.created_at
+
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        self.client.force_authenticate(user=other_traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "traveler_id": self.traveler.id,
+                "idea_id": other_idea.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["traveler_id"], other_traveler.id)
+        self.assertEqual(response.data["idea_id"], self.idea.id)
+
+        reaction = Reaction.objects.get(id=response.data["id"])
+
+        self.assertEqual(reaction.traveler, other_traveler)
+        self.assertEqual(reaction.idea, self.idea)
+        self.assertNotEqual(reaction.id, first_reaction.id)
+        self.assertEqual(
+            Reaction.objects.filter(idea=self.idea).count(),
+            2,
+        )
+        self.assertFalse(Reaction.objects.filter(idea=other_idea).exists())
+
+        first_reaction.refresh_from_db()
+        self.assertEqual(first_reaction.traveler, self.traveler)
+        self.assertEqual(first_reaction.idea, self.idea)
+        self.assertEqual(first_reaction.created_at, created_at)
+
+    # Test : un participant peut réagir à deux idées différentes
+    def test_participant_can_react_to_different_ideas(self):
+        first_reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        created_at = first_reaction.created_at
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": other_idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["traveler_id"], self.traveler.id)
+        self.assertEqual(response.data["idea_id"], other_idea.id)
+
+        reaction = Reaction.objects.get(id=response.data["id"])
+
+        self.assertEqual(reaction.traveler, self.traveler)
+        self.assertEqual(reaction.idea, other_idea)
+        self.assertNotEqual(reaction.id, first_reaction.id)
+        self.assertEqual(
+            Reaction.objects.filter(traveler=self.traveler).count(),
+            2,
+        )
+
+        first_reaction.refresh_from_db()
+        self.assertEqual(first_reaction.traveler, self.traveler)
+        self.assertEqual(first_reaction.idea, self.idea)
+        self.assertEqual(first_reaction.created_at, created_at)
+
+    # Tests échec : Réaction déjà existante
+    # ========================================================================#
+
+    # Test : un participant ne peut pas réagir deux fois à la même idée
+    def test_participant_cannot_create_duplicate_reaction(self):
+        reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        reaction_id = reaction.id
+        created_at = reaction.created_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("reaction", response.data["details"])
+
+        self.assertEqual(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).count(),
+            1,
+        )
+
+        reaction.refresh_from_db()
+        self.assertEqual(reaction.id, reaction_id)
+        self.assertEqual(reaction.created_at, created_at)
+
+    # Tests échec : Traveler non connecté
+    # ========================================================================#
+
+    # Test : un traveler non connecté ne peut pas créer de réaction
+    def test_create_reaction_forbidden_if_not_authenticated(self):
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Reaction.objects.exists())
+
+    # Tests échec : Traveler non-participant
+    # ========================================================================#
+
+    # Test : un non-participant ne peut pas créer de réaction
+    def test_non_participant_cannot_create_reaction(self):
+        self.client.force_authenticate(user=self.outsider)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Reaction.objects.exists())
+
+    # Tests échec : Participation non ACCEPTED
+    # ========================================================================#
+
+    # Test : une participation non ACCEPTED interdit la création d'une réaction
+    def test_create_reaction_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with (
+                self.subTest(participation_status=participation_status),
+                transaction.atomic(),
+            ):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.post(url)
+
+                self.assertEqual(response.status_code, 404)
+                self.assertFalse(Reaction.objects.exists())
+
+                transaction.set_rollback(True)
+
+    # Tests échec : Ressource ciblée
+    # ========================================================================#
+
+    # Test : une idée ne peut pas recevoir de réaction via un autre voyage
+    def test_cannot_create_reaction_with_wrong_travel(self):
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.other_travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Reaction.objects.exists())
+
+    # Test : une idée inexistante ne peut pas recevoir de réaction
+    def test_cannot_create_reaction_for_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Reaction.objects.exists())
