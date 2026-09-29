@@ -11,7 +11,6 @@ class TravelerAdmin(UserAdmin):
             "Traveler info",
             {
                 "fields": (
-                    "profile_picture_url",
                     "is_online",
                     "created_at",
                     "updated_at",

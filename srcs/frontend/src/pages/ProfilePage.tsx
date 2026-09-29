@@ -5,21 +5,31 @@ import Modify from "../features/profile/components/Modify";
 
 import Button from "../shared/ui/Button";
 import Modal from "../shared/ui/Modal";
+import { useAuth } from "@/features/auth/context/useAuth";
 
 function ProfilePage() {
   const [isModifyOpen, setIsModifyOpen] = useState(false);
+  const { currentUser } = useAuth();
 
   return (
-    <div className="max-w3xl mx-auto flex flex-col gap-6 p-8">
-      <ProfileInfo />
-      <Button
-        type="button"
-        variant="primary"
-        onClick={() => setIsModifyOpen(true)}
-      >
-        {" "}
-        Modifier le profil{" "}
-      </Button>
+    <div className="flex w-full flex-col gap-6 p-8">
+      <div className="flex w-full items-center justify-between">
+        <ProfileInfo />
+        {currentUser && (
+          <img
+            src={currentUser.profilePicture ?? undefined}
+            alt="Photo de profil"
+            className="square-full h-15 w-15 object-cover"
+          />
+        )}
+        <Button
+          type="button"
+          variant="primary"
+          onClick={() => setIsModifyOpen(true)}
+        >
+          Modifier le profil
+        </Button>
+      </div>
 
       {isModifyOpen && (
         <Modal
@@ -27,8 +37,7 @@ function ProfilePage() {
           title="Modifier le profil"
           onClose={() => setIsModifyOpen(false)}
         >
-          {" "}
-          <Modify onSuccess={() => setIsModifyOpen(false)} />{" "}
+          <Modify onSuccess={() => setIsModifyOpen(false)} />
         </Modal>
       )}
     </div>

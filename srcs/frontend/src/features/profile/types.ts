@@ -6,6 +6,7 @@ export interface SignupData {
   lastName: string;
   email: string;
   password: string;
+  passwordConfirmation: string;
 }
 
 export interface SignupResponse {
@@ -31,4 +32,8 @@ export interface ModifyPasswordData {
 
 export interface ModifyPasswordResponse {
   detail: string;
+}
+
+export interface ModifyProfilePictureResponse {
+  traveler: User;
 }
