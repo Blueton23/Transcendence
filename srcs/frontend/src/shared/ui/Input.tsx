@@ -35,16 +35,25 @@ function Input({
         className={`${baseStyle} ${variantStyle} ${icon ? "pl-10" : ""} ${inputClassName}`}
         {...rest}
       />
-      {icon && (
-        <button
-          type="button"
-          aria-label={iconLabel}
-          onClick={onIconClick}
-          className="absolute top-1/2 left-4 -translate-y-1/2 cursor-pointer"
-        >
-          {icon}
-        </button>
-      )}
+
+      {icon &&
+        (onIconClick ? (
+          <button
+            type="button"
+            aria-label={iconLabel}
+            onClick={onIconClick}
+            className="absolute top-1/2 left-4 -translate-y-1/2 cursor-pointer"
+          >
+            {icon}
+          </button>
+        ) : (
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2"
+          >
+            {icon}
+          </span>
+        ))}
     </div>
   );
 }
