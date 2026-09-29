@@ -7,7 +7,7 @@ from django.db import models
 
 from common.models import TimeStampedModel, ValidatedModel
 from idea.models import Idea
-from travel.models import Step, Travel
+from travel.models import Participation, ParticipationStatus, Step, Travel
 
 
 class SpendingCategory(models.TextChoices):
@@ -49,6 +49,7 @@ class Spending(TimeStampedModel, ValidatedModel):
         blank=True,
     )
     category = models.CharField(max_length=1, choices=SpendingCategory.choices)
+    label = models.CharField(max_length=100, blank=True, default="")
     amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -65,6 +66,17 @@ class Spending(TimeStampedModel, ValidatedModel):
     def clean(self) -> None:
         super().clean()
         errors: dict[str, str] = {}
+
+        if (
+            self.traveler_id
+            and self.travel_id
+            and not Participation.objects.filter(
+                travel_id=self.travel_id,
+                traveler_id=self.traveler_id,
+                status__in=[ParticipationStatus.ACCEPTED, ParticipationStatus.LEFT],
+            ).exists()
+        ):
+            errors["traveler"] = "The traveler must be a participant of the travel."
 
         if self.step_id and self.travel_id and self.step.travel_id != self.travel_id:
             errors["step"] = "The step must belong to the same travel as the spending."

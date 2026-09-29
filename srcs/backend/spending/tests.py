@@ -1,11 +1,12 @@
 import datetime
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from idea.models import Idea, IdeaType
 from spending.models import Spending, SpendingCategory
-from travel.models import Step, Travel
+from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
 
 
@@ -20,6 +21,11 @@ class SpendingModelTest(TestCase):
             title="Road trip",
             start_date=datetime.date(2026, 6, 1),
             end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
         )
         self.step = Step.objects.create(
             travel=self.travel,
@@ -150,3 +156,55 @@ class SpendingModelTest(TestCase):
         spending = self._make_spending(paid_date=datetime.date(2026, 6, 3))
         spending.refresh_from_db()
         self.assertEqual(spending.paid_date, datetime.date(2026, 6, 3))
+
+    def test_label_defaults_to_empty(self):
+        spending = self._make_spending()
+        self.assertEqual(spending.label, "")
+
+    def test_label_is_saved(self):
+        spending = self._make_spending(label="Hotel Ibis Lyon")
+        spending.refresh_from_db()
+        self.assertEqual(spending.label, "Hotel Ibis Lyon")
+
+    def test_label_too_long_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_spending(label="x" * 101)
+
+    def test_traveler_without_participation_is_rejected(self):
+        outsider = Traveler.objects.create_user(
+            username="bob",
+            email="bob@example.com",
+            password="password123",
+        )
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_spending(traveler=outsider)
+        self.assertIn("traveler", ctx.exception.message_dict)
+
+    def test_traveler_not_accepted_is_rejected(self):
+        for status in (ParticipationStatus.INVITED, ParticipationStatus.REFUSED):
+            with self.subTest(status=status):
+                Participation.objects.filter(traveler=self.traveler).update(
+                    status=status
+                )
+                with self.assertRaises(ValidationError) as ctx:
+                    self._make_spending()
+                self.assertIn("traveler", ctx.exception.message_dict)
+
+    def test_traveler_who_left_can_still_have_spendings(self):
+        spending = self._make_spending()
+        Participation.objects.filter(traveler=self.traveler).update(
+            status=ParticipationStatus.LEFT
+        )
+        spending.amount = "50.00"
+        spending.save()
+        spending.refresh_from_db()
+        self.assertEqual(spending.amount, Decimal("50.00"))
+
+    def test_traveler_participating_in_another_travel_is_rejected(self):
+        other_travel = Travel.objects.create(
+            title="Other trip",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 10),
+        )
+        with self.assertRaises(ValidationError):
+            self._make_spending(travel=other_travel)
