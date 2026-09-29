@@ -5,11 +5,18 @@ on:
     branches: [main]
     paths: ["srcs/backend/**"]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths: ["srcs/backend/**"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint-and-test:
+    if: github.event.pull_request.draft != true
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: srcs/backend
