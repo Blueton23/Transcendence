@@ -1,5 +1,7 @@
 # urls.py
 
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 
 from .views import (
@@ -11,6 +13,7 @@ from .views import (
     TravelerCreateView,
     TravelerPingView,
     TravelerUpdatePasswordView,
+    TravelerUpdateProfilePictureView,
     TravelerUpdateView,
 )
 
@@ -27,5 +30,15 @@ urlpatterns = [
         TravelerUpdatePasswordView.as_view(),
         name="traveler-update-password",
     ),
+    path(
+        "travelers/update-profile-picture/",
+        TravelerUpdateProfilePictureView.as_view(),
+        name="traveler-update-profile-picture",
+    ),
     path("travelers/update/", TravelerUpdateView.as_view(), name="traveler-update"),
 ]
+
+urlpatterns += static(
+    settings.MEDIA_URL,
+    document_root=settings.MEDIA_ROOT,
+)

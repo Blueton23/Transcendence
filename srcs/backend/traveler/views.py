@@ -21,6 +21,7 @@ from .serializers import (
     TravelerCreateSerializer,
     TravelerSerializer,
     TravelerUpdatePasswordSerializer,
+    TravelerUpdateProfilePictureSerializer,
     TravelerUpdateSerializer,
 )
 
@@ -69,7 +70,10 @@ class TravelerCreateView(APIView):
 
         return Response(
             {
-                "traveler": TravelerSerializer(traveler).data,
+                "traveler": TravelerSerializer(
+                    traveler,
+                    context={"request": request},
+                ).data,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -92,7 +96,36 @@ class TravelerUpdateView(APIView):
 
         return Response(
             {
-                "traveler": TravelerUpdateSerializer(traveler).data,
+                "traveler": TravelerUpdateSerializer(
+                    traveler,
+                    context={"request": request},
+                ).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class TravelerUpdateProfilePictureView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request: Request) -> Response:
+        traveler = request.user
+
+        serializer = TravelerUpdateProfilePictureSerializer(
+            traveler,
+            data=request.data,
+            partial=True,
+        )
+        serializer.is_valid(raise_exception=True)
+
+        traveler = serializer.save()
+
+        return Response(
+            {
+                "traveler": TravelerSerializer(
+                    traveler,
+                    context={"request": request},
+                ).data,
             },
             status=status.HTTP_200_OK,
         )
@@ -151,7 +184,10 @@ class LoginView(APIView):
 
         return Response(
             {
-                "traveler": TravelerSerializer(traveler).data,
+                "traveler": TravelerSerializer(
+                    traveler,
+                    context={"request": request},
+                ).data,
             },
             status=status.HTTP_200_OK,
         )
@@ -163,7 +199,10 @@ class MeView(APIView):
     def get(self, request: Request) -> Response:
         return Response(
             {
-                "traveler": TravelerSerializer(request.user).data,
+                "traveler": TravelerSerializer(
+                    request.user,
+                    context={"request": request},
+                ).data,
             },
             status=status.HTTP_200_OK,
         )
