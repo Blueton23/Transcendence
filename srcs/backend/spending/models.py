@@ -4,6 +4,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from common.models import TimeStampedModel, ValidatedModel
 from idea.models import Idea
@@ -17,6 +18,15 @@ class SpendingCategory(models.TextChoices):
     MEALS = "m", "Meals"
     TOLLS = "t", "Tolls"
     OTHER = "o", "Other"
+
+
+# LEFT compte comme membre : un ex-participant garde ses depenses et ses parts.
+def is_travel_member(travel_id: int, traveler_id: int) -> bool:
+    return Participation.objects.filter(
+        travel_id=travel_id,
+        traveler_id=traveler_id,
+        status__in=[ParticipationStatus.ACCEPTED, ParticipationStatus.LEFT],
+    ).exists()
 
 
 class Spending(TimeStampedModel, ValidatedModel):
@@ -70,11 +80,7 @@ class Spending(TimeStampedModel, ValidatedModel):
         if (
             self.traveler_id
             and self.travel_id
-            and not Participation.objects.filter(
-                travel_id=self.travel_id,
-                traveler_id=self.traveler_id,
-                status__in=[ParticipationStatus.ACCEPTED, ParticipationStatus.LEFT],
-            ).exists()
+            and not is_travel_member(self.travel_id, self.traveler_id)
         ):
             errors["traveler"] = "The traveler must be a participant of the travel."
 
@@ -93,3 +99,48 @@ class Spending(TimeStampedModel, ValidatedModel):
 
         if errors:
             raise ValidationError(errors)
+
+
+# Part d'une depense due par un voyageur. Figee a la creation : si quelqu'un
+# quitte le voyage, il reste redevable des depenses faites avant son depart.
+# La somme des parts == spending.amount est verifiee par le service de
+# creation (plusieurs lignes, donc hors de clean()).
+class SpendingShare(TimeStampedModel, ValidatedModel):
+    spending = models.ForeignKey(
+        Spending,
+        on_delete=models.CASCADE,
+        related_name="shares",
+    )
+    traveler = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.PROTECT,
+        related_name="spending_shares",
+        help_text="Who owes this part.",
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+    )
+
+    class Meta:
+        ordering: ClassVar[list] = ["created_at"]
+        constraints: ClassVar[list] = [
+            UniqueConstraint(
+                fields=["spending", "traveler"], name="unique_share_per_traveler"
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.traveler} owes {self.amount} ({self.spending})"
+
+    def clean(self) -> None:
+        super().clean()
+        if (
+            self.spending_id
+            and self.traveler_id
+            and not is_travel_member(self.spending.travel_id, self.traveler_id)
+        ):
+            raise ValidationError(
+                {"traveler": "The traveler must be a participant of the travel."}
+            )

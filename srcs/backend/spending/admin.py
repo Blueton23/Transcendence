@@ -1,9 +1,16 @@
 from django.contrib import admin
 
-from .models import Spending
+from .models import Spending, SpendingShare
+
+
+class SpendingShareInline(admin.TabularInline):
+    model = SpendingShare
+    extra = 0
+    fields = ("traveler", "amount")
 
 
 class SpendingAdmin(admin.ModelAdmin):
+    inlines = (SpendingShareInline,)
     list_display = (
         "category",
         "amount",

@@ -2,10 +2,12 @@ import datetime
 from decimal import Decimal
 
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
+from django.db.models import ProtectedError
 from django.test import TestCase
 
 from idea.models import Idea, IdeaType
-from spending.models import Spending, SpendingCategory
+from spending.models import Spending, SpendingCategory, SpendingShare
 from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
 
@@ -208,3 +210,101 @@ class SpendingModelTest(TestCase):
         )
         with self.assertRaises(ValidationError):
             self._make_spending(travel=other_travel)
+
+
+class SpendingShareModelTest(TestCase):
+    def setUp(self):
+        self.alice = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.bob = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        for traveler in (self.alice, self.bob):
+            Participation.objects.create(
+                traveler=traveler,
+                travel=self.travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        self.spending = Spending.objects.create(
+            travel=self.travel,
+            traveler=self.alice,
+            category=SpendingCategory.FUEL,
+            amount="30.00",
+        )
+
+    def _make_share(self, **overrides):
+        data = {"spending": self.spending, "traveler": self.bob, "amount": "15.00"}
+        data.update(overrides)
+        return SpendingShare.objects.create(**data)
+
+    def test_create_share(self):
+        share = self._make_share()
+        self.assertEqual(share.amount, Decimal("15.00"))
+        self.assertIn(share, self.spending.shares.all())
+        self.assertIn(share, self.bob.spending_shares.all())
+
+    def test_payer_can_have_a_share(self):
+        share = self._make_share(traveler=self.alice)
+        self.assertEqual(share.traveler, self.alice)
+
+    def test_duplicate_share_is_rejected(self):
+        self._make_share()
+        with self.assertRaises(ValidationError):
+            self._make_share()
+
+    def test_duplicate_share_is_rejected_at_db_level(self):
+        self._make_share()
+        duplicate = SpendingShare(
+            spending=self.spending, traveler=self.bob, amount="1.00"
+        )
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            SpendingShare.objects.bulk_create([duplicate])
+
+    def test_negative_amount_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_share(amount="-1.00")
+
+    def test_non_member_is_rejected(self):
+        outsider = Traveler.objects.create_user(
+            username="carol", email="carol@example.com", password="password123"
+        )
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_share(traveler=outsider)
+        self.assertIn("traveler", ctx.exception.message_dict)
+
+    def test_invited_traveler_is_rejected(self):
+        Participation.objects.filter(traveler=self.bob).update(
+            status=ParticipationStatus.INVITED
+        )
+        with self.assertRaises(ValidationError):
+            self._make_share()
+
+    def test_share_survives_traveler_leaving(self):
+        share = self._make_share()
+        Participation.objects.filter(traveler=self.bob).update(
+            status=ParticipationStatus.LEFT
+        )
+        share.amount = "10.00"
+        share.save()
+        share.refresh_from_db()
+        self.assertEqual(share.amount, Decimal("10.00"))
+
+    def test_spending_deletion_cascades(self):
+        self._make_share()
+        self.spending.delete()
+        self.assertFalse(SpendingShare.objects.exists())
+
+    def test_traveler_with_shares_cannot_be_deleted(self):
+        self._make_share()
+        with self.assertRaises(ProtectedError):
+            self.bob.delete()
+
+    def test_str(self):
+        share = self._make_share()
+        self.assertEqual(str(share), "bob owes 15.00 (Fuel - 30.00 (Road trip))")

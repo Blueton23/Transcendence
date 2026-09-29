@@ -2,7 +2,7 @@ from faker import Faker
 
 from idea.models import IdeaType
 from spending.models import Spending, SpendingCategory
-from travel.models import ParticipationStatus
+from travel.models import Participation, ParticipationStatus
 
 # Une depense liee a une idee prend la categorie qui lui correspond.
 IDEA_TYPE_TO_CATEGORY = {
@@ -18,13 +18,22 @@ def seed_spendings(
 ) -> list:
     spendings = []
     for travel in travels:
-        # Le payeur est de preference un participant du voyage.
+        # Le payeur doit etre un participant du voyage : si aucun n'a accepte,
+        # on en fait accepter un pour pouvoir seeder des depenses.
         payers = [
             p.traveler
             for p in travel.participations.filter(
                 status=ParticipationStatus.ACCEPTED
             ).select_related("traveler")
-        ] or travelers
+        ]
+        if not payers:
+            payer = fake.random_element(elements=travelers)
+            Participation.objects.update_or_create(
+                traveler=payer,
+                travel=travel,
+                defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
+            )
+            payers = [payer]
         steps = list(travel.steps.all())
         ideas = list(travel.ideas.all())
 
