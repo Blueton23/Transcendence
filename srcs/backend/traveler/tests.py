@@ -1,14 +1,14 @@
-from django.db import IntegrityError, transaction
-from django.test import TestCase
+from io import BytesIO
+
 from django.contrib.auth import SESSION_KEY
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import IntegrityError, transaction
+from django.test import TestCase
 from django.urls import reverse
-
-from traveler.models import Friendship, Status, Traveler
-from io import BytesIO
 from PIL import Image
 from rest_framework.test import APITestCase
 
+from traveler.models import Friendship, Status, Traveler
 from traveler.serializers import (
     TravelerCreateSerializer,
     TravelerSerializer,
