@@ -6,7 +6,7 @@ import { toApiDateString } from "@/features/step/utils/stepDates";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
 import type { Place } from "@/features/map/types";
-import { searchPlace } from "@/features/map/api/photonApi";
+import { searchPlace } from "@/features/map/api/mapboxApi";
 import { usePlaceSuggestions } from "@/features/map/hooks/usePlaceSuggestions";
 
 type OpenPanel = "place" | "calendar" | null;

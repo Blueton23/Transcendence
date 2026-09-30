@@ -1,4 +1,4 @@
-import { searchPlace } from "@/features/map/api/photonApi";
+import { searchPlace } from "@/features/map/api/mapboxApi";
 import type { Place } from "@/features/map/types";
 import { useEffect, useState } from "react";
 
