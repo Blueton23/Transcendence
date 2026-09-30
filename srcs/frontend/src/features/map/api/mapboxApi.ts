@@ -2,7 +2,11 @@ import type { Place } from "@/features/map/types";
 
 interface MapboxFeature {
   geometry: { coordinates: [number, number] };
-  properties: { full_address: string };
+  properties: {
+    name: string;
+    full_address: string;
+    context?: { country?: { name?: string } };
+  };
 }
 
 interface MapboxResponse {
@@ -29,7 +33,13 @@ export async function searchPlace(query: string): Promise<Place[]> {
   const data: MapboxResponse = await response.json();
 
   return data.features.map((feature) => ({
-    localisation: feature.properties.full_address,
+    label: feature.properties.full_address,
+    localisation: [
+      feature.properties.name,
+      feature.properties.context?.country?.name,
+    ]
+      .filter(Boolean)
+      .join(", "),
     longitude: round6(feature.geometry.coordinates[0]),
     latitude: round6(feature.geometry.coordinates[1]),
   }));
