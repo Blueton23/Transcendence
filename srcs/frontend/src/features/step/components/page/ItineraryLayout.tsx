@@ -6,12 +6,14 @@ interface ItineraryLayoutProps {
   mobileView: "list" | "map";
   children: ReactNode;
   steps: Step[];
+  detailStep: Step | null;
 }
 
 export function ItineraryLayout({
   mobileView,
   children,
   steps,
+  detailStep,
 }: ItineraryLayoutProps) {
   return (
     <div className="flex flex-1 flex-col md:grid md:min-h-0 md:flex-1 md:grid-cols-2 md:gap-2">
@@ -23,7 +25,7 @@ export function ItineraryLayout({
       <div
         className={`md:block ${mobileView === "map" ? "flex flex-1 flex-col" : "hidden"}`}
       >
-        <ItineraryMap steps={steps} />
+        <ItineraryMap steps={steps} detailStep={detailStep} />
       </div>
     </div>
   );

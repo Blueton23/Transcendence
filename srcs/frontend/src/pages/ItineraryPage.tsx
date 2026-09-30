@@ -62,7 +62,11 @@ function ItineraryPage() {
           isDetailView={detailView !== null}
         />
       </StickyHeader>
-      <ItineraryLayout mobileView={mobileView} steps={steps}>
+      <ItineraryLayout
+        mobileView={mobileView}
+        steps={steps}
+        detailStep={detailView}
+      >
         {detailView ? (
           <StepDetail
             step={detailView}
