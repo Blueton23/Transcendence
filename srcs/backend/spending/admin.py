@@ -28,3 +28,20 @@ class SpendingAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Spending, SpendingAdmin)
+
+
+class SpendingShareAdmin(admin.ModelAdmin):
+    list_display = ("traveler", "amount", "spending", "travel")
+    # Le __str__ de spending affiche son travel : on evite le N+1.
+    list_select_related = ("traveler", "spending__travel")
+    list_filter = ("spending__travel",)
+    search_fields = ("traveler__username", "spending__travel__title")
+    autocomplete_fields = ("spending",)
+    readonly_fields = ("created_at", "updated_at")
+
+    @admin.display(ordering="spending__travel")
+    def travel(self, obj: SpendingShare) -> str:
+        return str(obj.spending.travel)
+
+
+admin.site.register(SpendingShare, SpendingShareAdmin)

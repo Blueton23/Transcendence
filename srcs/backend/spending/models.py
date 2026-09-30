@@ -103,8 +103,6 @@ class Spending(TimeStampedModel, ValidatedModel):
 
 # Part d'une depense due par un voyageur. Figee a la creation : si quelqu'un
 # quitte le voyage, il reste redevable des depenses faites avant son depart.
-# La somme des parts == spending.amount est verifiee par le service de
-# creation (plusieurs lignes, donc hors de clean()).
 class SpendingShare(TimeStampedModel, ValidatedModel):
     spending = models.ForeignKey(
         Spending,
