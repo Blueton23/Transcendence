@@ -1,22 +1,47 @@
-import Map, { Marker } from "react-map-gl/maplibre";
-import "maplibre-gl/dist/maplibre-gl.css";
-import { setWorkerUrl } from "maplibre-gl";
-import workerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url";
+import Map, { Marker, type MapRef } from "react-map-gl/mapbox";
+import "mapbox-gl/dist/mapbox-gl.css";
+import mapboxgl from "mapbox-gl";
+import MapboxWorker from "mapbox-gl/dist/mapbox-gl-csp-worker?worker";
+import { getStepsBounds } from "@/features/map/utils/getBounds";
 import type { Step } from "@/features/step/types";
+import { useEffect, useRef } from "react";
 
-setWorkerUrl(workerUrl);
+mapboxgl.workerClass = MapboxWorker;
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export function ItineraryMap({ steps }: { steps: Step[] }) {
+  const bounds = getStepsBounds(steps);
+  const mapRef = useRef<MapRef>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver(() => mapRef.current?.resize());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <div className="flex-1 overflow-hidden rounded-lg border border-surface md:h-full">
+    <div
+      ref={containerRef}
+      className="flex-1 overflow-hidden rounded-lg border border-surface md:h-full"
+    >
       <Map
-        initialViewState={{
-          longitude: 6.63,
-          latitude: 46.52,
-          zoom: 11,
-        }}
+        language="fr"
+        ref={mapRef}
+        projection={"mercator"}
+        initialViewState={
+          bounds
+            ? {
+                bounds: [bounds.min, bounds.max],
+                fitBoundsOptions: { padding: 100 },
+              }
+            : { longitude: 6.63, latitude: 46.52, zoom: 11 }
+        }
+
         style={{ clipPath: "inset(0 round 20px)" }}
-        mapStyle="https://tiles.openfreemap.org/styles/bright"
+        mapStyle="mapbox://styles/mapbox/streets-v12"
       >
         {steps.map((step) => (
           <Marker
