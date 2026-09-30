@@ -1720,6 +1720,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -1900,6 +1901,7 @@ class IdeaViewTest(APITestCase):
             response = self.client.patch(
                 url,
                 {
+                    "title": "Hôtel du lac",
                     "type": IdeaType.LODGING,
                 },
             )
@@ -1909,6 +1911,7 @@ class IdeaViewTest(APITestCase):
 
             self.idea.refresh_from_db()
             self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+            self.assertEqual(self.idea.title, "Restaurant japonais")
 
             transaction.set_rollback(True)
 
@@ -1916,7 +1919,7 @@ class IdeaViewTest(APITestCase):
             response = self.client.put(
                 url,
                 {
-                    "title": "Restaurant japonais",
+                    "title": "Hôtel du lac",
                     "type": IdeaType.LODGING,
                 },
             )
@@ -1926,6 +1929,7 @@ class IdeaViewTest(APITestCase):
 
             self.idea.refresh_from_db()
             self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+            self.assertEqual(self.idea.title, "Restaurant japonais")
 
             transaction.set_rollback(True)
 
@@ -2351,6 +2355,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2394,6 +2399,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2443,6 +2449,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2483,6 +2490,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2551,6 +2559,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2616,6 +2625,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2654,6 +2664,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2700,6 +2711,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2759,6 +2771,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2859,6 +2872,7 @@ class IdeaViewTest(APITestCase):
     # Test : un hébergement encore dans le pool ne peut pas être choisi
     def test_cannot_choose_lodging_still_in_pool(self):
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
         self.idea.save()
@@ -2893,6 +2907,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
         self.idea.step = step
         self.idea.start_date = datetime.date(2026, 6, 4)
         self.idea.end_date = datetime.date(2026, 6, 5)
@@ -2986,13 +3001,14 @@ class IdeaViewTest(APITestCase):
 
 class ReactionViewTest(APITestCase):
     def setUp(self):
-        # Traveler principale
+        # Participant principal
         self.traveler = Traveler.objects.create_user(
             username="Jean",
             email="jean@exemple.com",
             password="password123",
         )
 
+        # Voyage principal
         self.travel = Travel.objects.create(
             title="Road trip Suisse",
             start_date=datetime.date(2026, 6, 2),
@@ -3005,6 +3021,7 @@ class ReactionViewTest(APITestCase):
             status=ParticipationStatus.ACCEPTED,
         )
 
+        # Idée proposée par Jean
         self.idea = Idea.objects.create(
             traveler=self.traveler,
             travel=self.travel,
@@ -3012,18 +3029,17 @@ class ReactionViewTest(APITestCase):
             type=IdeaType.RESTAURANT,
         )
 
-        # Non-participant
-        self.outsider = Traveler.objects.create_user(
-            username="Pierre",
-            email="pierre@exemple.com",
+        # Autre participant, au même voyage
+        self.other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
             password="password123",
         )
 
-        # Autre travel
-        self.other_travel = Travel.objects.create(
-            title="Road trip France",
-            start_date=datetime.date(2026, 7, 2),
-            end_date=datetime.date(2026, 7, 10),
+        Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
         )
 
     # Tests réussi
@@ -3068,18 +3084,6 @@ class ReactionViewTest(APITestCase):
         )
         created_at = first_reaction.created_at
 
-        other_traveler = Traveler.objects.create_user(
-            username="Paul",
-            email="paul@exemple.com",
-            password="password123",
-        )
-
-        Participation.objects.create(
-            traveler=other_traveler,
-            travel=self.travel,
-            status=ParticipationStatus.ACCEPTED,
-        )
-
         other_idea = Idea.objects.create(
             traveler=self.traveler,
             travel=self.travel,
@@ -3087,7 +3091,7 @@ class ReactionViewTest(APITestCase):
             type=IdeaType.ACTIVITY,
         )
 
-        self.client.force_authenticate(user=other_traveler)
+        self.client.force_authenticate(user=self.other_traveler)
 
         response = self.client.post(
             reverse(
@@ -3105,12 +3109,12 @@ class ReactionViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data["traveler_id"], other_traveler.id)
+        self.assertEqual(response.data["traveler_id"], self.other_traveler.id)
         self.assertEqual(response.data["idea_id"], self.idea.id)
 
         reaction = Reaction.objects.get(id=response.data["id"])
 
-        self.assertEqual(reaction.traveler, other_traveler)
+        self.assertEqual(reaction.traveler, self.other_traveler)
         self.assertEqual(reaction.idea, self.idea)
         self.assertNotEqual(reaction.id, first_reaction.id)
         self.assertEqual(
@@ -3177,20 +3181,8 @@ class ReactionViewTest(APITestCase):
             idea=self.idea,
         )
 
-        other_traveler = Traveler.objects.create_user(
-            username="Paul",
-            email="paul@exemple.com",
-            password="password123",
-        )
-
-        Participation.objects.create(
-            traveler=other_traveler,
-            travel=self.travel,
-            status=ParticipationStatus.ACCEPTED,
-        )
-
         other_participant_reaction = Reaction.objects.create(
-            traveler=other_traveler,
+            traveler=self.other_traveler,
             idea=self.idea,
         )
 
@@ -3233,20 +3225,8 @@ class ReactionViewTest(APITestCase):
             idea=self.idea,
         )
 
-        other_traveler = Traveler.objects.create_user(
-            username="Paul",
-            email="paul@exemple.com",
-            password="password123",
-        )
-
-        Participation.objects.create(
-            traveler=other_traveler,
-            travel=self.travel,
-            status=ParticipationStatus.ACCEPTED,
-        )
-
         other_reaction = Reaction.objects.create(
-            traveler=other_traveler,
+            traveler=self.other_traveler,
             idea=self.idea,
         )
 
@@ -3362,7 +3342,13 @@ class ReactionViewTest(APITestCase):
 
     # Test : un non-participant ne peut ni créer ni retirer une réaction
     def test_non_participant_cannot_create_or_delete_reaction(self):
-        self.client.force_authenticate(user=self.outsider)
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
 
         url = reverse(
             "idea-reaction",
@@ -3382,7 +3368,7 @@ class ReactionViewTest(APITestCase):
 
         with self.subTest(method="DELETE"), transaction.atomic():
             reaction = Reaction.objects.create(
-                traveler=self.outsider,
+                traveler=outsider,
                 idea=self.idea,
             )
 
@@ -3448,9 +3434,15 @@ class ReactionViewTest(APITestCase):
 
     # Test : une réaction ne peut ni être créée ni retirée via un autre voyage
     def test_cannot_create_or_delete_reaction_with_wrong_travel(self):
+        other_travel = Travel.objects.create(
+            title="Road trip France",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+
         Participation.objects.create(
             traveler=self.traveler,
-            travel=self.other_travel,
+            travel=other_travel,
             status=ParticipationStatus.ACCEPTED,
         )
 
@@ -3459,7 +3451,7 @@ class ReactionViewTest(APITestCase):
         url = reverse(
             "idea-reaction",
             kwargs={
-                "travel_id": self.other_travel.id,
+                "travel_id": other_travel.id,
                 "pk": self.idea.id,
             },
         )
