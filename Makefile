@@ -100,6 +100,9 @@ check:
 test:
 	$(COMPOSE) exec backend python manage.py test $(ARGS)
 
+test2:
+	docker compose exec backend python manage.py test $(filter-out $@,$(MAKECMDGOALS))
+
 format-back:
 	$(COMPOSE) exec backend ruff format .
 
