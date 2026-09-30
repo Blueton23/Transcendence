@@ -4,7 +4,7 @@ import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
 import { formatDateRange } from "@/features/step/utils/stepDates";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
-import { UseStepForm } from "@/features/step/hooks/useStepForm";
+import { useStepForm } from "@/features/step/hooks/useStepForm";
 
 interface AddStepFromProps {
   steps: Step[];
@@ -13,7 +13,7 @@ interface AddStepFromProps {
 }
 
 export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
-  const form = UseStepForm({ travel, onSuccess: refetch });
+  const form = useStepForm({ travel, onSuccess: refetch });
 
   return (
     <div className="relative">

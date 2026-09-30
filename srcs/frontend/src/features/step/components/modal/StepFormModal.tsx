@@ -8,7 +8,7 @@ import type { Travel } from "@/features/travel/types";
 import { PlaceSuggestions } from "@/features/step/components/add-step/PlaceSuggestions";
 import { formatDateRange } from "@/features/step/utils/stepDates";
 import { StepDateField } from "@/features/step/components/modal/StepDateField";
-import { UseStepForm } from "@/features/step/hooks/useStepForm";
+import { useStepForm } from "@/features/step/hooks/useStepForm";
 
 export interface StepFormModalProps {
   step?: Step;
@@ -25,7 +25,7 @@ export function StepFormModal({
   onClose,
   refetch,
 }: StepFormModalProps) {
-  const form = UseStepForm({
+  const form = useStepForm({
     step,
     travel,
     onSuccess: () => {

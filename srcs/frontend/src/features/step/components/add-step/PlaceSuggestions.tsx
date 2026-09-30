@@ -33,7 +33,7 @@ export function PlaceSuggestions({
             }}
           >
             <Icon name="search" size={18} />
-            {place.localisation}
+            {place.label}
           </button>
         ))
       ) : (

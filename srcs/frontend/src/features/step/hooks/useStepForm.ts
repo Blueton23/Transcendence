@@ -26,7 +26,7 @@ function placeFromStep(step?: Step): Place | null {
   };
 }
 
-export function UseStepForm({ step, travel, onSuccess }: UseStepFormProps) {
+export function useStepForm({ step, travel, onSuccess }: UseStepFormProps) {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [query, setQuery] = useState("");
   const [place, setPlace] = useState<Place | null>(placeFromStep(step));
@@ -48,7 +48,9 @@ export function UseStepForm({ step, travel, onSuccess }: UseStepFormProps) {
       throw new Error("Lieu introuvable, choisis-en un dans la liste.");
 
     const data = {
-      ...chosen,
+      localisation: chosen.localisation,
+      latitude: chosen.latitude,
+      longitude: chosen.longitude,
       startDate: toApiDateString(selected.from),
       endDate: toApiDateString(selected.to),
     };
