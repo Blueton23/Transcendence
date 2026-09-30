@@ -3022,6 +3022,119 @@ class ReactionViewTest(APITestCase):
         self.assertEqual(first_reaction.idea, self.idea)
         self.assertEqual(first_reaction.created_at, created_at)
 
+    # Test : un participant retire uniquement sa réaction sur l'idée ciblée
+    def test_participant_can_delete_only_own_reaction_on_target_idea(self):
+        reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        other_participant_reaction = Reaction.objects.create(
+            traveler=other_traveler,
+            idea=self.idea,
+        )
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        other_idea_reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=other_idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.delete(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(Reaction.objects.filter(id=reaction.id).exists())
+        self.assertTrue(
+            Reaction.objects.filter(id=other_participant_reaction.id).exists()
+        )
+        self.assertTrue(Reaction.objects.filter(id=other_idea_reaction.id).exists())
+
+    # Test : un retrait répété réussit sans supprimer la réaction d'un autre
+    def test_repeated_reaction_delete_preserves_other_participant_reaction(self):
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        other_reaction = Reaction.objects.create(
+            traveler=other_traveler,
+            idea=self.idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).exists()
+        )
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).exists()
+        )
+        self.assertTrue(Reaction.objects.filter(id=other_reaction.id).exists())
+
     # Tests échec : Réaction déjà existante
     # ========================================================================#
 
@@ -3065,46 +3178,78 @@ class ReactionViewTest(APITestCase):
     # Tests échec : Traveler non connecté
     # ========================================================================#
 
-    # Test : un traveler non connecté ne peut pas créer de réaction
-    def test_create_reaction_forbidden_if_not_authenticated(self):
-        response = self.client.post(
-            reverse(
-                "idea-reaction",
-                kwargs={
-                    "travel_id": self.travel.id,
-                    "pk": self.idea.id,
-                },
-            )
+    # Test : un traveler non connecté ne peut ni créer ni retirer une réaction
+    def test_reaction_forbidden_if_not_authenticated(self):
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
         )
 
-        self.assertEqual(response.status_code, 403)
-        self.assertFalse(Reaction.objects.exists())
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            reaction = Reaction.objects.create(
+                traveler=self.traveler,
+                idea=self.idea,
+            )
+
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+            transaction.set_rollback(True)
 
     # Tests échec : Traveler non-participant
     # ========================================================================#
 
-    # Test : un non-participant ne peut pas créer de réaction
-    def test_non_participant_cannot_create_reaction(self):
+    # Test : un non-participant ne peut ni créer ni retirer une réaction
+    def test_non_participant_cannot_create_or_delete_reaction(self):
         self.client.force_authenticate(user=self.outsider)
 
-        response = self.client.post(
-            reverse(
-                "idea-reaction",
-                kwargs={
-                    "travel_id": self.travel.id,
-                    "pk": self.idea.id,
-                },
-            )
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
         )
 
-        self.assertEqual(response.status_code, 404)
-        self.assertFalse(Reaction.objects.exists())
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            reaction = Reaction.objects.create(
+                traveler=self.outsider,
+                idea=self.idea,
+            )
+
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+            transaction.set_rollback(True)
 
     # Tests échec : Participation non ACCEPTED
     # ========================================================================#
 
-    # Test : une participation non ACCEPTED interdit la création d'une réaction
-    def test_create_reaction_forbidden_if_participation_not_accepted(self):
+    # Test : une participation non ACCEPTED interdit la création et le retrait
+    def test_reaction_forbidden_if_participation_not_accepted(self):
         self.client.force_authenticate(user=self.traveler)
 
         participation = Participation.objects.get(
@@ -3125,25 +3270,36 @@ class ReactionViewTest(APITestCase):
             ParticipationStatus.REFUSED,
             ParticipationStatus.LEFT,
         ):
-            with (
-                self.subTest(participation_status=participation_status),
-                transaction.atomic(),
-            ):
+            with self.subTest(participation_status=participation_status):
                 participation.status = participation_status
                 participation.save(update_fields=["status"])
 
-                response = self.client.post(url)
+                with self.subTest(method="POST"), transaction.atomic():
+                    response = self.client.post(url)
 
-                self.assertEqual(response.status_code, 404)
-                self.assertFalse(Reaction.objects.exists())
+                    self.assertEqual(response.status_code, 404)
+                    self.assertFalse(Reaction.objects.exists())
 
-                transaction.set_rollback(True)
+                    transaction.set_rollback(True)
+
+                with self.subTest(method="DELETE"), transaction.atomic():
+                    reaction = Reaction.objects.create(
+                        traveler=self.traveler,
+                        idea=self.idea,
+                    )
+
+                    response = self.client.delete(url)
+
+                    self.assertEqual(response.status_code, 404)
+                    self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+                    transaction.set_rollback(True)
 
     # Tests échec : Ressource ciblée
     # ========================================================================#
 
-    # Test : une idée ne peut pas recevoir de réaction via un autre voyage
-    def test_cannot_create_reaction_with_wrong_travel(self):
+    # Test : une réaction ne peut ni être créée ni retirée via un autre voyage
+    def test_cannot_create_or_delete_reaction_with_wrong_travel(self):
         Participation.objects.create(
             traveler=self.traveler,
             travel=self.other_travel,
@@ -3152,35 +3308,62 @@ class ReactionViewTest(APITestCase):
 
         self.client.force_authenticate(user=self.traveler)
 
-        response = self.client.post(
-            reverse(
-                "idea-reaction",
-                kwargs={
-                    "travel_id": self.other_travel.id,
-                    "pk": self.idea.id,
-                },
-            )
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.other_travel.id,
+                "pk": self.idea.id,
+            },
         )
 
-        self.assertEqual(response.status_code, 404)
-        self.assertFalse(Reaction.objects.exists())
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
 
-    # Test : une idée inexistante ne peut pas recevoir de réaction
-    def test_cannot_create_reaction_for_nonexistent_idea(self):
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            reaction = Reaction.objects.create(
+                traveler=self.traveler,
+                idea=self.idea,
+            )
+
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+            transaction.set_rollback(True)
+
+    # Test : une idée inexistante interdit la création et le retrait d'une réaction
+    def test_cannot_create_or_delete_reaction_for_nonexistent_idea(self):
         self.client.force_authenticate(user=self.traveler)
 
         idea_id = self.idea.id
         self.idea.delete()
 
-        response = self.client.post(
-            reverse(
-                "idea-reaction",
-                kwargs={
-                    "travel_id": self.travel.id,
-                    "pk": idea_id,
-                },
-            )
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": idea_id,
+            },
         )
 
-        self.assertEqual(response.status_code, 404)
-        self.assertFalse(Reaction.objects.exists())
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
