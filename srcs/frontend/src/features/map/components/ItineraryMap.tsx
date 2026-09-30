@@ -1,12 +1,10 @@
 import Map, { Marker, type MapRef } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
-import MapboxWorker from "mapbox-gl/dist/mapbox-gl-csp-worker?worker";
 import { getStepsBounds } from "@/features/map/utils/getBounds";
 import type { Step } from "@/features/step/types";
 import { useEffect, useRef } from "react";
 
-mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export function ItineraryMap({ steps }: { steps: Step[] }) {
