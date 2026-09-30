@@ -3,7 +3,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import mapboxgl from "mapbox-gl";
 import { getStepsBounds } from "@/features/map/utils/getBounds";
 import type { Step } from "@/features/step/types";
-import { useEffect, useRef } from "react";
+import { useMapResize } from "@/features/map/hooks/useMapResize";
+import { useRef } from "react";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -12,13 +13,7 @@ export function ItineraryMap({ steps }: { steps: Step[] }) {
   const mapRef = useRef<MapRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-    const observer = new ResizeObserver(() => mapRef.current?.resize());
-    observer.observe(container);
-    return () => observer.disconnect();
-  }, []);
+  useMapResize(containerRef, mapRef);
 
   return (
     <div
