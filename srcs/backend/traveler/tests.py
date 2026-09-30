@@ -236,6 +236,16 @@ class TravelerSerializerTest(TestCase):
 
         self.assertEqual(set(data.keys()), expected_keys)
 
+    def test_serialized_data_matches_traveler(self):
+        data = TravelerSerializer(self.traveler).data
+
+        self.assertEqual(data["id"], self.traveler.id)
+        self.assertEqual(data["username"], self.traveler.username)
+        self.assertEqual(data["first_name"], self.traveler.first_name)
+        self.assertEqual(data["last_name"], self.traveler.last_name)
+        self.assertEqual(data["email"], self.traveler.email)
+        self.assertEqual(data["is_online"], self.traveler.is_online)
+
     def test_profile_picture_is_none_when_not_set(self):
         data = TravelerSerializer(self.traveler).data
 
@@ -553,6 +563,28 @@ class TravelerApiTest(APITestCase):
         self.assertEqual(traveler.email, "bob@example.com")
         self.assertTrue(traveler.check_password("StrongPassword123!"))
         self.assertEqual(response.data["traveler"]["username"], "bob")
+
+    def test_create_traveler_stores_hashed_password(self):
+        password = "StrongPassword123!"
+
+        response = self.client.post(
+            reverse("traveler-create"),
+            {
+                "username": "hashed_api_user",
+                "first_name": "Hashed",
+                "last_name": "User",
+                "email": "hashed_api@example.com",
+                "password": password,
+                "password_confirmation": password,
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        traveler = Traveler.objects.get(username="hashed_api_user")
+
+        self.assertNotEqual(traveler.password, password)
+        self.assertTrue(traveler.check_password(password))
 
     def test_create_traveler_does_not_return_password(self):
         response = self.client.post(
