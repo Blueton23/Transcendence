@@ -1,7 +1,8 @@
 from faker import Faker
 
 from idea.models import IdeaType
-from spending.models import Spending, SpendingCategory
+from spending.models import SpendingCategory
+from spending.services import create_spending
 from travel.models import Participation, ParticipationStatus
 
 # Une depense liee a une idee prend la categorie qui lui correspond.
@@ -60,7 +61,7 @@ def seed_spendings(
                 )
 
             spendings.append(
-                Spending.objects.create(
+                create_spending(
                     travel=travel,
                     traveler=fake.random_element(elements=payers),
                     step=step,

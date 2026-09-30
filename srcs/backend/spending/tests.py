@@ -8,6 +8,12 @@ from django.test import TestCase
 
 from idea.models import Idea, IdeaType
 from spending.models import Spending, SpendingCategory, SpendingShare
+from spending.services import (
+    create_spending,
+    set_shares,
+    split_equally,
+    update_spending,
+)
 from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
 
@@ -308,3 +314,158 @@ class SpendingShareModelTest(TestCase):
     def test_str(self):
         share = self._make_share()
         self.assertEqual(str(share), "bob owes 15.00 (Fuel - 30.00 (Road trip))")
+
+
+class SplitEquallyTest(TestCase):
+    def setUp(self):
+        self.travelers = [
+            Traveler.objects.create_user(
+                username=name, email=f"{name}@example.com", password="password123"
+            )
+            for name in ("alice", "bob", "carol")
+        ]
+
+    def test_even_split(self):
+        shares = split_equally(Decimal("30.00"), self.travelers)
+        self.assertEqual(set(shares.values()), {Decimal("10.00")})
+
+    def test_remaining_cents_go_to_first_travelers(self):
+        shares = split_equally(Decimal("10.00"), reversed(self.travelers))
+        alice, bob, carol = self.travelers
+        self.assertEqual(shares[alice], Decimal("3.34"))
+        self.assertEqual(shares[bob], Decimal("3.33"))
+        self.assertEqual(shares[carol], Decimal("3.33"))
+        self.assertEqual(sum(shares.values()), Decimal("10.00"))
+
+    def test_no_traveler_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            split_equally(Decimal("10.00"), [])
+
+
+class SpendingServiceTest(TestCase):
+    def setUp(self):
+        self.alice, self.bob, self.carol = (
+            Traveler.objects.create_user(
+                username=name, email=f"{name}@example.com", password="password123"
+            )
+            for name in ("alice", "bob", "carol")
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        for traveler in (self.alice, self.bob):
+            Participation.objects.create(
+                traveler=traveler,
+                travel=self.travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        Participation.objects.create(
+            traveler=self.carol,
+            travel=self.travel,
+            status=ParticipationStatus.INVITED,
+        )
+
+    def _create(self, **overrides):
+        data = {
+            "travel": self.travel,
+            "traveler": self.alice,
+            "category": SpendingCategory.FUEL,
+            "amount": Decimal("30.00"),
+        }
+        data.update(overrides)
+        return create_spending(**data)
+
+    def _shares(self, spending):
+        return {share.traveler: share.amount for share in spending.shares.all()}
+
+    def test_default_split_between_accepted_travelers(self):
+        spending = self._create()
+        self.assertEqual(
+            self._shares(spending),
+            {self.alice: Decimal("15.00"), self.bob: Decimal("15.00")},
+        )
+
+    def test_custom_shares(self):
+        spending = self._create(
+            shares={self.alice: Decimal("12.00"), self.bob: Decimal("18.00")}
+        )
+        self.assertEqual(self._shares(spending)[self.bob], Decimal("18.00"))
+
+    def test_shares_not_matching_amount_roll_back_everything(self):
+        with self.assertRaises(ValidationError) as ctx:
+            self._create(shares={self.alice: Decimal("10.00")})
+        self.assertIn("shares", ctx.exception.message_dict)
+        self.assertFalse(Spending.objects.exists())
+        self.assertFalse(SpendingShare.objects.exists())
+
+    def test_share_for_non_member_rolls_back_everything(self):
+        with self.assertRaises(ValidationError):
+            self._create(
+                shares={self.alice: Decimal("15.00"), self.carol: Decimal("15.00")}
+            )
+        self.assertFalse(Spending.objects.exists())
+
+    def test_empty_shares_are_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._create(shares={})
+
+    def test_traveler_who_left_keeps_shares(self):
+        spending = self._create()
+        Participation.objects.filter(traveler=self.bob).update(
+            status=ParticipationStatus.LEFT
+        )
+        later = self._create(amount=Decimal("8.00"))
+        self.assertIn(self.bob, self._shares(spending))
+        self.assertEqual(self._shares(later), {self.alice: Decimal("8.00")})
+
+    def test_update_amount_resplits_between_current_holders(self):
+        spending = self._create(shares={self.alice: Decimal("30.00")})
+        update_spending(spending, amount=Decimal("40.00"))
+        self.assertEqual(self._shares(spending), {self.alice: Decimal("40.00")})
+
+    def test_update_with_explicit_shares(self):
+        spending = self._create()
+        update_spending(
+            spending,
+            amount=Decimal("40.00"),
+            shares={self.alice: Decimal("10.00"), self.bob: Decimal("30.00")},
+        )
+        spending.refresh_from_db()
+        self.assertEqual(spending.amount, Decimal("40.00"))
+        self.assertEqual(self._shares(spending)[self.bob], Decimal("30.00"))
+
+    def test_update_without_amount_change_keeps_shares(self):
+        spending = self._create(
+            shares={self.alice: Decimal("10.00"), self.bob: Decimal("20.00")}
+        )
+        update_spending(spending, label="Plein a Lyon")
+        self.assertEqual(self._shares(spending)[self.bob], Decimal("20.00"))
+
+    def test_update_spending_without_shares_uses_default_split(self):
+        spending = Spending.objects.create(
+            travel=self.travel,
+            traveler=self.alice,
+            category=SpendingCategory.FUEL,
+            amount="30.00",
+        )
+        update_spending(spending, amount=Decimal("20.00"))
+        self.assertEqual(
+            self._shares(spending),
+            {self.alice: Decimal("10.00"), self.bob: Decimal("10.00")},
+        )
+
+    def test_failed_update_rolls_back_amount(self):
+        spending = self._create()
+        with self.assertRaises(ValidationError):
+            update_spending(
+                spending, amount=Decimal("40.00"), shares={self.alice: Decimal("1.00")}
+            )
+        spending.refresh_from_db()
+        self.assertEqual(spending.amount, Decimal("30.00"))
+
+    def test_set_shares_replaces_previous_ones(self):
+        spending = self._create()
+        set_shares(spending, {self.bob: Decimal("30.00")})
+        self.assertEqual(self._shares(spending), {self.bob: Decimal("30.00")})

@@ -138,6 +138,13 @@ class SeedSpendingsTest(TestCase):
         for travel in Travel.objects.all():
             self.assertEqual(travel.spendings.count(), 4)
 
+    def test_seeded_shares_match_spending_amount(self):
+        _seed(travels=3, spendings_per_travel=4)
+
+        for spending in Spending.objects.prefetch_related("shares"):
+            total = sum(share.amount for share in spending.shares.all())
+            self.assertEqual(total, spending.amount)
+
     def test_step_and_idea_belong_to_spending_travel(self):
         _seed(travels=3, spendings_per_travel=10)
 
