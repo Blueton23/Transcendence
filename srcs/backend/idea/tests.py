@@ -538,6 +538,8 @@ class IdeaSerializerTest(TestCase):
             "title",
             "type",
             "status",
+            "vote_count",
+            "voted",
             "localisation",
             "note",
             "url",
@@ -557,6 +559,8 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(data["title"], "Brasserie")
         self.assertEqual(data["type"], IdeaType.RESTAURANT)
         self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
+        self.assertEqual(data["vote_count"], 0)
+        self.assertFalse(data["voted"])
 
     # Test : Désérialisation + création, les données deviennent une Idea sauvegardée
     def test_create_idea_with_serializer(self):
@@ -1181,6 +1185,81 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(len(response.data), 1)
         self.assertEqual(response.data[0]["id"], self.idea.id)
 
+    # Test : la liste expose le compteur et le vote de l'utilisateur connecté
+    def test_list_returns_vote_count_and_current_user_vote(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        idea_without_reaction = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Point de vue",
+            type=IdeaType.SIGHT,
+        )
+
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        Reaction.objects.create(
+            traveler=other_traveler,
+            idea=self.idea,
+        )
+        Reaction.objects.create(
+            traveler=other_traveler,
+            idea=other_idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            [idea["id"] for idea in response.data],
+            [
+                idea_without_reaction.id,
+                other_idea.id,
+                self.idea.id,
+            ],
+        )
+
+        ideas_by_id = {idea["id"]: idea for idea in response.data}
+
+        self.assertEqual(ideas_by_id[self.idea.id]["vote_count"], 2)
+        self.assertTrue(ideas_by_id[self.idea.id]["voted"])
+
+        self.assertEqual(ideas_by_id[other_idea.id]["vote_count"], 1)
+        self.assertFalse(ideas_by_id[other_idea.id]["voted"])
+
+        self.assertEqual(
+            ideas_by_id[idea_without_reaction.id]["vote_count"],
+            0,
+        )
+        self.assertFalse(ideas_by_id[idea_without_reaction.id]["voted"])
+
     # Test : création réussie, créer une idée
     def test_create_idea_travel_and_traveler(self):
         self.client.force_authenticate(user=self.traveler)
@@ -1402,6 +1481,69 @@ class IdeaViewTest(APITestCase):
         self.assertEqual(response.data["id"], self.idea.id)
         self.assertEqual(response.data["title"], self.idea.title)
 
+    # Test : le détail expose le compteur et le vote de l'utilisateur connecté
+    def test_detail_returns_vote_count_and_current_user_vote(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        non_voter = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=non_voter,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        Reaction.objects.create(
+            traveler=other_traveler,
+            idea=self.idea,
+        )
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        with self.subTest(user="Jean"):
+            self.client.force_authenticate(user=self.traveler)
+
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["id"], self.idea.id)
+            self.assertEqual(response.data["vote_count"], 2)
+            self.assertTrue(response.data["voted"])
+
+        with self.subTest(user="Pierre"):
+            self.client.force_authenticate(user=non_voter)
+
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["id"], self.idea.id)
+            self.assertEqual(response.data["vote_count"], 2)
+            self.assertFalse(response.data["voted"])
+
     # Test : Le créateur de l'idée peut la modifier
     def test_creator_can_patch_idea(self):
         self.client.force_authenticate(user=self.traveler)
@@ -1458,7 +1600,7 @@ class IdeaViewTest(APITestCase):
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.title, "Titre modifié par Paul")
 
-    # Test : les champs protégés envoyés via le detail sont ignorés
+    # Test : les champs protégés envoyés via le détail sont ignorés
     def test_cannot_patch_protected_fields_via_detail(self):
         self.client.force_authenticate(user=self.traveler)
 
@@ -1474,15 +1616,21 @@ class IdeaViewTest(APITestCase):
                 "chosen_at": "2026-06-04T10:00:00Z",
                 "chosen_by_id": self.traveler.id,
                 "status": IdeaStatus.CHOSEN,
+                "vote_count": 999,
+                "voted": True,
             },
+            format="json",
         )
 
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["vote_count"], 0)
+        self.assertFalse(response.data["voted"])
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.chosen_at)
         self.assertIsNone(self.idea.chosen_by)
         self.assertEqual(self.idea.status, IdeaStatus.SUGGESTED)
+        self.assertFalse(Reaction.objects.filter(idea=self.idea).exists())
 
     # Test : un participant peut placer une idée dans une étape du voyage
     def test_participant_can_place_idea_on_step(self):

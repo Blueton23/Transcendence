@@ -1,6 +1,7 @@
 from typing import ClassVar
 
 from django.db import transaction
+from django.db.models import Count, Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
@@ -12,7 +13,7 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from idea.models import Idea
+from idea.models import Idea, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
 from travel.mixins import ParticipantScopedMixin
 from travel.models import Step
@@ -31,7 +32,21 @@ class IdeaListView(ListCreateAPIView):
     ]
 
     def get_queryset(self):
-        return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
+        user_reactions = Reaction.objects.filter(
+            idea_id=OuterRef("pk"),
+            traveler=self.request.user,
+        )
+
+        return (
+            super()
+            .get_queryset()
+            .filter(travel_id=self.kwargs["travel_id"])
+            .annotate(
+                vote_count=Count("reactions"),
+                voted=Exists(user_reactions),
+            )
+            .order_by("-created_at")
+        )
 
     def perform_create(self, serializer):
         serializer.save(
