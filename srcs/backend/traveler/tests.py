@@ -1,12 +1,11 @@
 from django.db import IntegrityError, transaction
 from django.test import TestCase
-
-from traveler.models import Friendship, Status, Traveler
-
-from io import BytesIO
-
+from django.contrib.auth import SESSION_KEY
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
+
+from traveler.models import Friendship, Status, Traveler
+from io import BytesIO
 from PIL import Image
 from rest_framework.test import APITestCase
 
@@ -74,6 +73,48 @@ class TravelerModelTest(TestCase):
             password="password123",
         )
         self.assertEqual(str(traveler), "erin")
+
+    def test_username_must_be_unique(self):
+        Traveler.objects.create_user(
+            username="alice",
+            email="alice@example.com",
+            password="password123",
+        )
+
+        with self.assertRaises(IntegrityError), transaction.atomic():
+            Traveler.objects.create_user(
+                username="alice",
+                email="alice2@example.com",
+                password="password123",
+            )
+
+    def test_password_is_stored_hashed(self):
+        password = "password123"
+
+        traveler = Traveler.objects.create_user(
+            username="hashed_user",
+            email="hashed@example.com",
+            password=password,
+        )
+
+        self.assertNotEqual(traveler.password, password)
+        self.assertTrue(traveler.password.startswith("pbkdf2_"))
+        self.assertTrue(traveler.check_password(password))
+
+    def test_is_online_can_be_changed_directly(self):
+        traveler = Traveler.objects.create_user(
+            username="online_user",
+            email="online@example.com",
+            password="password123",
+        )
+
+        self.assertFalse(traveler.is_online)
+
+        traveler.is_online = True
+        traveler.save()
+        traveler.refresh_from_db()
+
+        self.assertTrue(traveler.is_online)
 
 
 class FriendshipModelTest(TestCase):
@@ -164,7 +205,9 @@ class FriendshipModelTest(TestCase):
         self.assertIn(friendship, self.user_b.friendships_as_receiver.all())
         self.assertIn(friendship, self.user_a.friendships_requested.all())
 
+
 # --- Serializer tests ---
+
 
 class TravelerSerializerTest(TestCase):
     def setUp(self):
@@ -274,12 +317,8 @@ class TravelerCreateSerializerTest(TestCase):
     def test_password_fields_are_write_only(self):
         serializer = TravelerCreateSerializer()
 
-        self.assertTrue(
-            serializer.fields["password"].write_only
-        )
-        self.assertTrue(
-            serializer.fields["password_confirmation"].write_only
-        )
+        self.assertTrue(serializer.fields["password"].write_only)
+        self.assertTrue(serializer.fields["password_confirmation"].write_only)
 
 
 class TravelerUpdateSerializerTest(TestCase):
@@ -776,12 +815,8 @@ class TravelerApiTest(APITestCase):
 
         self.traveler.refresh_from_db()
 
-        self.assertTrue(
-            self.traveler.check_password("NewPassword123!")
-        )
-        self.assertFalse(
-            self.traveler.check_password(self.password)
-        )
+        self.assertTrue(self.traveler.check_password("NewPassword123!"))
+        self.assertFalse(self.traveler.check_password(self.password))
 
     def test_update_password_rejects_wrong_old_password(self):
         self.client.force_authenticate(user=self.traveler)
@@ -799,9 +834,7 @@ class TravelerApiTest(APITestCase):
 
         self.traveler.refresh_from_db()
 
-        self.assertTrue(
-            self.traveler.check_password(self.password)
-        )
+        self.assertTrue(self.traveler.check_password(self.password))
 
     def test_update_password_rejects_mismatched_passwords(self):
         self.client.force_authenticate(user=self.traveler)
@@ -825,3 +858,232 @@ class TravelerApiTest(APITestCase):
             response.data["message"],
             "CSRF token initialized.",
         )
+
+    def test_create_traveler_rejects_duplicate_username(self):
+        response = self.client.post(
+            reverse("traveler-create"),
+            {
+                "username": self.traveler.username,
+                "first_name": "Bob",
+                "last_name": "Martin",
+                "email": "different@example.com",
+                "password": "StrongPassword123!",
+                "password_confirmation": "StrongPassword123!",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("username", response.data["details"])
+
+    def test_create_traveler_rejects_invalid_email(self):
+        response = self.client.post(
+            reverse("traveler-create"),
+            {
+                "username": "invalid_email",
+                "first_name": "Invalid",
+                "last_name": "Email",
+                "email": "not-an-email",
+                "password": "StrongPassword123!",
+                "password_confirmation": "StrongPassword123!",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("email", response.data["details"])
+
+    def test_create_traveler_requires_username(self):
+        response = self.client.post(
+            reverse("traveler-create"),
+            {
+                "first_name": "No",
+                "last_name": "Username",
+                "email": "nousername@example.com",
+                "password": "StrongPassword123!",
+                "password_confirmation": "StrongPassword123!",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("username", response.data["details"])
+
+    def test_create_traveler_requires_email(self):
+        response = self.client.post(
+            reverse("traveler-create"),
+            {
+                "username": "noemail",
+                "first_name": "No",
+                "last_name": "Email",
+                "password": "StrongPassword123!",
+                "password_confirmation": "StrongPassword123!",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("email", response.data["details"])
+
+    def test_create_traveler_requires_password(self):
+        response = self.client.post(
+            reverse("traveler-create"),
+            {
+                "username": "nopassword",
+                "first_name": "No",
+                "last_name": "Password",
+                "email": "nopassword@example.com",
+                "password_confirmation": "StrongPassword123!",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("password", response.data["details"])
+
+    def test_login_creates_session(self):
+        response = self.client.post(
+            reverse("auth-login"),
+            {
+                "username": self.traveler.username,
+                "password": self.password,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        session = self.client.session
+
+        self.assertEqual(
+            session.get(SESSION_KEY),
+            str(self.traveler.pk),
+        )
+
+    def test_logout_removes_session(self):
+        login_response = self.client.post(
+            reverse("auth-login"),
+            {
+                "username": self.traveler.username,
+                "password": self.password,
+            },
+        )
+
+        self.assertEqual(login_response.status_code, 200)
+        self.assertIsNotNone(self.client.session.get(SESSION_KEY))
+
+        logout_response = self.client.post(
+            reverse("auth-logout"),
+        )
+
+        self.assertEqual(logout_response.status_code, 200)
+        self.assertIsNone(self.client.session.get(SESSION_KEY))
+
+    def test_update_profile_rejects_duplicate_email(self):
+        Traveler.objects.create_user(
+            username="bob",
+            email="bob@example.com",
+            password="Password123!",
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse("traveler-update"),
+            {
+                "email": "bob@example.com",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("email", response.data["details"])
+
+        self.traveler.refresh_from_db()
+
+        self.assertEqual(
+            self.traveler.email,
+            "alice@example.com",
+        )
+
+    def test_update_profile_with_empty_data(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        original_first_name = self.traveler.first_name
+        original_last_name = self.traveler.last_name
+        original_email = self.traveler.email
+
+        response = self.client.patch(
+            reverse("traveler-update"),
+            {},
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.traveler.refresh_from_db()
+
+        self.assertEqual(
+            self.traveler.first_name,
+            original_first_name,
+        )
+        self.assertEqual(
+            self.traveler.last_name,
+            original_last_name,
+        )
+        self.assertEqual(
+            self.traveler.email,
+            original_email,
+        )
+
+    def test_update_profile_picture(self):
+        image = Image.new("RGB", (100, 100), "white")
+
+        buffer = BytesIO()
+        image.save(buffer, format="JPEG")
+        buffer.seek(0)
+
+        uploaded_image = SimpleUploadedFile(
+            "profile.jpg",
+            buffer.read(),
+            content_type="image/jpeg",
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("traveler-update-profile-picture"),
+            {
+                "profile_picture": uploaded_image,
+            },
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.traveler.refresh_from_db()
+
+        self.assertTrue(self.traveler.profile_picture)
+        self.assertIn(
+            "profile_pictures/",
+            self.traveler.profile_picture.name,
+        )
+
+    def test_update_profile_picture_rejects_file_over_5mb(self):
+        oversized_file = SimpleUploadedFile(
+            "large.jpg",
+            b"x" * (5 * 1024 * 1024 + 1),
+            content_type="image/jpeg",
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("traveler-update-profile-picture"),
+            {
+                "profile_picture": oversized_file,
+            },
+            format="multipart",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            "profile_picture",
+            response.data["details"],
+        )
+
+        self.traveler.refresh_from_db()
+
+        self.assertFalse(self.traveler.profile_picture)
