@@ -20,6 +20,11 @@ export interface StepIdeaPreview {
   status: "proposed" | "selected" | "reserved";
 }
 
+export interface Segment {
+  durationMinutes: number;
+  distanceKm: number;
+}
+
 export interface CreateStepData {
   startDate: string;
   endDate: string;

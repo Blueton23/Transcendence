@@ -1,4 +1,3 @@
-import { getSegments } from "@/features/step/api/segmentApi";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import { computeDateLabels } from "@/features/step/utils/stepDates";
 import { useState } from "react";
@@ -13,6 +12,7 @@ import { useParams } from "react-router";
 import { Navigate } from "react-router";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import { StickyHeader } from "@/shared/ui/StickyHeader";
+import { useRoute } from "@/features/map/hooks/useRoute";
 
 //TODO(branchement):
 // + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
@@ -32,7 +32,11 @@ function ItineraryPage() {
     error: errorSteps,
     refetch,
   } = useSteps(travelId);
-  const segments = getSegments();
+  const {
+    route,
+    isLoading: isLoadingRoute,
+    error: errorRoute,
+  } = useRoute(steps);
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const [detailStepId, setDetailStepId] = useState<number | null>(null);
@@ -40,8 +44,8 @@ function ItineraryPage() {
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
 
-  const isLoading = isLoadingTravel || isLoadingSteps;
-  const error = errorTravel || errorSteps;
+  const isLoading = isLoadingTravel || isLoadingSteps || isLoadingRoute;
+  const error = errorTravel || errorSteps || errorRoute;
   if (isLoading) return null;
   if (error) return <Navigate to="/trip" replace />;
   if (!travel) return null;
@@ -55,7 +59,7 @@ function ItineraryPage() {
         <ItineraryHeader
           travel={travel}
           steps={steps}
-          segments={segments}
+          route={route}
           mobileView={mobileView}
           onToggle={setMobileView}
           refetch={refetch}
@@ -79,7 +83,7 @@ function ItineraryPage() {
           <div className="flex flex-col gap-4 md:min-h-0 md:flex-1">
             <ItineraryListPanel
               steps={steps}
-              segments={segments}
+              route={route}
               travel={travel}
               dateLabels={dateLabels}
               onDetailView={(step) => setDetailStepId(step.id)}

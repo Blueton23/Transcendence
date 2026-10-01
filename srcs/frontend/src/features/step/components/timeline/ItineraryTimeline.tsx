@@ -2,8 +2,7 @@ import { StepPositionBadge } from "@/features/step/components/card/StepPositionB
 import { StepCard } from "@/features/step/components/card/StepCard";
 import { SegmentRow } from "@/features/step/components/timeline/Segment";
 import { Fragment } from "react/jsx-runtime";
-import type { Segment } from "@/features/step/api/segmentApi";
-import type { Step } from "@/features/step/types";
+import type { Segment, Step } from "@/features/step/types";
 
 export interface ItineraryTimelineProps {
   steps: Step[];
