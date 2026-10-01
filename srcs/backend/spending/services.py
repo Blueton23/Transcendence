@@ -1,8 +1,11 @@
 from collections.abc import Iterable, Mapping
+from dataclasses import dataclass
 from decimal import Decimal
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.db.models import Sum
 
 from travel.models import ParticipationStatus
 
@@ -93,3 +96,47 @@ def update_spending(
     if shares is not None:
         set_shares(spending, shares)
     return spending
+
+
+@dataclass(frozen=True)
+class TravelerBalance:
+    traveler: object
+    paid: Decimal
+    owed: Decimal
+
+    @property
+    def balance(self) -> Decimal:
+        """> 0 : les autres lui doivent de l'argent, < 0 : il doit de l'argent."""
+        return self.paid - self.owed
+
+
+def _totals_by_traveler(queryset) -> dict[int, Decimal]:
+    return {
+        row["traveler"]: row["total"]
+        for row in queryset.values("traveler").annotate(total=Sum("amount"))
+    }
+
+
+def compute_balances(travel) -> list[TravelerBalance]:
+    """Balance of every traveler of ``travel``: what they paid minus their shares.
+
+    Covers ACCEPTED and LEFT participants (someone who left still owes, or is
+    owed, for the spendings made before leaving), plus anyone who still has a
+    spending or a share in the travel. Sorted by traveler id.
+    """
+    paid = _totals_by_traveler(Spending.objects.filter(travel=travel))
+    owed = _totals_by_traveler(SpendingShare.objects.filter(spending__travel=travel))
+    members = travel.participations.filter(
+        status__in=[ParticipationStatus.ACCEPTED, ParticipationStatus.LEFT]
+    ).values_list("traveler", flat=True)
+
+    traveler_ids = set(members) | paid.keys() | owed.keys()
+    travelers = get_user_model().objects.filter(pk__in=traveler_ids).order_by("pk")
+    return [
+        TravelerBalance(
+            traveler=traveler,
+            paid=paid.get(traveler.pk, Decimal(0)),
+            owed=owed.get(traveler.pk, Decimal(0)),
+        )
+        for traveler in travelers
+    ]

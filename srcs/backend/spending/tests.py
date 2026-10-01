@@ -9,6 +9,7 @@ from django.test import TestCase
 from idea.models import Idea, IdeaType
 from spending.models import Spending, SpendingCategory, SpendingShare
 from spending.services import (
+    compute_balances,
     create_spending,
     set_shares,
     split_equally,
@@ -469,3 +470,118 @@ class SpendingServiceTest(TestCase):
         spending = self._create()
         set_shares(spending, {self.bob: Decimal("30.00")})
         self.assertEqual(self._shares(spending), {self.bob: Decimal("30.00")})
+
+
+class ComputeBalancesTest(TestCase):
+    def setUp(self):
+        self.alice, self.bob, self.carol, self.dave = (
+            Traveler.objects.create_user(
+                username=name, email=f"{name}@example.com", password="password123"
+            )
+            for name in ("alice", "bob", "carol", "dave")
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        for traveler in (self.alice, self.bob, self.carol):
+            Participation.objects.create(
+                traveler=traveler,
+                travel=self.travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        # dave a ete invite mais n'a jamais accepte : il n'a pas de solde.
+        Participation.objects.create(
+            traveler=self.dave,
+            travel=self.travel,
+            status=ParticipationStatus.INVITED,
+        )
+
+    def _spend(self, payer, amount, shares=None):
+        return create_spending(
+            travel=self.travel,
+            traveler=payer,
+            category=SpendingCategory.FUEL,
+            amount=Decimal(amount),
+            shares=shares,
+        )
+
+    def _by_traveler(self):
+        return {b.traveler: b for b in compute_balances(self.travel)}
+
+    def test_no_spending_gives_zero_balances(self):
+        balances = self._by_traveler()
+        self.assertEqual(set(balances), {self.alice, self.bob, self.carol})
+        for balance in balances.values():
+            self.assertEqual(balance.paid, Decimal(0))
+            self.assertEqual(balance.owed, Decimal(0))
+            self.assertEqual(balance.balance, Decimal(0))
+
+    def test_equal_split(self):
+        self._spend(self.alice, "90.00")
+        balances = self._by_traveler()
+        self.assertEqual(balances[self.alice].paid, Decimal("90.00"))
+        self.assertEqual(balances[self.alice].owed, Decimal("30.00"))
+        self.assertEqual(balances[self.alice].balance, Decimal("60.00"))
+        self.assertEqual(balances[self.bob].balance, Decimal("-30.00"))
+        self.assertEqual(balances[self.carol].balance, Decimal("-30.00"))
+
+    def test_several_spendings_and_custom_shares(self):
+        self._spend(self.alice, "90.00")
+        self._spend(
+            self.bob,
+            "40.00",
+            shares={self.bob: Decimal("22.00"), self.carol: Decimal("18.00")},
+        )
+        balances = self._by_traveler()
+        self.assertEqual(balances[self.alice].balance, Decimal("60.00"))
+        self.assertEqual(balances[self.bob].balance, Decimal("-12.00"))
+        self.assertEqual(balances[self.carol].balance, Decimal("-48.00"))
+
+    def test_balances_sum_to_zero(self):
+        self._spend(self.alice, "10.00")
+        self._spend(self.bob, "33.33")
+        self._spend(self.carol, "7.01")
+        total = sum(b.balance for b in compute_balances(self.travel))
+        self.assertEqual(total, Decimal(0))
+
+    def test_traveler_who_left_keeps_their_balance(self):
+        self._spend(self.alice, "90.00")
+        Participation.objects.filter(traveler=self.carol).update(
+            status=ParticipationStatus.LEFT
+        )
+        self._spend(self.alice, "20.00")
+        balances = self._by_traveler()
+        self.assertIn(self.carol, balances)
+        self.assertEqual(balances[self.carol].balance, Decimal("-30.00"))
+        self.assertEqual(balances[self.bob].balance, Decimal("-40.00"))
+
+    def test_other_travels_are_ignored(self):
+        other_travel = Travel.objects.create(
+            title="Other trip",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 10),
+        )
+        Participation.objects.create(
+            traveler=self.alice,
+            travel=other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        create_spending(
+            travel=other_travel,
+            traveler=self.alice,
+            category=SpendingCategory.FUEL,
+            amount=Decimal("100.00"),
+        )
+        self.assertEqual(self._by_traveler()[self.alice].paid, Decimal(0))
+
+    def test_sorted_by_traveler_id(self):
+        travelers = [b.traveler for b in compute_balances(self.travel)]
+        self.assertEqual(travelers, [self.alice, self.bob, self.carol])
+
+    def test_query_count_does_not_grow_with_spendings(self):
+        for _ in range(5):
+            self._spend(self.alice, "10.00")
+        with self.assertNumQueries(4):
+            compute_balances(self.travel)
