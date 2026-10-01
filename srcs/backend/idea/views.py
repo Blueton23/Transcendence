@@ -83,10 +83,12 @@ class IdeaChoiceView(ParticipantScopedMixin, GenericAPIView):
             .select_for_update(of=("self",))
         )
 
+    # Requete sql ciblée
     @transaction.atomic
     def post(self, request, travel_id, pk):
         idea = self.get_object()
 
+        # Si l’idée n’a pas déjà été placée
         if idea.chosen_at is None:
             if idea.step_id is not None:
                 idea.step = get_object_or_404(
