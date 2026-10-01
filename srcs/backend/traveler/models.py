@@ -31,20 +31,20 @@ class Status(models.TextChoices):
 
 
 class Friendship(TimeStampedModel):
-    sender = models.ForeignKey(
+    user1 = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="friendships_as_sender",
+        related_name="friendships_user1",
     )
-    receiver = models.ForeignKey(
+    user2 = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="friendships_as_receiver",
+        related_name="friendships_user2",
     )
     requested_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name="friendships_requested",
+        related_name="friendships_requested_by",
     )
     status = models.CharField(
         max_length=1, choices=Status.choices, default=Status.PENDING
@@ -52,8 +52,12 @@ class Friendship(TimeStampedModel):
 
     class Meta:
         constraints: ClassVar[list] = [
-            UniqueConstraint(fields=["sender", "receiver"], name="unique_friendship"),
+            UniqueConstraint(fields=["user1", "user2"], name="unique_friendship"),
             CheckConstraint(
-                check=Q(sender__lt=F("receiver")), name="friendship_sender_lt_receiver"
+                check=Q(user1__lt=F("user2")), name="friendship_user1_lt_user2"
+            ),
+            CheckConstraint(
+                check=Q(requested_by=F("user1")) | Q(requested_by=F("user2")),
+                name="requested_by_is_participant",
             ),
         ]

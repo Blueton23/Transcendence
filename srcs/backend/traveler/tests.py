@@ -78,8 +78,8 @@ class FriendshipModelTest(TestCase):
 
     def test_create_friendship_default_status_pending(self):
         friendship = Friendship.objects.create(
-            sender=self.user_a,
-            receiver=self.user_b,
+            user1=self.user_a,
+            user2=self.user_b,
             requested_by=self.user_a,
         )
         self.assertEqual(friendship.status, Status.PENDING)
@@ -87,19 +87,19 @@ class FriendshipModelTest(TestCase):
 
     def test_friendship_status_can_be_accepted(self):
         friendship = Friendship.objects.create(
-            sender=self.user_a,
-            receiver=self.user_b,
+            user1=self.user_a,
+            user2=self.user_b,
             requested_by=self.user_a,
             status=Status.ACCEPTED,
         )
         self.assertEqual(friendship.status, Status.ACCEPTED)
 
-    def test_requested_by_tracks_the_initiator_regardless_of_sender_order(self):
+    def test_requested_by_tracks_the_initiator_regardless_of_user1_order(self):
         # user_b initiated the request even though it must be stored as
-        # "receiver" to satisfy the sender < receiver ordering constraint.
+        # "user2" to satisfy the user1 < user2 ordering constraint.
         friendship = Friendship.objects.create(
-            sender=self.user_a,
-            receiver=self.user_b,
+            user1=self.user_a,
+            user2=self.user_b,
             requested_by=self.user_b,
         )
         self.assertEqual(friendship.requested_by, self.user_b)
@@ -107,22 +107,22 @@ class FriendshipModelTest(TestCase):
 
     def test_duplicate_friendship_raises_integrity_error(self):
         Friendship.objects.create(
-            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+            user1=self.user_a, user2=self.user_b, requested_by=self.user_a
         )
         with self.assertRaises(IntegrityError), transaction.atomic():
             Friendship.objects.create(
-                sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+                user1=self.user_a, user2=self.user_b, requested_by=self.user_a
             )
 
-    def test_sender_must_be_less_than_receiver(self):
+    def test_user1_must_be_less_than_user2(self):
         with self.assertRaises(IntegrityError), transaction.atomic():
             Friendship.objects.create(
-                sender=self.user_b, receiver=self.user_a, requested_by=self.user_b
+                user1=self.user_b, user2=self.user_a, requested_by=self.user_b
             )
 
-    def test_cascade_delete_on_sender_removal(self):
+    def test_cascade_delete_on_user1_removal(self):
         friendship = Friendship.objects.create(
-            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+            user1=self.user_a, user2=self.user_b, requested_by=self.user_a
         )
         friendship_id = friendship.id
 
@@ -130,9 +130,9 @@ class FriendshipModelTest(TestCase):
 
         self.assertFalse(Friendship.objects.filter(id=friendship_id).exists())
 
-    def test_cascade_delete_on_receiver_removal(self):
+    def test_cascade_delete_on_user2_removal(self):
         friendship = Friendship.objects.create(
-            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+            user1=self.user_a, user2=self.user_b, requested_by=self.user_a
         )
         friendship_id = friendship.id
 
@@ -142,9 +142,9 @@ class FriendshipModelTest(TestCase):
 
     def test_related_names(self):
         friendship = Friendship.objects.create(
-            sender=self.user_a, receiver=self.user_b, requested_by=self.user_a
+            user1=self.user_a, user2=self.user_b, requested_by=self.user_a
         )
 
-        self.assertIn(friendship, self.user_a.friendships_as_sender.all())
-        self.assertIn(friendship, self.user_b.friendships_as_receiver.all())
+        self.assertIn(friendship, self.user_a.friendships_as_user1.all())
+        self.assertIn(friendship, self.user_b.friendships_as_user2.all())
         self.assertIn(friendship, self.user_a.friendships_requested.all())
