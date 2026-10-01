@@ -4,12 +4,19 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from rest_framework.serializers import ValidationError as DRFValidationError
+from rest_framework.test import APITestCase
 
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
-from travel.models import Step, Travel
+from travel.models import (
+    Participation,
+    ParticipationStatus,
+    Step,
+    Travel,
+)
 from traveler.models import Traveler
 
 
@@ -213,6 +220,18 @@ class IdeaModelTest(TestCase):
                     **date_case,
                 )
 
+    def test_idea_dates_outside_step_are_rejected(self):
+        outside_date = self.step.end_date + datetime.timedelta(days=1)
+
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                step=self.step,
+                start_date=outside_date,
+                end_date=outside_date,
+            )
+
+        self.assertIn("step", context.exception.message_dict)
+
     def test_lodging_dates_in_order_are_allowed(self):
         idea = self._make_idea(
             type=IdeaType.LODGING,
@@ -251,8 +270,15 @@ class IdeaModelTest(TestCase):
             self._make_idea(price_per_night="10.00")
 
     def test_negative_price_per_night_is_rejected(self):
-        with self.assertRaises(ValidationError):
-            self._make_idea(type=IdeaType.LODGING, price_per_night="-1.00")
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                type=IdeaType.LODGING,
+                price_per_night="-1.00",
+                start_date=datetime.date(2026, 6, 8),
+                end_date=datetime.date(2026, 6, 10),
+            )
+
+        self.assertIn("price_per_night", context.exception.message_dict)
 
     def test_non_lodging_idea_in_pool_cannot_have_dates(self):
         with self.assertRaises(ValidationError):
@@ -308,7 +334,7 @@ class IdeaModelTest(TestCase):
                 type=IdeaType.LODGING,
                 step=self.step,
                 start_date=datetime.date(2026, 6, 3),
-                end_date=datetime.date(2026, 6, 5),
+                end_date=datetime.date(2026, 6, 4),
                 chosen_at=timezone.now(),
             )
 
@@ -325,7 +351,7 @@ class IdeaModelTest(TestCase):
             type=IdeaType.LODGING,
             step=self.step,
             start_date=datetime.date(2026, 6, 4),
-            end_date=datetime.date(2026, 6, 5),
+            end_date=datetime.date(2026, 6, 4),
             chosen_at=timezone.now(),
         )
         self.assertEqual(second.status, IdeaStatus.CHOSEN)
@@ -444,8 +470,6 @@ class ReactionModelTest(TestCase):
 
 
 # ========================================================================#
-
-# ========================================================================#
 # --- Idée -> Serializer tests --- #
 # ========================================================================#
 
@@ -514,6 +538,8 @@ class IdeaSerializerTest(TestCase):
             "title",
             "type",
             "status",
+            "vote_count",
+            "voted",
             "localisation",
             "note",
             "url",
@@ -533,19 +559,8 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(data["title"], "Brasserie")
         self.assertEqual(data["type"], IdeaType.RESTAURANT)
         self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
-
-    # Test : Désérialisation + validation, les données entrantes sont acceptées
-    def test_valid_idea_data(self):
-        data = {
-            "title": "Brasserie",
-            "type": IdeaType.RESTAURANT,
-        }
-
-        serializer = IdeaSerializer(data=data)
-
-        self.assertTrue(serializer.is_valid())
-        self.assertEqual(serializer.validated_data["title"], "Brasserie")
-        self.assertEqual(serializer.validated_data["type"], IdeaType.RESTAURANT)
+        self.assertEqual(data["vote_count"], 0)
+        self.assertFalse(data["voted"])
 
     # Test : Désérialisation + création, les données deviennent une Idea sauvegardée
     def test_create_idea_with_serializer(self):
@@ -558,6 +573,9 @@ class IdeaSerializerTest(TestCase):
 
         self.assertTrue(serializer.is_valid())
 
+        self.assertEqual(serializer.validated_data["title"], "Brasserie")
+        self.assertEqual(serializer.validated_data["type"], IdeaType.RESTAURANT)
+
         idea = serializer.save(
             traveler=self.traveler,
             travel=self.travel,
@@ -566,8 +584,6 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(idea.title, "Brasserie")
         self.assertEqual(idea.travel_id, self.travel.id)
         self.assertEqual(idea.traveler_id, self.traveler.id)
-
-    # ========================================================================#
 
     # ========================================================================#
     # Bloc 2 : Validation step_id
@@ -647,8 +663,6 @@ class IdeaSerializerTest(TestCase):
             )
 
         self.assertIn("step", context.exception.detail)
-
-    # ========================================================================#
 
     # ========================================================================#
     # Bloc 3 : Vérification des champs read-only
@@ -808,8 +822,6 @@ class IdeaSerializerTest(TestCase):
         self.assertIsNotNone(idea.updated_at)
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 4 :  Type d'idée
     # ========================================================================#
 
@@ -847,8 +859,6 @@ class IdeaSerializerTest(TestCase):
         self.assertIn("type", serializer.errors)
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 5 : Champs modifiables / optionnels
     # ========================================================================#
 
@@ -868,8 +878,6 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(serializer.validated_data["localisation"], "Valais")
         self.assertEqual(serializer.validated_data["note"], "Réserver le restaurant")
         self.assertEqual(serializer.validated_data["url"], "http://pizzeria.ch")
-
-    # ========================================================================#
 
     # ========================================================================#
     # Bloc 6 : Conversion des champs speciaux
@@ -953,8 +961,6 @@ class IdeaSerializerTest(TestCase):
         )
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 7 : Champs obligatoire
     # ========================================================================#
 
@@ -980,8 +986,6 @@ class IdeaSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("type", serializer.errors)
 
-
-# ========================================================================#
 
 # ========================================================================#
 # --- Reaction -> Serializer tests --- #
@@ -1010,8 +1014,6 @@ class ReactionSerializerTest(TestCase):
         )
 
     # ========================================================================#
-
-    # ========================================================================#
     # Bloc 8 : Tests complet reaction
     # ========================================================================#
 
@@ -1038,18 +1040,12 @@ class ReactionSerializerTest(TestCase):
         self.assertEqual(data["idea_id"], self.idea.id)
         self.assertIsNotNone(data["created_at"])
 
-    # Test : Entrée vide acceptée par le frontend
-    def test_reaction_serializer_accepts_empty_input(self):
-        serializer = ReactionSerializer(data={})
-
-        self.assertTrue(serializer.is_valid())
-        self.assertEqual(serializer.validated_data, {})
-
     # Test : Création d’une réaction via le serializer
     def test_create_reaction_with_serializer(self):
         serializer = ReactionSerializer(data={})
 
         self.assertTrue(serializer.is_valid())
+        self.assertEqual(serializer.validated_data, {})
 
         reaction = serializer.save(
             traveler=self.traveler,
@@ -1112,3 +1108,2402 @@ class ReactionSerializerTest(TestCase):
             )
 
         self.assertIn("reaction", context.exception.detail)
+
+
+# ========================================================================#
+# --- Idée -> views tests --- #
+# ========================================================================#
+
+
+class IdeaViewTest(APITestCase):
+    def setUp(self):
+        # Travel principale
+        self.traveler = Traveler.objects.create_user(
+            username="Jean",
+            email="jean@exemple.com",
+            password="password123",
+        )
+
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Restaurant japonais",
+            type=IdeaType.RESTAURANT,
+        )
+        # Autre Travel
+        self.other_travel = Travel.objects.create(
+            title="Road trip France",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+
+        self.other_step = Step.objects.create(
+            travel=self.other_travel,
+            localisation="Paris",
+            start_date=datetime.date(2026, 7, 3),
+            end_date=datetime.date(2026, 7, 3),
+        )
+
+        Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            title="Restaurant français",
+            type=IdeaType.RESTAURANT,
+        )
+
+    # ========================================================================#
+    # Bloc 1 : Tests idea-list -> GET/POST
+    # ========================================================================#
+
+    # Tests réussi
+    # ========================================================================#
+
+    # Test : lecture réussie, récupérer la liste d'idées
+    def test_list_returns_only_ideas_of_this_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["id"], self.idea.id)
+
+    # Test : la liste expose le compteur et le vote de l'utilisateur connecté
+    def test_list_returns_vote_count_and_current_user_vote(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        idea_without_reaction = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Point de vue",
+            type=IdeaType.SIGHT,
+        )
+
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        Reaction.objects.create(
+            traveler=other_traveler,
+            idea=self.idea,
+        )
+        Reaction.objects.create(
+            traveler=other_traveler,
+            idea=other_idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            [idea["id"] for idea in response.data],
+            [
+                idea_without_reaction.id,
+                other_idea.id,
+                self.idea.id,
+            ],
+        )
+
+        ideas_by_id = {idea["id"]: idea for idea in response.data}
+
+        self.assertEqual(ideas_by_id[self.idea.id]["vote_count"], 2)
+        self.assertTrue(ideas_by_id[self.idea.id]["voted"])
+
+        self.assertEqual(ideas_by_id[other_idea.id]["vote_count"], 1)
+        self.assertFalse(ideas_by_id[other_idea.id]["voted"])
+
+        self.assertEqual(
+            ideas_by_id[idea_without_reaction.id]["vote_count"],
+            0,
+        )
+        self.assertFalse(ideas_by_id[idea_without_reaction.id]["voted"])
+
+    # Test : création réussie, créer une idée
+    def test_create_idea_travel_and_traveler(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            ),
+            {
+                "title": "Fondue",
+                "type": IdeaType.RESTAURANT,
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        idea = Idea.objects.get(id=response.data["id"])
+
+        self.assertEqual(idea.travel, self.travel)
+        self.assertEqual(idea.traveler, self.traveler)
+        self.assertEqual(idea.title, "Fondue")
+
+    # Tests echec : Traveler non connecté
+    # ========================================================================#
+
+    # Test : un traveler non connecté ne peut ni lister ni créer des idées
+    def test_list_and_create_forbidden_if_not_authenticated(self):
+        url = reverse(
+            "idea-list",
+            kwargs={"travel_id": self.travel.id},
+        )
+
+        with self.subTest(method="GET"):
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 403)
+
+        with self.subTest(method="POST"):
+            response = self.client.post(
+                url,
+                {
+                    "title": "Fondue",
+                    "type": IdeaType.RESTAURANT,
+                },
+            )
+
+            self.assertEqual(response.status_code, 403)
+
+            self.assertFalse(
+                Idea.objects.filter(
+                    travel=self.travel,
+                    title="Fondue",
+                ).exists()
+            )
+
+    # Tests echec : Taveler non-participant
+    # ========================================================================#
+
+    # Test : un non-participant ne peut ni lister ni créer des idées
+    def test_list_and_create_forbidden_if_not_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        url = reverse(
+            "idea-list",
+            kwargs={"travel_id": self.other_travel.id},
+        )
+
+        with self.subTest(method="GET"):
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 403)
+
+        with self.subTest(method="POST"):
+            response = self.client.post(
+                url,
+                {
+                    "title": "Fondue",
+                    "type": IdeaType.RESTAURANT,
+                },
+            )
+
+            self.assertEqual(response.status_code, 403)
+
+            self.assertFalse(
+                Idea.objects.filter(
+                    travel=self.other_travel,
+                    title="Fondue",
+                ).exists()
+            )
+
+    # Tests echec : Participation non ACCEPTED
+    # ========================================================================#
+
+    # Test : une participation non ACCEPTED interdit la liste et la création
+    def test_list_and_create_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        url = reverse(
+            "idea-list",
+            kwargs={"travel_id": self.travel.id},
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                with self.subTest(method="GET"), transaction.atomic():
+                    response = self.client.get(url)
+
+                    self.assertEqual(response.status_code, 403)
+
+                    transaction.set_rollback(True)
+
+                with self.subTest(method="POST"), transaction.atomic():
+                    response = self.client.post(
+                        url,
+                        {
+                            "title": "Fondue",
+                            "type": IdeaType.RESTAURANT,
+                        },
+                    )
+
+                    self.assertEqual(response.status_code, 403)
+
+                    self.assertFalse(
+                        Idea.objects.filter(
+                            travel=self.travel,
+                            title="Fondue",
+                        ).exists()
+                    )
+
+                    transaction.set_rollback(True)
+
+    # Tests echec : Données invalides
+    # ========================================================================#
+
+    # Test : step appartient a un autre travel
+    def test_rejects_step_from_another_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            ),
+            {
+                "title": "Pizzeria",
+                "type": IdeaType.RESTAURANT,
+                "step_id": self.other_step.id,
+                "start_date": "2026-07-03",
+                "end_date": "2026-07-03",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("step", response.data["details"])
+
+    # Test : une étape dans la corbeille ne peut pas recevoir une nouvelle idée
+    def test_rejects_trashed_step(self):
+        trashed_step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        trashed_step.soft_delete()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-list",
+                kwargs={"travel_id": self.travel.id},
+            ),
+            {
+                "title": "Idée sur étape supprimée",
+                "type": IdeaType.RESTAURANT,
+                "step_id": trashed_step.id,
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("step_id", response.data["details"])
+        self.assertFalse(Idea.objects.filter(title="Idée sur étape supprimée").exists())
+
+    # ========================================================================#
+    # Bloc 2 : Tests idea-detail -> GET/PATCH/PUT/DELETE
+    # ========================================================================#
+
+    # Tests réussi
+    # ========================================================================#
+
+    # Test : récupérer l'idée du travel
+    def test_retrieve_idea_from_this_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.idea.id)
+        self.assertEqual(response.data["title"], self.idea.title)
+
+    # Test : le détail expose le compteur et le vote de l'utilisateur connecté
+    def test_detail_returns_vote_count_and_current_user_vote(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        non_voter = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=non_voter,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        Reaction.objects.create(
+            traveler=other_traveler,
+            idea=self.idea,
+        )
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        with self.subTest(user="Jean"):
+            self.client.force_authenticate(user=self.traveler)
+
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["id"], self.idea.id)
+            self.assertEqual(response.data["vote_count"], 2)
+            self.assertTrue(response.data["voted"])
+
+        with self.subTest(user="Pierre"):
+            self.client.force_authenticate(user=non_voter)
+
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["id"], self.idea.id)
+            self.assertEqual(response.data["vote_count"], 2)
+            self.assertFalse(response.data["voted"])
+
+    # Test : Le créateur de l'idée peut la modifier
+    def test_creator_can_patch_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Restaurant japonais modifié",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Restaurant japonais modifié")
+
+    # Test : un autre participant du travel peut modifier n'importe quelle idée
+    def test_other_participant_can_patch_idea(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=other_traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "title": "Titre modifié par Paul",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Titre modifié par Paul")
+
+    # Test : les champs protégés envoyés via le détail sont ignorés
+    def test_cannot_patch_protected_fields_via_detail(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "chosen_at": "2026-06-04T10:00:00Z",
+                "chosen_by_id": self.traveler.id,
+                "status": IdeaStatus.CHOSEN,
+                "vote_count": 999,
+                "voted": True,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["vote_count"], 0)
+        self.assertFalse(response.data["voted"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertEqual(self.idea.status, IdeaStatus.SUGGESTED)
+        self.assertFalse(Reaction.objects.filter(idea=self.idea).exists())
+
+    # Test : un participant peut placer une idée dans une étape du voyage
+    def test_participant_can_place_idea_on_step(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 5),
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": step.id,
+                "start_date": "2026-06-04",
+                "end_date": "2026-06-04",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["status"], IdeaStatus.PLACED)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.travel, self.travel)
+        self.assertFalse(self.idea.is_in_pool)
+
+    # Test : un participant peut remettre une idée non hébergement dans le pool
+    def test_participant_can_return_idea_to_pool(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 5),
+        )
+
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 4)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": None,
+                "start_date": None,
+                "end_date": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["status"], IdeaStatus.SUGGESTED)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.step)
+        self.assertIsNone(self.idea.start_date)
+        self.assertIsNone(self.idea.end_date)
+        self.assertEqual(self.idea.travel, self.travel)
+        self.assertTrue(self.idea.is_in_pool)
+
+    # Test : un hébergement non choisi retourne au pool en conservant ses dates
+    def test_participant_can_return_lodging_to_pool(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["status"], IdeaStatus.SUGGESTED)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.step)
+        self.assertEqual(self.idea.type, IdeaType.LODGING)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+        self.assertEqual(self.idea.travel, self.travel)
+        self.assertTrue(self.idea.is_in_pool)
+
+    # Test : un participant au travel peut modifier complètement une idée
+    def test_participant_can_put_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.put(
+            reverse(
+                "idea-detail",
+                kwargs={"travel_id": self.travel.id, "pk": self.idea.id},
+            ),
+            {
+                "title": "Randonnée",
+                "type": IdeaType.ACTIVITY,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.title, "Randonnée")
+        self.assertEqual(self.idea.type, IdeaType.ACTIVITY)
+        self.assertEqual(self.idea.travel, self.travel)
+        self.assertEqual(self.idea.traveler, self.traveler)
+
+    # Test : suppression réussie
+    def test_creator_can_delete_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail", kwargs={"travel_id": self.travel.id, "pk": self.idea.id}
+            )
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+    # Test : un autre participant accepté peut supprimer l'idée
+    def test_other_participant_can_delete_idea(self):
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=other_traveler)
+
+        idea_id = self.idea.id
+
+        response = self.client.delete(
+            reverse(
+                "idea-detail", kwargs={"travel_id": self.travel.id, "pk": self.idea.id}
+            )
+        )
+
+        self.assertEqual(response.status_code, 204)
+
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+    # Tests echec : Traveler non connecté
+    # ========================================================================#
+
+    # Test : un traveler non connecté ne peut pas accéder au détail d'une idée
+    def test_detail_forbidden_if_not_authenticated(self):
+        idea_id = self.idea.id
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": idea_id,
+            },
+        )
+
+        with self.subTest(method="GET"), transaction.atomic():
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 403)
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PATCH"), transaction.atomic():
+            response = self.client.patch(
+                url,
+                {
+                    "title": "Modification interdite",
+                },
+            )
+
+            self.assertEqual(response.status_code, 403)
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PUT"), transaction.atomic():
+            response = self.client.put(
+                url,
+                {
+                    "title": "Modification interdite",
+                    "type": IdeaType.ACTIVITY,
+                },
+            )
+
+            self.assertEqual(response.status_code, 403)
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+            self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
+            transaction.set_rollback(True)
+
+    # Tests echec : Taveler participant
+    # ========================================================================#
+
+    # Test : un participant ne peut pas transformer une idée en hébergement sans dates
+    def test_participant_cannot_update_with_invalid_data(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        with self.subTest(method="PATCH"), transaction.atomic():
+            response = self.client.patch(
+                url,
+                {
+                    "title": "Hôtel du lac",
+                    "type": IdeaType.LODGING,
+                },
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn("start_date", response.data["details"])
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PUT"), transaction.atomic():
+            response = self.client.put(
+                url,
+                {
+                    "title": "Hôtel du lac",
+                    "type": IdeaType.LODGING,
+                },
+            )
+
+            self.assertEqual(response.status_code, 400)
+            self.assertIn("start_date", response.data["details"])
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+
+            transaction.set_rollback(True)
+
+    # Tests echec : Taveler non-participant
+    # ========================================================================#
+
+    # Test : un non-participant ne peut pas accéder au détail d'une idée
+    def test_non_participant_cannot_access_idea_detail(self):
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
+
+        idea_id = self.idea.id
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": idea_id,
+            },
+        )
+
+        with self.subTest(method="GET"), transaction.atomic():
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 404)
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PATCH"), transaction.atomic():
+            response = self.client.patch(
+                url,
+                {
+                    "title": "Modification interdite",
+                },
+            )
+
+            self.assertEqual(response.status_code, 404)
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PUT"), transaction.atomic():
+            response = self.client.put(
+                url,
+                {
+                    "title": "Modification interdite",
+                    "type": IdeaType.RESTAURANT,
+                },
+            )
+
+            self.assertEqual(response.status_code, 404)
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
+            transaction.set_rollback(True)
+
+    # Tests echec : Participation non ACCEPTED
+    # ========================================================================#
+
+    # Test : une participation non ACCEPTED interdit l'accès au détail
+    def test_detail_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        idea_id = self.idea.id
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": idea_id,
+            },
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                with self.subTest(method="GET"), transaction.atomic():
+                    response = self.client.get(url)
+
+                    self.assertEqual(response.status_code, 404)
+
+                    transaction.set_rollback(True)
+
+                with self.subTest(method="PATCH"), transaction.atomic():
+                    response = self.client.patch(
+                        url,
+                        {
+                            "title": "Modification interdite",
+                        },
+                    )
+
+                    self.assertEqual(response.status_code, 404)
+
+                    self.idea.refresh_from_db()
+                    self.assertEqual(self.idea.title, "Restaurant japonais")
+
+                    transaction.set_rollback(True)
+
+                with self.subTest(method="PUT"), transaction.atomic():
+                    response = self.client.put(
+                        url,
+                        {
+                            "title": "Modification interdite",
+                            "type": IdeaType.ACTIVITY,
+                        },
+                    )
+
+                    self.assertEqual(response.status_code, 404)
+
+                    self.idea.refresh_from_db()
+                    self.assertEqual(self.idea.title, "Restaurant japonais")
+                    self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+
+                    transaction.set_rollback(True)
+
+                with self.subTest(method="DELETE"), transaction.atomic():
+                    response = self.client.delete(url)
+                    self.assertEqual(response.status_code, 404)
+                    self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+                    transaction.set_rollback(True)
+
+    # Tests echec : Données invalides
+    # ========================================================================#
+
+    # Test : une idée ne peut pas être accessible via un autre voyage
+    def test_cannot_access_idea_with_wrong_travel(self):
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.other_travel.id,
+                "pk": idea_id,
+            },
+        )
+
+        with self.subTest(method="GET"), transaction.atomic():
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 404)
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PATCH"), transaction.atomic():
+            response = self.client.patch(
+                url,
+                {
+                    "title": "Modification interdite",
+                },
+            )
+
+            self.assertEqual(response.status_code, 404)
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+            self.assertEqual(self.idea.travel, self.travel)
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PUT"), transaction.atomic():
+            response = self.client.put(
+                url,
+                {
+                    "title": "Modification interdite",
+                    "type": IdeaType.ACTIVITY,
+                },
+            )
+
+            self.assertEqual(response.status_code, 404)
+
+            self.idea.refresh_from_db()
+            self.assertEqual(self.idea.title, "Restaurant japonais")
+            self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
+            self.assertEqual(self.idea.travel, self.travel)
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertTrue(Idea.objects.filter(id=idea_id).exists())
+
+            transaction.set_rollback(True)
+
+    # Test : une idée inexistante ne peut être consultée, modifiée ou supprimée
+    def test_cannot_access_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        url = reverse(
+            "idea-detail",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": idea_id,
+            },
+        )
+
+        with self.subTest(method="GET"), transaction.atomic():
+            response = self.client.get(url)
+
+            self.assertEqual(response.status_code, 404)
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PATCH"), transaction.atomic():
+            response = self.client.patch(
+                url,
+                {
+                    "title": "Modification impossible",
+                },
+            )
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="PUT"), transaction.atomic():
+            response = self.client.put(
+                url,
+                {
+                    "title": "Modification impossible",
+                    "type": IdeaType.ACTIVITY,
+                },
+            )
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+            transaction.set_rollback(True)
+
+    # Test : une idée ne peut pas être rattachée à une étape d'un autre voyage
+    def test_cannot_patch_idea_with_step_from_another_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": self.other_step.id,
+                "start_date": "2026-07-03",
+                "end_date": "2026-07-03",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("step", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.step)
+        self.assertIsNone(self.idea.start_date)
+        self.assertIsNone(self.idea.end_date)
+        self.assertEqual(self.idea.travel, self.travel)
+
+    # Test : une idée ne peut pas être rattachée à une étape à la corbeille
+    def test_cannot_patch_idea_with_trashed_step(self):
+        trashed_step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        trashed_step.soft_delete()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": trashed_step.id,
+                "start_date": "2026-06-04",
+                "end_date": "2026-06-04",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("step_id", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.step)
+        self.assertIsNone(self.idea.start_date)
+        self.assertIsNone(self.idea.end_date)
+        self.assertEqual(self.idea.travel, self.travel)
+
+    # Test : une idée ne peut pas être placée hors des dates de l'étape
+    def test_cannot_patch_idea_with_dates_outside_step(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 5),
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": step.id,
+                "start_date": "2026-06-06",
+                "end_date": "2026-06-06",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("step", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.step)
+        self.assertIsNone(self.idea.start_date)
+        self.assertIsNone(self.idea.end_date)
+        self.assertEqual(self.idea.travel, self.travel)
+
+    # Test : une idée non hébergement ne peut pas retourner au pool avec ses dates
+    def test_cannot_return_idea_to_pool_with_dates(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 5),
+        )
+
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 4)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 4))
+        self.assertFalse(self.idea.is_in_pool)
+
+    # Test : un hébergement ne peut pas retourner au pool sans ses dates
+    def test_cannot_return_lodging_to_pool_without_dates(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": None,
+                "start_date": None,
+                "end_date": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("start_date", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.type, IdeaType.LODGING)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+        self.assertFalse(self.idea.is_in_pool)
+
+    # Test : un hébergement déjà choisi ne peut pas retourner au pool directement
+    def test_cannot_return_chosen_lodging_to_pool_directly(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.chosen_by = self.traveler
+        self.idea.chosen_at = timezone.now()
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "idea-detail",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "step_id": None,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.step, step)
+        self.assertIsNotNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+
+    # ========================================================================#
+    # Bloc 3 : Tests idea-choice -> POST
+    # ========================================================================#
+
+    # Tests réussi
+    # ========================================================================#
+
+    # Test : un participant peut choisir un hébergement placé sur une étape
+    def test_participant_can_choose_lodging(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.idea.id)
+        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertIsNotNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+
+    # Test : un autre participant peut choisir, sans imposer les données du choix
+    def test_other_participant_can_choose_lodging_ignoring_request_data(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        title = self.idea.title
+
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=other_traveler)
+
+        before_choice = timezone.now()
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "chosen_by_id": self.traveler.id,
+                "chosen_at": "2000-01-01T10:00:00Z",
+                "title": "Titre imposé dans la requête",
+            },
+            format="json",
+        )
+
+        after_choice = timezone.now()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.idea.id)
+        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["chosen_by_id"], other_traveler.id)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, other_traveler)
+        self.assertIsNotNone(self.idea.chosen_at)
+        self.assertGreaterEqual(self.idea.chosen_at, before_choice)
+        self.assertLessEqual(self.idea.chosen_at, after_choice)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+        self.assertEqual(self.idea.traveler, self.traveler)
+        self.assertEqual(self.idea.title, title)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+
+    # Test : un choix répété conserve l'auteur et les dates du premier choix
+    def test_repeated_choice_preserves_first_choice(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        url = reverse(
+            "idea-choice",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertIsNotNone(self.idea.chosen_at)
+
+        chosen_at = self.idea.chosen_at
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=other_traveler)
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
+
+        self.idea.refresh_from_db()
+        self.assertEqual(self.idea.chosen_by, self.traveler)
+        self.assertEqual(self.idea.chosen_at, chosen_at)
+        self.assertEqual(self.idea.updated_at, updated_at)
+        self.assertEqual(self.idea.status, IdeaStatus.CHOSEN)
+
+    # Tests echec : Traveler non connecté
+    # ========================================================================#
+
+    # Test : un traveler non connecté ne peut pas choisir un hébergement
+    def test_choice_forbidden_if_not_authenticated(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Tests echec : Traveler non-participant
+    # ========================================================================#
+
+    # Test : un non-participant ne peut pas choisir un hébergement
+    def test_non_participant_cannot_choose_lodging(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Tests echec : Participation non ACCEPTED
+    # ========================================================================#
+
+    # Test : une participation non ACCEPTED ne permet pas de choisir un hébergement
+    def test_choice_forbidden_if_participation_not_accepted(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        url = reverse(
+            "idea-choice",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with (
+                self.subTest(participation_status=participation_status),
+                transaction.atomic(),
+            ):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.post(url)
+
+                self.assertEqual(response.status_code, 404)
+
+                self.idea.refresh_from_db()
+                self.assertIsNone(self.idea.chosen_by)
+                self.assertIsNone(self.idea.chosen_at)
+                self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+                self.assertEqual(self.idea.updated_at, updated_at)
+
+                transaction.set_rollback(True)
+
+    # Tests echec : Ressource ciblée
+    # ========================================================================#
+
+    # Test : un hébergement ne peut pas être choisi via un autre voyage
+    def test_cannot_choose_lodging_with_wrong_travel(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.other_travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.travel, self.travel)
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Test : une idée inexistante ne peut pas être choisie
+    def test_cannot_choose_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": idea_id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Idea.objects.filter(id=idea_id).exists())
+
+    # Tests echec : Données invalides
+    # ========================================================================#
+
+    # Test : une idée non hébergement placée sur une étape ne peut pas être choisie
+    def test_cannot_choose_non_lodging_idea(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 4)
+        self.idea.save()
+
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.PLACED)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Test : un hébergement encore dans le pool ne peut pas être choisi
+    def test_cannot_choose_lodging_still_in_pool(self):
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertTrue(self.idea.is_in_pool)
+
+    # Test : un hébergement sur une étape à la corbeille ne peut pas être choisi
+    def test_cannot_choose_lodging_on_trashed_step(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+        )
+
+        self.idea.type = IdeaType.LODGING
+        self.idea.title = "Hôtel du lac"
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        step.soft_delete()
+        self.idea.refresh_from_db()
+
+        updated_at = self.idea.updated_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        self.idea.refresh_from_db()
+        self.assertIsNone(self.idea.chosen_by)
+        self.assertIsNone(self.idea.chosen_at)
+        self.assertEqual(self.idea.status, IdeaStatus.SUGGESTED)
+        self.assertTrue(self.idea.is_in_pool)
+        self.assertEqual(self.idea.step, step)
+        self.assertEqual(self.idea.start_date, datetime.date(2026, 6, 4))
+        self.assertEqual(self.idea.end_date, datetime.date(2026, 6, 5))
+        self.assertEqual(self.idea.updated_at, updated_at)
+
+    # Test : un hébergement qui chevauche un hébergement déjà choisi ne peut pas être choisi
+    def test_choosing_overlapping_lodging_via_endpoint_is_rejected(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 8),
+        )
+
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel déjà choisi",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            chosen_by=self.traveler,
+            chosen_at=timezone.now(),
+        )
+
+        second = Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Autre hôtel",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 5),
+            end_date=datetime.date(2026, 6, 7),
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": second.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("chosen_at", response.data["details"])
+
+        second.refresh_from_db()
+        self.assertIsNone(second.chosen_by)
+        self.assertIsNone(second.chosen_at)
+
+
+# ========================================================================#
+# --- Reaction -> views tests --- #
+# ========================================================================#
+
+
+class ReactionViewTest(APITestCase):
+    def setUp(self):
+        # Participant principal
+        self.traveler = Traveler.objects.create_user(
+            username="Jean",
+            email="jean@exemple.com",
+            password="password123",
+        )
+
+        # Voyage principal
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        # Idée proposée par Jean
+        self.idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Restaurant japonais",
+            type=IdeaType.RESTAURANT,
+        )
+
+        # Autre participant, au même voyage
+        self.other_traveler = Traveler.objects.create_user(
+            username="Paul",
+            email="paul@exemple.com",
+            password="password123",
+        )
+
+        Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+    # Tests réussi
+    # ========================================================================#
+
+    # Test : un participant accepté peut réagir à une idée du voyage
+    def test_participant_can_create_reaction(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["traveler_id"], self.traveler.id)
+        self.assertEqual(response.data["idea_id"], self.idea.id)
+
+        reaction = Reaction.objects.get(id=response.data["id"])
+
+        self.assertEqual(reaction.traveler, self.traveler)
+        self.assertEqual(reaction.idea, self.idea)
+        self.assertIsNotNone(reaction.created_at)
+        self.assertEqual(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).count(),
+            1,
+        )
+
+    # Test : deux participants peuvent réagir à la même idée
+    def test_other_participant_can_react_ignoring_request_data(self):
+        first_reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        created_at = first_reaction.created_at
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        self.client.force_authenticate(user=self.other_traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            ),
+            {
+                "traveler_id": self.traveler.id,
+                "idea_id": other_idea.id,
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["traveler_id"], self.other_traveler.id)
+        self.assertEqual(response.data["idea_id"], self.idea.id)
+
+        reaction = Reaction.objects.get(id=response.data["id"])
+
+        self.assertEqual(reaction.traveler, self.other_traveler)
+        self.assertEqual(reaction.idea, self.idea)
+        self.assertNotEqual(reaction.id, first_reaction.id)
+        self.assertEqual(
+            Reaction.objects.filter(idea=self.idea).count(),
+            2,
+        )
+        self.assertFalse(Reaction.objects.filter(idea=other_idea).exists())
+
+        first_reaction.refresh_from_db()
+        self.assertEqual(first_reaction.traveler, self.traveler)
+        self.assertEqual(first_reaction.idea, self.idea)
+        self.assertEqual(first_reaction.created_at, created_at)
+
+    # Test : un participant peut réagir à deux idées différentes
+    def test_participant_can_react_to_different_ideas(self):
+        first_reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        created_at = first_reaction.created_at
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": other_idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["traveler_id"], self.traveler.id)
+        self.assertEqual(response.data["idea_id"], other_idea.id)
+
+        reaction = Reaction.objects.get(id=response.data["id"])
+
+        self.assertEqual(reaction.traveler, self.traveler)
+        self.assertEqual(reaction.idea, other_idea)
+        self.assertNotEqual(reaction.id, first_reaction.id)
+        self.assertEqual(
+            Reaction.objects.filter(traveler=self.traveler).count(),
+            2,
+        )
+
+        first_reaction.refresh_from_db()
+        self.assertEqual(first_reaction.traveler, self.traveler)
+        self.assertEqual(first_reaction.idea, self.idea)
+        self.assertEqual(first_reaction.created_at, created_at)
+
+    # Test : un participant retire uniquement sa réaction sur l'idée ciblée
+    def test_participant_can_delete_only_own_reaction_on_target_idea(self):
+        reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        other_participant_reaction = Reaction.objects.create(
+            traveler=self.other_traveler,
+            idea=self.idea,
+        )
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+        )
+
+        other_idea_reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=other_idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.delete(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(Reaction.objects.filter(id=reaction.id).exists())
+        self.assertTrue(
+            Reaction.objects.filter(id=other_participant_reaction.id).exists()
+        )
+        self.assertTrue(Reaction.objects.filter(id=other_idea_reaction.id).exists())
+
+    # Test : un retrait répété réussit sans supprimer la réaction d'un autre
+    def test_repeated_reaction_delete_preserves_other_participant_reaction(self):
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        other_reaction = Reaction.objects.create(
+            traveler=self.other_traveler,
+            idea=self.idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).exists()
+        )
+
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.content, b"")
+        self.assertFalse(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).exists()
+        )
+        self.assertTrue(Reaction.objects.filter(id=other_reaction.id).exists())
+
+    # Tests échec : Réaction déjà existante
+    # ========================================================================#
+
+    # Test : un participant ne peut pas réagir deux fois à la même idée
+    def test_participant_cannot_create_duplicate_reaction(self):
+        reaction = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+
+        reaction_id = reaction.id
+        created_at = reaction.created_at
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse(
+                "idea-reaction",
+                kwargs={
+                    "travel_id": self.travel.id,
+                    "pk": self.idea.id,
+                },
+            )
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("reaction", response.data["details"])
+
+        self.assertEqual(
+            Reaction.objects.filter(
+                traveler=self.traveler,
+                idea=self.idea,
+            ).count(),
+            1,
+        )
+
+        reaction.refresh_from_db()
+        self.assertEqual(reaction.id, reaction_id)
+        self.assertEqual(reaction.created_at, created_at)
+
+    # Tests échec : Traveler non connecté
+    # ========================================================================#
+
+    # Test : un traveler non connecté ne peut ni créer ni retirer une réaction
+    def test_reaction_forbidden_if_not_authenticated(self):
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 403)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            reaction = Reaction.objects.create(
+                traveler=self.traveler,
+                idea=self.idea,
+            )
+
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 403)
+            self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+            transaction.set_rollback(True)
+
+    # Tests échec : Traveler non-participant
+    # ========================================================================#
+
+    # Test : un non-participant ne peut ni créer ni retirer une réaction
+    def test_non_participant_cannot_create_or_delete_reaction(self):
+        outsider = Traveler.objects.create_user(
+            username="Pierre",
+            email="pierre@exemple.com",
+            password="password123",
+        )
+
+        self.client.force_authenticate(user=outsider)
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            reaction = Reaction.objects.create(
+                traveler=outsider,
+                idea=self.idea,
+            )
+
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+            transaction.set_rollback(True)
+
+    # Tests échec : Participation non ACCEPTED
+    # ========================================================================#
+
+    # Test : une participation non ACCEPTED interdit la création et le retrait
+    def test_reaction_forbidden_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(participation_status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                with self.subTest(method="POST"), transaction.atomic():
+                    response = self.client.post(url)
+
+                    self.assertEqual(response.status_code, 404)
+                    self.assertFalse(Reaction.objects.exists())
+
+                    transaction.set_rollback(True)
+
+                with self.subTest(method="DELETE"), transaction.atomic():
+                    reaction = Reaction.objects.create(
+                        traveler=self.traveler,
+                        idea=self.idea,
+                    )
+
+                    response = self.client.delete(url)
+
+                    self.assertEqual(response.status_code, 404)
+                    self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+                    transaction.set_rollback(True)
+
+    # Tests échec : Ressource ciblée
+    # ========================================================================#
+
+    # Test : une réaction ne peut ni être créée ni retirée via un autre voyage
+    def test_cannot_create_or_delete_reaction_with_wrong_travel(self):
+        other_travel = Travel.objects.create(
+            title="Road trip France",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": other_travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            reaction = Reaction.objects.create(
+                traveler=self.traveler,
+                idea=self.idea,
+            )
+
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertTrue(Reaction.objects.filter(id=reaction.id).exists())
+
+            transaction.set_rollback(True)
+
+    # Test : une idée inexistante interdit la création et le retrait d'une réaction
+    def test_cannot_create_or_delete_reaction_for_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        idea_id = self.idea.id
+        self.idea.delete()
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": idea_id,
+            },
+        )
+
+        with self.subTest(method="POST"), transaction.atomic():
+            response = self.client.post(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)
+
+        with self.subTest(method="DELETE"), transaction.atomic():
+            response = self.client.delete(url)
+
+            self.assertEqual(response.status_code, 404)
+            self.assertFalse(Reaction.objects.exists())
+
+            transaction.set_rollback(True)

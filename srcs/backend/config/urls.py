@@ -5,4 +5,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("traveler.urls")),
     path("api/travels/", include("travel.urls")),
+    path("api/travels/", include("idea.urls")),
 ]
