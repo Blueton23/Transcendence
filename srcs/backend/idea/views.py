@@ -88,7 +88,7 @@ class IdeaChoiceView(ParticipantScopedMixin, GenericAPIView):
     def post(self, request, travel_id, pk):
         idea = self.get_object()
 
-        # Si l’idée n’a pas déjà été placée
+        # Si l’hébergement n’a pas déjà été choisi
         if idea.chosen_at is None:
             if idea.step_id is not None:
                 idea.step = get_object_or_404(
