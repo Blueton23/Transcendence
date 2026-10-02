@@ -18,12 +18,31 @@ export async function parseResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get("content-type");
 
   if (!response.ok) {
+    const rawBody = await response.text();
+
+    console.error("API ERROR", {
+      status: response.status,
+      statusText: response.statusText,
+      contentType,
+      body: rawBody,
+    });
+
     if (contentType?.includes("application/json")) {
-      const result = await response.json();
-      throw new Error(getApiErrorMessage(result));
+      try {
+        const result: ApiErrorResponse = JSON.parse(rawBody);
+        throw new Error(getApiErrorMessage(result));
+      } catch (error) {
+        if (error instanceof Error) {
+          throw error;
+        }
+
+        throw new Error(rawBody || "Erreur serveur.");
+      }
     }
 
-    throw new Error("Une erreur serveur est survenue.");
+    throw new Error(
+      rawBody || `Erreur serveur (${response.status} ${response.statusText})`,
+    );
   }
 
   if (contentType?.includes("application/json")) {

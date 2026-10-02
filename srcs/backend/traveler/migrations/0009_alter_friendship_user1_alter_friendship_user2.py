@@ -6,20 +6,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('traveler', '0008_remove_friendship_unique_friendship_and_more'),
+        ("traveler", "0008_remove_friendship_unique_friendship_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='friendship',
-            name='user1',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='friendships_user1', to=settings.AUTH_USER_MODEL),
+            model_name="friendship",
+            name="user1",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="friendships_user1",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='friendship',
-            name='user2',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='friendships_user2', to=settings.AUTH_USER_MODEL),
+            model_name="friendship",
+            name="user2",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="friendships_user2",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

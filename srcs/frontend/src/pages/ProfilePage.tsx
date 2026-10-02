@@ -2,6 +2,9 @@ import { useState } from "react";
 
 import ProfileInfo from "../features/profile/components/ProfileInfo";
 import Modify from "../features/profile/components/Modify";
+import FriendList from "../features/friendship/components/FriendList";
+import FriendRequests from "../features/friendship/components/FriendRequests";
+import FriendSearch from "../features/friendship/components/FriendSearch";
 
 import Button from "../shared/ui/Button";
 import Modal from "../shared/ui/Modal";
@@ -30,6 +33,10 @@ function ProfilePage() {
           Modifier le profil
         </Button>
       </div>
+
+      <FriendSearch />
+      <FriendRequests />
+      <FriendList />
 
       {isModifyOpen && (
         <Modal

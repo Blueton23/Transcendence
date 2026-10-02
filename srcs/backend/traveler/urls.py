@@ -7,6 +7,12 @@ from django.urls import path
 from .views import (
     ApiHealthView,
     CsrfTokenView,
+    FriendshipAcceptView,
+    FriendshipListView,
+    FriendshipRejectView,
+    FriendshipRequestsView,
+    FriendshipRequestView,
+    FriendshipSearchView,
     LoginView,
     LogoutView,
     MeView,
@@ -36,6 +42,34 @@ urlpatterns = [
         name="traveler-update-profile-picture",
     ),
     path("travelers/update/", TravelerUpdateView.as_view(), name="traveler-update"),
+    path(
+        "friendships/search/", FriendshipSearchView.as_view(), name="friendship-search"
+    ),
+    path(
+        "friendships/request/",
+        FriendshipRequestView.as_view(),
+        name="friendship-request",
+    ),
+    path(
+        "friendships/requests/",
+        FriendshipRequestsView.as_view(),
+        name="friendship-requests",
+    ),
+    path(
+        "friendships/<int:friendship_id>/accept/",
+        FriendshipAcceptView.as_view(),
+        name="friendship-accept",
+    ),
+    path(
+        "friendships/<int:friendship_id>/reject/",
+        FriendshipRejectView.as_view(),
+        name="friendship-reject",
+    ),
+    path(
+        "friendships/",
+        FriendshipListView.as_view(),
+        name="friendship-list",
+    ),
 ]
 
 urlpatterns += static(
