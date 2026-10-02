@@ -140,3 +140,50 @@ def compute_balances(travel) -> list[TravelerBalance]:
         )
         for traveler in travelers
     ]
+
+
+@dataclass(frozen=True)
+class Settlement:
+    debtor: object
+    creditor: object
+    amount: Decimal
+
+
+def compute_settlements(travel) -> list[Settlement]:
+    """Transfers that bring every balance of ``travel`` back to zero.
+
+    Greedy: the biggest debtor repays the biggest creditor, as much as possible,
+    until everyone is even. Gives at most ``n - 1`` transfers. Ties are broken
+    by traveler id so the result is stable.
+    """
+    creditors: list[list] = []
+    debtors: list[list] = []
+    for balance in compute_balances(travel):
+        if balance.balance > 0:
+            creditors.append([balance.traveler, balance.balance])
+        elif balance.balance < 0:
+            debtors.append([balance.traveler, -balance.balance])
+
+    def by_amount(entry: list) -> tuple:
+        return (-entry[1], entry[0].pk)
+
+    creditors.sort(key=by_amount)
+    debtors.sort(key=by_amount)
+
+    settlements = []
+    while creditors and debtors:
+        creditor, debtor = creditors[0], debtors[0]
+        amount = min(creditor[1], debtor[1])
+        settlements.append(
+            Settlement(debtor=debtor[0], creditor=creditor[0], amount=amount)
+        )
+        creditor[1] -= amount
+        debtor[1] -= amount
+        if not creditor[1]:
+            creditors.pop(0)
+        if not debtor[1]:
+            debtors.pop(0)
+        # Le reste d'un solde partiellement rembourse peut ne plus etre le plus gros.
+        creditors.sort(key=by_amount)
+        debtors.sort(key=by_amount)
+    return settlements

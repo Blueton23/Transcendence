@@ -10,6 +10,7 @@ from idea.models import Idea, IdeaType
 from spending.models import Spending, SpendingCategory, SpendingShare
 from spending.services import (
     compute_balances,
+    compute_settlements,
     create_spending,
     set_shares,
     split_equally,
@@ -585,3 +586,91 @@ class ComputeBalancesTest(TestCase):
             self._spend(self.alice, "10.00")
         with self.assertNumQueries(4):
             compute_balances(self.travel)
+
+
+class ComputeSettlementsTest(TestCase):
+    def setUp(self):
+        self.alice, self.bob, self.carol, self.dave = (
+            Traveler.objects.create_user(
+                username=name, email=f"{name}@example.com", password="password123"
+            )
+            for name in ("alice", "bob", "carol", "dave")
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        for traveler in (self.alice, self.bob, self.carol, self.dave):
+            Participation.objects.create(
+                traveler=traveler,
+                travel=self.travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
+
+    def _spend(self, payer, amount, shares=None):
+        return create_spending(
+            travel=self.travel,
+            traveler=payer,
+            category=SpendingCategory.FUEL,
+            amount=Decimal(amount),
+            shares=shares,
+        )
+
+    def _as_tuples(self):
+        return [
+            (s.debtor, s.creditor, s.amount) for s in compute_settlements(self.travel)
+        ]
+
+    def _assert_settles_everyone(self):
+        remaining = {b.traveler: b.balance for b in compute_balances(self.travel)}
+        for settlement in compute_settlements(self.travel):
+            self.assertGreater(settlement.amount, 0)
+            remaining[settlement.debtor] += settlement.amount
+            remaining[settlement.creditor] -= settlement.amount
+        self.assertEqual(set(remaining.values()), {Decimal(0)})
+
+    def test_no_spending_needs_no_settlement(self):
+        self.assertEqual(compute_settlements(self.travel), [])
+
+    def test_payer_alone_in_shares_needs_no_settlement(self):
+        self._spend(self.alice, "50.00", shares={self.alice: Decimal("50.00")})
+        self.assertEqual(compute_settlements(self.travel), [])
+
+    def test_mockup_example(self):
+        # 1 240 CHF a 4 : 310 chacun -> alice +250, bob +110, carol -145, dave -215.
+        self._spend(self.alice, "560.00")
+        self._spend(self.bob, "420.00")
+        self._spend(self.carol, "165.00")
+        self._spend(self.dave, "95.00")
+        self.assertEqual(
+            self._as_tuples(),
+            [
+                (self.dave, self.alice, Decimal("215.00")),
+                (self.carol, self.bob, Decimal("110.00")),
+                (self.carol, self.alice, Decimal("35.00")),
+            ],
+        )
+        self._assert_settles_everyone()
+
+    def test_at_most_n_minus_one_transfers(self):
+        self._spend(self.alice, "10.00")
+        self._spend(self.bob, "33.33")
+        self._spend(self.carol, "7.01")
+        self._spend(self.dave, "0.05")
+        self.assertLessEqual(len(compute_settlements(self.travel)), 3)
+        self._assert_settles_everyone()
+
+    def test_uneven_cents_are_fully_settled(self):
+        self._spend(self.alice, "10.00")
+        self._spend(self.bob, "1.00")
+        self._assert_settles_everyone()
+
+    def test_traveler_who_left_still_settles(self):
+        self._spend(self.alice, "40.00")
+        Participation.objects.filter(traveler=self.dave).update(
+            status=ParticipationStatus.LEFT
+        )
+        debtors = {s.debtor for s in compute_settlements(self.travel)}
+        self.assertIn(self.dave, debtors)
+        self._assert_settles_everyone()
