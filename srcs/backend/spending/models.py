@@ -35,9 +35,10 @@ class Spending(TimeStampedModel, ValidatedModel):
         on_delete=models.CASCADE,
         related_name="spendings",
     )
+    # PROTECT : supprimer le payeur effacerait ce que les autres lui doivent.
     traveler = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name="spendings",
         help_text="Who paid.",
     )

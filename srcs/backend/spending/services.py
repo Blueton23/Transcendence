@@ -80,6 +80,14 @@ def update_spending(
     spending: Spending, *, shares: Mapping | None = None, **fields: object
 ) -> Spending:
 
+    # Changer de voyage laisserait des parts a des non-membres du nouveau voyage.
+    travel = fields.get("travel")
+    travel_id = fields.get("travel_id", travel.pk if travel else spending.travel_id)
+    if travel_id != spending.travel_id:
+        raise ValidationError(
+            {"travel": "A spending cannot be moved to another travel."}
+        )
+
     previous_amount = spending.amount
     for name, value in fields.items():
         setattr(spending, name, value)

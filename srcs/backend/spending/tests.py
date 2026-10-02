@@ -153,6 +153,11 @@ class SpendingModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self._make_spending(category="z")
 
+    def test_payer_with_spendings_cannot_be_deleted(self):
+        self._make_spending()
+        with self.assertRaises(ProtectedError):
+            self.traveler.delete()
+
     def test_travel_deletion_cascades(self):
         self._make_spending()
         self.travel.delete()
@@ -466,6 +471,26 @@ class SpendingServiceTest(TestCase):
             )
         spending.refresh_from_db()
         self.assertEqual(spending.amount, Decimal("30.00"))
+
+    def test_update_cannot_move_spending_to_another_travel(self):
+        spending = self._create()
+        other_travel = Travel.objects.create(
+            title="Other trip",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 10),
+        )
+        for fields in ({"travel": other_travel}, {"travel_id": other_travel.pk}):
+            with self.subTest(fields=fields):
+                with self.assertRaises(ValidationError) as ctx:
+                    update_spending(spending, **fields)
+                self.assertIn("travel", ctx.exception.message_dict)
+        spending.refresh_from_db()
+        self.assertEqual(spending.travel, self.travel)
+
+    def test_update_with_same_travel_is_allowed(self):
+        spending = self._create()
+        update_spending(spending, travel=self.travel, label="Plein")
+        self.assertEqual(spending.label, "Plein")
 
     def test_set_shares_replaces_previous_ones(self):
         spending = self._create()
