@@ -8,12 +8,9 @@ import {
 } from "../api/friendship";
 
 import Button from "@/shared/ui/Button";
-import Card from "@/shared/ui/Card";
-import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
-import Badge from "@/shared/ui/Badge";
-import Divider from "@/shared/ui/Divider";
+import Icon from "@/shared/ui/Icon";
 
 function FriendRequests() {
   const [requests, setRequests] = useState<FriendshipRequest[]>([]);
@@ -77,24 +74,12 @@ function FriendRequests() {
   }
 
   return (
-    <Card variant="default" className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex flex-col gap-1">
-          <Heading level={2} size="md">
-            Demandes d'amis reçues
-          </Heading>
-
-          <Text tone="secondary">
-            Les personnes qui souhaitent rejoindre vos amis.
-          </Text>
-        </div>
-
-        {requests.length > 0 && (
-          <Badge variant="warning">{requests.length}</Badge>
-        )}
+        <Text tone="muted">
+          DEMANDES RECUES · {requests.length > 0 && requests.length}
+        </Text>
       </div>
-
-      <Divider />
 
       {error && <Text tone="accent">{error}</Text>}
 
@@ -108,7 +93,7 @@ function FriendRequests() {
             return (
               <div
                 key={request.id}
-                className="flex flex-col gap-4 rounded-md border border-border bg-surface-container p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-4"
               >
                 <div className="flex items-center gap-3">
                   <Avatar size="md">
@@ -127,20 +112,20 @@ function FriendRequests() {
                 <div className="flex gap-2">
                   <Button
                     type="button"
-                    variant="primary"
+                    icon={<Icon name="check" size={16} />}
+                    variant="success"
                     disabled={isLoading}
                     onClick={() => void handleAccept(request.id)}
                   >
-                    Accepter
                   </Button>
-
+                  
                   <Button
                     type="button"
-                    variant="outline"
+                    icon={<Icon name="x" size={16} />}
+                    variant="danger"
                     disabled={isLoading}
                     onClick={() => void handleReject(request.id)}
                   >
-                    Rejeter
                   </Button>
                 </div>
               </div>
@@ -148,7 +133,7 @@ function FriendRequests() {
           })}
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 

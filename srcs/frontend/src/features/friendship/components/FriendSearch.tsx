@@ -74,11 +74,11 @@ function FriendSearch() {
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Input
-          icon={<Icon name="search" size={18} className="text-brand-primary" />}
+          icon={<Icon name="search" size={18} className="text-muted" />}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Ajouter un ami . pseudo ou email"
-          className="flex-1"
+          placeholder="Ajouter un ami · pseudo ou email"
+          className="flex-1 "
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               void handleSearch();

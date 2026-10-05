@@ -1,6 +1,6 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
-type ButtonVariant = "primary" | "dark" | "outline" | "danger" | "ghost";
+type ButtonVariant = "primary" | "dark" | "outline" | "danger" | "ghost" | "success";
 
 type ButtonSize = "sm" | "md";
 
@@ -17,6 +17,7 @@ const variantStyles = {
   outline: "bg-surface border border-border text-text",
   danger: "bg-error text-inverse border-transparent",
   ghost: "bg-transparent text-text",
+  success: "bg-success text-inverse border-transparent",
 };
 
 const sizeStyles = {
