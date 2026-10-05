@@ -4,12 +4,11 @@ import type { User } from "@/features/auth/types";
 import { searchFriend, sendFriendRequest } from "../api/friendship";
 
 import Button from "@/shared/ui/Button";
-import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
-import Divider from "@/shared/ui/Divider";
+import Icon from "@/shared/ui/Icon";
 
 function FriendSearch() {
   const [query, setQuery] = useState("");
@@ -66,24 +65,19 @@ function FriendSearch() {
   }
 
   return (
-    <Card variant="default" className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <Heading level={2} size="md">
-          Rechercher un ami
+        <Heading level={1} size="xl">
+          Amis
         </Heading>
-
-        <Text tone="secondary">
-          Recherchez un utilisateur avec son username ou son email.
-        </Text>
       </div>
-
-      <Divider />
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Input
+          icon={<Icon name="search" size={18} className="text-brand-primary" />}
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Username ou email"
+          placeholder="Ajouter un ami . pseudo ou email"
           className="flex-1"
           onKeyDown={(event) => {
             if (event.key === "Enter") {
@@ -131,7 +125,7 @@ function FriendSearch() {
           </Button>
         </div>
       )}
-    </Card>
+    </div>
   );
 }
 
