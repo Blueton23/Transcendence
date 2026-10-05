@@ -353,13 +353,13 @@ class FriendshipRequestsView(APIView):
         requests = []
 
         for friendship in friendships:
-            sender = friendship.requested_by
+            user1 = friendship.requested_by
 
             requests.append(
                 {
                     "id": friendship.id,
                     "traveler": TravelerSerializer(
-                        sender,
+                        user1,
                         context={"request": request},
                     ).data,
                     "created_at": friendship.created_at,

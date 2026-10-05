@@ -26,18 +26,18 @@ def seed_friendships(fake: Faker, travelers: list, count: int) -> list:
 
     while len(friendships) < count and attempts < max_attempts:
         attempts += 1
-        sender, receiver = fake.random_elements(travelers, length=2, unique=True)
-        if sender.pk > receiver.pk:
-            sender, receiver = receiver, sender
+        user1, user2 = fake.random_elements(travelers, length=2, unique=True)
+        if user1.pk > user2.pk:
+            user1, user2 = user2, user1
 
-        if Friendship.objects.filter(sender=sender, receiver=receiver).exists():
+        if Friendship.objects.filter(user1=user1, user2=user2).exists():
             continue
 
         friendships.append(
             Friendship.objects.create(
-                sender=sender,
-                receiver=receiver,
-                requested_by=fake.random_element(elements=(sender, receiver)),
+                user1=user1,
+                user2=user2,
+                requested_by=fake.random_element(elements=(user1, user2)),
                 status=fake.random_element(elements=Status.values),
             )
         )
