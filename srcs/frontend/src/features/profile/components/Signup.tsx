@@ -80,9 +80,7 @@ function Signup() {
 
             <Input
               name="firstName"
-              icon={
-                <Icon name="user" size={18} className="text-muted" />
-              }
+              icon={<Icon name="user" size={18} className="text-muted" />}
               placeholder="Charlotte"
               type="text"
               value={form.firstName}
@@ -98,9 +96,7 @@ function Signup() {
 
             <Input
               name="lastName"
-              icon={
-                <Icon name="user" size={18} className="text-muted" />
-              }
+              icon={<Icon name="user" size={18} className="text-muted" />}
               placeholder="Petit"
               type="text"
               value={form.lastName}
@@ -136,9 +132,7 @@ function Signup() {
 
           <Input
             name="email"
-            icon={
-              <Icon name="email" size={18} className="text-muted" />
-            }
+            icon={<Icon name="email" size={18} className="text-muted" />}
             placeholder="charlotte@peripl.com"
             type="email"
             value={form.email}

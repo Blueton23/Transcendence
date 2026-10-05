@@ -116,17 +116,15 @@ function FriendRequests() {
                     variant="success"
                     disabled={isLoading}
                     onClick={() => void handleAccept(request.id)}
-                  >
-                  </Button>
-                  
+                  ></Button>
+
                   <Button
                     type="button"
                     icon={<Icon name="x" size={16} />}
                     variant="danger"
                     disabled={isLoading}
                     onClick={() => void handleReject(request.id)}
-                  >
-                  </Button>
+                  ></Button>
                 </div>
               </div>
             );

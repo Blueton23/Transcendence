@@ -57,7 +57,6 @@ function FriendList() {
               </div>
             </div>
           ))}
-          
         </div>
       )}
     </div>

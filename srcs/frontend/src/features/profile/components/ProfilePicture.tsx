@@ -58,7 +58,7 @@ function ProfilePicture() {
       <img
         src={currentUser.profilePicture ?? undefined}
         alt="Photo de profil"
-        className="rounded-full h-24 w-24 object-cover"
+        className="h-24 w-24 rounded-full object-cover"
       />
 
       <input

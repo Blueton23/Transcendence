@@ -4,7 +4,12 @@ from faker import Faker
 from common.seeders.clear import clear_seed_data
 from common.seeders.idea import seed_ideas, seed_reactions
 from common.seeders.travel import seed_participations, seed_steps, seed_travels
-from common.seeders.traveler import seed_friendships, seed_travelers
+from common.seeders.traveler import (
+    seed_friendships,
+    seed_travelers,
+    seed_dub_friendships,
+    seed_dub_travelers,
+)
 
 
 class Command(BaseCommand):
@@ -36,11 +41,21 @@ class Command(BaseCommand):
         travelers = seed_travelers(fake, options["travelers"])
         self.stdout.write(f"Created {len(travelers)} travelers.")
 
+        # Travelers DUB
+        dub_travelers = seed_dub_travelers()
+        self.stdout.write(f"Created {len(dub_travelers)} DUB travelers.")
+
+        # Friendships spécifiques des DUB
+        dub_friendships = seed_dub_friendships(dub_travelers)
+        self.stdout.write(f"Created {len(dub_friendships)} DUB friendships.")
+
         friendships = seed_friendships(fake, travelers, options["friendships"])
         self.stdout.write(f"Created {len(friendships)} friendships.")
 
         travels = seed_travels(fake, options["travels"])
         self.stdout.write(f"Created {len(travels)} travels.")
+
+#        travelers.extend(dub_travelers)
 
         participations = seed_participations(
             fake, travelers, travels, options["participations"]

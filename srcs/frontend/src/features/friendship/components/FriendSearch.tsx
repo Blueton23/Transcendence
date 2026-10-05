@@ -78,7 +78,7 @@ function FriendSearch() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Ajouter un ami · pseudo ou email"
-          className="flex-1 "
+          className="flex-1"
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               void handleSearch();

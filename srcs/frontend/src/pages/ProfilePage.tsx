@@ -22,7 +22,7 @@ function ProfilePage() {
           <img
             src={currentUser.profilePicture ?? undefined}
             alt="Photo de profil"
-            className="rounded-full h-15 w-15 object-cover"
+            className="h-15 w-15 rounded-full object-cover"
           />
         )}
         <Button
