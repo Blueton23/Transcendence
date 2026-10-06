@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 
 from chat.models import Message
 from idea.models import Idea, Reaction
+from spending.models import Spending
 from travel.models import Participation, Step, Travel
 from traveler.models import Friendship
 
@@ -21,6 +22,7 @@ def clear_seed_data(*, keep_superusers: bool = True) -> dict[str, int]:
         "messages": Message.objects.all().delete()[0],
         "friendships": Friendship.objects.all().delete()[0],
         "participations": Participation.objects.all().delete()[0],
+        "spendings": Spending.objects.all().delete()[0],
         "reactions": Reaction.objects.all().delete()[0],
         "ideas": Idea.objects.all().delete()[0],
         "steps": Step.objects.all().delete()[0],

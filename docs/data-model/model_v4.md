@@ -17,6 +17,7 @@ erDiagram
     TRAVELER ||--o{ REACTION : "réagit (0,N)"
     TRAVELER ||--o{ MESSAGE : "écrit (0,N)"
     TRAVELER ||--o{ SPENDING : "paie (0,N)"
+    TRAVELER ||--o{ SPENDING_SHARE : "doit (0,N)"
     TRAVELER ||--o{ FRIENDSHIP : "est ami (0,N)"
 
     TRAVEL ||--o{ STEP : "contient (0,N)"
@@ -32,6 +33,8 @@ erDiagram
     IDEA ||--o{ REACTION : "reçoit (0,N)"
     IDEA ||--o{ MESSAGE : "commente (0,N)"
     IDEA ||--o{ SPENDING : "génère (0,N)"
+
+    SPENDING ||--o{ SPENDING_SHARE : "se répartit en (0,N)"
 
     TRAVELER {
         int id PK
@@ -134,8 +137,18 @@ erDiagram
         int StepId FK "optionnel"
         int IdeaId FK "optionnel"
         enum Category "logement / carburant / activités / repas / péages / autres"
+        string Label "optionnel - libellé libre, ex. Hôtel Ibis Lyon"
         decimal Amount
         datetime PaidDate "optionnel"
+        datetime CreatedAt
+        datetime UpdatedAt
+    }
+
+    SPENDING_SHARE {
+        int id PK
+        int SpendingId FK
+        int TravelerId FK "qui doit cette part"
+        decimal Amount "part due, >= 0"
         datetime CreatedAt
         datetime UpdatedAt
     }
@@ -156,8 +169,9 @@ erDiagram
 - **Idea** : une proposition faite pour un voyage. Rattachée à une étape, ou libre dans le pool. Une idée d'hébergement porte en plus son prix et ses dates. `Latitude`/`Longitude` permettent de l'épingler sur la carte à son propre emplacement, pas forcément celui de l'étape.
 - **Reaction** : un ❤️ d'une personne sur une idée. Purement indicatif.
 - **Friendship** : un lien d'amitié entre deux comptes, indépendant des voyages. Un refus supprime la ligne plutôt que de la conserver.
-- **Message** : un message du chat, rattaché au voyage, à une étape ou à une idée (jamais une étape et une idée à la fois). `IsSystem` distingue les notifications automatiques, qui n'ont pas d'auteur. L'auteur doit être membre du voyage au moment où il écrit.
-- **Spending** : une dépense, rattachable au voyage seul (carburant), à une étape (péage) ou à une idée (le resto qu'on a fait).
+- **Message** : un message du chat, rattachable au voyage, à une étape ou à une idée. `IsSystem` distingue les notifications automatiques.
+- **Spending** : une dépense, rattachable au voyage seul (carburant), à une étape (péage) ou à une idée (le resto qu'on a fait). `Category` sert aux regroupements de l'écran budget, `Label` précise de quoi il s'agit. Le payeur doit être un participant du voyage (statut accepté ou parti).
+- **SpendingShare** : la part d'une dépense due par un voyageur. Un voyageur a au plus une part par dépense (`SpendingId` + `TravelerId` uniques), et doit lui aussi être un participant accepté ou parti. Les parts sont figées à la création : quelqu'un qui quitte le voyage reste redevable des dépenses faites avant son départ. La somme des parts doit égaler `Spending.Amount`, vérifiée par le service de création (plusieurs lignes, donc pas dans la validation du modèle).
 
 ## Comportements en cas de suppression
 
@@ -166,6 +180,7 @@ erDiagram
 - **Message** : corbeille aussi (`DeletedAt`), la ligne reste en base. Si le compte de son auteur est supprimé, le message reste dans le fil sans auteur (`ON DELETE SET NULL`).
 - **Dépenses et messages** : conservés quoi qu'il arrive. Si leur étape ou leur idée disparaît, ils perdent juste leur rattachement (`ON DELETE SET NULL`). Exemple : les 240 CHF du camping restent au budget même sans l'étape Zermatt.
 - **Réactions** : supprimées avec leur idée, un ❤️ ne veut rien dire sans elle.
+- **Parts de dépense** : supprimées avec leur dépense. Un voyageur qui possède des parts ne peut pas être supprimé (`ON DELETE PROTECT`), sinon les soldes des autres seraient faussés sans bruit.
 
 `PricePerNight` est descriptif (« ce camping coûte 24 CHF/nuit »), `Spending` est de l'argent réellement sorti. Rien ne passe automatiquement de l'un à l'autre.
 
@@ -200,9 +215,12 @@ erDiagram
 | 17 | `Travel.EndDate` obligatoire, bornes fermes | Un voyage a une durée connue dès sa création, utile pour réserver. La somme des nuits des étapes ne peut pas dépasser `EndDate − StartDate`, c'est une validation applicative. Réduire propose une confirmation si des étapes en sortent, agrandir est immédiat. | Maquette |
 | 18 | `Step.Latitude` / `Longitude` | La carte a besoin de vraies coordonnées, pas juste un nom de lieu, quel que soit le service de géocodage choisi. Remplies automatiquement par la recherche de lieu. | Maquette |
 | 19 | `Idea.Latitude` / `Longitude` | Une idée (un resto, une activité) a son propre emplacement, pas forcément celui de son étape. Epinglable sur la carte à sa vraie adresse. Même mécanisme que sur `Step`. | Maquette |
-| 20 | `Message` : `DeletedAt` remplace `Enabled` | Même convention que la corbeille de `Step`, et on sait quand le message a été retiré. | Code |
-| 21 | `Participate.LastReadAt` | Nécessaire pour afficher les non-lus du chat. Une date suffit, le nombre de non-lus se calcule. | Code |
-| 22 | `Message` : une étape ou une idée, pas les deux | Un fil de commentaires ne s'accroche qu'à un seul objet, et le lien ne devient pas faux quand une idée change d'étape. | Code |
+| 20 | `Spending.Label` | `Category` dit le type de dépense, pas laquelle : « Repas » ne distingue pas deux restos. Libellé libre et optionnel. | |
+| 21 | Payeur d'une dépense = participant du voyage | Une dépense payée par quelqu'un d'extérieur au voyage fausserait les soldes. « Parti » reste accepté pour pouvoir modifier ses anciennes dépenses. | |
+| 22 | Table `SpendingShare` | Répartir une dépense entre les participants présents au moment où elle est faite. Calculer la répartition à partir des participants actuels changerait les soldes à chaque arrivée ou départ. Montant exact par part plutôt qu'un poids : couvre le partage égal comme le « j'ai juste pris le plat à 18 € ». | |
+| 23 | `Message` : `DeletedAt` remplace `Enabled` | Même convention que la corbeille de `Step`, et on sait quand le message a été retiré. | Code |
+| 24 | `Participate.LastReadAt` | Nécessaire pour afficher les non-lus du chat. Une date suffit, le nombre de non-lus se calcule. | Code |
+| 25 | `Message` : une étape ou une idée, pas les deux | Un fil de commentaires ne s'accroche qu'à un seul objet, et le lien ne devient pas faux quand une idée change d'étape. | Code |
 
 ### Statuts (point 5)
 

@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "travel",
     "idea",
     "chat",
+    "spending",
 ]
 
 AUTH_USER_MODEL = "traveler.Traveler"

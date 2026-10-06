@@ -9,6 +9,7 @@ from django.test import TestCase
 from chat.models import Message
 from common.seeders.clear import clear_seed_data
 from idea.models import Idea, Reaction
+from spending.models import Spending
 from travel.models import Participation, Step, Travel
 from traveler.models import Friendship
 
@@ -25,6 +26,7 @@ def _seed(**kwargs):
         "ideas_per_travel": 3,
         "reactions": 5,
         "messages_per_travel": 3,
+        "spendings_per_travel": 3,
     }
     defaults.update(kwargs)
     call_command("seed", stdout=StringIO(), **defaults)
@@ -43,6 +45,7 @@ class ClearSeedDataTest(TestCase):
         self.assertEqual(Friendship.objects.count(), 0)
         self.assertEqual(Participation.objects.count(), 0)
         self.assertEqual(Reaction.objects.count(), 0)
+        self.assertEqual(Spending.objects.count(), 0)
         self.assertEqual(Idea.objects.count(), 0)
         self.assertEqual(Step.objects.count(), 0)
         self.assertEqual(Travel.objects.count(), 0)
@@ -52,6 +55,7 @@ class ClearSeedDataTest(TestCase):
                 "messages",
                 "friendships",
                 "participations",
+                "spendings",
                 "reactions",
                 "ideas",
                 "steps",
@@ -129,3 +133,28 @@ class SeedFreshFlagTest(TestCase):
 
         self.assertTrue(Traveler.objects.filter(username="admin").exists())
         self.assertEqual(Traveler.objects.count(), 5)
+
+
+class SeedSpendingsTest(TestCase):
+    def test_creates_spendings_per_travel(self):
+        _seed(travels=3, spendings_per_travel=4)
+
+        self.assertEqual(Spending.objects.count(), 12)
+        for travel in Travel.objects.all():
+            self.assertEqual(travel.spendings.count(), 4)
+
+    def test_seeded_shares_match_spending_amount(self):
+        _seed(travels=3, spendings_per_travel=4)
+
+        for spending in Spending.objects.prefetch_related("shares"):
+            total = sum(share.amount for share in spending.shares.all())
+            self.assertEqual(total, spending.amount)
+
+    def test_step_and_idea_belong_to_spending_travel(self):
+        _seed(travels=3, spendings_per_travel=10)
+
+        for spending in Spending.objects.select_related("step", "idea"):
+            if spending.step is not None:
+                self.assertEqual(spending.step.travel_id, spending.travel_id)
+            if spending.idea is not None:
+                self.assertEqual(spending.idea.travel_id, spending.travel_id)
