@@ -53,8 +53,8 @@ def seed_dub_travelers() -> list:
             username=f"dub{i}",
             email=f"dub{i}@example.com",
             password="123456qw.",
-            first_name=f"Dubois{i}",
-            last_name=f"Sylvain{i}",
+            first_name=f"Sylvain{i}",
+            last_name=f"Dubois{i}",
         )
 
         travelers.append(traveler)

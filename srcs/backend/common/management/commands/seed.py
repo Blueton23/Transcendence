@@ -41,21 +41,11 @@ class Command(BaseCommand):
         travelers = seed_travelers(fake, options["travelers"])
         self.stdout.write(f"Created {len(travelers)} travelers.")
 
-        # Travelers DUB
-        dub_travelers = seed_dub_travelers()
-        self.stdout.write(f"Created {len(dub_travelers)} DUB travelers.")
-
-        # Friendships spécifiques des DUB
-        dub_friendships = seed_dub_friendships(dub_travelers)
-        self.stdout.write(f"Created {len(dub_friendships)} DUB friendships.")
-
         friendships = seed_friendships(fake, travelers, options["friendships"])
         self.stdout.write(f"Created {len(friendships)} friendships.")
 
         travels = seed_travels(fake, options["travels"])
         self.stdout.write(f"Created {len(travels)} travels.")
-
-#        travelers.extend(dub_travelers)
 
         participations = seed_participations(
             fake, travelers, travels, options["participations"]
@@ -70,5 +60,13 @@ class Command(BaseCommand):
 
         reactions = seed_reactions(fake, travelers, ideas, options["reactions"])
         self.stdout.write(f"Created {len(reactions)} reactions.")
+
+        # Travelers DUB
+        dub_travelers = seed_dub_travelers()
+        self.stdout.write(f"Created {len(dub_travelers)} DUB travelers.")
+
+        # Friendships spécifiques des DUB
+        dub_friendships = seed_dub_friendships(dub_travelers)
+        self.stdout.write(f"Created {len(dub_friendships)} DUB friendships.")
 
         self.stdout.write(self.style.SUCCESS("Seed complete."))
