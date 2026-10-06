@@ -3,7 +3,11 @@ import Text from "@/shared/ui/Text";
 import { computeDurationLabel } from "@/features/step/utils/segmentDuration";
 import type { Route } from "@/features/map/types";
 
-export function TotalSegment({ route }: { route: Route | null }) {
+interface TotalSegmentProps {
+  route: Route | null;
+}
+
+export function TotalSegment({ route }: TotalSegmentProps) {
   if (!route) return null;
   const totalMinutes = route.totalDurationMinutes;
   const totalKms = route.totalDistanceKm;

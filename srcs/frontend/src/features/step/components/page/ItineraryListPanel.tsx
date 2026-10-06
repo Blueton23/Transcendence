@@ -8,6 +8,7 @@ import type { Route } from "@/features/map/types";
 interface ItineraryListPanelProps {
   steps: Step[];
   route: Route | null;
+  isLoadingRoute: boolean;
   travel: Travel;
   dateLabels: string[];
   onDetailView: (step: Step) => void;
@@ -18,13 +19,14 @@ interface ItineraryListPanelProps {
 export function ItineraryListPanel({
   steps,
   route,
+  isLoadingRoute,
   travel,
   dateLabels,
   onDetailView,
   onModifyStep,
   refetch,
 }: ItineraryListPanelProps) {
-  const segments = route?.legs ?? [];
+  const segments = isLoadingRoute ? [] : (route?.legs ?? []);
   return (
     <>
       <div className="hidden md:block">

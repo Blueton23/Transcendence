@@ -32,11 +32,7 @@ function ItineraryPage() {
     error: errorSteps,
     refetch,
   } = useSteps(travelId);
-  const {
-    route,
-    isLoading: isLoadingRoute,
-    error: errorRoute,
-  } = useRoute(steps);
+  const { route, isLoading: isLoadingRoute } = useRoute(steps);
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const [detailStepId, setDetailStepId] = useState<number | null>(null);
@@ -44,8 +40,8 @@ function ItineraryPage() {
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
 
-  const isLoading = isLoadingTravel || isLoadingSteps || isLoadingRoute;
-  const error = errorTravel || errorSteps || errorRoute;
+  const isLoading = isLoadingTravel || isLoadingSteps;
+  const error = errorTravel || errorSteps;
   if (isLoading) return null;
   if (error) return <Navigate to="/trip" replace />;
   if (!travel) return null;
@@ -84,6 +80,7 @@ function ItineraryPage() {
             <ItineraryListPanel
               steps={steps}
               route={route}
+              isLoadingRoute={isLoadingRoute}
               travel={travel}
               dateLabels={dateLabels}
               onDetailView={(step) => setDetailStepId(step.id)}
