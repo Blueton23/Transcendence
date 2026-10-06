@@ -11,6 +11,7 @@ from travel.models import (
     Step,
     Travel,
     TravelStatus,
+    is_travel_member,
 )
 from travel.serializers import StepSerializer, TravelSerializer
 from traveler.models import Traveler
@@ -127,6 +128,36 @@ class ParticipationModelTest(TestCase):
 
         self.assertIn(participation, self.traveler.participations.all())
         self.assertIn(participation, self.travel.participations.all())
+
+    def test_last_read_at_is_empty_until_marked_read(self):
+        participation = Participation.objects.create(
+            traveler=self.traveler, travel=self.travel
+        )
+        self.assertIsNone(participation.last_read_at)
+
+        participation.mark_read()
+
+        participation.refresh_from_db()
+        self.assertIsNotNone(participation.last_read_at)
+
+    def test_is_travel_member_depends_on_status(self):
+        self.assertFalse(is_travel_member(self.travel.id, self.traveler.id))
+
+        participation = Participation.objects.create(
+            traveler=self.traveler, travel=self.travel
+        )
+        expected = {
+            ParticipationStatus.INVITED: False,
+            ParticipationStatus.ACCEPTED: True,
+            ParticipationStatus.REFUSED: False,
+            ParticipationStatus.LEFT: True,
+        }
+        for status, is_member in expected.items():
+            participation.status = status
+            participation.save()
+            self.assertEqual(
+                is_travel_member(self.travel.id, self.traveler.id), is_member
+            )
 
 
 class StepModelTest(TestCase):

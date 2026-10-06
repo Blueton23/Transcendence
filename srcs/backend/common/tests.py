@@ -6,6 +6,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
 
+from chat.models import Message
 from common.seeders.clear import clear_seed_data
 from idea.models import Idea, Reaction
 from travel.models import Participation, Step, Travel
@@ -23,6 +24,7 @@ def _seed(**kwargs):
         "steps_per_travel": 2,
         "ideas_per_travel": 3,
         "reactions": 5,
+        "messages_per_travel": 3,
     }
     defaults.update(kwargs)
     call_command("seed", stdout=StringIO(), **defaults)
@@ -32,10 +34,12 @@ class ClearSeedDataTest(TestCase):
     def test_clears_every_domain_table(self):
         _seed()
         self.assertTrue(Travel.objects.exists())
+        self.assertTrue(Message.objects.exists())
 
         deleted = clear_seed_data()
 
         self.assertEqual(Traveler.objects.count(), 0)
+        self.assertEqual(Message.objects.count(), 0)
         self.assertEqual(Friendship.objects.count(), 0)
         self.assertEqual(Participation.objects.count(), 0)
         self.assertEqual(Reaction.objects.count(), 0)
@@ -45,6 +49,7 @@ class ClearSeedDataTest(TestCase):
         self.assertEqual(
             set(deleted),
             {
+                "messages",
                 "friendships",
                 "participations",
                 "reactions",

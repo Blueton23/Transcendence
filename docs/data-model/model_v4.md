@@ -110,18 +110,19 @@ erDiagram
         int TravelId PK, FK
         enum Status "invité / accepté / refusé / parti"
         datetime LeftAt "optionnel"
+        datetime LastReadAt "optionnel - dernier passage dans le chat"
         datetime CreatedAt
     }
 
     MESSAGE {
         int id PK
         int TravelId FK
-        int TravelerId FK "optionnel si système"
-        int StepId FK "optionnel"
-        int IdeaId FK "optionnel"
+        int TravelerId FK "vide si système ou compte supprimé"
+        int StepId FK "optionnel - jamais avec IdeaId"
+        int IdeaId FK "optionnel - jamais avec StepId"
         bool IsSystem
-        text Body
-        bool Enabled
+        text Body "2000 caractères max"
+        datetime DeletedAt "optionnel - corbeille"
         datetime CreatedAt
         datetime UpdatedAt
     }
@@ -150,18 +151,19 @@ erDiagram
 
 - **Traveler** : un compte. Désactivable plutôt que supprimé.
 - **Travel** : un voyage, avec ses dates de départ et de fin, deux bornes fermes fixées à la création. `InviteToken` est le lien qui permet à quiconque le possède de rejoindre. Aucun propriétaire : tous les participants ont les mêmes droits.
-- **Participate** : qui participe à quel voyage et où en est son invitation. Une personne partie garde sa ligne, pour que les soldes restent justes.
+- **Participate** : qui participe à quel voyage et où en est son invitation. Une personne partie garde sa ligne, pour que les soldes restent justes. `LastReadAt` retient son dernier passage dans le chat : les non-lus sont les messages des autres créés après, aucun compteur n'est stocké.
 - **Step** : un arrêt du trajet. `Position` donne l'ordre, `Nights` la durée (0 pour une halte). Les dates se déduisent de `Travel.StartDate` et du cumul des nuits. `Latitude`/`Longitude` sont remplies par la recherche de lieu au moment de la création, nécessaires pour placer l'étape sur la carte.
 - **Idea** : une proposition faite pour un voyage. Rattachée à une étape, ou libre dans le pool. Une idée d'hébergement porte en plus son prix et ses dates. `Latitude`/`Longitude` permettent de l'épingler sur la carte à son propre emplacement, pas forcément celui de l'étape.
 - **Reaction** : un ❤️ d'une personne sur une idée. Purement indicatif.
 - **Friendship** : un lien d'amitié entre deux comptes, indépendant des voyages. Un refus supprime la ligne plutôt que de la conserver.
-- **Message** : un message du chat, rattachable au voyage, à une étape ou à une idée. `IsSystem` distingue les notifications automatiques.
+- **Message** : un message du chat, rattaché au voyage, à une étape ou à une idée (jamais une étape et une idée à la fois). `IsSystem` distingue les notifications automatiques, qui n'ont pas d'auteur. L'auteur doit être membre du voyage au moment où il écrit.
 - **Spending** : une dépense, rattachable au voyage seul (carburant), à une étape (péage) ou à une idée (le resto qu'on a fait).
 
 ## Comportements en cas de suppression
 
 - **Voyage** : on ne le supprime pas, on le quitte (comme un groupe WhatsApp). Il sort de sa liste, rien ne bouge pour les autres, et sa participation reste en base pour que les soldes restent justes.
 - **Étape et idée** : corbeille (`DeletedAt`), restaurables. Protège des suppressions accidentelles à plusieurs.
+- **Message** : corbeille aussi (`DeletedAt`), la ligne reste en base. Si le compte de son auteur est supprimé, le message reste dans le fil sans auteur (`ON DELETE SET NULL`).
 - **Dépenses et messages** : conservés quoi qu'il arrive. Si leur étape ou leur idée disparaît, ils perdent juste leur rattachement (`ON DELETE SET NULL`). Exemple : les 240 CHF du camping restent au budget même sans l'étape Zermatt.
 - **Réactions** : supprimées avec leur idée, un ❤️ ne veut rien dire sans elle.
 
@@ -198,6 +200,9 @@ erDiagram
 | 17 | `Travel.EndDate` obligatoire, bornes fermes | Un voyage a une durée connue dès sa création, utile pour réserver. La somme des nuits des étapes ne peut pas dépasser `EndDate − StartDate`, c'est une validation applicative. Réduire propose une confirmation si des étapes en sortent, agrandir est immédiat. | Maquette |
 | 18 | `Step.Latitude` / `Longitude` | La carte a besoin de vraies coordonnées, pas juste un nom de lieu, quel que soit le service de géocodage choisi. Remplies automatiquement par la recherche de lieu. | Maquette |
 | 19 | `Idea.Latitude` / `Longitude` | Une idée (un resto, une activité) a son propre emplacement, pas forcément celui de son étape. Epinglable sur la carte à sa vraie adresse. Même mécanisme que sur `Step`. | Maquette |
+| 20 | `Message` : `DeletedAt` remplace `Enabled` | Même convention que la corbeille de `Step`, et on sait quand le message a été retiré. | Code |
+| 21 | `Participate.LastReadAt` | Nécessaire pour afficher les non-lus du chat. Une date suffit, le nombre de non-lus se calcule. | Code |
+| 22 | `Message` : une étape ou une idée, pas les deux | Un fil de commentaires ne s'accroche qu'à un seul objet, et le lien ne devient pas faux quand une idée change d'étape. | Code |
 
 ### Statuts (point 5)
 
