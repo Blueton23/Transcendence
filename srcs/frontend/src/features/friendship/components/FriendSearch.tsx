@@ -53,7 +53,7 @@ function FriendSearch() {
 
     try {
       await sendFriendRequest(traveler.id);
-
+      setTraveler(null);
       setMessage("Demande d'amitié envoyée.");
     } catch (err) {
       setError(

@@ -12,7 +12,11 @@ import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
 import Icon from "@/shared/ui/Icon";
 
-function FriendRequests() {
+interface FriendRequestsProps {
+  onFriendAccepted: () => void;
+}
+
+function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
   const [requests, setRequests] = useState<FriendshipRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loadingId, setLoadingId] = useState<number | null>(null);
@@ -43,6 +47,8 @@ function FriendRequests() {
       await acceptFriendRequest(id);
 
       setRequests((current) => current.filter((request) => request.id !== id));
+
+      onFriendAccepted();
     } catch (err) {
       setError(
         err instanceof Error
@@ -116,7 +122,7 @@ function FriendRequests() {
                     variant="success"
                     disabled={isLoading}
                     onClick={() => void handleAccept(request.id)}
-                  ></Button>
+                  />
 
                   <Button
                     type="button"
@@ -124,7 +130,7 @@ function FriendRequests() {
                     variant="danger"
                     disabled={isLoading}
                     onClick={() => void handleReject(request.id)}
-                  ></Button>
+                  />
                 </div>
               </div>
             );

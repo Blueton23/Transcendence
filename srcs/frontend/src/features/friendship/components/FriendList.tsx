@@ -5,9 +5,12 @@ import { getFriends } from "../api/friendship";
 
 import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
-import Divider from "@/shared/ui/Divider";
 
-function FriendList() {
+interface FriendListProps {
+  refreshKey: number;
+}
+
+function FriendList({ refreshKey }: FriendListProps) {
   const [friends, setFriends] = useState<User[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,6 +19,7 @@ function FriendList() {
       try {
         const response = await getFriends();
         setFriends(response.friends);
+        setError(null);
       } catch (err) {
         setError(
           err instanceof Error
@@ -26,10 +30,10 @@ function FriendList() {
     }
 
     void loadFriends();
-  }, []);
+  }, [refreshKey]);
 
   return (
-    <div variant="default" className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <Text tone="muted">
           MES AMIS · {friends.length > 0 && friends.length}
