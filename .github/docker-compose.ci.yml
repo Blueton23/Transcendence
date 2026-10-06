@@ -1,14 +1,15 @@
-# CI-only overrides: reuse Docker layers between runs via the GitHub Actions cache
+# CI-only overrides: reuse Docker layers between runs via the GitHub Actions cache.
+# ignore-error: a cache upload hiccup must not fail the build
 services:
   backend:
     build:
       cache_from: [type=gha,scope=backend]
-      cache_to: [type=gha,scope=backend,mode=max]
+      cache_to: [type=gha,scope=backend,mode=max,ignore-error=true]
   frontend:
     build:
       cache_from: [type=gha,scope=frontend]
-      cache_to: [type=gha,scope=frontend,mode=max]
+      cache_to: [type=gha,scope=frontend,mode=max,ignore-error=true]
   nginx:
     build:
       cache_from: [type=gha,scope=nginx]
-      cache_to: [type=gha,scope=nginx,mode=max]
+      cache_to: [type=gha,scope=nginx,mode=max,ignore-error=true]
