@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import { ItineraryMap } from "@/features/map/components/ItineraryMap";
 import type { Step } from "@/features/step/types";
+import type { Route } from "@/features/map/types";
 
 interface ItineraryLayoutProps {
   mobileView: "list" | "map";
   children: ReactNode;
   steps: Step[];
+  route: Route | null;
   detailStep: Step | null;
 }
 
@@ -13,6 +15,7 @@ export function ItineraryLayout({
   mobileView,
   children,
   steps,
+  route,
   detailStep,
 }: ItineraryLayoutProps) {
   return (
@@ -25,7 +28,7 @@ export function ItineraryLayout({
       <div
         className={`md:block ${mobileView === "map" ? "flex flex-1 flex-col" : "hidden"}`}
       >
-        <ItineraryMap steps={steps} detailStep={detailStep} />
+        <ItineraryMap steps={steps} detailStep={detailStep} route={route} />
       </div>
     </div>
   );

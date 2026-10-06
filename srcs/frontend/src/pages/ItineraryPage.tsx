@@ -65,6 +65,7 @@ function ItineraryPage() {
       <ItineraryLayout
         mobileView={mobileView}
         steps={steps}
+        route={route}
         detailStep={detailView}
       >
         {detailView ? (
