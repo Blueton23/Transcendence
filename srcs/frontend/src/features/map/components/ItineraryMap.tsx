@@ -53,6 +53,7 @@ export function ItineraryMap({
             longitude={Number(step.longitude)}
             latitude={Number(step.latitude)}
             color={themeColor("brand-primary")}
+            scale={0.8}
           />
         ))}
         {route && (
