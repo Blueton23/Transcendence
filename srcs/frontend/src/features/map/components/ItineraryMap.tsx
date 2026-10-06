@@ -33,8 +33,13 @@ export function ItineraryMap({
         ref={mapRef}
         projection={"mercator"}
         initialViewState={
-          bounds ? {bounds: [bounds.min, bounds.max], fitBoundsOptions: { padding: 100, maxZoom:12}}
-          : { longitude: 6.63, latitude: 46.52, zoom: 11 }}
+          bounds
+            ? {
+                bounds: [bounds.min, bounds.max],
+                fitBoundsOptions: { padding: 100, maxZoom: 12 },
+              }
+            : { longitude: 6.63, latitude: 46.52, zoom: 11 }
+        }
         style={{ clipPath: "inset(0 round 20px)" }}
         mapStyle="mapbox://styles/mapbox/streets-v12"
       >
