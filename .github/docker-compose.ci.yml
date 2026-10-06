@@ -3,13 +3,19 @@
 services:
   backend:
     build:
-      cache_from: [type=gha,scope=backend]
-      cache_to: [type=gha,scope=backend,mode=max,ignore-error=true]
+      cache_from:
+        - "type=gha,scope=backend"
+      cache_to:
+        - "type=gha,scope=backend,mode=max,ignore-error=true"
   frontend:
     build:
-      cache_from: [type=gha,scope=frontend]
-      cache_to: [type=gha,scope=frontend,mode=max,ignore-error=true]
+      cache_from:
+        - "type=gha,scope=frontend"
+      cache_to:
+        - "type=gha,scope=frontend,mode=max,ignore-error=true"
   nginx:
     build:
-      cache_from: [type=gha,scope=nginx]
-      cache_to: [type=gha,scope=nginx,mode=max,ignore-error=true]
+      cache_from:
+        - "type=gha,scope=nginx"
+      cache_to:
+        - "type=gha,scope=nginx,mode=max,ignore-error=true"
