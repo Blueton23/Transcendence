@@ -7,6 +7,7 @@ import { useRef } from "react";
 import { useMapFraming } from "@/features/map/hooks/useMapFraming";
 import { getStepsBounds } from "@/features/map/utils/getBounds";
 import type { Route } from "@/features/map/types";
+import { themeColor } from "@/features/map/utils/themeColor";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -51,6 +52,7 @@ export function ItineraryMap({
             key={step.id}
             longitude={Number(step.longitude)}
             latitude={Number(step.latitude)}
+            color={themeColor("brand-primary")}
           />
         ))}
         {route && (
@@ -63,13 +65,16 @@ export function ItineraryMap({
               id="route-outline"
               type="line"
               layout={{ "line-join": "round", "line-cap": "round" }}
-              paint={{ "line-color": "#fff", "line-width": 7 }}
+              paint={{ "line-color": themeColor("surface"), "line-width": 7 }}
             />
             <Layer
               id="route-line"
               type="line"
               layout={{ "line-join": "round", "line-cap": "round" }}
-              paint={{ "line-color": "#f2664a", "line-width": 4 }}
+              paint={{
+                "line-color": themeColor("brand-primary"),
+                "line-width": 4,
+              }}
             />
           </Source>
         )}
