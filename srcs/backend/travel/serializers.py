@@ -86,8 +86,7 @@ class StepSerializer(serializers.ModelSerializer):
         return (obj.end_date - obj.start_date).days
 
     def get_idea_count(self, obj):
-        # TODO(seb): brancher sur idea.count() une fois l app idea prete
-        return 2
+        return obj.ideas.count()
 
     def validate(self, attrs):
         validate_date_range(self.instance, attrs)

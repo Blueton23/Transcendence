@@ -12,6 +12,11 @@ from travel.models import (
     Travel,
     TravelStatus,
 )
+
+from idea.models import (
+    Idea,
+    IdeaType,
+)
 from travel.serializers import StepSerializer, TravelSerializer
 from traveler.models import Traveler
 
@@ -402,6 +407,34 @@ class StepSerializerTest(TestCase):
             end_date=datetime.date(2026, 6, 4),
         )
         self.assertEqual(StepSerializer(step).data["nights"], 2)
+
+    def test_idea_counts_is_computed(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+        )
+        other_step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 5),
+            end_date=datetime.date(2026, 6, 8),
+        )
+        traveler = Traveler.objects.create_user(
+            username="alice", password="Password-123!"
+        )
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=traveler,
+            step=step,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 2),
+        )
+        self.assertEqual(StepSerializer(step).data["idea_count"], 1)
+        self.assertEqual(StepSerializer(other_step).data["idea_count"], 0)
 
 
 # --- View tests ---
