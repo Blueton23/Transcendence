@@ -103,10 +103,7 @@ function FriendSearch() {
       {traveler && (
         <div className="flex flex-col gap-4 rounded-md border border-border bg-surface-container p-4">
           <div className="flex items-center gap-3">
-            <Avatar size="md">
-              {traveler.username.slice(0, 2).toUpperCase()}
-            </Avatar>
-
+            <Avatar user={traveler} />
             <div className="flex min-w-0 flex-col">
               <Text>{traveler.username}</Text>
               <Text size="sm" tone="secondary">

@@ -25,14 +25,6 @@ function ProfilePage() {
       <div className="flex w-full items-center justify-between">
         <ProfileInfo />
 
-        {currentUser && (
-          <img
-            src={currentUser.profilePicture ?? undefined}
-            alt="Photo de profil"
-            className="h-15 w-15 rounded-full object-cover"
-          />
-        )}
-
         <Button
           type="button"
           variant="primary"

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 
 import Button from "@/shared/ui/Button";
+import Avatar from "@/shared/ui/Avatar";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyProfilePicture } from "../api/profile";
@@ -9,9 +10,7 @@ import { useAuth } from "../../auth/context/useAuth";
 
 function ProfilePicture() {
   const { currentUser, setCurrentUser } = useAuth();
-
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { submit, isSubmitting, error } = useSubmitAction(() => {
@@ -54,12 +53,8 @@ function ProfilePicture() {
   }
 
   return (
-    <div className="flex flex-col items-center gap-3">
-      <img
-        src={currentUser.profilePicture ?? undefined}
-        alt="Photo de profil"
-        className="h-24 w-24 rounded-full object-cover"
-      />
+    <div className="flex items-center gap-3">
+      <Avatar size="xl" />
 
       <input
         ref={fileInputRef}
@@ -71,11 +66,11 @@ function ProfilePicture() {
 
       <Button
         type="button"
-        variant="primary"
+        variant="dark"
         onClick={handleSelectPicture}
         disabled={isSubmitting}
       >
-        Choisir une photo
+        Changer l'avatar
       </Button>
 
       {selectedFile && (

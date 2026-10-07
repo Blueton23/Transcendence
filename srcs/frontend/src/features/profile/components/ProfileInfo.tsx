@@ -14,11 +14,8 @@ function ProfileInfo() {
     <>
       <div>
         <div className="flex items-center">
-          <div className="flex w-24 justify-center">
-            <Avatar size="lg" color="1">
-              {currentUser.firstName?.charAt(0).toUpperCase()}
-              {currentUser.lastName?.charAt(0).toUpperCase()}
-            </Avatar>
+          <div className="flex w-25 justify-center">
+            <Avatar size="xl" />
           </div>
           <div>
             <Heading level={3} size="lg">

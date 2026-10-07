@@ -4,6 +4,7 @@ import Text from "../shared/ui/Text";
 
 import { useNavigate } from "react-router";
 import { useAuth } from "../features/auth/context/useAuth";
+import Avatar from "@/shared/ui/Avatar";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -12,7 +13,6 @@ function HomePage() {
   async function handleLogout() {
     try {
       await logout();
-      console.log("SDU : logout terminé");
     } catch (error) {
       console.error("Erreur lors de la déconnexion :", error);
     }
@@ -30,6 +30,7 @@ function HomePage() {
           {" "}
           {isConnected ? currentUser.username : "Déconnecté"}{" "}
         </Text>
+        <Avatar />
       </div>
 
       <div className="flex w-full max-w-3xl flex-col items-center gap-6 text-center">

@@ -18,9 +18,7 @@ export function SecondaryInfo({
   if (ideaType === "accommodation" && pricePerNight !== null) {
     return (
       <div className="flex items-start gap-2 md:items-center">
-        <Avatar size="xs" color="2" className="md:size-7 md:text-xs">
-          {proposerInitials}
-        </Avatar>
+        <Avatar />
 
         <Text tone="muted" size="sm">
           {pricePerNight} CHF/nuit par {proposerName}

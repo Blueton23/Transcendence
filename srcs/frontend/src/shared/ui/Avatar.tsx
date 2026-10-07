@@ -1,10 +1,16 @@
-import type { ReactNode } from "react";
+import { useAuth } from "@/features/auth/context/useAuth";
 
 type AvatarSize = "xs" | "sm" | "md" | "lg";
 type AvatarColor = "1" | "2" | "3" | "4";
 
+interface AvatarUser {
+  profilePicture?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+}
+
 interface AvatarProps {
-  children: ReactNode;
+  user?: AvatarUser | null;
   size?: AvatarSize;
   color?: AvatarColor;
   className?: string;
@@ -15,6 +21,7 @@ const sizeStyles = {
   sm: "w-7 h-7 text-xs",
   md: "w-8 h-8 text-sm",
   lg: "w-9 h-9 text-md",
+  xl: "w-15 h-15 text-lg",
 };
 
 const colorStyles = {
@@ -25,21 +32,36 @@ const colorStyles = {
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center rounded-full font-bold";
+  "inline-flex items-center justify-center overflow-hidden rounded-full font-bold";
 
 function Avatar({
-  children,
+  user,
   size = "md",
   color = "1",
   className = "",
 }: AvatarProps) {
+  const { currentUser } = useAuth();
+  const avatarUser = user ?? currentUser;
   const avatarSize = sizeStyles[size];
   const avatarColor = colorStyles[color];
+  const initials =
+    `${avatarUser?.firstName?.charAt(0) ?? ""}${avatarUser?.lastName?.charAt(0) ?? ""}`.toUpperCase();
 
   return (
     <span className={`${baseStyle} ${avatarSize} ${avatarColor} ${className}`}>
-      {children}
+      {avatarUser?.profilePicture ? (
+        <img
+          src={avatarUser.profilePicture}
+          alt="Photo de profil"
+          className="h-full w-full object-cover"
+        />
+      ) : initials ? (
+        initials
+      ) : (
+        "A"
+      )}
     </span>
   );
 }
+
 export default Avatar;

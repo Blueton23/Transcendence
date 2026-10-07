@@ -51,9 +51,7 @@ function FriendList({ refreshKey }: FriendListProps) {
               key={friend.id}
               className="flex items-center gap-3 rounded-md border border-border bg-surface-container p-4"
             >
-              <Avatar size="md">
-                {friend.username.slice(0, 2).toUpperCase()}
-              </Avatar>
+              <Avatar user={friend} />
 
               <div className="flex min-w-0 flex-col">
                 <Text>{friend.username}</Text>
