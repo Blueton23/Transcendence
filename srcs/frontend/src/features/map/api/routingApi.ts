@@ -1,15 +1,9 @@
-import type { Route, RouteGeometry } from "@/features/map/types";
-
-interface DirectionsLeg {
-  distance: number;
-  duration: number;
-}
+import type { Leg, LongLat } from "@/features/map/types";
 
 interface DirectionsRoutes {
   distance: number;
   duration: number;
-  legs: DirectionsLeg[];
-  geometry: RouteGeometry;
+  geometry: { coordinates: LongLat[] };
 }
 
 interface DirectionsResponse {
@@ -17,10 +11,12 @@ interface DirectionsResponse {
   routes: DirectionsRoutes[];
 }
 
-type LongLat = [number, number];
+const cache = new Map<string, Leg | null>();
 
-export async function getRoute(coords: LongLat[]): Promise<Route | null> {
-  const coordsParam = coords.map(([lon, lat]) => `${lon},${lat}`).join(";");
+export async function getLeg(from: LongLat, to: LongLat): Promise<Leg | null> {
+  const coordsParam = [from, to].map(([lon, lat]) => `${lon},${lat}`).join(";");
+  if (cache.has(coordsParam)) return cache.get(coordsParam) ?? null;
+
   const params = new URLSearchParams({
     geometries: "geojson",
     overview: "full",
@@ -32,16 +28,19 @@ export async function getRoute(coords: LongLat[]): Promise<Route | null> {
   );
   const data: DirectionsResponse = await response.json();
 
-  if (data.code !== "Ok" || data.routes.length === 0) return null;
-
-  const route = data.routes[0];
-  return {
-    totalDistanceKm: route.distance / 1000,
-    totalDurationMinutes: route.duration / 60,
-    legs: route.legs.map((leg) => ({
-      distanceKm: leg.distance / 1000,
-      durationMinutes: leg.duration / 60,
-    })),
-    geometry: route.geometry,
-  };
+  let leg: Leg | null;
+  if (data.code === "Ok") {
+    const route = data.routes[0];
+    leg = {
+      distanceKm: route.distance / 1000,
+      durationMinutes: route.duration / 60,
+      coordinates: route.geometry.coordinates,
+    };
+  } else if (data.code === "NoRoute" || data.code === "NoSegment") {
+    leg = null;
+  } else {
+    throw new Error("Erreur Mapbox");
+  }
+  cache.set(coordsParam, leg);
+  return leg;
 }

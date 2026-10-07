@@ -6,7 +6,7 @@ import type { Segment, Step } from "@/features/step/types";
 
 export interface ItineraryTimelineProps {
   steps: Step[];
-  segments: Segment[];
+  segments: (Segment | null)[];
   dateLabels: string[];
   onDetailView: (step: Step) => void;
   onModifyStep: (step: Step) => void;
@@ -23,24 +23,27 @@ export function ItineraryTimeline({
 }: ItineraryTimelineProps) {
   return (
     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
-      {steps.map((step, index) => (
-        <Fragment key={step.id}>
-          {index > 0 && segments[index - 1] && (
-            <Fragment>
-              <span aria-hidden="true" />
-              <SegmentRow segment={segments[index - 1]} />
-            </Fragment>
-          )}
-          <StepPositionBadge position={index + 1} />
-          <StepCard
-            step={step}
-            dateLabel={dateLabels[index]}
-            onClick={() => onDetailView(step)}
-            onModify={() => onModifyStep(step)}
-            refetch={refetch}
-          />
-        </Fragment>
-      ))}
+      {steps.map((step, index) => {
+        const segment = segments[index - 1];
+        return (
+          <Fragment key={step.id}>
+            {segment && (
+              <Fragment>
+                <span aria-hidden="true" />
+                <SegmentRow segment={segments[index - 1]} />
+              </Fragment>
+            )}
+            <StepPositionBadge position={index + 1} />
+            <StepCard
+              step={step}
+              dateLabel={dateLabels[index]}
+              onClick={() => onDetailView(step)}
+              onModify={() => onModifyStep(step)}
+              refetch={refetch}
+            />
+          </Fragment>
+        );
+      })}
     </div>
   );
 }

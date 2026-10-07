@@ -17,7 +17,7 @@ export function TotalSegment({ route }: TotalSegmentProps) {
     <div className="col-span-2 flex flex-col items-center gap-2">
       <Divider></Divider>
       <Text font="mono" tone="muted" className="text-[10px] md:text-sm">
-        TOTAL · {totalHoursLabel} DE ROUTE · {Math.round(totalKms)} KM
+        TOTAL · {totalHoursLabel} DE ROUTE · {totalKms} KM
       </Text>
     </div>
   );
