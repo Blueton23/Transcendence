@@ -30,7 +30,7 @@ export function ItineraryTimeline({
             {segment && (
               <Fragment>
                 <span aria-hidden="true" />
-                <SegmentRow segment={segments[index - 1]} />
+                <SegmentRow segment={segment} />
               </Fragment>
             )}
             <StepPositionBadge position={index + 1} />
