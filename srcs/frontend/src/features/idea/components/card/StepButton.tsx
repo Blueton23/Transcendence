@@ -2,13 +2,13 @@ import Button from "@/shared/ui/Button";
 import Icon from "@/shared/ui/Icon";
 
 interface StepButtonProps {
-  stepId: number | null;
+  isInPool: boolean;
   onPlace: () => void;
   onView: () => void;
 }
 
-export function StepButton({ stepId, onPlace, onView }: StepButtonProps) {
-  if (stepId === null) {
+export function StepButton({ isInPool, onPlace, onView }: StepButtonProps) {
+  if (isInPool) {
     return (
       <Button variant="outline" size="sm" onClick={onPlace}>
         <span className="text-error">Placer</span>

@@ -40,6 +40,8 @@ export function IdeaCard({
   onEdit,
   onDelete,
 }: IdeaCardProps) {
+  const isInPool = idea.status === "suggested";
+
   return (
     <Card>
       <div className="flex md:items-center md:justify-between">
@@ -58,7 +60,7 @@ export function IdeaCard({
                 proposerName={proposerName}
                 proposerInitials={proposerInitials}
               />
-              <StepLabel stepId={idea.stepId} stepName={stepName} />
+              <StepLabel isInPool={isInPool} stepName={stepName} />
             </div>
           </div>
         </div>
@@ -73,11 +75,7 @@ export function IdeaCard({
           </div>
 
           <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">
-            <StepButton
-              stepId={idea.stepId}
-              onPlace={onPlace}
-              onView={onView}
-            />
+            <StepButton isInPool={isInPool} onPlace={onPlace} onView={onView} />
           </div>
         </div>
       </div>

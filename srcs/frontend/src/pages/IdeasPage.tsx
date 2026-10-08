@@ -90,6 +90,14 @@ export function IdeasPage() {
       </div>
 
       <div className="flex flex-col gap-3">
+        {filteredIdeas.length === 0 && (
+          <Text tone="muted">
+            {ideas.length === 0
+              ? "Aucune idée pour ce voyage."
+              : "Aucune idée ne correspond aux filtres sélectionnés."}
+          </Text>
+        )}
+
         {filteredIdeas.map((idea) => {
           const step = mockSteps.find((step) => step.id === idea.stepId);
 
