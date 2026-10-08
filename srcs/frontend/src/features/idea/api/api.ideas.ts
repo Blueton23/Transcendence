@@ -4,7 +4,22 @@ import type {
   PlaceIdeaInput,
   EditIdeaInput,
   VoteIdea,
+  IdeaApiResponse,
 } from "@/features/idea/types";
+
+import { mapIdeaFromApi } from "@/features/idea/api/ideaMapper";
+import { parseResponse } from "@/shared/api/errors";
+
+// Récupérer les idées réelles du voyage
+export async function fetchIdeas(travelId: number): Promise<Idea[]> {
+  const response = await fetch(`/api/travels/${travelId}/ideas/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = await parseResponse<IdeaApiResponse[]>(response);
+  return data.map(mapIdeaFromApi);
+}
 
 // get -> permet de récupérer une idée
 export function getIdeas(): Idea[] {
