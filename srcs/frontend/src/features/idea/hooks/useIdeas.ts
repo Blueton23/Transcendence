@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type {
   Idea,
   CreateIdeaInput,
@@ -7,18 +7,71 @@ import type {
   VoteIdea,
 } from "@/features/idea/types";
 import {
-  getIdeas,
+  fetchIdeas,
   createIdea,
   placeIdea,
   voteIdea,
   editIdea,
-  getIdeaVotes,
   deleteIdea,
 } from "@/features/idea/api/api.ideas";
 
-export function useIdeas() {
-  const [ideas, setIdeas] = useState<Idea[]>(() => getIdeas());
-  const [voted, setVoted] = useState<VoteIdea[]>(() => getIdeaVotes());
+export function useIdeas(travelId: number) {
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [voted, setVoted] = useState<VoteIdea[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadIdea() {
+      setIsLoading(true);
+      setError(null);
+      setIdeas([]);
+      setVoted([]);
+
+      try {
+        if (!Number.isSafeInteger(travelId) || travelId <= 0) {
+          throw new Error("Identifiant de voyage invalide");
+        }
+
+        const result = await fetchIdeas(travelId);
+
+        if (ignore) {
+          return;
+        }
+
+        setIdeas(result);
+        setVoted(
+          result.map((idea) => ({
+            ideaId: idea.id,
+            voteCount: idea.voteCount,
+            voted: idea.voted,
+          })),
+        );
+      } catch (err) {
+        if (ignore) {
+          return;
+        }
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Impossible de charger les idées",
+        );
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadIdea();
+
+    return () => {
+      ignore = true;
+    };
+  }, [travelId]);
 
   {
     /* Gère la création d'idée */
@@ -102,6 +155,8 @@ export function useIdeas() {
 
   return {
     ideas,
+    isLoading,
+    error,
     handleCreateIdea,
     handlePlaceIdea,
     handleDeleteIdea,

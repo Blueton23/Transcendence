@@ -9,6 +9,7 @@ import { PlaceIdeaModal } from "@/features/idea/components/modal/PlaceIdeaModal"
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
 import type { IdeaFilter, StepFilter } from "@/features/idea/types";
 import { filterIdeas } from "@/features/idea/utils/filterIdeas";
+import { useParams } from "react-router";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 
@@ -27,15 +28,20 @@ const mockTravelers = [
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
+  const { id } = useParams();
+  const travelId = Number(id);
+
   const {
     ideas,
+    isLoading,
+    error,
     handleCreateIdea,
     handlePlaceIdea,
     handleDeleteIdea,
     handleEditIdea,
     handleVote,
     voted,
-  } = useIdeas();
+  } = useIdeas(travelId);
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
@@ -48,6 +54,14 @@ export function IdeasPage() {
 
   const [editIdeaId, setEditIdeaId] = useState<number | null>(null);
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
+
+  if (isLoading) {
+    return <Text>Chargement des idées…</Text>;
+  }
+
+  if (error) {
+    return <Text>{error}</Text>;
+  }
 
   return (
     <div className="px-4 pt-8 md:px-8">
