@@ -30,6 +30,10 @@ export function CreateIdeaModal({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+
+  const titleError =
+    values.title.trim() === "" ? "Le titre est obligatoire." : undefined;
 
   return (
     <Modal
@@ -50,8 +54,14 @@ export function CreateIdeaModal({
             return;
           }
 
-          setIsSubmitting(true);
+          setHasSubmitted(true);
           setSubmitError(null);
+
+          if (titleError) {
+            return;
+          }
+
+          setIsSubmitting(true);
 
           try {
             const input = ideaFormInput(values);
@@ -66,7 +76,12 @@ export function CreateIdeaModal({
           }
         }}
       >
-        <CreateIdeaForm steps={steps} values={values} setValues={setValues} />
+        <CreateIdeaForm
+          steps={steps}
+          values={values}
+          setValues={setValues}
+          titleError={hasSubmitted ? titleError : undefined}
+        />
 
         {submitError && (
           <div role="alert">
@@ -82,7 +97,6 @@ export function CreateIdeaModal({
           className="w-full"
           disabled={
             isSubmitting ||
-            values.title.trim() === "" ||
             ((values.stepId !== null || values.type === "accommodation") &&
               (!values.dateRange?.from || !values.dateRange?.to))
           }

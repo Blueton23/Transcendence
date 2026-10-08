@@ -1,6 +1,6 @@
 import { TypeSelector } from "@/features/idea/components/forms/TypeSelector";
 import type { StepOption } from "@/features/idea/types";
-import type { Dispatch, SetStateAction } from "react";
+import { useId, type Dispatch, type SetStateAction } from "react";
 import type { IdeaFormValues } from "@/features/idea/types";
 import { DateField } from "@/features/idea/components/forms/DateField";
 import { AccommodationFields } from "@/features/idea/components/forms/AccommodationFields";
@@ -12,10 +12,18 @@ interface IdeaFormProps {
   steps: StepOption[];
   values: IdeaFormValues;
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
+  titleError?: string;
 }
 
-export function CreateIdeaForm({ steps, values, setValues }: IdeaFormProps) {
+export function CreateIdeaForm({
+  steps,
+  values,
+  setValues,
+  titleError,
+}: IdeaFormProps) {
   const isAccommodation = values.type === "accommodation";
+  const titleId = useId();
+  const titleErrorId = `${titleId}-error`;
 
   return (
     <>
@@ -65,11 +73,14 @@ export function CreateIdeaForm({ steps, values, setValues }: IdeaFormProps) {
         }
       />
 
-      <Text size="sm" className="mb-1">
-        Nom
-      </Text>
+      <label htmlFor={titleId}>
+        <Text as="span" size="sm" className="mb-1 block">
+          Nom
+        </Text>
+      </label>
 
       <Input
+        id={titleId}
         value={values.title}
         onChange={(event) =>
           setValues((current) => ({
@@ -77,8 +88,19 @@ export function CreateIdeaForm({ steps, values, setValues }: IdeaFormProps) {
             title: event.target.value,
           }))
         }
+        aria-required="true"
+        aria-invalid={Boolean(titleError)}
+        aria-describedby={titleError ? titleErrorId : undefined}
         className="mb-2"
       />
+
+      {titleError && (
+        <div id={titleErrorId} role="alert">
+          <Text tone="accent" size="sm" className="mb-2">
+            {titleError}
+          </Text>
+        </div>
+      )}
 
       <Text size="sm" className="mb-1">
         Lien
