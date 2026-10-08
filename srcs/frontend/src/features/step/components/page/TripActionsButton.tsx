@@ -1,23 +1,19 @@
-import Button from "@/shared/ui/Button";
 import AddExpenseButton from "@/features/spending/components/AddExpenseButton";
 import { useState } from "react";
 import IconButton from "@/shared/ui/IconButton";
 import Icon from "@/shared/ui/Icon";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import MenuItem from "@/shared/ui/MenuItem";
+import { PinIdeaButton } from "@/features/idea/components/page/PinIdeaButton";
 
-// Button epingler une idee a importer une fois que la features chez David existe
-
-export function TripActionsButton() {
+export function TripActionsButton({ onPinIdea }: { onPinIdea: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <div className="relative">
-      <div className="hidden gap-5 md:flex">
-        <Button variant="primary" className="flex-1">
-          Epingler une idee
-        </Button>
-        <AddExpenseButton className="flex-1" />
+      <div className="hidden gap-5 grid-cols-2 md:grid">
+        <PinIdeaButton onClick={onPinIdea}/>
+        <AddExpenseButton/>
       </div>
       <div
         className="fixed right-5 bottom-20 z-30 md:hidden"
@@ -37,7 +33,13 @@ export function TripActionsButton() {
             onClose={() => setIsOpen(false)}
             className="right-0 bottom-full mb-2"
           >
-            <MenuItem icon="pinplus" onClick={() => setIsOpen(false)}>
+            <MenuItem
+              icon="pinplus"
+              onClick={() => {
+                setIsOpen(false);
+                onPinIdea();
+              }}
+            >
               Epingler une idee
             </MenuItem>
             <MenuItem icon="cash" onClick={() => setIsOpen(false)}>

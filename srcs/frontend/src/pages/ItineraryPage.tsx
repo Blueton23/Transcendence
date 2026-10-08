@@ -13,10 +13,14 @@ import { useParams } from "react-router";
 import { Navigate } from "react-router";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import { StickyHeader } from "@/shared/ui/StickyHeader";
+import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
+import { useIdeas } from "@/features/idea/hooks/useIdeas";
+import type { StepOption } from "@/features/idea/types";
 
-//TODO(branchement):
-// + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
-// cote serializer comme ca step.ideaCount au lieu de la valeur en dur {2} inscrite dans le backend
+// TODO(branchement): un fois que PR de david est branchee:
+// - useIdeas() devient useIdeas(travelId)
+// - handleCreateIdea doit appeler l'API (createIdea est encore un mock)
+// - recharger les etapes (refetch) apres la creation pour mettre a jour ideaCount
 
 function ItineraryPage() {
   const { id } = useParams();
@@ -32,6 +36,7 @@ function ItineraryPage() {
     error: errorSteps,
     refetch,
   } = useSteps(travelId);
+  const { handleCreateIdea } = useIdeas();
   const segments = getSegments();
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
@@ -39,6 +44,13 @@ function ItineraryPage() {
   const detailView = steps.find((step) => step.id === detailStepId) ?? null;
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
+  const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
+
+  // A enlever une fois que c est connecter correctement du cote de David ou StepOption est Step[]
+  const stepOptions: StepOption[] = steps.map((step) => ({
+    id: step.id,
+    name: step.localisation,
+  }));
 
   const isLoading = isLoadingTravel || isLoadingSteps;
   const error = errorTravel || errorSteps;
@@ -84,7 +96,7 @@ function ItineraryPage() {
             />
           </div>
         )}
-        <TripActionsButton />
+        <TripActionsButton onPinIdea={() => setCreateIdeaModalOpen(true)} />
       </ItineraryLayout>
       {stepToModify && (
         <StepFormModal
@@ -93,6 +105,13 @@ function ItineraryPage() {
           travel={travel}
           refetch={refetch}
           onClose={() => setStepToModify(null)}
+        />
+      )}
+      {createIdeaModalOpen && (
+        <CreateIdeaModal
+          steps={stepOptions}
+          onClose={() => setCreateIdeaModalOpen(false)}
+          onCreate={handleCreateIdea}
         />
       )}
     </div>

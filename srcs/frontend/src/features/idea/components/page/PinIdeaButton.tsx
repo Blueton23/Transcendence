@@ -25,6 +25,7 @@ export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
           variant="primary"
           icon={<Icon name="pinplus" size={18} />}
           onClick={onClick}
+          className="w-full"
         >
           Épingler une idée
         </Button>
