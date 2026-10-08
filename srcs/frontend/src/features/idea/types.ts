@@ -106,7 +106,7 @@ export interface IdeaFormValues {
   dateRange: DateRange | undefined;
 }
 
-// Exemple pour la mock en dur
+// Représente les différentes steps
 export interface StepOption {
   id: number;
   name: string;

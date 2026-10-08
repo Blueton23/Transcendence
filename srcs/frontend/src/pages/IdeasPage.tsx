@@ -7,24 +7,13 @@ import { IdeaStepFilter } from "@/features/idea/components/page/IdeaStepFilter";
 import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
 import { PlaceIdeaModal } from "@/features/idea/components/modal/PlaceIdeaModal";
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
-import type { IdeaFilter, StepFilter } from "@/features/idea/types";
+import type { IdeaFilter, StepFilter, StepOption, } from "@/features/idea/types";
 import { filterIdeas } from "@/features/idea/utils/filterIdeas";
 import { useParams } from "react-router";
+import { useSteps } from "@/features/step/hooks/useSteps";
+import { useTravel } from "@/features/travel/hooks/useTravel";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
-
-//A SUPPRIMER, mettre useStep dans la foncton princiale et dans le .map
-const mockSteps = [
-  { id: 1, name: "Interlaken" },
-  { id: 2, name: "Zermatt" },
-];
-
-const mockTravelers = [
-  { id: 1, name: "David", initials: "DL" },
-  { id: 2, name: "Alice", initials: "AM" },
-];
-
-/*----------------------------------------------------------------------------------*/
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
@@ -43,6 +32,23 @@ export function IdeasPage() {
     voted,
   } = useIdeas(travelId);
 
+  const {
+    steps,
+    isLoading: isLoadingSteps,
+    error: errorSteps,
+  } = useSteps(travelId);
+
+  const {
+    travel,
+    isLoading: isLoadingTravel,
+    error: errorTravel,
+  } = useTravel(travelId);
+
+  const stepOptions: StepOption[] = steps.map((step) => ({
+    id: step.id,
+    name: step.localisation,
+  }));
+
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
   const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
@@ -55,12 +61,16 @@ export function IdeasPage() {
   const [editIdeaId, setEditIdeaId] = useState<number | null>(null);
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
 
-  if (isLoading) {
-    return <Text>Chargement des idées…</Text>;
+  if (isLoading || isLoadingSteps || isLoadingTravel) {
+    return <Text>Chargement des idées, des étapes et des voyageurs…</Text>;
   }
 
-  if (error) {
-    return <Text>{error}</Text>;
+  if (error || errorSteps || errorTravel) {
+    return <Text>{error || errorSteps || errorTravel}</Text>;
+  }
+
+  if (!travel) {
+    return <Text>Voyage introuvable.</Text>;
   }
 
   return (
@@ -83,7 +93,7 @@ export function IdeasPage() {
       <div>
         <Text className="mb-1">Etape</Text>
         <IdeaStepFilter
-          steps={mockSteps}
+          steps={stepOptions}
           stepActiveFilter={stepActiveFilter}
           onChange={setStepActiveFilter}
         />
@@ -99,9 +109,9 @@ export function IdeasPage() {
         )}
 
         {filteredIdeas.map((idea) => {
-          const step = mockSteps.find((step) => step.id === idea.stepId);
+          const step = stepOptions.find((step) => step.id === idea.stepId);
 
-          const proposer = mockTravelers.find(
+          const proposer = travel.travelers.find(
             (traveler) => traveler.id === idea.travelerId,
           );
 
@@ -128,7 +138,7 @@ export function IdeasPage() {
 
       {createIdeaModalOpen && (
         <CreateIdeaModal
-          steps={mockSteps}
+          steps={stepOptions}
           onClose={() => setCreateIdeaModalOpen(false)}
           onCreate={handleCreateIdea}
         />
@@ -137,7 +147,7 @@ export function IdeasPage() {
       {ideaToPlace && (
         <PlaceIdeaModal
           idea={ideaToPlace}
-          steps={mockSteps}
+          steps={stepOptions}
           onClose={() => setIdeaPlaceId(null)}
           onPlace={handlePlaceIdea}
         />
@@ -146,7 +156,7 @@ export function IdeasPage() {
       {editIdea && (
         <EditIdeaModal
           idea={editIdea}
-          steps={mockSteps}
+          steps={stepOptions}
           onClose={() => setEditIdeaId(null)}
           onEdit={(input) => handleEditIdea(editIdea.id, input)}
         />
