@@ -18,6 +18,11 @@ export interface FriendshipRequestsResponse {
   requests: FriendshipRequest[];
 }
 
+export interface Friendship {
+  friendshipId: number;
+  friend: User;
+}
+
 export interface FriendshipListResponse {
-  friends: User[];
+  friendships: Friendship[];
 }

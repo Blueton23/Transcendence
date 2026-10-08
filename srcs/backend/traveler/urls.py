@@ -63,7 +63,7 @@ urlpatterns = [
     path(
         "friendships/<int:friendship_id>/remove/",
         FriendshipRemoveView.as_view(),
-        name="friendship-reject",
+        name="friendship-remove",
     ),
     path(
         "friendships/",

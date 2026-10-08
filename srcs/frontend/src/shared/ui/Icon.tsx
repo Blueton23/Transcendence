@@ -44,6 +44,7 @@ export const iconNames = [
   "store",
   "sun",
   "tent",
+  "trash",
   "user",
   "users",
   "van",

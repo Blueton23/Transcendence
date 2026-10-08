@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import type { User } from "@/features/auth/types";
+import type { Friendship } from "../types";
 import { getFriends } from "../api/friendship";
 
 import Text from "@/shared/ui/Text";
@@ -11,14 +11,14 @@ interface FriendListProps {
 }
 
 function FriendList({ refreshKey }: FriendListProps) {
-  const [friends, setFriends] = useState<User[]>([]);
+  const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadFriends() {
       try {
         const response = await getFriends();
-        setFriends(response.friends);
+        setFriendships(response.friendships);
         setError(null);
       } catch (err) {
         setError(
@@ -36,29 +36,33 @@ function FriendList({ refreshKey }: FriendListProps) {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <Text tone="muted">
-          MES AMIS · {friends.length > 0 && friends.length}
+          MES AMIS · {friendships.length > 0 && friendships.length}
         </Text>
       </div>
 
       {error && <Text tone="accent">{error}</Text>}
 
-      {friends.length === 0 ? (
+      {friendships.length === 0 ? (
         <Text tone="muted">Vous n'avez pas encore d'amis.</Text>
       ) : (
         <div className="grid gap-3">
-          {friends.map((friend) => (
-            <div
-              key={friend.id}
-              className="flex items-center gap-3 rounded-md border border-border bg-surface-container p-4"
-            >
-              <Avatar user={friend} />
+          {friendships.map((friendship) => {
+            const friend = friendship.friend;
 
-              <div className="flex min-w-0 flex-col">
-                <Text>{friend.username}</Text>
-                <Text>{friend.email}</Text>
+            return (
+              <div
+                key={friendship.friendshipId}
+                className="flex items-center gap-3 rounded-md border border-border bg-surface-container p-4"
+              >
+                <Avatar user={friend} />
+
+                <div className="flex min-w-0 flex-col">
+                  <Text>{friend.username}</Text>
+                  <Text>{friend.email}</Text>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

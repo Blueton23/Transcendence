@@ -461,7 +461,7 @@ class FriendshipListView(APIView):
             .order_by("created_at")
         )
 
-        friends = []
+        friendship_list = []
 
         for friendship in friendships:
             friend = (
@@ -470,14 +470,17 @@ class FriendshipListView(APIView):
                 else friendship.user1
             )
 
-            friends.append(
-                TravelerSerializer(
-                    friend,
-                    context={"request": request},
-                ).data
+            friendship_list.append(
+                {
+                    "friendship_id": friendship.id,
+                    "friend": TravelerSerializer(
+                        friend,
+                        context={"request": request},
+                    ).data,
+                }
             )
 
         return Response(
-            {"friends": friends},
+            {"friendships": friendship_list},
             status=status.HTTP_200_OK,
         )
