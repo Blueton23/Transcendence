@@ -10,16 +10,6 @@ import { parseResponse } from "@/shared/api/errors";
 
 const API_BASE_URL = "/api";
 
-function getCsrfToken(): string {
-  const csrfToken = getCookie("csrftoken");
-
-  if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
-  }
-
-  return csrfToken;
-}
-
 export async function searchFriend(
   query: string,
 ): Promise<FriendshipSearchResponse> {
@@ -37,7 +27,10 @@ export async function searchFriend(
 export async function sendFriendRequest(
   userId: number,
 ): Promise<FriendshipRequestResponse> {
-  const csrfToken = getCsrfToken();
+  const csrfToken = getCookie("csrftoken");
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
 
   const response = await fetch(`${API_BASE_URL}/friendships/request/`, {
     method: "POST",
@@ -64,7 +57,10 @@ export async function getFriendRequests(): Promise<FriendshipRequestsResponse> {
 }
 
 export async function acceptFriendRequest(friendshipId: number): Promise<void> {
-  const csrfToken = getCsrfToken();
+  const csrfToken = getCookie("csrftoken");
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
 
   const response = await fetch(
     `${API_BASE_URL}/friendships/${friendshipId}/accept/`,
@@ -81,7 +77,10 @@ export async function acceptFriendRequest(friendshipId: number): Promise<void> {
 }
 
 export async function removeFriendRequest(friendshipId: number): Promise<void> {
-  const csrfToken = getCsrfToken();
+  const csrfToken = getCookie("csrftoken");
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable.");
+  }
 
   const response = await fetch(
     `${API_BASE_URL}/friendships/${friendshipId}/remove/`,
