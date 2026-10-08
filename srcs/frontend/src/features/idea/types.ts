@@ -28,6 +28,21 @@ export interface IdeaApiResponse {
   updatedAt: string;
 }
 
+// Données envoyées à l’API pour créer une idée
+export interface CreateIdeaApiInput {
+  title: string;
+  type: IdeaApiType;
+  stepId: number | null;
+  localisation: string;
+  note: string;
+  url: string;
+  latitude: number | null;
+  longitude: number | null;
+  pricePerNight: number | null;
+  startDate: string | null;
+  endDate: string | null;
+}
+
 /*================================================================================*/
 
 export type IdeaType =

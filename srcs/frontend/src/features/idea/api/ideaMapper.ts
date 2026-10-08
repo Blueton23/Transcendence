@@ -5,6 +5,8 @@ import type {
   IdeaStatus,
   IdeaApiResponse,
   Idea,
+  CreateIdeaApiInput,
+  CreateIdeaInput,
 } from "@/features/idea/types";
 
 // Conversion pour lecture backend/frontend
@@ -19,6 +21,14 @@ const ideaStatusMap: Record<IdeaApiStatus, IdeaStatus> = {
   s: "suggested",
   p: "placed",
   c: "chosen",
+};
+
+// Conversion pour lecture frontend/backend
+const ideaTypeToApiMap: Record<IdeaType, IdeaApiType> = {
+  restaurant: "r",
+  accommodation: "l",
+  activity: "a",
+  sightseeing: "s",
 };
 
 // Retourne une idée de l’API et utilisable par les composants
@@ -49,5 +59,23 @@ export function mapIdeaFromApi(response: IdeaApiResponse): Idea {
     chosenAt: response.chosenAt,
     createdAt: response.createdAt,
     updatedAt: response.updatedAt,
+  };
+}
+
+export function mapCreateIdeaToApi(input: CreateIdeaInput): CreateIdeaApiInput {
+  const isAccommodation = input.type === "accommodation";
+
+  return {
+    title: input.title,
+    type: ideaTypeToApiMap[input.type],
+    stepId: input.stepId,
+    localisation: input.localisation ?? "",
+    note: input.note ?? "",
+    url: input.url ?? "",
+    latitude: input.latitude,
+    longitude: input.longitude,
+    pricePerNight: input.pricePerNight,
+    startDate: isAccommodation ? input.arrivalDate : input.date,
+    endDate: isAccommodation ? input.departureDate : input.date,
   };
 }

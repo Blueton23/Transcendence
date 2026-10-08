@@ -7,7 +7,12 @@ import type {
   IdeaApiResponse,
 } from "@/features/idea/types";
 
-import { mapIdeaFromApi } from "@/features/idea/api/ideaMapper";
+import { getCookie } from "@/shared/api/cookies";
+
+import {
+  mapIdeaFromApi,
+  mapCreateIdeaToApi,
+} from "@/features/idea/api/ideaMapper";
 import { parseResponse } from "@/shared/api/errors";
 
 // Récupérer les idées réelles du voyage
@@ -19,6 +24,33 @@ export async function fetchIdeas(travelId: number): Promise<Idea[]> {
 
   const data = await parseResponse<IdeaApiResponse[]>(response);
   return data.map(mapIdeaFromApi);
+}
+
+// Créer une idée réelle dans le voyage
+export async function postIdea(
+  travelId: number,
+  input: CreateIdeaInput,
+): Promise<Idea> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const payload = mapCreateIdeaToApi(input);
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await parseResponse<IdeaApiResponse>(response);
+  return mapIdeaFromApi(data);
 }
 
 // get -> permet de récupérer une idée

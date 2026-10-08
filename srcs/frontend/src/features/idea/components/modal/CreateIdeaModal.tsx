@@ -3,13 +3,14 @@ import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import type { StepOption } from "@/features/idea/types";
+import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 
 export interface CreateIdeaModalProps {
   steps: StepOption[];
   onClose: () => void;
-  onCreate: (input: CreateIdeaInput) => void;
+  onCreate: (input: CreateIdeaInput) => Promise<void>;
 }
 
 export function CreateIdeaModal({
@@ -27,34 +28,66 @@ export function CreateIdeaModal({
     dateRange: undefined,
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   return (
     <Modal
       icon="pinplus"
       title="Épingler une idée"
       subtitle="Road trip Suisse"
-      onClose={onClose}
+      onClose={() => {
+        if (!isSubmitting) {
+          onClose();
+        }
+      }}
     >
       <form
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
-          const input = ideaFormInput(values);
-          onCreate(input);
-          onClose();
+
+          if (isSubmitting) {
+            return;
+          }
+
+          setIsSubmitting(true);
+          setSubmitError(null);
+
+          try {
+            const input = ideaFormInput(values);
+            await onCreate(input);
+            onClose();
+          } catch (err) {
+            setSubmitError(
+              err instanceof Error ? err.message : "Impossible de créer l'idée",
+            );
+          } finally {
+            setIsSubmitting(false);
+          }
         }}
       >
         <CreateIdeaForm steps={steps} values={values} setValues={setValues} />
+
+        {submitError && (
+          <div role="alert">
+            <Text tone="accent" className="whitespace-pre-line">
+              {submitError}
+            </Text>
+          </div>
+        )}
 
         <Button
           type="submit"
           variant="primary"
           className="w-full"
           disabled={
+            isSubmitting ||
             values.title.trim() === "" ||
             ((values.stepId !== null || values.type === "accommodation") &&
               (!values.dateRange?.from || !values.dateRange?.to))
           }
         >
-          Enregistrer
+          {isSubmitting ? "Enregistrement…" : "Enregistrer"}
         </Button>
       </form>
     </Modal>

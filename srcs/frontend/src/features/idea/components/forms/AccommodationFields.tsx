@@ -25,6 +25,7 @@ export function AccommodationFields({
           </Text>
 
           <Input
+            readOnly
             value={
               values.dateRange?.from
                 ? values.dateRange.from.toLocaleDateString("fr-CH")
@@ -42,6 +43,7 @@ export function AccommodationFields({
           </Text>
 
           <Input
+            readOnly
             value={
               values.dateRange?.to
                 ? values.dateRange.to.toLocaleDateString("fr-CH")
@@ -77,6 +79,7 @@ export function AccommodationFields({
       <Input
         type="number"
         min={0}
+        step="0.01"
         value={values.pricePerNight}
         onChange={(event) =>
           setValues((current) => ({

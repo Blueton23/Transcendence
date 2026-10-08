@@ -20,6 +20,7 @@ export function DateField({ dateRange, setDateRange }: DateFieldProps) {
       </Text>
 
       <Input
+        readOnly
         value={
           dateRange?.from ? dateRange.from.toLocaleDateString("fr-CH") : ""
         }

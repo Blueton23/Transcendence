@@ -7,7 +7,7 @@ import { IdeaStepFilter } from "@/features/idea/components/page/IdeaStepFilter";
 import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
 import { PlaceIdeaModal } from "@/features/idea/components/modal/PlaceIdeaModal";
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
-import type { IdeaFilter, StepFilter, StepOption, } from "@/features/idea/types";
+import type { IdeaFilter, StepFilter, StepOption } from "@/features/idea/types";
 import { filterIdeas } from "@/features/idea/utils/filterIdeas";
 import { useParams } from "react-router";
 import { useSteps } from "@/features/step/hooks/useSteps";

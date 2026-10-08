@@ -8,7 +8,7 @@ import type {
 } from "@/features/idea/types";
 import {
   fetchIdeas,
-  createIdea,
+  postIdea,
   placeIdea,
   voteIdea,
   editIdea,
@@ -23,7 +23,7 @@ export function useIdeas(travelId: number) {
 
   useEffect(() => {
     let ignore = false;
-
+    /* Gère le chargement des idées */
     async function loadIdea() {
       setIsLoading(true);
       setError(null);
@@ -76,17 +76,17 @@ export function useIdeas(travelId: number) {
   {
     /* Gère la création d'idée */
   }
-  function handleCreateIdea(input: CreateIdeaInput) {
-    const newIdea = createIdea(input);
+  async function handleCreateIdea(input: CreateIdeaInput): Promise<void> {
+    const newIdea = await postIdea(travelId, input);
 
-    setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
+    setIdeas((currentIdeas) => [newIdea, ...currentIdeas]);
 
     setVoted((currentVotes) => [
       ...currentVotes,
       {
         ideaId: newIdea.id,
-        voteCount: 0,
-        voted: false,
+        voteCount: newIdea.voteCount,
+        voted: newIdea.voted,
       },
     ]);
   }
