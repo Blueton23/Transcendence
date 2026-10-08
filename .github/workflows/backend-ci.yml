@@ -3,13 +3,44 @@ name: Backend CI
 on:
   push:
     branches: [main]
-    paths: ["srcs/backend/**"]
+    paths: ["srcs/backend/**", ".github/workflows/backend-ci.yml"]
   pull_request:
-    paths: ["srcs/backend/**"]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: ["srcs/backend/**", ".github/workflows/backend-ci.yml"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  lint-and-test:
+  lint:
+    if: github.event.pull_request.draft != true
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: srcs/backend
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      # Same ruff version as requirements.txt, without installing the rest
+      - name: Install ruff
+        run: pip install "$(grep '^ruff==' requirements.txt)"
+
+      - name: Lint (ruff)
+        run: |
+          ruff check --output-format=github .
+          ruff format --check .
+
+  test:
+    if: github.event.pull_request.draft != true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     defaults:
       run:
         working-directory: srcs/backend
@@ -29,6 +60,16 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      redis:
+        image: redis:7.4.9-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v5
 
@@ -41,15 +82,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
-      - name: Lint (ruff)
-        run: |
-          pip install ruff==0.16.3
-          ruff check .
-          ruff format --check .
-
-      - name: Run tests
-        run: python manage.py test
-        env:
+      - name: Check for missing migrations
+        run: python manage.py makemigrations --check --dry-run
+        env: &django-env
           DJANGO_SECRET_KEY: ci-test-secret-key
           DJANGO_DEBUG: "False"
           DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1
@@ -58,3 +93,9 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: localhost
           POSTGRES_PORT: 5432
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+
+      - name: Run tests
+        run: python manage.py test --parallel
+        env: *django-env
