@@ -80,11 +80,11 @@ export async function acceptFriendRequest(friendshipId: number): Promise<void> {
   await parseResponse(response);
 }
 
-export async function rejectFriendRequest(friendshipId: number): Promise<void> {
+export async function removeFriendRequest(friendshipId: number): Promise<void> {
   const csrfToken = getCsrfToken();
 
   const response = await fetch(
-    `${API_BASE_URL}/friendships/${friendshipId}/reject/`,
+    `${API_BASE_URL}/friendships/${friendshipId}/remove/`,
     {
       method: "DELETE",
       credentials: "include",

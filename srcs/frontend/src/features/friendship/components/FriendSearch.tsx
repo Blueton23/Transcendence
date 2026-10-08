@@ -72,7 +72,7 @@ function FriendSearch() {
         </Heading>
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex gap-3 sm:flex-row">
         <Input
           icon={<Icon name="search" size={18} className="text-muted" />}
           value={query}
@@ -88,7 +88,7 @@ function FriendSearch() {
 
         <Button
           type="button"
-          variant="primary"
+          variant="dark"
           onClick={() => void handleSearch()}
           disabled={isSearching}
         >

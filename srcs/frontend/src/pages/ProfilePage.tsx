@@ -8,13 +8,10 @@ import FriendSearch from "../features/friendship/components/FriendSearch";
 
 import Button from "../shared/ui/Button";
 import Modal from "../shared/ui/Modal";
-import { useAuth } from "@/features/auth/context/useAuth";
 
 function ProfilePage() {
   const [isModifyOpen, setIsModifyOpen] = useState(false);
   const [friendsRefreshKey, setFriendsRefreshKey] = useState(0);
-
-  const { currentUser } = useAuth();
 
   function handleFriendAccepted() {
     setFriendsRefreshKey((current) => current + 1);
@@ -27,7 +24,7 @@ function ProfilePage() {
 
         <Button
           type="button"
-          variant="primary"
+          variant="dark"
           onClick={() => setIsModifyOpen(true)}
         >
           Modifier le profil

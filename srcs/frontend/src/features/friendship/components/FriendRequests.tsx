@@ -4,7 +4,7 @@ import type { FriendshipRequest } from "../types";
 import {
   acceptFriendRequest,
   getFriendRequests,
-  rejectFriendRequest,
+  removeFriendRequest,
 } from "../api/friendship";
 
 import Button from "@/shared/ui/Button";
@@ -65,7 +65,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     setError(null);
 
     try {
-      await rejectFriendRequest(id);
+      await removeFriendRequest(id);
 
       setRequests((current) => current.filter((request) => request.id !== id));
     } catch (err) {

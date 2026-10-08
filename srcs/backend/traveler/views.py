@@ -415,25 +415,18 @@ class FriendshipAcceptView(APIView):
         )
 
 
-class FriendshipRejectView(APIView):
+class FriendshipRemoveView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def delete(self, request: Request, friendship_id: int) -> Response:
         try:
             friendship = Friendship.objects.get(
                 pk=friendship_id,
-                status=Status.PENDING,
             )
         except Friendship.DoesNotExist:
             return Response(
-                {"detail": "Demande d'amitié introuvable."},
+                {"detail": "Amitié introuvable."},
                 status=status.HTTP_404_NOT_FOUND,
-            )
-
-        if request.user.pk == friendship.requested_by_id:
-            return Response(
-                {"detail": "Vous ne pouvez pas rejeter votre propre demande."},
-                status=status.HTTP_403_FORBIDDEN,
             )
 
         if request.user.pk not in {
@@ -441,14 +434,15 @@ class FriendshipRejectView(APIView):
             friendship.user2_id,
         }:
             return Response(
-                {"detail": "Vous n'êtes pas concerné par cette demande."},
+                {"detail": "Vous n'êtes pas concerné par cette relation"},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         friendship.delete()
 
         return Response(
-            status=status.HTTP_204_NO_CONTENT,
+            {"detail": "Amitié supprimée."},
+            status=status.HTTP_200_OK,
         )
 
 

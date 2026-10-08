@@ -9,7 +9,7 @@ from .views import (
     CsrfTokenView,
     FriendshipAcceptView,
     FriendshipListView,
-    FriendshipRejectView,
+    FriendshipRemoveView,
     FriendshipRequestsView,
     FriendshipRequestView,
     FriendshipSearchView,
@@ -61,8 +61,8 @@ urlpatterns = [
         name="friendship-accept",
     ),
     path(
-        "friendships/<int:friendship_id>/reject/",
-        FriendshipRejectView.as_view(),
+        "friendships/<int:friendship_id>/remove/",
+        FriendshipRemoveView.as_view(),
         name="friendship-reject",
     ),
     path(
