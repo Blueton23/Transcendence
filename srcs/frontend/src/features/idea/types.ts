@@ -1,5 +1,38 @@
 import type { DateRange } from "@daypicker/react";
 
+export type IdeaApiType = "r" | "l" | "a" | "s";
+export type IdeaApiStatus = "s" | "p" | "c";
+
+// Décrit une idée telle qu’elle arrive dans le JSON de l’API
+export interface IdeaApiResponse {
+  id: number;
+  travelId: number;
+  travelerId: number;
+  stepId: number | null;
+  chosenById: number | null;
+
+  title: string;
+  type: IdeaApiType;
+  status: IdeaApiStatus;
+
+  voteCount: number;
+  voted: boolean;
+
+  localisation: string;
+  note: string;
+  url: string;
+  latitude: string | null;
+  longitude: string | null;
+  pricePerNight: string | null;
+  startDate: string | null;
+  endDate: string | null;
+  chosenAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/*================================================================================*/
+
 export type IdeaType =
   "restaurant" | "accommodation" | "activity" | "sightseeing";
 export type IdeaStatus = "suggested" | "placed" | "chosen";
@@ -7,7 +40,7 @@ export type IdeaStatus = "suggested" | "placed" | "chosen";
 export type IdeaFilter = "all" | IdeaType;
 export type StepFilter = "all" | "none" | number;
 
-// représente une idée complète coté backend
+// Représente une idée adaptée pour les composants du frontend
 export interface Idea {
   id: number;
   travelId: number;
@@ -17,6 +50,8 @@ export interface Idea {
   title: string;
   type: IdeaType;
   status: IdeaStatus;
+  voteCount: number;
+  Voted: boolean;
   localisation: string | null;
   latitude: number | null;
   longitude: number | null;
