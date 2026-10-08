@@ -10,14 +10,11 @@ export interface IdeaApiResponse {
   travelerId: number;
   stepId: number | null;
   chosenById: number | null;
-
   title: string;
   type: IdeaApiType;
   status: IdeaApiStatus;
-
   voteCount: number;
   voted: boolean;
-
   localisation: string;
   note: string;
   url: string;
@@ -51,7 +48,7 @@ export interface Idea {
   type: IdeaType;
   status: IdeaStatus;
   voteCount: number;
-  Voted: boolean;
+  voted: boolean;
   localisation: string | null;
   latitude: number | null;
   longitude: number | null;
