@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("idea", "0005_alter_idea_price_per_night"),
-        ("travel", "0005_participation_last_read_at"),
+        ("travel", "0006_participation_last_read_at"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 

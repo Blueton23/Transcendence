@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("travel", "0004_alter_step_options"),
+        ("travel", "0005_alter_step_latitude_alter_step_longitude"),
     ]
 
     operations = [
