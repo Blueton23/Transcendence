@@ -29,6 +29,6 @@ export interface CreateStepData {
   startDate: string;
   endDate: string;
   localisation: string;
-  latitude?: number | null;
-  longitude?: number | null;
+  latitude: number;
+  longitude: number;
 }

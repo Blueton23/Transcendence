@@ -19,6 +19,8 @@ from spending.services import (
 from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
 
+COORDS = {"latitude": 46.5197, "longitude": 6.6323}
+
 
 class SpendingModelTest(TestCase):
     def setUp(self):
@@ -42,6 +44,7 @@ class SpendingModelTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         self.idea = Idea.objects.create(
             travel=self.travel,
@@ -87,6 +90,7 @@ class SpendingModelTest(TestCase):
             localisation="Nice",
             start_date=datetime.date(2026, 7, 2),
             end_date=datetime.date(2026, 7, 3),
+            **COORDS,
         )
         with self.assertRaises(ValidationError):
             self._make_spending(step=other_step)
@@ -128,6 +132,7 @@ class SpendingModelTest(TestCase):
             localisation="Grenoble",
             start_date=datetime.date(2026, 6, 5),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
         placed_idea = Idea.objects.create(
             travel=self.travel,
