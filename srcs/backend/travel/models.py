@@ -3,6 +3,7 @@ from typing import ClassVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.utils import timezone
@@ -117,10 +118,14 @@ class Step(TimeStampedModel):
     end_date = models.DateField()
     localisation = models.CharField(max_length=255)
     latitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
+        max_digits=10,
+        decimal_places=7,
+        validators=[MinValueValidator(-90), MaxValueValidator(90)],
     )
     longitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
+        max_digits=10,
+        decimal_places=7,
+        validators=[MinValueValidator(-180), MaxValueValidator(180)],
     )
     deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
 

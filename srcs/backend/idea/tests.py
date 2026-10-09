@@ -19,6 +19,8 @@ from travel.models import (
 )
 from traveler.models import Traveler
 
+COORDS = {"latitude": 46.5197, "longitude": 6.6323}
+
 
 class IdeaModelTest(TestCase):
     def setUp(self):
@@ -37,6 +39,7 @@ class IdeaModelTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
 
     def _make_idea(self, **overrides):
@@ -257,6 +260,7 @@ class IdeaModelTest(TestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 7, 2),
             end_date=datetime.date(2026, 7, 4),
+            **COORDS,
         )
         with self.assertRaises(ValidationError):
             self._make_idea(
@@ -494,6 +498,7 @@ class IdeaSerializerTest(TestCase):
             localisation="Vouvry",
             start_date=datetime.date(2026, 6, 3),
             end_date=datetime.date(2026, 6, 3),
+            **COORDS,
         )
 
         # Autre Travel
@@ -512,6 +517,7 @@ class IdeaSerializerTest(TestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 7, 3),
             end_date=datetime.date(2026, 7, 3),
+            **COORDS,
         )
 
     # ========================================================================#
@@ -1154,6 +1160,7 @@ class IdeaViewTest(APITestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 7, 3),
             end_date=datetime.date(2026, 7, 3),
+            **COORDS,
         )
 
         Idea.objects.create(
@@ -1435,6 +1442,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         trashed_step.soft_delete()
 
@@ -1639,6 +1647,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.client.force_authenticate(user=self.traveler)
@@ -1675,6 +1684,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.idea.step = step
@@ -1717,6 +1727,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2242,6 +2253,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         trashed_step.soft_delete()
 
@@ -2278,6 +2290,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.client.force_authenticate(user=self.traveler)
@@ -2313,6 +2326,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.idea.step = step
@@ -2352,6 +2366,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2396,6 +2411,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2446,6 +2462,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2487,6 +2504,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2556,6 +2574,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2622,6 +2641,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2661,6 +2681,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2708,6 +2729,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2768,6 +2790,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2836,6 +2859,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.step = step
@@ -2904,6 +2928,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2950,6 +2975,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 8),
+            **COORDS,
         )
 
         Idea.objects.create(

@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from faker import Faker
 
 from travel.models import Participation, ParticipationStatus, Step, Travel
@@ -57,14 +59,18 @@ def seed_steps(fake: Faker, travels: list, per_travel: int) -> list:
             end_date = fake.date_between_dates(
                 date_start=start_date, date_end=travel.end_date
             )
+            coords = fake.local_latlng(
+                country_code=fake.random_element(["FR", "CH", "IT", "DE", "ES"]),
+                coords_only=False,
+            )
             steps.append(
                 Step.objects.create(
                     travel=travel,
                     start_date=start_date,
                     end_date=end_date,
-                    localisation=fake.city(),
-                    latitude=round(fake.latitude(), 6),
-                    longitude=round(fake.longitude(), 6),
+                    localisation=coords[2],
+                    latitude=Decimal(coords[0]),
+                    longitude=Decimal(coords[1]),
                 )
             )
             current = end_date
