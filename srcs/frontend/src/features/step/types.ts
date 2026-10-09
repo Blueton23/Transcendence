@@ -7,8 +7,8 @@ export interface Step {
   ideaCount: number;
   priority: number | null;
   localisation: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,6 +18,11 @@ export interface Step {
 export interface StepIdeaPreview {
   label: string;
   status: "proposed" | "selected" | "reserved";
+}
+
+export interface Segment {
+  durationMinutes: number;
+  distanceKm: number;
 }
 
 export interface CreateStepData {

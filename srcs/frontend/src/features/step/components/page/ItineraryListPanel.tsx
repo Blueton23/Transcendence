@@ -1,13 +1,14 @@
-import type { Segment } from "@/features/step/api/segmentApi";
 import type { Step } from "@/features/step/types";
 import { ItineraryTimeline } from "@/features/step/components/timeline/ItineraryTimeline";
 import { TotalSegment } from "../timeline/TotalSegment";
 import { AddStepForm } from "@/features/step/components/add-step";
 import type { Travel } from "@/features/travel/types";
+import type { Route } from "@/features/map/types";
 
 interface ItineraryListPanelProps {
   steps: Step[];
-  segments: Segment[];
+  route: Route | null;
+  isLoadingRoute: boolean;
   travel: Travel;
   dateLabels: string[];
   onDetailView: (step: Step) => void;
@@ -17,13 +18,15 @@ interface ItineraryListPanelProps {
 
 export function ItineraryListPanel({
   steps,
-  segments,
+  route,
+  isLoadingRoute,
   travel,
   dateLabels,
   onDetailView,
   onModifyStep,
   refetch,
 }: ItineraryListPanelProps) {
+  const segments = isLoadingRoute ? [] : (route?.legs ?? []);
   return (
     <>
       <div className="hidden md:block">
@@ -38,7 +41,7 @@ export function ItineraryListPanel({
           onModifyStep={onModifyStep}
           refetch={refetch}
         />
-        <TotalSegment segments={segments} />
+        <TotalSegment route={route} />
       </div>
     </>
   );
