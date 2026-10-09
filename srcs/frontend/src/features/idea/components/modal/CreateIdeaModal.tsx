@@ -3,6 +3,7 @@ import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import type { StepOption } from "@/features/idea/types";
+import { formatDateToISO } from "@/features/idea/utils/formatDate";
 import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
@@ -35,6 +36,22 @@ export function CreateIdeaModal({
   const titleError =
     values.title.trim() === "" ? "Le titre est obligatoire." : undefined;
 
+  const isAccommodation = values.type === "accommodation";
+  const startDate = values.dateRange?.from;
+  const endDate = values.dateRange?.to;
+
+  let datesError: string | undefined;
+
+  if (isAccommodation) {
+    if (!startDate || !endDate) {
+      datesError = "Les dates d’arrivée et de départ sont obligatoires.";
+    } else if (formatDateToISO(endDate) < formatDateToISO(startDate)) {
+      datesError = "La date de départ ne peut pas précéder la date d’arrivée.";
+    }
+  } else if (values.stepId !== null && !startDate) {
+    datesError = "Choisis une date pour cette idée.";
+  }
+
   return (
     <Modal
       icon="pinplus"
@@ -57,7 +74,7 @@ export function CreateIdeaModal({
           setHasSubmitted(true);
           setSubmitError(null);
 
-          if (titleError) {
+          if (titleError || datesError) {
             return;
           }
 
@@ -69,7 +86,9 @@ export function CreateIdeaModal({
             onClose();
           } catch (err) {
             setSubmitError(
-              err instanceof Error ? err.message : "Impossible de créer l'idée",
+              err instanceof Error
+                ? err.message
+                : "Impossible de créer l’idée.",
             );
           } finally {
             setIsSubmitting(false);
@@ -81,6 +100,7 @@ export function CreateIdeaModal({
           values={values}
           setValues={setValues}
           titleError={hasSubmitted ? titleError : undefined}
+          datesError={hasSubmitted ? datesError : undefined}
         />
 
         {submitError && (
@@ -95,11 +115,7 @@ export function CreateIdeaModal({
           type="submit"
           variant="primary"
           className="w-full"
-          disabled={
-            isSubmitting ||
-            ((values.stepId !== null || values.type === "accommodation") &&
-              (!values.dateRange?.from || !values.dateRange?.to))
-          }
+          disabled={isSubmitting}
         >
           {isSubmitting ? "Enregistrement…" : "Enregistrer"}
         </Button>

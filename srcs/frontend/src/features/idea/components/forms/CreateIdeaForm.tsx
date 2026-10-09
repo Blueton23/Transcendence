@@ -13,6 +13,7 @@ interface IdeaFormProps {
   values: IdeaFormValues;
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
   titleError?: string;
+  datesError?: string;
 }
 
 export function CreateIdeaForm({
@@ -20,6 +21,7 @@ export function CreateIdeaForm({
   values,
   setValues,
   titleError,
+  datesError,
 }: IdeaFormProps) {
   const isAccommodation = values.type === "accommodation";
   const titleId = useId();
@@ -60,6 +62,7 @@ export function CreateIdeaForm({
               dateRange,
             }))
           }
+          datesError={datesError}
         />
       )}
 
@@ -133,7 +136,11 @@ export function CreateIdeaForm({
       />
 
       {isAccommodation && (
-        <AccommodationFields values={values} setValues={setValues} />
+        <AccommodationFields
+          values={values}
+          setValues={setValues}
+          datesError={datesError}
+        />
       )}
     </>
   );
