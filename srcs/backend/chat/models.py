@@ -5,7 +5,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.db.models import CheckConstraint, Q
-from django.utils import timezone
 
 from common.models import TimeStampedModel, ValidatedModel
 from idea.models import Idea
@@ -15,19 +14,11 @@ MESSAGE_BODY_MAX_LENGTH = 2000
 
 
 class MessageQuerySet(models.QuerySet):
-    def alive(self) -> "MessageQuerySet":
-        return self.filter(deleted_at__isnull=True)
-
-    def trashed(self) -> "MessageQuerySet":
-        return self.filter(deleted_at__isnull=False)
-
     # Non-lus d'un participant : les messages des autres, arrives depuis son
     # dernier passage (tous si le chat n'a jamais ete ouvert).
     def unread_for(self, participation: Participation) -> "MessageQuerySet":
-        unread = (
-            self.alive()
-            .filter(travel_id=participation.travel_id)
-            .exclude(traveler_id=participation.traveler_id)
+        unread = self.filter(travel_id=participation.travel_id).exclude(
+            traveler_id=participation.traveler_id
         )
         if participation.last_read_at is not None:
             unread = unread.filter(created_at__gt=participation.last_read_at)
@@ -68,7 +59,6 @@ class Message(TimeStampedModel, ValidatedModel):
     )
     is_system = models.BooleanField(default=False)
     body = models.TextField(validators=[MaxLengthValidator(MESSAGE_BODY_MAX_LENGTH)])
-    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
 
     objects = MessageQuerySet.as_manager()
 
@@ -93,18 +83,6 @@ class Message(TimeStampedModel, ValidatedModel):
     def __str__(self) -> str:
         author = "system" if self.is_system else self.traveler
         return f"{author} @ {self.travel}: {self.body[:30]}"
-
-    @property
-    def is_trashed(self) -> bool:
-        return self.deleted_at is not None
-
-    def soft_delete(self) -> None:
-        self.deleted_at = timezone.now()
-        self.save(update_fields=["deleted_at", "updated_at"])
-
-    def restore(self) -> None:
-        self.deleted_at = None
-        self.save(update_fields=["deleted_at", "updated_at"])
 
     def clean(self) -> None:
         super().clean()

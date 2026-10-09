@@ -12,10 +12,9 @@ class MessageAdmin(admin.ModelAdmin):
         "step",
         "idea",
         "created_at",
-        "deleted_at",
     )
     list_select_related = ("travel", "traveler", "step__travel", "idea__travel")
-    list_filter = ("is_system", ("deleted_at", admin.EmptyFieldListFilter), "travel")
+    list_filter = ("is_system", "travel")
     search_fields = ("body", "travel__title", "traveler__username")
     readonly_fields = ("created_at", "updated_at")
 

@@ -9,6 +9,8 @@ from idea.models import Idea, IdeaType
 from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
 
+COORDS = {"latitude": 45.0, "longitude": 6.0}
+
 
 class MessageModelTest(TestCase):
     def setUp(self):
@@ -42,6 +44,7 @@ class MessageModelTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         self.idea = Idea.objects.create(
             travel=self.travel,
@@ -71,8 +74,6 @@ class MessageModelTest(TestCase):
         self.assertFalse(message.is_system)
         self.assertIsNone(message.step_id)
         self.assertIsNone(message.idea_id)
-        self.assertIsNone(message.deleted_at)
-        self.assertFalse(message.is_trashed)
         self.assertIsNotNone(message.created_at)
         self.assertIsNotNone(message.updated_at)
 
@@ -117,15 +118,14 @@ class MessageModelTest(TestCase):
         self.assertIsNone(message.traveler_id)
         self.assertFalse(message.is_system)
 
-    def test_orphaned_message_can_still_be_soft_deleted(self):
+    def test_orphaned_message_can_still_be_deleted(self):
         message = self._make_message()
         self.traveler.delete()
         message.refresh_from_db()
 
-        message.soft_delete()
+        message.delete()
 
-        message.refresh_from_db()
-        self.assertTrue(message.is_trashed)
+        self.assertFalse(Message.objects.filter(id=message.id).exists())
 
     def test_step_hard_delete_keeps_the_message_on_the_travel(self):
         message = self._make_message(step=self.step)
@@ -221,6 +221,7 @@ class MessageModelTest(TestCase):
             localisation="Nice",
             start_date=datetime.date(2026, 7, 2),
             end_date=datetime.date(2026, 7, 4),
+            **COORDS,
         )
         with self.assertRaises(ValidationError) as ctx:
             self._make_message(step=foreign_step)
@@ -251,22 +252,15 @@ class MessageModelTest(TestCase):
             self._make_message(body="a" * (MESSAGE_BODY_MAX_LENGTH + 1))
         self.assertIn("body", ctx.exception.message_dict)
 
-    # --- Corbeille ---
+    # --- Suppression ---
 
-    def test_soft_delete_and_restore(self):
+    def test_delete_removes_the_row(self):
         message = self._make_message()
+        message_id = message.id
 
-        message.soft_delete()
+        message.delete()
 
-        self.assertTrue(message.is_trashed)
-        self.assertNotIn(message, Message.objects.alive())
-        self.assertIn(message, Message.objects.trashed())
-
-        message.restore()
-
-        self.assertFalse(message.is_trashed)
-        self.assertIn(message, Message.objects.alive())
-        self.assertNotIn(message, Message.objects.trashed())
+        self.assertFalse(Message.objects.filter(id=message_id).exists())
 
     # --- Non-lus ---
 
@@ -291,9 +285,8 @@ class MessageModelTest(TestCase):
 
         self.assertEqual(list(Message.objects.unread_for(self.participation)), [new])
 
-    def test_unread_ignores_trashed_messages_and_other_travels(self):
-        trashed = self._make_message(traveler=self.other)
-        trashed.soft_delete()
+    def test_unread_ignores_deleted_messages_and_other_travels(self):
+        self._make_message(traveler=self.other).delete()
         Participation.objects.create(
             traveler=self.other,
             travel=self.other_travel,

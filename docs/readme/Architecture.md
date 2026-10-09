@@ -253,13 +253,13 @@ L'app `chat` porte le fil de discussion d'un voyage. `Message` hérite de `TimeS
 
 | Modèle | Rôle | Champs principaux |
 |---|---|---|
-| `Message` | Un message du chat d'un voyage | `travel` (FK, CASCADE), `traveler` (FK optionnel, `SET NULL` : l'auteur), `step` / `idea` (FK optionnels, `SET NULL`), `is_system`, `body` (2000 caractères max), `deleted_at` (corbeille) |
+| `Message` | Un message du chat d'un voyage | `travel` (FK, CASCADE), `traveler` (FK optionnel, `SET NULL` : l'auteur), `step` / `idea` (FK optionnels, `SET NULL`), `is_system`, `body` (2000 caractères max) |
 
 - Un message relève du voyage, d'une étape **ou** d'une idée, jamais des deux à la fois. Si l'étape ou l'idée disparaît, il reste rattaché au voyage.
 - Un message système n'a pas d'auteur. Un message sans auteur n'est pas forcément système : si le compte de l'auteur est supprimé, le message reste dans le fil (`SET NULL`).
 - À la création, l'auteur doit être membre du voyage (`is_travel_member`). Cette règle n'est vérifiée qu'à la création, pour qu'un message reste modifiable et supprimable après le départ de son auteur.
-- **Suppression douce** comme `Step` : `Message.objects.alive()` / `trashed()`, `soft_delete()` / `restore()`, propriété `is_trashed`.
-- Non-lus : `Message.objects.unread_for(participation)` renvoie les messages vivants des autres, créés après `Participation.last_read_at` (tous si le chat n'a jamais été ouvert). Aucun compteur n'est stocké.
+- **Pas de corbeille** : un message ne se supprime que définitivement (`delete()`, admin), et pas depuis le chat par les utilisateurs.
+- Non-lus : `Message.objects.unread_for(participation)` renvoie les messages des autres, créés après `Participation.last_read_at` (tous si le chat n'a jamais été ouvert). Aucun compteur n'est stocké.
 
 #### Seeds (données de test) :
 - Objectif : remplir rapidement la base avec des données de test réalistes, sans tout créer à la main via l'admin
