@@ -15,6 +15,8 @@ from travel.models import (
 from travel.serializers import StepSerializer, TravelSerializer
 from traveler.models import Traveler
 
+COORDS = {"latitude": 46.5197, "longitude": 6.6323}
+
 # --- Model tests ---
 
 
@@ -143,6 +145,8 @@ class StepModelTest(TestCase):
             "localisation": "Lyon",
             "start_date": datetime.date(2026, 6, 2),
             "end_date": datetime.date(2026, 6, 4),
+            "latitude": 46.5197,
+            "longitude": 6.6323,
         }
         data.update(overrides)
         return Step.objects.create(**data)
@@ -150,8 +154,6 @@ class StepModelTest(TestCase):
     def test_create_step_defaults(self):
         step = self._make_step()
         self.assertIsNone(step.priority)
-        self.assertIsNone(step.latitude)
-        self.assertIsNone(step.longitude)
         self.assertIsNone(step.deleted_at)
         self.assertFalse(step.is_trashed)
         self.assertIsNotNone(step.created_at)
@@ -364,6 +366,8 @@ class StepSerializerTest(TestCase):
                 "start_date": "2026-10-12",
                 "end_date": "2026-10-11",
                 "localisation": "Test",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             }
         )
         self.assertFalse(serializer.is_valid())
@@ -375,6 +379,7 @@ class StepSerializerTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         data = StepSerializer(step).data
 
@@ -400,6 +405,7 @@ class StepSerializerTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         self.assertEqual(StepSerializer(step).data["nights"], 2)
 
@@ -456,6 +462,8 @@ class TravelViewTest(APITestCase):
                 "title": "Nouveau voyage",
                 "start_date": "2026-08-01",
                 "end_date": "2026-08-05",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -478,6 +486,8 @@ class TravelViewTest(APITestCase):
                 "title": "Nouvelle aventure",
                 "start_date": "2026-08-06",
                 "end_date": "2026-08-12",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -537,6 +547,7 @@ class StepViewTest(APITestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 1),
             end_date=datetime.date(2026, 6, 3),
+            **COORDS,
         )
 
         self.autre_voyage = Travel.objects.create(
@@ -550,6 +561,7 @@ class StepViewTest(APITestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 7, 3),
             end_date=datetime.date(2026, 7, 4),
+            **COORDS,
         )
 
     def test_list_returns_only_steps_of_this_travel(self):
@@ -587,6 +599,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-10",
                 "end_date": "2026-06-12",
                 "localisation": "Nice",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -602,6 +616,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-10",
                 "end_date": "2026-06-12",
                 "localisation": "Nice",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -617,6 +633,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-05-02",
                 "end_date": "2026-06-14",
                 "localisation": "Lyon",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
         self.assertEqual(response.status_code, 400)
@@ -631,6 +649,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-02",
                 "end_date": "2026-06-17",
                 "localisation": "Lyon",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
         self.assertEqual(response.status_code, 400)
@@ -645,6 +665,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-02",
                 "end_date": "2026-06-04",
                 "localisation": "Lyon",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
         self.assertEqual(response.status_code, 400)
