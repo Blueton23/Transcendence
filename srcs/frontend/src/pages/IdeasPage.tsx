@@ -138,6 +138,7 @@ export function IdeasPage() {
 
       {createIdeaModalOpen && (
         <CreateIdeaModal
+          travelTitle={travel.title}
           steps={stepOptions}
           onClose={() => setCreateIdeaModalOpen(false)}
           onCreate={handleCreateIdea}
@@ -155,6 +156,7 @@ export function IdeasPage() {
 
       {editIdea && (
         <EditIdeaModal
+          travelTitle={travel.title}
           idea={editIdea}
           steps={stepOptions}
           onClose={() => setEditIdeaId(null)}

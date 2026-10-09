@@ -11,6 +11,7 @@ import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 
 export interface EditIdeaModalProps {
+  travelTitle: string;
   idea: Idea;
   steps: StepOption[];
   onClose: () => void;
@@ -18,6 +19,7 @@ export interface EditIdeaModalProps {
 }
 
 export function EditIdeaModal({
+  travelTitle,
   idea,
   steps,
   onClose,
@@ -51,7 +53,7 @@ export function EditIdeaModal({
     <Modal
       icon="pinplus"
       title="Modifier l'idée"
-      subtitle="Road trip Suisse"
+      subtitle={travelTitle}
       onClose={onClose}
     >
       <form

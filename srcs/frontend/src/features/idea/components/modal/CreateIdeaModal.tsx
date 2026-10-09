@@ -9,12 +9,14 @@ import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 
 export interface CreateIdeaModalProps {
+  travelTitle: string;
   steps: StepOption[];
   onClose: () => void;
   onCreate: (input: CreateIdeaInput) => Promise<void>;
 }
 
 export function CreateIdeaModal({
+  travelTitle,
   steps,
   onClose,
   onCreate,
@@ -56,7 +58,7 @@ export function CreateIdeaModal({
     <Modal
       icon="pinplus"
       title="Épingler une idée"
-      subtitle="Road trip Suisse"
+      subtitle={travelTitle}
       onClose={() => {
         if (!isSubmitting) {
           onClose();
