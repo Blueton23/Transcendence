@@ -3,7 +3,7 @@ import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import type { StepOption } from "@/features/idea/types";
-import { formatDateToISO } from "@/features/idea/utils/formatDate";
+import { validateIdeaForm } from "@/features/idea/utils/validateIdeaForm";
 import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
@@ -35,24 +35,7 @@ export function CreateIdeaModal({
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
-  const titleError =
-    values.title.trim() === "" ? "Le titre est obligatoire." : undefined;
-
-  const isAccommodation = values.type === "accommodation";
-  const startDate = values.dateRange?.from;
-  const endDate = values.dateRange?.to;
-
-  let datesError: string | undefined;
-
-  if (isAccommodation) {
-    if (!startDate || !endDate) {
-      datesError = "Les dates d’arrivée et de départ sont obligatoires.";
-    } else if (formatDateToISO(endDate) < formatDateToISO(startDate)) {
-      datesError = "La date de départ ne peut pas précéder la date d’arrivée.";
-    }
-  } else if (values.stepId !== null && !startDate) {
-    datesError = "Choisis une date pour cette idée.";
-  }
+  const { titleError, datesError } = validateIdeaForm(values);
 
   return (
     <Modal

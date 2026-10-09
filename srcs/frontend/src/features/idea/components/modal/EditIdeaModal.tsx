@@ -7,6 +7,7 @@ import type {
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import type { StepOption } from "@/features/idea/types";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
+import { validateIdeaForm } from "@/features/idea/utils/validateIdeaForm";
 import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
@@ -52,6 +53,8 @@ export function EditIdeaModal({
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const { titleError, datesError } = validateIdeaForm(values);
 
   return (
     <Modal
@@ -72,7 +75,13 @@ export function EditIdeaModal({
             return;
           }
 
+          setHasSubmitted(true);
           setSubmitError(null);
+
+          if (titleError || datesError) {
+            return;
+          }
+
           setIsSubmitting(true);
 
           try {
@@ -95,7 +104,13 @@ export function EditIdeaModal({
           }
         }}
       >
-        <CreateIdeaForm steps={steps} values={values} setValues={setValues} />
+        <CreateIdeaForm
+          steps={steps}
+          values={values}
+          setValues={setValues}
+          titleError={hasSubmitted ? titleError : undefined}
+          datesError={hasSubmitted ? datesError : undefined}
+        />
 
         {submitError && (
           <div role="alert">
@@ -109,15 +124,7 @@ export function EditIdeaModal({
           type="submit"
           variant="primary"
           className="w-full"
-          disabled={
-            isSubmitting ||
-            values.title.trim() === "" ||
-            (values.type === "accommodation" &&
-              (!values.dateRange?.from || !values.dateRange?.to)) ||
-            (values.type !== "accommodation" &&
-              values.stepId !== null &&
-              !values.dateRange?.from)
-          }
+          disabled={isSubmitting}
         >
           {isSubmitting ? "Enregistrement…" : "Enregistrer"}
         </Button>
