@@ -642,6 +642,22 @@ class TravelerApiTest(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("password", response.data["details"])
 
+    def test_create_traveler_rejects_numeric_password(self):
+        response = self.client.post(
+            reverse("traveler-create"),
+            {
+                "username": "bob",
+                "first_name": "Bob",
+                "last_name": "Martin",
+                "email": "bob@example.com",
+                "password": "123456789",
+                "password_confirmation": "123456789",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("password", response.data["details"])
+
     def test_create_traveler_rejects_duplicate_email(self):
         response = self.client.post(
             reverse("traveler-create"),
