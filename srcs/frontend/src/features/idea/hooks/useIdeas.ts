@@ -9,9 +9,9 @@ import type {
 import {
   fetchIdeas,
   postIdea,
+  patchIdea,
   placeIdea,
   voteIdea,
-  editIdea,
   deleteIdea,
 } from "@/features/idea/api/api.ideas";
 
@@ -92,6 +92,34 @@ export function useIdeas(travelId: number) {
   }
 
   {
+    /* Gère la modification d'idée */
+  }
+  async function handleEditIdea(
+    ideaId: Idea["id"],
+    input: EditIdeaInput,
+  ): Promise<void> {
+    const updatedIdea = await patchIdea(travelId, ideaId, input);
+
+    setIdeas((currentIdeas) =>
+      currentIdeas.map((idea) =>
+        idea.id === updatedIdea.id ? updatedIdea : idea,
+      ),
+    );
+
+    setVoted((currentVotes) =>
+      currentVotes.map((vote) =>
+        vote.ideaId === updatedIdea.id
+          ? {
+              ideaId: updatedIdea.id,
+              voteCount: updatedIdea.voteCount,
+              voted: updatedIdea.voted,
+            }
+          : vote,
+      ),
+    );
+  }
+
+  {
     /* Gère le placement d'idée */
   }
   function handlePlaceIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
@@ -112,25 +140,6 @@ export function useIdeas(travelId: number) {
 
     setIdeas((currentIdeas) =>
       currentIdeas.filter((idea) => idea.id !== ideaId),
-    );
-  }
-
-  {
-    /* Gère la modification d'idée */
-  }
-  function handleEditIdea(ideaId: Idea["id"], input: EditIdeaInput) {
-    editIdea(ideaId, input);
-
-    setIdeas((currentIdeas) =>
-      currentIdeas.map((idea) =>
-        idea.id === ideaId
-          ? {
-              ...idea,
-              ...input,
-              updatedAt: new Date().toISOString(),
-            }
-          : idea,
-      ),
     );
   }
 

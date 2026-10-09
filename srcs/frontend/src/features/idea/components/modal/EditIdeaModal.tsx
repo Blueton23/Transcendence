@@ -7,6 +7,7 @@ import type {
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import type { StepOption } from "@/features/idea/types";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
+import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 
@@ -15,7 +16,7 @@ export interface EditIdeaModalProps {
   idea: Idea;
   steps: StepOption[];
   onClose: () => void;
-  onEdit: (input: EditIdeaInput) => void;
+  onEdit: (input: EditIdeaInput) => Promise<void>;
 }
 
 export function EditIdeaModal({
@@ -49,33 +50,67 @@ export function EditIdeaModal({
           : undefined,
   }));
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   return (
     <Modal
       icon="pinplus"
       title="Modifier l'idée"
       subtitle={travelTitle}
-      onClose={onClose}
+      onClose={() => {
+        if (!isSubmitting) {
+          onClose();
+        }
+      }}
     >
       <form
-        onSubmit={(event) => {
+        onSubmit={async (event) => {
           event.preventDefault();
-          const input = ideaFormInput(values, {
-            localisation: idea.localisation,
-            latitude: idea.latitude,
-            longitude: idea.longitude,
-          });
 
-          onEdit(input);
-          onClose();
+          if (isSubmitting) {
+            return;
+          }
+
+          setSubmitError(null);
+          setIsSubmitting(true);
+
+          try {
+            const input = ideaFormInput(values, {
+              localisation: idea.localisation,
+              latitude: idea.latitude,
+              longitude: idea.longitude,
+            });
+
+            await onEdit(input);
+            onClose();
+          } catch (err) {
+            setSubmitError(
+              err instanceof Error
+                ? err.message
+                : "Impossible de modifier l’idée.",
+            );
+          } finally {
+            setIsSubmitting(false);
+          }
         }}
       >
         <CreateIdeaForm steps={steps} values={values} setValues={setValues} />
+
+        {submitError && (
+          <div role="alert">
+            <Text tone="accent" className="whitespace-pre-line">
+              {submitError}
+            </Text>
+          </div>
+        )}
 
         <Button
           type="submit"
           variant="primary"
           className="w-full"
           disabled={
+            isSubmitting ||
             values.title.trim() === "" ||
             (values.type === "accommodation" &&
               (!values.dateRange?.from || !values.dateRange?.to)) ||
@@ -84,7 +119,7 @@ export function EditIdeaModal({
               !values.dateRange?.from)
           }
         >
-          Enregistrer
+          {isSubmitting ? "Enregistrement…" : "Enregistrer"}
         </Button>
       </form>
     </Modal>

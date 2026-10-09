@@ -3,7 +3,6 @@ import type {
   CreateIdeaInput,
   PlaceIdeaInput,
   EditIdeaInput,
-  VoteIdea,
   IdeaApiResponse,
 } from "@/features/idea/types";
 
@@ -15,7 +14,7 @@ import {
 } from "@/features/idea/api/ideaMapper";
 import { parseResponse } from "@/shared/api/errors";
 
-// Récupérer les idées réelles du voyage
+// Récupérer les idées du voyage
 export async function fetchIdeas(travelId: number): Promise<Idea[]> {
   const response = await fetch(`/api/travels/${travelId}/ideas/`, {
     method: "GET",
@@ -26,7 +25,7 @@ export async function fetchIdeas(travelId: number): Promise<Idea[]> {
   return data.map(mapIdeaFromApi);
 }
 
-// Créer une idée réelle dans le voyage
+// Créer une idée dans le voyage
 export async function postIdea(
   travelId: number,
   input: CreateIdeaInput,
@@ -53,153 +52,32 @@ export async function postIdea(
   return mapIdeaFromApi(data);
 }
 
-// get -> permet de récupérer une idée
-export function getIdeas(): Idea[] {
-  return [
-    {
-      id: 1,
-      travelId: 1,
-      travelerId: 1,
-      stepId: null,
-      chosenBy: null,
-      title: "Fondue chez Chez Vrony",
-      type: "restaurant",
-      status: "suggested",
-      voteCount: 0,
-      voted: false,
-      localisation: "12 rue des Alpes, Annecy",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: null,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: null,
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
-    },
+// Modifier une idée du voyage
+export async function patchIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+  input: EditIdeaInput,
+): Promise<Idea> {
+  const csrfToken = getCookie("csrftoken");
 
-    {
-      id: 2,
-      travelId: 1,
-      travelerId: 2,
-      stepId: null,
-      chosenBy: null,
-      title: "Pont suspendu Charles Kuonen",
-      type: "sightseeing",
-      status: "suggested",
-      voteCount: 0,
-      voted: false,
-      localisation: "22 rue de la statut",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: null,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: null,
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
-    },
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
 
-    {
-      id: 3,
-      travelId: 1,
-      travelerId: 2,
-      stepId: 1,
-      chosenBy: 2,
-      title: "Rando du Bachalpsee",
-      type: "activity",
-      status: "placed",
-      voteCount: 4,
-      voted: false,
-      localisation: "15 rue des ponts",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: null,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: "2026-08-05T18:30:00Z",
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
-    },
+  const payload = mapCreateIdeaToApi(input);
 
-    {
-      id: 4,
-      travelId: 1,
-      travelerId: 1,
-      stepId: 2,
-      chosenBy: 2,
-      title: "Backpackers Zermatt",
-      type: "accommodation",
-      status: "chosen",
-      voteCount: 3,
-      voted: false,
-      localisation: "34 chemin du puit",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: 48,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: "2026-08-05T18:30:00Z",
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
+  const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
     },
-  ];
-}
+    body: JSON.stringify(payload),
+  });
 
-export function getIdeaVotes(): VoteIdea[] {
-  return [
-    {
-      ideaId: 1,
-      voteCount: 0,
-      voted: false,
-    },
-    {
-      ideaId: 2,
-      voteCount: 0,
-      voted: false,
-    },
-    {
-      ideaId: 3,
-      voteCount: 4,
-      voted: false,
-    },
-    {
-      ideaId: 4,
-      voteCount: 3,
-      voted: false,
-    },
-  ];
-}
-
-// les fonctions suivant sont a modifier plus tard pour la connexion backend
-
-// fonction métier pour le bouton "Epingler une idée"
-export function createIdea(input: CreateIdeaInput): Idea {
-  return {
-    id: Date.now(),
-    travelId: 1,
-    travelerId: 1,
-    chosenBy: null,
-    ...input,
-    status: "suggested",
-    voteCount: 0,
-    voted: false,
-    chosenAt: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+  const data = await parseResponse<IdeaApiResponse>(response);
+  return mapIdeaFromApi(data);
 }
 
 // fonction métier pour le bouton "placer"
@@ -209,10 +87,6 @@ export function placeIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
 
 export function deleteIdea(ideaId: Idea["id"]) {
   console.log(ideaId);
-}
-
-export function editIdea(ideaId: Idea["id"], input: EditIdeaInput) {
-  console.log(ideaId, input);
 }
 
 // fonction métier pour le bouton de vote
