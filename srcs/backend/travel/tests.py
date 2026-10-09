@@ -409,6 +409,32 @@ class StepSerializerTest(TestCase):
         )
         self.assertEqual(StepSerializer(step).data["nights"], 2)
 
+    def test_rejects_coordinates_out_of_range(self):
+        serializer = StepSerializer(
+            data={
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-03",
+                "localisation": "Nice",
+                "latitude": -120,
+                "longitude": -200,
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("latitude", serializer.errors)
+        self.assertIn("longitude", serializer.errors)
+
+    def test_missing_coordinates(self):
+        serializer = StepSerializer(
+            data={
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-03",
+                "localisation": "Nice",
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("latitude", serializer.errors)
+        self.assertIn("longitude", serializer.errors)
+
 
 # --- View tests ---
 
