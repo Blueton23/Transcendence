@@ -1,4 +1,3 @@
-import { getSegments } from "@/features/step/api/segmentApi";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import { computeDateLabels } from "@/features/step/utils/stepDates";
 import { useState } from "react";
@@ -13,6 +12,7 @@ import { useParams } from "react-router";
 import { Navigate } from "react-router";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import { StickyHeader } from "@/shared/ui/StickyHeader";
+import { useRoute } from "@/features/map/hooks/useRoute";
 
 //TODO(branchement):
 // + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
@@ -32,7 +32,7 @@ function ItineraryPage() {
     error: errorSteps,
     refetch,
   } = useSteps(travelId);
-  const segments = getSegments();
+  const { route, isLoading: isLoadingRoute } = useRoute(steps);
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
   const [detailStepId, setDetailStepId] = useState<number | null>(null);
@@ -50,19 +50,24 @@ function ItineraryPage() {
     : -1;
 
   return (
-    <div className="flex flex-col gap-4 px-4 pb-0 md:h-full md:pb-4">
+    <div className="flex flex-1 flex-col gap-4 px-4 pb-0 md:h-full md:flex-none md:pb-4">
       <StickyHeader>
         <ItineraryHeader
           travel={travel}
           steps={steps}
-          segments={segments}
+          route={route}
           mobileView={mobileView}
           onToggle={setMobileView}
           refetch={refetch}
           isDetailView={detailView !== null}
         />
       </StickyHeader>
-      <ItineraryLayout mobileView={mobileView}>
+      <ItineraryLayout
+        mobileView={mobileView}
+        steps={steps}
+        route={route}
+        detailStep={detailView}
+      >
         {detailView ? (
           <StepDetail
             step={detailView}
@@ -75,7 +80,8 @@ function ItineraryPage() {
           <div className="flex flex-col gap-4 md:min-h-0 md:flex-1">
             <ItineraryListPanel
               steps={steps}
-              segments={segments}
+              route={route}
+              isLoadingRoute={isLoadingRoute}
               travel={travel}
               dateLabels={dateLabels}
               onDetailView={(step) => setDetailStepId(step.id)}

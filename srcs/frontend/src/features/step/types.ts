@@ -1,5 +1,3 @@
-// TODO(branchement): confirmer avec Sebastien si latitude/longitude peuvent vraiment etre vides
-// flux texte libre sans geolocatison ? sinon enlever le null
 export interface Step {
   id: number;
   travelId: number;
@@ -9,8 +7,8 @@ export interface Step {
   ideaCount: number;
   priority: number | null;
   localisation: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | null;
+  longitude: number | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -20,6 +18,11 @@ export interface Step {
 export interface StepIdeaPreview {
   label: string;
   status: "proposed" | "selected" | "reserved";
+}
+
+export interface Segment {
+  durationMinutes: number;
+  distanceKm: number;
 }
 
 export interface CreateStepData {
