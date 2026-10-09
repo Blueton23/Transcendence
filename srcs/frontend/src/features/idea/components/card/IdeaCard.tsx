@@ -5,6 +5,8 @@ import { SecondaryInfo } from "@/features/idea/components/card/SecondaryInfo";
 import { StepLabel } from "@/features/idea/components/card/StepLabel";
 import { IdeaOptionsMenu } from "@/features/idea/components/card/IdeaOptionsMenu";
 import { ideaIcons } from "@/features/idea/utils/ideaIcons";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
+import Text from "@/shared/ui/Text";
 import IconBadge from "@/shared/ui/IconBadge";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
@@ -21,7 +23,7 @@ export interface IdeaCardProps {
   onView: () => void;
   onVote: () => void;
   onEdit: () => void;
-  onDelete: () => void;
+  onDelete: () => Promise<void>;
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -41,6 +43,12 @@ export function IdeaCard({
   onDelete,
 }: IdeaCardProps) {
   const isInPool = idea.status === "suggested";
+
+  const {
+    submit: submitDelete,
+    isSubmitting: isDeleting,
+    error: deleteError,
+  } = useSubmitAction(onDelete);
 
   return (
     <Card>
@@ -71,7 +79,22 @@ export function IdeaCard({
           </div>
 
           <div className="order-2 md:order-3">
-            <IdeaOptionsMenu onEdit={onEdit} onDelete={onDelete} />
+            {isDeleting ? (
+              <div role="status">
+                <Text size="sm">Suppression…</Text>
+              </div>
+            ) : (
+              <IdeaOptionsMenu
+                onEdit={onEdit}
+                onDelete={() => {
+                  if (isDeleting) {
+                    return;
+                  }
+
+                  void submitDelete();
+                }}
+              />
+            )}
           </div>
 
           <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">
@@ -79,6 +102,13 @@ export function IdeaCard({
           </div>
         </div>
       </div>
+      {deleteError && (
+        <div role="alert" className="mt-2">
+          <Text tone="accent" size="sm" className="whitespace-pre-line">
+            {deleteError}
+          </Text>
+        </div>
+      )}
     </Card>
   );
 }

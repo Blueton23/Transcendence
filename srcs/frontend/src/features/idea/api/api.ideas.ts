@@ -80,13 +80,33 @@ export async function patchIdea(
   return mapIdeaFromApi(data);
 }
 
+// Supprimer une idée d'un voyage
+export async function removeIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "X-CSRFToken": csrfToken,
+    },
+  });
+
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
+}
+
 // fonction métier pour le bouton "placer"
 export function placeIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
   console.log(ideaId, input);
-}
-
-export function deleteIdea(ideaId: Idea["id"]) {
-  console.log(ideaId);
 }
 
 // fonction métier pour le bouton de vote

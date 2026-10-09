@@ -10,9 +10,9 @@ import {
   fetchIdeas,
   postIdea,
   patchIdea,
+  removeIdea,
   placeIdea,
   voteIdea,
-  deleteIdea,
 } from "@/features/idea/api/api.ideas";
 
 export function useIdeas(travelId: number) {
@@ -120,6 +120,21 @@ export function useIdeas(travelId: number) {
   }
 
   {
+    /* Gère la suppression d'idée */
+  }
+  async function handleDeleteIdea(ideaId: Idea["id"]): Promise<void> {
+    await removeIdea(travelId, ideaId);
+
+    setIdeas((currentIdeas) =>
+      currentIdeas.filter((idea) => idea.id !== ideaId),
+    );
+
+    setVoted((currentVotes) =>
+      currentVotes.filter((vote) => vote.ideaId !== ideaId),
+    );
+  }
+
+  {
     /* Gère le placement d'idée */
   }
   function handlePlaceIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
@@ -129,17 +144,6 @@ export function useIdeas(travelId: number) {
       currentIdeas.map((idea) =>
         idea.id === ideaId ? { ...idea, ...input } : idea,
       ),
-    );
-  }
-
-  {
-    /* Gère la suppression d'idée */
-  }
-  function handleDeleteIdea(ideaId: Idea["id"]) {
-    deleteIdea(ideaId);
-
-    setIdeas((currentIdeas) =>
-      currentIdeas.filter((idea) => idea.id !== ideaId),
     );
   }
 
