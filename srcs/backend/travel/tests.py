@@ -582,7 +582,7 @@ class StepViewTest(APITestCase):
             end_date=datetime.date(2026, 7, 15),
         )
 
-        Step.objects.create(
+        self.autre_step = Step.objects.create(
             travel=self.autre_voyage,
             localisation="Paris",
             start_date=datetime.date(2026, 7, 3),
@@ -697,3 +697,66 @@ class StepViewTest(APITestCase):
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("start_date", response.data["details"])
+
+    def test_403_is_traveler_has_not_accepted_participation(self):
+        other_traveler = Traveler.objects.create_user(
+            username="bobby", email="bobby@example.com", password="password123"
+        )
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.INVITED,
+        )
+        self.client.force_authenticate(user=other_traveler)
+
+        response = self.client.get(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_403_traveler_is_not_connected(self):
+        response = self.client.get(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_access_wrong_step_from_travel_id(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "step-detail",
+                kwargs={"pk": self.autre_step.id, "travel_id": self.mon_voyage.id},
+            ),
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_patch_step_succeeds(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "step-detail",
+                kwargs={"pk": self.mon_step.id, "travel_id": self.mon_voyage.id},
+            ),
+            {"localisation": "Fribourg"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.mon_step.refresh_from_db()
+        self.assertEqual(self.mon_step.localisation, "Fribourg")
+
+    def test_patch_step_refused_if_not_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "step-detail",
+                kwargs={"pk": self.autre_step.id, "travel_id": self.autre_voyage.id},
+            ),
+            {"localisation": "Fribourg"},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.mon_step.refresh_from_db()
+        self.assertEqual(self.autre_step.localisation, "Paris")
