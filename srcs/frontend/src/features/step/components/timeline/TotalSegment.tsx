@@ -1,16 +1,17 @@
 import Divider from "@/shared/ui/Divider";
 import Text from "@/shared/ui/Text";
-import type { Segment } from "@/features/step/api/segmentApi";
-import {
-  computeDurationLabel,
-  computeTotalHours,
-  computeTotalKms,
-} from "@/features/step/utils/segmentDuration";
+import { computeDurationLabel } from "@/features/step/utils/segmentDuration";
+import type { Route } from "@/features/map/types";
 
-export function TotalSegment({ segments }: { segments: Segment[] }) {
-  const totalHours = computeTotalHours(segments);
-  const totalKms = computeTotalKms(segments);
-  const totalHoursLabel = computeDurationLabel(totalHours);
+interface TotalSegmentProps {
+  route: Route | null;
+}
+
+export function TotalSegment({ route }: TotalSegmentProps) {
+  if (!route) return null;
+  const totalMinutes = route.totalDurationMinutes;
+  const totalKms = route.totalDistanceKm;
+  const totalHoursLabel = computeDurationLabel(totalMinutes);
 
   return (
     <div className="col-span-2 flex flex-col items-center gap-2">

@@ -1,5 +1,4 @@
-import type { Segment } from "@/features/step/api/segmentApi";
-import { computeTotalKms } from "@/features/step/utils/segmentDuration";
+import type { Route } from "@/features/map/types";
 import type { Travel } from "@/features/travel/types";
 import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
 import { getStatus } from "@/features/travel/utils/getStatus";
@@ -11,12 +10,12 @@ import { useNavigate } from "react-router";
 
 interface CurrentTripCardProps {
   travel: Travel;
-  segments: Segment[];
+  route: Route | null;
 }
 
-export function CurrentTripCard({ travel, segments }: CurrentTripCardProps) {
+export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
   const dateLabels = computeTravelDates(travel.startDate, travel.endDate);
-  const totalKms = computeTotalKms(segments);
+  const totalKms = route ? route.totalDistanceKm : 0;
   const status = getStatus(travel);
   const navigate = useNavigate();
   return (

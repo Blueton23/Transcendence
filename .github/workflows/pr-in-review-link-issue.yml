@@ -67,7 +67,7 @@ jobs:
             }' -f pr="$PR_NODE_ID")
 
           ITEM_ID=$(echo "$RESULT" | jq -r --arg num "$PROJECT_NUMBER" \
-            '.data.node.closingIssuesReferences.nodes[0].projectItems.nodes[] | select(.project.number == ($num|tonumber)) | .id')
+            '.data.node.closingIssuesReferences.nodes[0].projectItems.nodes[]? | select(.project.number == ($num|tonumber)) | .id')
 
           if [ -z "$ITEM_ID" ] || [ "$ITEM_ID" == "null" ]; then
             echo "Aucune issue liée trouvée sur ce Project. As-tu bien écrit 'Closes #12' dans la description de la PR, et l'issue #12 est-elle déjà sur le board ?"
@@ -151,7 +151,7 @@ jobs:
             }' -f pr="$PR_NODE_ID")
  
           ITEM_ID=$(echo "$RESULT" | jq -r --arg num "$PROJECT_NUMBER" \
-            '.data.node.closingIssuesReferences.nodes[0].projectItems.nodes[] | select(.project.number == ($num|tonumber)) | .id')
+            '.data.node.closingIssuesReferences.nodes[0].projectItems.nodes[]? | select(.project.number == ($num|tonumber)) | .id')
  
           if [ -z "$ITEM_ID" ] || [ "$ITEM_ID" == "null" ]; then
             echo "Aucune issue liée trouvée, rien à faire."
@@ -235,7 +235,7 @@ jobs:
               }' -f pr="$PR_NODE_ID")
   
             ITEM_ID=$(echo "$RESULT" | jq -r --arg num "$PROJECT_NUMBER" \
-              '.data.node.closingIssuesReferences.nodes[0].projectItems.nodes[] | select(.project.number == ($num|tonumber)) | .id')
+              '.data.node.closingIssuesReferences.nodes[0].projectItems.nodes[]? | select(.project.number == ($num|tonumber)) | .id')
   
             if [ -z "$ITEM_ID" ] || [ "$ITEM_ID" == "null" ]; then
               echo "Aucune issue liée trouvée, rien à faire."
