@@ -113,18 +113,19 @@ erDiagram
         int TravelId PK, FK
         enum Status "invité / accepté / refusé / parti"
         datetime LeftAt "optionnel"
+        datetime LastReadAt "optionnel - dernier passage dans le chat"
         datetime CreatedAt
     }
 
     MESSAGE {
         int id PK
         int TravelId FK
-        int TravelerId FK "optionnel si système"
-        int StepId FK "optionnel"
-        int IdeaId FK "optionnel"
+        int TravelerId FK "vide si système ou compte supprimé"
+        int StepId FK "optionnel - jamais avec IdeaId"
+        int IdeaId FK "optionnel - jamais avec StepId"
         bool IsSystem
-        text Body
-        bool Enabled
+        text Body "2000 caractères max"
+        datetime DeletedAt "optionnel - corbeille"
         datetime CreatedAt
         datetime UpdatedAt
     }
@@ -163,7 +164,7 @@ erDiagram
 
 - **Traveler** : un compte. Désactivable plutôt que supprimé.
 - **Travel** : un voyage, avec ses dates de départ et de fin, deux bornes fermes fixées à la création. `InviteToken` est le lien qui permet à quiconque le possède de rejoindre. Aucun propriétaire : tous les participants ont les mêmes droits.
-- **Participate** : qui participe à quel voyage et où en est son invitation. Une personne partie garde sa ligne, pour que les soldes restent justes.
+- **Participate** : qui participe à quel voyage et où en est son invitation. Une personne partie garde sa ligne, pour que les soldes restent justes. `LastReadAt` retient son dernier passage dans le chat : les non-lus sont les messages des autres créés après, aucun compteur n'est stocké.
 - **Step** : un arrêt du trajet. `Position` donne l'ordre, `Nights` la durée (0 pour une halte). Les dates se déduisent de `Travel.StartDate` et du cumul des nuits. `Latitude`/`Longitude` sont remplies par la recherche de lieu au moment de la création, nécessaires pour placer l'étape sur la carte.
 - **Idea** : une proposition faite pour un voyage. Rattachée à une étape, ou libre dans le pool. Une idée d'hébergement porte en plus son prix et ses dates. `Latitude`/`Longitude` permettent de l'épingler sur la carte à son propre emplacement, pas forcément celui de l'étape.
 - **Reaction** : un ❤️ d'une personne sur une idée. Purement indicatif.
@@ -176,6 +177,7 @@ erDiagram
 
 - **Voyage** : on ne le supprime pas, on le quitte (comme un groupe WhatsApp). Il sort de sa liste, rien ne bouge pour les autres, et sa participation reste en base pour que les soldes restent justes.
 - **Étape et idée** : corbeille (`DeletedAt`), restaurables. Protège des suppressions accidentelles à plusieurs.
+- **Message** : corbeille aussi (`DeletedAt`), la ligne reste en base. Si le compte de son auteur est supprimé, le message reste dans le fil sans auteur (`ON DELETE SET NULL`).
 - **Dépenses et messages** : conservés quoi qu'il arrive. Si leur étape ou leur idée disparaît, ils perdent juste leur rattachement (`ON DELETE SET NULL`). Exemple : les 240 CHF du camping restent au budget même sans l'étape Zermatt.
 - **Réactions** : supprimées avec leur idée, un ❤️ ne veut rien dire sans elle.
 - **Parts de dépense** : supprimées avec leur dépense. Un voyageur qui possède des parts ne peut pas être supprimé (`ON DELETE PROTECT`), sinon les soldes des autres seraient faussés sans bruit.
@@ -216,6 +218,9 @@ erDiagram
 | 20 | `Spending.Label` | `Category` dit le type de dépense, pas laquelle : « Repas » ne distingue pas deux restos. Libellé libre et optionnel. | |
 | 21 | Payeur d'une dépense = participant du voyage | Une dépense payée par quelqu'un d'extérieur au voyage fausserait les soldes. « Parti » reste accepté pour pouvoir modifier ses anciennes dépenses. | |
 | 22 | Table `SpendingShare` | Répartir une dépense entre les participants présents au moment où elle est faite. Calculer la répartition à partir des participants actuels changerait les soldes à chaque arrivée ou départ. Montant exact par part plutôt qu'un poids : couvre le partage égal comme le « j'ai juste pris le plat à 18 € ». | |
+| 23 | `Message` : `DeletedAt` remplace `Enabled` | Même convention que la corbeille de `Step`, et on sait quand le message a été retiré. | Code |
+| 24 | `Participate.LastReadAt` | Nécessaire pour afficher les non-lus du chat. Une date suffit, le nombre de non-lus se calcule. | Code |
+| 25 | `Message` : une étape ou une idée, pas les deux | Un fil de commentaires ne s'accroche qu'à un seul objet, et le lien ne devient pas faux quand une idée change d'étape. | Code |
 
 ### Statuts (point 5)
 
