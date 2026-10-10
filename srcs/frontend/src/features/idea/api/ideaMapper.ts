@@ -62,6 +62,7 @@ export function mapIdeaFromApi(response: IdeaApiResponse): Idea {
   };
 }
 
+// Retourne une idée créer de l'API
 export function mapCreateIdeaToApi(input: CreateIdeaInput): CreateIdeaApiInput {
   const isAccommodation = input.type === "accommodation";
 

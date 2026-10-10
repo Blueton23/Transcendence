@@ -8,12 +8,14 @@ interface IdeaOptionsMenuProps {
   onEdit: () => void;
   onDelete: () => void;
   onChoose?: () => void;
+  disabled?: boolean;
 }
 
 export function IdeaOptionsMenu({
   onEdit,
   onDelete,
   onChoose,
+  disabled = false,
 }: IdeaOptionsMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -24,10 +26,11 @@ export function IdeaOptionsMenu({
         label="Options de l'idée"
         variant="flat"
         size="xs"
+        disabled={disabled}
         onClick={() => setMenuOpen((open) => !open)}
       />
 
-      {menuOpen && (
+      {menuOpen && !disabled && (
         <DropdownMenu
           onClose={() => setMenuOpen(false)}
           className="top-full right-0 mt-2"

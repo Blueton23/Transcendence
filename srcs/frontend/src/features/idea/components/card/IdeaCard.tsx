@@ -111,39 +111,28 @@ export function IdeaCard({
           </div>
 
           <div className="order-2 md:order-3">
-            {isActionPending ? (
-              <div role="status">
-                <Text size="sm">
-                  {isDeleting
-                    ? "Suppression…"
-                    : isChoosing
-                      ? "Choix en cours…"
-                      : "Vote en cours…"}
-                </Text>
-              </div>
-            ) : (
-              <IdeaOptionsMenu
-                onEdit={onEdit}
-                onDelete={() => {
-                  if (isActionPending) {
-                    return;
-                  }
-
-                  void submitDelete();
-                }}
-                onChoose={
-                  canChoose
-                    ? () => {
-                        if (isActionPending) {
-                          return;
-                        }
-
-                        void submitChoose();
-                      }
-                    : undefined
+            <IdeaOptionsMenu
+              disabled={isActionPending}
+              onEdit={onEdit}
+              onDelete={() => {
+                if (isActionPending) {
+                  return;
                 }
-              />
-            )}
+
+                void submitDelete();
+              }}
+              onChoose={
+                canChoose
+                  ? () => {
+                      if (isActionPending) {
+                        return;
+                      }
+
+                      void submitChoose();
+                    }
+                  : undefined
+              }
+            />
           </div>
 
           <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">

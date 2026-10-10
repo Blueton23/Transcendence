@@ -163,7 +163,7 @@ export async function patchIdeaPlacement(
   return mapIdeaFromApi(data);
 }
 
-// Choisir un hébergement déjà placé sur une étape
+// Choisir un hébergement déjà placé sur une étape (PLACED a CHOOSEN)
 export async function chooseIdea(
   travelId: number,
   ideaId: Idea["id"],

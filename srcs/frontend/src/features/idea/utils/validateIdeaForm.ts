@@ -28,3 +28,7 @@ export function validateIdeaForm(values: IdeaFormValues): IdeaFormErrors {
 
   return { titleError, datesError };
 }
+
+/*
+Fonction utiles pour valider les entrées du formulaire "Epingler une idée/Modifier une idée"
+*/
