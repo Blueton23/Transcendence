@@ -10,3 +10,8 @@ export interface Travel {
   createdAt: string;
   updatedAt: string;
 }
+export interface CreateTravelData {
+  startDate: string;
+  endDate: string;
+  title: string;
+}
