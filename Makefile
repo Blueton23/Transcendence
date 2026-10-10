@@ -101,10 +101,13 @@ shell:
 	$(COMPOSE) exec backend python manage.py shell
 
 check:
-	docker compose exec backend python manage.py check
+	$(COMPOSE) exec backend python manage.py check
 
 test:
 	$(COMPOSE) exec backend python manage.py test $(ARGS)
+
+ping:
+	$(COMPOSE) exec redis redis-cli ping
 
 format-back:
 	$(COMPOSE) exec backend ruff format .

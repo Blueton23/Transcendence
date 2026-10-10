@@ -476,6 +476,7 @@ Explication nginx.conf :
 | `make unseed` | Vide les données de seed -> "make unseed ARGS=--yes" (superusers gardés, `--all-travelers` pour tout supprimer) |
 | `make shell` | Ouvre le shell Python avec l’environnement Django chargé |
 | `make check` | Permet de controler avant une migration si aucune erreur dans les settings |
+| `make ping` | Controle la réponse du container redis -> reponse PONG |
 | `make format-back` | Corrige le format au niveau du code backend dans les fichiers, utilise ruff |
 | `make format-check-back` | Check (ne corrige pas) le format au niveau du code backend dans les fichiers, utilise ruff |
 
