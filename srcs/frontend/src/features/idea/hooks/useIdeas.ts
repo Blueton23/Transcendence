@@ -12,6 +12,7 @@ import {
   patchIdea,
   removeIdea,
   patchIdeaPlacement,
+  chooseIdea,
   voteIdea,
 } from "@/features/idea/api/api.ideas";
 
@@ -169,6 +170,31 @@ export function useIdeas(travelId: number) {
   }
 
   {
+    /* Gère le choix d’un hébergement déjà placé */
+  }
+  async function handleChooseIdea(ideaId: Idea["id"]): Promise<void> {
+    const updatedIdea = await chooseIdea(travelId, ideaId);
+
+    setIdeas((currentIdeas) =>
+      currentIdeas.map((idea) =>
+        idea.id === updatedIdea.id ? updatedIdea : idea,
+      ),
+    );
+
+    setVoted((currentVotes) =>
+      currentVotes.map((vote) =>
+        vote.ideaId === updatedIdea.id
+          ? {
+              ideaId: updatedIdea.id,
+              voteCount: updatedIdea.voteCount,
+              voted: updatedIdea.voted,
+            }
+          : vote,
+      ),
+    );
+  }
+
+  {
     /* Gère le vote */
   }
   function handleVote(ideaId: Idea["id"]) {
@@ -195,6 +221,7 @@ export function useIdeas(travelId: number) {
     handlePlaceIdea,
     handleDeleteIdea,
     handleEditIdea,
+    handleChooseIdea,
     handleVote,
     voted,
   };

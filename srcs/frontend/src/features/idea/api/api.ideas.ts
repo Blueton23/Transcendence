@@ -80,7 +80,7 @@ export async function patchIdea(
   return mapIdeaFromApi(data);
 }
 
-// Supprimer une idée d'un voyage
+// Supprimer une idée du voyage
 export async function removeIdea(
   travelId: number,
   ideaId: Idea["id"],
@@ -104,7 +104,7 @@ export async function removeIdea(
   }
 }
 
-// Placer une idée sur un voyage
+// Placer une idée sur le voyage
 export async function patchIdeaPlacement(
   travelId: number,
   idea: Idea,
@@ -143,6 +143,32 @@ export async function patchIdeaPlacement(
     },
     body: JSON.stringify(payload),
   });
+
+  const data = await parseResponse<IdeaApiResponse>(response);
+  return mapIdeaFromApi(data);
+}
+
+// Choisir un hébergement déjà placé sur une étape
+export async function chooseIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<Idea> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const response = await fetch(
+    `/api/travels/${travelId}/ideas/${ideaId}/choice/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    },
+  );
 
   const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
