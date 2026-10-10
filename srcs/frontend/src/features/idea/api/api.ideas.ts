@@ -104,9 +104,48 @@ export async function removeIdea(
   }
 }
 
-// fonction métier pour le bouton "placer"
-export function placeIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
-  console.log(ideaId, input);
+// Placer une idée sur un voyage
+export async function patchIdeaPlacement(
+  travelId: number,
+  idea: Idea,
+  input: PlaceIdeaInput,
+): Promise<Idea> {
+  if (input.stepId === null) {
+    throw new Error("Choisis une étape pour cette idée");
+  }
+
+  const isAccommodation = idea.type === "accommodation";
+
+  if (!isAccommodation && !input.date) {
+    throw new Error("Choisis une date pour cette idée");
+  }
+
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const payload = isAccommodation
+    ? { stepId: input.stepId }
+    : {
+        stepId: input.stepId,
+        startDate: input.date,
+        endDate: input.date,
+      };
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/${idea.id}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  const data = await parseResponse<IdeaApiResponse>(response);
+  return mapIdeaFromApi(data);
 }
 
 // fonction métier pour le bouton de vote

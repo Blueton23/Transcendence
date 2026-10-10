@@ -11,7 +11,7 @@ import {
   postIdea,
   patchIdea,
   removeIdea,
-  placeIdea,
+  patchIdeaPlacement,
   voteIdea,
 } from "@/features/idea/api/api.ideas";
 
@@ -137,12 +137,33 @@ export function useIdeas(travelId: number) {
   {
     /* Gère le placement d'idée */
   }
-  function handlePlaceIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
-    placeIdea(ideaId, input);
+  async function handlePlaceIdea(
+    ideaId: Idea["id"],
+    input: PlaceIdeaInput,
+  ): Promise<void> {
+    const ideaToPlace = ideas.find((idea) => idea.id === ideaId);
+
+    if (!ideaToPlace) {
+      throw new Error("Idée introuvable.");
+    }
+
+    const updatedIdea = await patchIdeaPlacement(travelId, ideaToPlace, input);
 
     setIdeas((currentIdeas) =>
       currentIdeas.map((idea) =>
-        idea.id === ideaId ? { ...idea, ...input } : idea,
+        idea.id === updatedIdea.id ? updatedIdea : idea,
+      ),
+    );
+
+    setVoted((currentVotes) =>
+      currentVotes.map((vote) =>
+        vote.ideaId === updatedIdea.id
+          ? {
+              ideaId: updatedIdea.id,
+              voteCount: updatedIdea.voteCount,
+              voted: updatedIdea.voted,
+            }
+          : vote,
       ),
     );
   }
