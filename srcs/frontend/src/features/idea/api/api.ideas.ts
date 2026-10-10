@@ -4,6 +4,7 @@ import type {
   PlaceIdeaInput,
   EditIdeaInput,
   IdeaApiResponse,
+  ReactionApiResponse,
 } from "@/features/idea/types";
 
 import { getCookie } from "@/shared/api/cookies";
@@ -23,6 +24,20 @@ export async function fetchIdeas(travelId: number): Promise<Idea[]> {
 
   const data = await parseResponse<IdeaApiResponse[]>(response);
   return data.map(mapIdeaFromApi);
+}
+
+// Récupérer une idée du voyage
+export async function fetchIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<Idea> {
+  const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = await parseResponse<IdeaApiResponse>(response);
+  return mapIdeaFromApi(data);
 }
 
 // Créer une idée dans le voyage
@@ -174,7 +189,51 @@ export async function chooseIdea(
   return mapIdeaFromApi(data);
 }
 
-// fonction métier pour le bouton de vote
-export function voteIdea(ideaId: Idea["id"]) {
-  console.log(ideaId);
+// Voter pour une idée du voyage
+export async function addIdeaReaction(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<ReactionApiResponse> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const response = await fetch(
+    `/api/travels/${travelId}/ideas/${ideaId}/reaction/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    },
+  );
+  return parseResponse<ReactionApiResponse>(response);
+}
+
+// Retirer le vote sur une idée du voyage
+export async function removeIdeaReaction(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+  const response = await fetch(
+    `/api/travels/${travelId}/ideas/${ideaId}/reaction/`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    },
+  );
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
 }

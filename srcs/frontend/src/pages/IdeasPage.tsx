@@ -28,6 +28,7 @@ export function IdeasPage() {
     handlePlaceIdea,
     handleDeleteIdea,
     handleEditIdea,
+    handleChooseIdea,
     handleVote,
     voted,
   } = useIdeas(travelId);
@@ -131,6 +132,7 @@ export function IdeasPage() {
               onView={() => null}
               onEdit={() => setEditIdeaId(idea.id)}
               onDelete={() => handleDeleteIdea(idea.id)}
+              onChoose={() => handleChooseIdea(idea.id)}
             />
           );
         })}

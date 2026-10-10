@@ -56,6 +56,33 @@ export function EditIdeaModal({
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const { titleError, datesError } = validateIdeaForm(values);
 
+  const hasTrashedStep = idea.status === "suggested" && idea.stepId !== null;
+
+  if (hasTrashedStep) {
+    return (
+      <Modal
+        icon="pinplus"
+        title="Modifier l'idée"
+        subtitle={travelTitle}
+        onClose={onClose}
+      >
+        <Text className="mb-4">
+          Cette idée est liée à une étape à la corbeille. Restaure cette étape
+          ou replace l’idée sur une étape active avant de la modifier.
+        </Text>
+
+        <Button
+          type="button"
+          variant="primary"
+          className="w-full"
+          onClick={onClose}
+        >
+          Fermer
+        </Button>
+      </Modal>
+    );
+  }
+
   return (
     <Modal
       icon="pinplus"

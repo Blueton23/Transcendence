@@ -8,12 +8,14 @@ import type {
 } from "@/features/idea/types";
 import {
   fetchIdeas,
+  fetchIdea,
   postIdea,
   patchIdea,
   removeIdea,
   patchIdeaPlacement,
   chooseIdea,
-  voteIdea,
+  addIdeaReaction,
+  removeIdeaReaction,
 } from "@/features/idea/api/api.ideas";
 
 export function useIdeas(travelId: number) {
@@ -197,20 +199,64 @@ export function useIdeas(travelId: number) {
   {
     /* Gère le vote */
   }
-  function handleVote(ideaId: Idea["id"]) {
-    voteIdea(ideaId);
+  async function handleVote(ideaId: Idea["id"]): Promise<void> {
+    const currentVote = voted.find((vote) => vote.ideaId === ideaId);
+
+    if (!currentVote) {
+      throw new Error("État du vote introuvable.");
+    }
+
+    const nextVoted = !currentVote.voted;
+
+    if (nextVoted) {
+      await addIdeaReaction(travelId, ideaId);
+    } else {
+      await removeIdeaReaction(travelId, ideaId);
+    }
+
+    setIdeas((currentIdeas) =>
+      currentIdeas.map((idea) =>
+        idea.id === ideaId ? { ...idea, voted: nextVoted } : idea,
+      ),
+    );
 
     setVoted((currentVotes) =>
       currentVotes.map((vote) =>
-        vote.ideaId === ideaId
-          ? {
-              ...vote,
-              voted: !vote.voted,
-              voteCount: vote.voted ? vote.voteCount - 1 : vote.voteCount + 1,
-            }
-          : vote,
+        vote.ideaId === ideaId ? { ...vote, voted: nextVoted } : vote,
       ),
     );
+
+    try {
+      const updatedIdea = await fetchIdea(travelId, ideaId);
+
+      setIdeas((currentIdeas) =>
+        currentIdeas.map((idea) =>
+          idea.id === ideaId
+            ? {
+                ...idea,
+                voteCount: updatedIdea.voteCount,
+                voted: updatedIdea.voted,
+              }
+            : idea,
+        ),
+      );
+
+      setVoted((currentVotes) =>
+        currentVotes.map((vote) =>
+          vote.ideaId === ideaId
+            ? {
+                ideaId,
+                voteCount: updatedIdea.voteCount,
+                voted: updatedIdea.voted,
+              }
+            : vote,
+        ),
+      );
+    } catch {
+      throw new Error(
+        "La modification de ton vote a été enregistrée, mais le compteur n’a pas pu être actualisé. Recharge la page pour le synchroniser.",
+      );
+    }
   }
 
   return {

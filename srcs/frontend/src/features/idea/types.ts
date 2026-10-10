@@ -43,6 +43,14 @@ export interface CreateIdeaApiInput {
   endDate: string | null;
 }
 
+// Réaction envoyée par l'API après l'ajout d'un vote
+export interface ReactionApiResponse {
+  id: number;
+  travelerId: number;
+  ideaId: number;
+  createdAt: string;
+}
+
 /*================================================================================*/
 
 export type IdeaType =

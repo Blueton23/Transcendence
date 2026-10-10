@@ -7,9 +7,14 @@ import Icon from "@/shared/ui/Icon";
 interface IdeaOptionsMenuProps {
   onEdit: () => void;
   onDelete: () => void;
+  onChoose?: () => void;
 }
 
-export function IdeaOptionsMenu({ onEdit, onDelete }: IdeaOptionsMenuProps) {
+export function IdeaOptionsMenu({
+  onEdit,
+  onDelete,
+  onChoose,
+}: IdeaOptionsMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -27,6 +32,18 @@ export function IdeaOptionsMenu({ onEdit, onDelete }: IdeaOptionsMenuProps) {
           onClose={() => setMenuOpen(false)}
           className="top-full right-0 mt-2"
         >
+          {onChoose && (
+            <MenuItem
+              icon="check"
+              onClick={() => {
+                onChoose();
+                setMenuOpen(false);
+              }}
+            >
+              Choisir cet hébergement
+            </MenuItem>
+          )}
+
           <MenuItem
             icon="edit"
             onClick={() => {

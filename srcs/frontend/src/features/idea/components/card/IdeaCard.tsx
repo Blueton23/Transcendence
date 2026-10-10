@@ -21,9 +21,10 @@ export interface IdeaCardProps {
   stepName?: string;
   onPlace: () => void;
   onView: () => void;
-  onVote: () => void;
+  onVote: () => Promise<void>;
   onEdit: () => void;
   onDelete: () => Promise<void>;
+  onChoose: () => Promise<void>;
 }
 
 /*----------------------------------------------------------------------------------*/
@@ -41,6 +42,7 @@ export function IdeaCard({
   onVote,
   onEdit,
   onDelete,
+  onChoose,
 }: IdeaCardProps) {
   const isInPool = idea.status === "suggested";
 
@@ -49,6 +51,22 @@ export function IdeaCard({
     isSubmitting: isDeleting,
     error: deleteError,
   } = useSubmitAction(onDelete);
+
+  const {
+    submit: submitChoose,
+    isSubmitting: isChoosing,
+    error: chooseError,
+  } = useSubmitAction(onChoose);
+
+  const {
+    submit: submitVote,
+    isSubmitting: isVoting,
+    error: voteError,
+  } = useSubmitAction(onVote);
+
+  const canChoose = idea.type === "accommodation" && idea.status === "placed";
+
+  const isActionPending = isDeleting || isChoosing || isVoting;
 
   return (
     <Card>
@@ -69,36 +87,72 @@ export function IdeaCard({
                 proposerInitials={proposerInitials}
               />
               <StepLabel isInPool={isInPool} stepName={stepName} />
+              {idea.type === "accommodation" && idea.status === "chosen" && (
+                <Text size="sm">Hébergement choisi</Text>
+              )}
             </div>
           </div>
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 whitespace-nowrap md:flex-nowrap md:gap-3">
           <div className="order-1">
-            <VoteButton voteCount={voteCount} voted={voted} onVote={onVote} />
+            <VoteButton
+              voteCount={voteCount}
+              voted={voted}
+              disabled={isActionPending}
+              onVote={() => {
+                if (isActionPending) {
+                  return;
+                }
+
+                void submitVote();
+              }}
+            />
           </div>
 
           <div className="order-2 md:order-3">
-            {isDeleting ? (
+            {isActionPending ? (
               <div role="status">
-                <Text size="sm">Suppression…</Text>
+                <Text size="sm">
+                  {isDeleting
+                    ? "Suppression…"
+                    : isChoosing
+                      ? "Choix en cours…"
+                      : "Vote en cours…"}
+                </Text>
               </div>
             ) : (
               <IdeaOptionsMenu
                 onEdit={onEdit}
                 onDelete={() => {
-                  if (isDeleting) {
+                  if (isActionPending) {
                     return;
                   }
 
                   void submitDelete();
                 }}
+                onChoose={
+                  canChoose
+                    ? () => {
+                        if (isActionPending) {
+                          return;
+                        }
+
+                        void submitChoose();
+                      }
+                    : undefined
+                }
               />
             )}
           </div>
 
           <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">
-            <StepButton isInPool={isInPool} onPlace={onPlace} onView={onView} />
+            <StepButton
+              isInPool={isInPool}
+              onPlace={onPlace}
+              onView={onView}
+              disabled={isActionPending}
+            />
           </div>
         </div>
       </div>
@@ -106,6 +160,20 @@ export function IdeaCard({
         <div role="alert" className="mt-2">
           <Text tone="accent" size="sm" className="whitespace-pre-line">
             {deleteError}
+          </Text>
+        </div>
+      )}
+      {chooseError && (
+        <div role="alert" className="mt-2">
+          <Text tone="accent" size="sm" className="whitespace-pre-line">
+            {chooseError}
+          </Text>
+        </div>
+      )}
+      {voteError && (
+        <div role="alert" className="mt-2">
+          <Text tone="accent" size="sm" className="whitespace-pre-line">
+            {voteError}
           </Text>
         </div>
       )}
