@@ -3068,6 +3068,14 @@ class ReactionViewTest(APITestCase):
             status=ParticipationStatus.ACCEPTED,
         )
 
+        self.reaction_url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
     # Tests réussi
     # ========================================================================#
 
@@ -3533,3 +3541,132 @@ class ReactionViewTest(APITestCase):
             self.assertFalse(Reaction.objects.exists())
 
             transaction.set_rollback(True)
+
+    # Test : Un participant peut consulter toutes les réactions de l'idée,
+    def test_get_returns_only_reactions_of_target_idea(self):
+        first = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        second = Reaction.objects.create(
+            traveler=self.other_traveler,
+            idea=self.idea,
+        )
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Autre restaurant",
+            type=IdeaType.RESTAURANT,
+        )
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=other_idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            [item["id"] for item in response.data],
+            [first.id, second.id],
+        )
+        self.assertEqual(
+            [item["traveler_id"] for item in response.data],
+            [self.traveler.id, self.other_traveler.id],
+        )
+
+        for item in response.data:
+            self.assertEqual(item["idea_id"], self.idea.id)
+            self.assertIsNotNone(item["created_at"])
+
+        self.assertEqual(Reaction.objects.count(), 3)
+
+    # Test : Une idée sans réaction renvoie une liste vide
+    def test_get_returns_empty_list_without_reactions(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+        self.assertFalse(Reaction.objects.exists())
+
+    # Test : Un utilisateur anonyme ne peut pas consulter les réactions
+    def test_get_forbidden_if_not_authenticated(self):
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 403)
+
+    # Test : Un utilisateur extérieur au voyage ne peut pas accéder à la liste
+    def test_get_not_found_if_not_participant(self):
+        outsider = Traveler.objects.create_user(
+            username="Outside",
+            email="outside@example.com",
+            password="password123",
+        )
+        self.client.force_authenticate(user=outsider)
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 404)
+
+    # Test : Une invitation, un refus ou un départ ne donne pas accès aux réactions
+    def test_get_not_found_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.get(self.reaction_url)
+
+                self.assertEqual(response.status_code, 404)
+
+    # Test : Participant aux deux voyages, évite le mélange d'ID
+    def test_get_not_found_with_wrong_travel(self):
+        other_travel = Travel.objects.create(
+            title="Autre voyage",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.client.force_authenticate(user=self.traveler)
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": other_travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    # Test : Une idée inexistante renvoie 404, pas une liste vide
+    def test_get_not_found_for_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+        self.idea.delete()
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 404)
