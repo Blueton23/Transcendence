@@ -493,6 +493,8 @@ Les appels API utilisent credentials: "include" pour transmettre les cookies. Le
 
 Pour les requêtes de modification qui le nécessitent, le frontend lit le cookie csrftoken et transmet sa valeur dans l’en-tête X-CSRFToken.
 
+"Content-Type": "application/json"Indique au serveur que le corps envoyé est du JSON.
+
 ### 5.3 Gestion des erreurs et des actions :
 Les outils de shared/api/ permettent notamment de lire les cookies et d’extraire les messages d’erreur du backend. La fonction parseResponse lève une erreur lorsque la réponse HTTP indique un échec.
 
@@ -1194,7 +1196,7 @@ Message affiché à l’utilisateur
 | Placer cette activité avec une date comprise dans l’étape. | Statut `placed`. |
 | Envoyer des dates hors de l’étape. | Refus HTTP `400`. |
 | Créer un hébergement sans dates. | Refus par le formulaire et par l’API. |
-| Choisir un hébergement encore dans la réserve via l’API. | Refus HTTP `400`. |
+| Choisir un hébergement encore dans le pool via l’API. | Refus HTTP `400`. |
 | Choisir un hébergement placé. | Statut `chosen`, auteur et date du choix renseignés. |
 | Choisir un autre hébergement aux dates chevauchantes sur la même étape. | Refus HTTP `400`. |
 | Modifier une idée avec un autre participant accepté. | Modification autorisée. |
