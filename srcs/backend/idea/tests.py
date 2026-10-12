@@ -249,6 +249,60 @@ class IdeaModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self._make_idea(type=IdeaType.LODGING)
 
+    def test_pool_lodging_start_before_travel_is_rejected(self):
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                type=IdeaType.LODGING,
+                start_date=datetime.date(2026, 5, 31),
+                end_date=datetime.date(2026, 6, 10),
+            )
+
+        self.assertIn("start_date", context.exception.message_dict)
+
+    def test_pool_lodging_end_after_travel_is_rejected(self):
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                type=IdeaType.LODGING,
+                start_date=datetime.date(2026, 6, 1),
+                end_date=datetime.date(2026, 6, 16),
+            )
+
+        self.assertIn("end_date", context.exception.message_dict)
+
+    def test_pool_lodging_at_travel_is_allowed(self):
+        idea = self._make_idea(
+            type=IdeaType.LODGING,
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+
+        self.assertTrue(idea.is_in_pool)
+        self.assertEqual(idea.start_date, self.travel.start_date)
+        self.assertEqual(idea.end_date, self.travel.end_date)
+
+    def test_lodging_on_trashed_step_outside_travel_is_rejected(self):
+        idea = self._make_idea(
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.end_date,
+        )
+
+        self.step.soft_delete()
+        idea.refresh_from_db()
+
+        self.assertEqual(idea.step_id, self.step.id)
+        self.assertTrue(idea.is_in_pool)
+
+        idea.start_date = datetime.date(2026, 5, 31)
+        idea.end_date = datetime.date(2026, 6, 16)
+
+        with self.assertRaises(ValidationError) as context:
+            idea.save()
+
+        self.assertIn("start_date", context.exception.message_dict)
+        self.assertIn("end_date", context.exception.message_dict)
+
     def test_step_from_another_travel_is_rejected(self):
         other_travel = Travel.objects.create(
             title="Other trip",

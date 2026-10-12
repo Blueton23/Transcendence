@@ -4,6 +4,12 @@ const translations: Record<string, string> = {
 
   "Another chosen lodging on this step overlaps these dates.":
     "Un hébergement est déjà choisi sur cette étape pour des dates qui chevauchent celles-ci.",
+
+  "The lodging cannot start before the travel.":
+    "L’hébergement ne peut pas commencer avant le début du voyage.",
+
+  "The lodging cannot end after the travel.":
+    "L’hébergement ne peut pas se terminer après la fin du voyage.",
 };
 
 export function translateIdeaError(error: unknown): never {
