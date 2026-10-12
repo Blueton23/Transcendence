@@ -230,11 +230,12 @@ L'app `travel` porte les modèles du roadtrip. Tous héritent de `TimeStampedMod
 | Modèle | Rôle | Champs principaux |
 |---|---|---|
 | `Travel` | Un roadtrip | `title`, `start_date`, `end_date` (contrainte : `end_date >= start_date`), `invite_token` (unique, généré), `status` (`current` / `finished`) |
-| `Participation` | Lien traveler ↔ travel | `traveler` (FK), `travel` (FK), `status` (`invited` / `accepted` / `refused` / `left`), `left_at` ; unicité `(traveler, travel)` |
+| `Participation` | Lien traveler ↔ travel | `traveler` (FK), `travel` (FK), `status` (`invited` / `accepted` / `refused` / `left`), `left_at`, `last_read_at` (dernier passage dans le chat) ; unicité `(traveler, travel)` |
 | `Step` | Une étape ordonnée d'un travel | `travel` (FK), `position`, `nights` (0 = simple halte), `localisation`, `latitude` / `longitude` (optionnels, remplis par la recherche), `deleted_at` (corbeille) |
 
 - `Step` gère une **suppression douce** : `deleted_at` marque l'étape comme dans la corbeille. Le manager expose `Step.objects.alive()` et `Step.objects.trashed()`, et l'instance a `soft_delete()` / `restore()` + la propriété `is_trashed`.
 - Unicité `(travel, position)` restreinte aux étapes vivantes (`deleted_at IS NULL`), pour qu'une étape supprimée ne bloque pas la réutilisation de sa position.
+- `Participation.mark_read()` met `last_read_at` à maintenant. `is_travel_member(travel_id, traveler_id)` dit si un traveler est membre d'un voyage (`accepted` ou `left` : un ex-participant garde ce qu'il a produit).
 
 #### Modèles métier — app `idea` :
 L'app `idea` porte les propositions rattachées à un voyage (où dormir, manger, quoi voir). `Idea` hérite de `TimeStampedModel`, `Reaction` non (un <3 ne se modifie pas).
@@ -246,6 +247,19 @@ L'app `idea` porte les propositions rattachées à un voyage (où dormir, manger
 
 - Pas de suppression douce pour `Idea` : retirée du pool, elle est supprimée définitivement (`delete()`) ; retirée d'une étape, elle retourne simplement au pool. Manager `Idea.objects.pool()` pour les idées sans étape, propriété `is_in_pool`.
 - Une étape supprimée renvoie ses idées au pool (`step` → `NULL`) plutôt que de les emporter. Les réactions, elles, disparaissent avec leur idée (`CASCADE`).
+
+#### Modèles métier — app `chat` :
+L'app `chat` porte le fil de discussion d'un voyage. `Message` hérite de `TimeStampedModel` et de `ValidatedModel`.
+
+| Modèle | Rôle | Champs principaux |
+|---|---|---|
+| `Message` | Un message du chat d'un voyage | `travel` (FK, CASCADE), `traveler` (FK optionnel, `SET NULL` : l'auteur), `step` / `idea` (FK optionnels, `SET NULL`), `is_system`, `body` (2000 caractères max) |
+
+- Un message relève du voyage, d'une étape **ou** d'une idée, jamais des deux à la fois. Si l'étape ou l'idée disparaît, il reste rattaché au voyage.
+- Un message système n'a pas d'auteur. Un message sans auteur n'est pas forcément système : si le compte de l'auteur est supprimé, le message reste dans le fil (`SET NULL`).
+- À la création, l'auteur doit être membre du voyage (`is_travel_member`). Cette règle n'est vérifiée qu'à la création, pour qu'un message reste modifiable et supprimable après le départ de son auteur.
+- **Pas de corbeille** : un message ne se supprime que définitivement (`delete()`, admin), et pas depuis le chat par les utilisateurs.
+- Non-lus : `Message.objects.unread_for(participation)` renvoie les messages des autres, créés après `Participation.last_read_at` (tous si le chat n'a jamais été ouvert). Aucun compteur n'est stocké.
 
 #### Seeds (données de test) :
 - Objectif : remplir rapidement la base avec des données de test réalistes, sans tout créer à la main via l'admin
@@ -261,6 +275,7 @@ common/
     ├── traveler.py                # génération pour l'app traveler : seed_travelers(), seed_friendships()
     ├── travel.py                  # génération pour l'app travel : seed_travels(), seed_participations(), seed_steps()
     ├── idea.py                    # génération pour l'app idea : seed_ideas(), seed_reactions()
+    ├── chat.py                    # génération pour l'app chat : seed_messages()
     └── clear.py                   # clear_seed_data() : suppression partagée par unseed et seed --fresh
 ```
 
@@ -269,7 +284,7 @@ common/
 - Pour seed une nouvelle app : créer `common/seeders/nom_app.py`, puis appeler ses fonctions depuis `seed.py` dans le bon ordre de dépendance
 
 #### Nettoyage des seeds :
-- Les lignes seedées ne sont pas taguées en base : `unseed` vide donc **tout le domaine** (travels, steps, ideas, reactions, participations, friendships, travelers). Les superusers sont conservés par défaut pour garder l'accès admin.
+- Les lignes seedées ne sont pas taguées en base : `unseed` vide donc **tout le domaine** (messages, travels, steps, ideas, reactions, participations, friendships, travelers). Les superusers sont conservés par défaut pour garder l'accès admin.
 - `clear_seed_data()` (dans `common/seeders/clear.py`) est la fonction partagée ; elle renvoie un dict `{label: nombre_supprimé}`.
 - `unseed` demande une confirmation ; `--yes` la saute, `--all-travelers` supprime aussi les superusers.
 - `seed --fresh` appelle `clear_seed_data()` avant de re-générer : reset + reseed en une commande.
@@ -278,6 +293,7 @@ common/
 |---|---|
 | `docker compose exec backend python manage.py seed --travelers 20 --friendships 10 --travels 10 --participations 30` | Crée 20 travelers, 10 friendships, 10 travels et 30 participations aléatoires (+ étapes, idées et réactions par défaut) |
 | Options idées : `--steps-per-travel 4 --ideas-per-travel 6 --reactions 40` | Nombre d'étapes et d'idées par voyage, et total de réactions |
+| Option chat : `--messages-per-travel 8` | Nombre de messages par voyage |
 | `make seed ARGS="--travelers 50 --friendships 30 --travels 20 --participations 60"` | Équivalent via le Makefile |
 | `make seed ARGS="--fresh --travelers 50"` | Vide les seeds existants (superusers gardés) puis re-seed |
 | `make unseed ARGS="--yes"` | Supprime toutes les données de seed (superusers gardés) |

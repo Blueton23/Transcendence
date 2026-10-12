@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand, CommandParser
 from faker import Faker
 
+from common.seeders.chat import seed_messages
 from common.seeders.clear import clear_seed_data
 from common.seeders.idea import seed_ideas, seed_reactions
 from common.seeders.spending import seed_spendings
@@ -21,6 +22,7 @@ class Command(BaseCommand):
         parser.add_argument("--steps-per-travel", type=int, default=4)
         parser.add_argument("--ideas-per-travel", type=int, default=6)
         parser.add_argument("--reactions", type=int, default=40)
+        parser.add_argument("--messages-per-travel", type=int, default=8)
         parser.add_argument("--spendings-per-travel", type=int, default=5)
         parser.add_argument(
             "--fresh",
@@ -57,6 +59,9 @@ class Command(BaseCommand):
 
         reactions = seed_reactions(fake, travelers, ideas, options["reactions"])
         self.stdout.write(f"Created {len(reactions)} reactions.")
+
+        messages = seed_messages(fake, travels, options["messages_per_travel"])
+        self.stdout.write(f"Created {len(messages)} messages.")
 
         spendings = seed_spendings(
             fake, travelers, travels, options["spendings_per_travel"]
