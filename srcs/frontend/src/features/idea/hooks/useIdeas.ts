@@ -4,7 +4,6 @@ import type {
   CreateIdeaInput,
   PlaceIdeaInput,
   EditIdeaInput,
-  VoteIdea,
 } from "@/features/idea/types";
 import {
   fetchIdeas,
@@ -20,7 +19,6 @@ import {
 
 export function useIdeas(travelId: number) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
-  const [voted, setVoted] = useState<VoteIdea[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +29,6 @@ export function useIdeas(travelId: number) {
       setIsLoading(true);
       setError(null);
       setIdeas([]);
-      setVoted([]);
 
       try {
         if (!Number.isSafeInteger(travelId) || travelId <= 0) {
@@ -45,13 +42,6 @@ export function useIdeas(travelId: number) {
         }
 
         setIdeas(result);
-        setVoted(
-          result.map((idea) => ({
-            ideaId: idea.id,
-            voteCount: idea.voteCount,
-            voted: idea.voted,
-          })),
-        );
       } catch (err) {
         if (ignore) {
           return;
@@ -83,15 +73,6 @@ export function useIdeas(travelId: number) {
     const newIdea = await postIdea(travelId, input);
 
     setIdeas((currentIdeas) => [newIdea, ...currentIdeas]);
-
-    setVoted((currentVotes) => [
-      ...currentVotes,
-      {
-        ideaId: newIdea.id,
-        voteCount: newIdea.voteCount,
-        voted: newIdea.voted,
-      },
-    ]);
   }
 
   {
@@ -108,18 +89,6 @@ export function useIdeas(travelId: number) {
         idea.id === updatedIdea.id ? updatedIdea : idea,
       ),
     );
-
-    setVoted((currentVotes) =>
-      currentVotes.map((vote) =>
-        vote.ideaId === updatedIdea.id
-          ? {
-              ideaId: updatedIdea.id,
-              voteCount: updatedIdea.voteCount,
-              voted: updatedIdea.voted,
-            }
-          : vote,
-      ),
-    );
   }
 
   {
@@ -130,10 +99,6 @@ export function useIdeas(travelId: number) {
 
     setIdeas((currentIdeas) =>
       currentIdeas.filter((idea) => idea.id !== ideaId),
-    );
-
-    setVoted((currentVotes) =>
-      currentVotes.filter((vote) => vote.ideaId !== ideaId),
     );
   }
 
@@ -157,18 +122,6 @@ export function useIdeas(travelId: number) {
         idea.id === updatedIdea.id ? updatedIdea : idea,
       ),
     );
-
-    setVoted((currentVotes) =>
-      currentVotes.map((vote) =>
-        vote.ideaId === updatedIdea.id
-          ? {
-              ideaId: updatedIdea.id,
-              voteCount: updatedIdea.voteCount,
-              voted: updatedIdea.voted,
-            }
-          : vote,
-      ),
-    );
   }
 
   {
@@ -182,31 +135,19 @@ export function useIdeas(travelId: number) {
         idea.id === updatedIdea.id ? updatedIdea : idea,
       ),
     );
-
-    setVoted((currentVotes) =>
-      currentVotes.map((vote) =>
-        vote.ideaId === updatedIdea.id
-          ? {
-              ideaId: updatedIdea.id,
-              voteCount: updatedIdea.voteCount,
-              voted: updatedIdea.voted,
-            }
-          : vote,
-      ),
-    );
   }
 
   {
     /* Gère le vote */
   }
   async function handleVote(ideaId: Idea["id"]): Promise<void> {
-    const currentVote = voted.find((vote) => vote.ideaId === ideaId);
+    const currentIdea = ideas.find((idea) => idea.id === ideaId);
 
-    if (!currentVote) {
+    if (!currentIdea) {
       throw new Error("État du vote introuvable.");
     }
 
-    const nextVoted = !currentVote.voted;
+    const nextVoted = !currentIdea.voted;
 
     if (nextVoted) {
       await addIdeaReaction(travelId, ideaId);
@@ -217,12 +158,6 @@ export function useIdeas(travelId: number) {
     setIdeas((currentIdeas) =>
       currentIdeas.map((idea) =>
         idea.id === ideaId ? { ...idea, voted: nextVoted } : idea,
-      ),
-    );
-
-    setVoted((currentVotes) =>
-      currentVotes.map((vote) =>
-        vote.ideaId === ideaId ? { ...vote, voted: nextVoted } : vote,
       ),
     );
 
@@ -238,18 +173,6 @@ export function useIdeas(travelId: number) {
                 voted: updatedIdea.voted,
               }
             : idea,
-        ),
-      );
-
-      setVoted((currentVotes) =>
-        currentVotes.map((vote) =>
-          vote.ideaId === ideaId
-            ? {
-                ideaId,
-                voteCount: updatedIdea.voteCount,
-                voted: updatedIdea.voted,
-              }
-            : vote,
         ),
       );
     } catch {
@@ -269,6 +192,5 @@ export function useIdeas(travelId: number) {
     handleEditIdea,
     handleChooseIdea,
     handleVote,
-    voted,
   };
 }

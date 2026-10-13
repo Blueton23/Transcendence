@@ -30,7 +30,6 @@ export function IdeasPage() {
     handleEditIdea,
     handleChooseIdea,
     handleVote,
-    voted,
   } = useIdeas(travelId);
 
   const {
@@ -116,16 +115,14 @@ export function IdeasPage() {
             (traveler) => traveler.id === idea.travelerId,
           );
 
-          const vote = voted.find((vote) => vote.ideaId === idea.id);
-
           return (
             <IdeaCard
               key={idea.id}
               idea={idea}
               proposerName={proposer?.name ?? "Inconnu"}
               proposerInitials={proposer?.initials ?? "?"}
-              voteCount={vote?.voteCount ?? 0}
-              voted={vote?.voted ?? false}
+              voteCount={idea.voteCount}
+              voted={idea.voted}
               stepName={step?.name}
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}
