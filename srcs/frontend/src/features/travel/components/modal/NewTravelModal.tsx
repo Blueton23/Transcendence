@@ -2,6 +2,7 @@ import { ChoiceScreen } from "@/features/travel/components/modal/ChoiceScreen";
 import { CreatedScreen } from "@/features/travel/components/modal/CreatedScreen";
 import { FormScreen } from "@/features/travel/components/modal/FormScreen";
 import type { Travel } from "@/features/travel/types";
+import type { IconName } from "@/shared/ui/Icon";
 import Modal from "@/shared/ui/Modal";
 import { useState } from "react";
 
@@ -24,12 +25,18 @@ export function NewTravelModal({ onClose, refetch }: NewTravelModalProps) {
 
   const titles: Record<Screen, string> = {
     choice: "Nouveau voyage",
-    form: "Crée un voyage",
-    created: "Voyage créé",
+    form: "Créer un voyage",
+    created: created ? `${created.title} créé` : "",
+  };
+
+  const icons: Record<Screen, IconName> = {
+    choice: "compass",
+    form: "compass",
+    created: "check",
   };
 
   return (
-    <Modal icon="compass" title={titles[screen]} onClose={onClose}>
+    <Modal icon={icons[screen]} title={titles[screen]} onClose={onClose}>
       {screen === "choice" && (
         <ChoiceScreen onCreate={() => setScreen("form")} />
       )}
