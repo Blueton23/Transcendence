@@ -13,7 +13,7 @@ import Text from "@/shared/ui/Text";
 import { useState } from "react";
 
 function TravelPage() {
-  const { travels, isLoading, error } = useTravels();
+  const { travels, isLoading, error, refetch } = useTravels();
   const nextTravel = isLoading || error ? undefined : getNextTravel(travels);
   const [newTravelOpen, setNewTravelOpen] = useState(false);
   const { steps } = useSteps(nextTravel?.id ?? 0);
@@ -48,7 +48,7 @@ function TravelPage() {
       {newTravelOpen && (
         <NewTravelModal
           onClose={() => setNewTravelOpen(false)}
-          refetch={() => {}}
+          refetch={refetch}
         />
       )}
     </div>

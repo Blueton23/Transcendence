@@ -7,6 +7,7 @@ export function useTravel(travelId: number) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+
   useEffect(() => {
     async function loadTravel() {
       setIsLoading(true);
@@ -23,17 +24,18 @@ export function useTravel(travelId: number) {
     loadTravel();
   }, [travelId]);
 
-  return { travel, isLoading, error };
+
+  return { travel, isLoading, error};
 }
 
 export function useTravels() {
   const [travels, setTravels] = useState<Travel[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refetchTrigger, setRefetchTrigger] = useState(0);
 
   useEffect(() => {
     async function loadTravels() {
-      setIsLoading(true);
       setError(null);
       try {
         const result = await getTravels();
@@ -45,7 +47,12 @@ export function useTravels() {
       }
     }
     loadTravels();
-  }, []);
+  }, [refetchTrigger]);
 
-  return { travels, isLoading, error };
+  function refetch() {
+    setRefetchTrigger((n) => n + 1);
+  }
+
+  return { travels, isLoading, error, refetch };
 }
+
