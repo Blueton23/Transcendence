@@ -4,7 +4,6 @@ import type {
   PlaceIdeaInput,
   EditIdeaInput,
   IdeaApiResponse,
-  ReactionApiResponse,
 } from "@/features/idea/types";
 
 import { getCookie } from "@/shared/api/cookies";
@@ -198,7 +197,7 @@ export async function chooseIdea(
 export async function addIdeaReaction(
   travelId: number,
   ideaId: Idea["id"],
-): Promise<ReactionApiResponse> {
+): Promise<void> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
@@ -215,7 +214,7 @@ export async function addIdeaReaction(
       },
     },
   );
-  return parseResponse<ReactionApiResponse>(response);
+  await parseResponse<unknown>(response);
 }
 
 // Retirer le vote sur une idée du voyage
