@@ -7,7 +7,6 @@ export function useTravel(travelId: number) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
     async function loadTravel() {
       setIsLoading(true);
@@ -24,8 +23,7 @@ export function useTravel(travelId: number) {
     loadTravel();
   }, [travelId]);
 
-
-  return { travel, isLoading, error};
+  return { travel, isLoading, error };
 }
 
 export function useTravels() {
@@ -55,4 +53,3 @@ export function useTravels() {
 
   return { travels, isLoading, error, refetch };
 }
-
