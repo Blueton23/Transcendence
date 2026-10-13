@@ -1,8 +1,6 @@
 import type {
   IdeaApiType,
-  IdeaApiStatus,
   IdeaType,
-  IdeaStatus,
   IdeaApiResponse,
   Idea,
   CreateIdeaApiInput,
@@ -15,12 +13,6 @@ const ideaTypeMap: Record<IdeaApiType, IdeaType> = {
   l: "accommodation",
   a: "activity",
   s: "sightseeing",
-};
-
-const ideaStatusMap: Record<IdeaApiStatus, IdeaStatus> = {
-  s: "suggested",
-  p: "placed",
-  c: "chosen",
 };
 
 // Conversion pour lecture frontend/backend
@@ -43,7 +35,7 @@ export function mapIdeaFromApi(response: IdeaApiResponse): Idea {
     chosenBy: response.chosenById,
     title: response.title,
     type: ideaTypeMap[response.type],
-    status: ideaStatusMap[response.status],
+    status: response.status,
     voteCount: response.voteCount,
     voted: response.voted,
     localisation: response.localisation,

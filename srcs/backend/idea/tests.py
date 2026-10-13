@@ -618,7 +618,7 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(data["travel_id"], self.travel.id)
         self.assertEqual(data["title"], "Brasserie")
         self.assertEqual(data["type"], IdeaType.RESTAURANT)
-        self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
+        self.assertEqual(data["status"], "suggested")
         self.assertEqual(data["vote_count"], 0)
         self.assertFalse(data["voted"])
 
@@ -1722,7 +1722,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.PLACED)
+        self.assertEqual(response.data["status"], "placed")
 
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.step, step)
@@ -1765,7 +1765,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.SUGGESTED)
+        self.assertEqual(response.data["status"], "suggested")
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -1808,7 +1808,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.SUGGESTED)
+        self.assertEqual(response.data["status"], "suggested")
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -2540,7 +2540,7 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], self.idea.id)
-        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["status"], "chosen")
         self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
 
         self.idea.refresh_from_db()
@@ -2606,7 +2606,7 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], self.idea.id)
-        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["status"], "chosen")
         self.assertEqual(response.data["chosen_by_id"], other_traveler.id)
 
         self.idea.refresh_from_db()
@@ -2676,7 +2676,7 @@ class IdeaViewTest(APITestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["status"], "chosen")
         self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
 
         self.idea.refresh_from_db()

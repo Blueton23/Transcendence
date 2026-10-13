@@ -1,7 +1,6 @@
 import type { DateRange } from "@daypicker/react";
 
 export type IdeaApiType = "r" | "l" | "a" | "s";
-export type IdeaApiStatus = "s" | "p" | "c";
 
 // Décrit une idée telle qu’elle arrive dans le JSON de l’API
 export interface IdeaApiResponse {
@@ -12,7 +11,7 @@ export interface IdeaApiResponse {
   chosenById: number | null;
   title: string;
   type: IdeaApiType;
-  status: IdeaApiStatus;
+  status: IdeaStatus;
   voteCount: number;
   voted: boolean;
   localisation: string;
