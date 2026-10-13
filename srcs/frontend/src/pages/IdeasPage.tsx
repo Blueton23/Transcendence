@@ -121,8 +121,6 @@ export function IdeasPage() {
               idea={idea}
               proposerName={proposer?.name ?? "Inconnu"}
               proposerInitials={proposer?.initials ?? "?"}
-              voteCount={idea.voteCount}
-              voted={idea.voted}
               stepName={step?.name}
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}

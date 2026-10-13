@@ -21,7 +21,10 @@ export function translateIdeaError(error: unknown): never {
     }
 
     if (message !== error.message) {
-      message = message.replace(/^(?:step|chosenAt)\s*:\s*/gm, "");
+      message = message.replace(
+        /^(?:step|chosenAt|startDate|endDate|start_date|end_date)\s*:\s*/gm,
+        "",
+      );
       throw new Error(message);
     }
   }

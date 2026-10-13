@@ -16,8 +16,6 @@ export interface IdeaCardProps {
   idea: Idea;
   proposerName: string;
   proposerInitials: string;
-  voteCount: number;
-  voted: boolean;
   stepName?: string;
   onPlace: () => void;
   onView: () => void;
@@ -34,8 +32,6 @@ export function IdeaCard({
   idea,
   proposerName,
   proposerInitials,
-  voteCount,
-  voted,
   stepName,
   onPlace,
   onView,
@@ -97,8 +93,8 @@ export function IdeaCard({
         <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 whitespace-nowrap md:flex-nowrap md:gap-3">
           <div className="order-1">
             <VoteButton
-              voteCount={voteCount}
-              voted={voted}
+              voteCount={idea.voteCount}
+              voted={idea.voted}
               disabled={isActionPending}
               onVote={() => {
                 if (isActionPending) {
