@@ -1,4 +1,4 @@
-import { toApiDateString } from "@/features/step/utils/stepDates";
+import { toApiDateString } from "@/shared/utils/dates";
 import { createTravel } from "@/features/travel/api/travelApi";
 import type { Travel } from "@/features/travel/types";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";

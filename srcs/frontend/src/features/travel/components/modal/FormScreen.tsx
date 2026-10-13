@@ -1,4 +1,4 @@
-import { StepDateField } from "@/features/step/components/modal/StepDateField";
+import { DateRangeField } from "@/shared/ui/DateRangeField";
 import { formatDateRange } from "@/features/step/utils/stepDates";
 import { useTravelForm } from "@/features/travel/hooks/useTravelForm";
 import type { Travel } from "@/features/travel/types";
@@ -25,7 +25,7 @@ export function FormScreen({ onCreated }: FormScreenProps) {
           placeholder="Titre de mon voyage"
         />
       </div>
-      <StepDateField
+      <DateRangeField
         label={formatDateRange(form.dates)}
         onClick={() => form.setCalendarOpen((open) => !open)}
       />

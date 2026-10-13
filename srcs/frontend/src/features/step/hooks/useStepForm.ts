@@ -2,7 +2,7 @@ import { useState } from "react";
 import { type DateRange } from "@daypicker/react";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { createStep, updateStep } from "@/features/step/api/stepApi";
-import { toApiDateString } from "@/features/step/utils/stepDates";
+import { toApiDateString } from "@/shared/utils/dates";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
 import type { Place } from "@/features/map/types";
