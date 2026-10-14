@@ -27,7 +27,7 @@ function TravelPage() {
     );
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-4 p-4 md:p-8">
+    <div className="flex flex-col gap-4 p-4 md:p-8">
       <div className="flex items-center justify-between">
         <Heading size="lg">Mes Voyages</Heading>
         <Button
@@ -42,9 +42,10 @@ function TravelPage() {
       <Card variant="default">
         Notification: je sais pas encore comment ca sera connecte
       </Card>
-      <div className="flex flex-row">
-        <TravelList travels={travels.filter((t) => t.id !== nextTravel?.id)} />
-      </div>
+      <TravelList
+        travels={travels.filter((t) => t.id !== nextTravel?.id)}
+        onAdd={() => setNewTravelOpen(true)}
+      />
       {newTravelOpen && (
         <NewTravelModal
           onClose={() => setNewTravelOpen(false)}

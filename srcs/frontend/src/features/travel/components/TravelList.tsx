@@ -12,12 +12,13 @@ import { useNavigate } from "react-router";
 
 interface TravelListProps {
   travels: Travel[];
+  onAdd: () => void;
 }
 
-export function TravelList({ travels }: TravelListProps) {
+export function TravelList({ travels, onAdd }: TravelListProps) {
   const navigate = useNavigate();
   return (
-    <div className="flex flex-1 flex-col gap-2 md:flex-row">
+    <div className="grid auto-rows-fr grid-cols-1 gap-2 md:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
       {travels.map((travel) => (
         <div key={travel.id}>
           <Card
@@ -33,12 +34,18 @@ export function TravelList({ travels }: TravelListProps) {
                 {formatNights(travel.nights)}
               </Tag>
             </div>
-            <Heading size="sm">{travel.title}</Heading>
+            <Heading size="sm" className="line-clamp-1">
+              {travel.title}
+            </Heading>
             <Text>{computeTravelDates(travel.startDate, travel.endDate)}</Text>
           </Card>
         </div>
       ))}
-      <Card variant="dashed" className="flex flex-col items-center p-4">
+      <Card
+        variant="dashed"
+        className="flex cursor-pointer flex-col items-center p-4"
+        onClick={onAdd}
+      >
         <IconButton
           variant="ghost"
           icon={<Icon name="plus" size={18} />}
