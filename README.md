@@ -1212,3 +1212,5 @@ Commande :
 | `make test ARGS="idea.tests.IdeaModelTest idea.tests.ReactionModelTest"` | Règles des modèles, relations et contraintes. |
 | `make test ARGS="idea.tests.IdeaSerializerTest idea.tests.ReactionSerializerTest"` | Validation, représentation et champs protégés. |
 | `make test ARGS="idea.tests.IdeaViewTest idea.tests.ReactionViewTest"` | Routes, permissions et actions de l’API. |
+
+### detail a venir pour module api
