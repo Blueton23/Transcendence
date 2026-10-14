@@ -7,10 +7,10 @@ from common.seeders.idea import seed_ideas, seed_reactions
 from common.seeders.spending import seed_spendings
 from common.seeders.travel import seed_participations, seed_steps, seed_travels
 from common.seeders.traveler import (
-    seed_friendships,
-    seed_travelers,
     seed_dub_friendships,
     seed_dub_travelers,
+    seed_friendships,
+    seed_travelers,
 )
 
 

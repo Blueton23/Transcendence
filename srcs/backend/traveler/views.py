@@ -288,6 +288,14 @@ class FriendshipRequestView(APIView):
             )
 
         try:
+            user_id = int(user_id)
+        except (ValueError, TypeError):
+            return Response(
+                {"error": "user_id doit etre un entier valide"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
             target = Traveler.objects.get(pk=user_id)
         except Traveler.DoesNotExist:
             return Response(

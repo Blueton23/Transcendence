@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from django.contrib.auth import SESSION_KEY
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
 from django.test import TestCase
@@ -1135,3 +1136,338 @@ class TravelerApiTest(APITestCase):
         self.traveler.refresh_from_db()
 
         self.assertFalse(self.traveler.profile_picture)
+
+
+class FriendshipApiTest(APITestCase):
+    def setUp(self):
+        self.alice = Traveler.objects.create_user(
+            username="alice",
+            email="alice@example.com",
+            password="Password123!",
+        )
+        self.bob = Traveler.objects.create_user(
+            username="bob",
+            email="bob@example.com",
+            password="Password123!",
+        )
+        self.charlie = Traveler.objects.create_user(
+            username="charlie",
+            email="charlie@example.com",
+            password="Password123!",
+        )
+
+    def create_friendship(self, requester, target, status=Status.PENDING):
+        user1, user2 = sorted([requester, target], key=lambda user: user.pk)
+        return Friendship.objects.create(
+            user1=user1,
+            user2=user2,
+            requested_by=requester,
+            status=status,
+        )
+
+    def test_request_friendship_success(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            reverse("friendship-request"),
+            {"user_id": self.bob.pk},
+        )
+
+        self.assertEqual(response.status_code, 201)
+
+        friendship = Friendship.objects.get(
+            user1=min(self.alice.pk, self.bob.pk),
+            user2=max(self.alice.pk, self.bob.pk),
+        )
+        self.assertEqual(friendship.requested_by, self.alice)
+        self.assertEqual(friendship.status, Status.PENDING)
+        self.assertEqual(response.data["friendship"], friendship.pk)
+
+    def test_cannot_request_friendship_with_self(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            reverse("friendship-request"),
+            {"user_id": self.alice.pk},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Friendship.objects.count(), 0)
+
+    def test_cannot_request_friendship_with_unknown_user(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            reverse("friendship-request"),
+            {"user_id": 999999},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(Friendship.objects.count(), 0)
+
+    def test_cannot_create_duplicate_friendship(self):
+        self.create_friendship(self.alice, self.bob)
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            reverse("friendship-request"),
+            {"user_id": self.bob.pk},
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(Friendship.objects.count(), 1)
+
+    def test_reverse_request_is_also_rejected(self):
+        self.create_friendship(self.alice, self.bob)
+        self.client.force_authenticate(user=self.bob)
+
+        response = self.client.post(
+            reverse("friendship-request"),
+            {"user_id": self.alice.pk},
+        )
+
+        self.assertEqual(response.status_code, 409)
+        self.assertEqual(Friendship.objects.count(), 1)
+
+    def test_recipient_can_accept_friendship(self):
+        friendship = self.create_friendship(self.alice, self.bob)
+        self.client.force_authenticate(user=self.bob)
+
+        response = self.client.post(
+            reverse("friendship-accept", args=[friendship.pk]),
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+        friendship.refresh_from_db()
+        self.assertEqual(friendship.status, Status.ACCEPTED)
+
+    def test_requester_cannot_accept_own_request(self):
+        friendship = self.create_friendship(self.alice, self.bob)
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            reverse("friendship-accept", args=[friendship.pk]),
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        friendship.refresh_from_db()
+        self.assertEqual(friendship.status, Status.PENDING)
+
+    def test_unrelated_user_cannot_accept_friendship(self):
+        friendship = self.create_friendship(self.alice, self.bob)
+        self.client.force_authenticate(user=self.charlie)
+
+        response = self.client.post(
+            reverse("friendship-accept", args=[friendship.pk]),
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+        friendship.refresh_from_db()
+        self.assertEqual(friendship.status, Status.PENDING)
+
+    def test_cannot_accept_already_accepted_friendship(self):
+        friendship = self.create_friendship(
+            self.alice,
+            self.bob,
+            status=Status.ACCEPTED,
+        )
+        self.client.force_authenticate(user=self.bob)
+
+        response = self.client.post(
+            reverse("friendship-accept", args=[friendship.pk]),
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_cannot_accept_unknown_friendship(self):
+        self.client.force_authenticate(user=self.bob)
+
+        response = self.client.post(
+            reverse("friendship-accept", args=[999999]),
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_participant_can_remove_friendship(self):
+        friendship = self.create_friendship(
+            self.alice,
+            self.bob,
+            status=Status.ACCEPTED,
+        )
+        friendship_id = friendship.pk
+        self.client.force_authenticate(user=self.bob)
+
+        response = self.client.delete(
+            reverse("friendship-remove", args=[friendship_id]),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Friendship.objects.filter(pk=friendship_id).exists())
+
+    def test_unrelated_user_cannot_remove_friendship(self):
+        friendship = self.create_friendship(
+            self.alice,
+            self.bob,
+            status=Status.ACCEPTED,
+        )
+        self.client.force_authenticate(user=self.charlie)
+
+        response = self.client.delete(
+            reverse("friendship-remove", args=[friendship.pk]),
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertTrue(Friendship.objects.filter(pk=friendship.pk).exists())
+
+    def test_cannot_remove_unknown_friendship(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.delete(
+            reverse("friendship-remove", args=[999999]),
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+
+def test_requests_returns_only_incoming_pending_requests(self):
+    # Alice envoie une demande à Bob.
+    incoming = self.create_friendship(self.alice, self.bob)
+
+    # Charlie envoie une demande à Alice.
+    self.create_friendship(self.charlie, self.alice)
+
+    self.client.force_authenticate(user=self.alice)
+
+    response = self.client.get(reverse("friendship-requests"))
+
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(len(response.data["requests"]), 1)
+    self.assertEqual(
+        response.data["requests"][0]["id"],
+        incoming.pk,
+    )
+    self.assertEqual(
+        response.data["requests"][0]["traveler"]["id"],
+        self.charlie.pk,
+    )
+
+    def test_friendship_list_returns_only_accepted_friends(self):
+        # Alice est user1 ou user2 selon les identifiants.
+        self.create_friendship(self.alice, self.bob, status=Status.ACCEPTED)
+        # self.create_friendship(self.alice, self.charlie) #dejas fait plus haut
+
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.get(reverse("friendship-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["friendships"]), 1)
+        self.assertEqual(
+            response.data["friendships"][0]["friend"]["id"],
+            self.bob.pk,
+        )
+
+    def test_friendship_list_returns_correct_friend_for_user2(self):
+        friendship = self.create_friendship(
+            self.alice, self.bob, status=Status.ACCEPTED
+        )
+
+        # On authentifie volontairement l'utilisateur stocké en user2.
+        user2 = friendship.user2
+        expected_friend = friendship.user1
+
+        self.client.force_authenticate(user=user2)
+
+        response = self.client.get(reverse("friendship-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["friendships"]), 1)
+        self.assertEqual(
+            response.data["friendships"][0]["friend"]["id"],
+            expected_friend.pk,
+        )
+
+    def test_search_friend_by_username(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.get(
+            reverse("friendship-search"),
+            {"q": "bob"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["traveler"]["id"], self.bob.pk)
+
+    def test_search_friend_by_email_is_case_insensitive(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.get(
+            reverse("friendship-search"),
+            {"q": "BOB@EXAMPLE.COM"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["traveler"]["id"], self.bob.pk)
+
+    def test_search_rejects_empty_query(self):
+        self.client.force_authenticate(user=self.alice)
+
+        for query in ("", "   "):
+            with self.subTest(query=query):
+                response = self.client.get(
+                    reverse("friendship-search"),
+                    {"q": query},
+                )
+                self.assertEqual(response.status_code, 400)
+
+    def test_search_excludes_current_user(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.get(
+            reverse("friendship-search"),
+            {"q": "alice"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_friendship_endpoints_require_authentication(self):
+        friendship = self.create_friendship(self.alice, self.bob)
+
+        cases = [
+            ("get", reverse("friendship-search"), {"q": "bob"}),
+            ("post", reverse("friendship-request"), {"user_id": self.bob.pk}),
+            ("get", reverse("friendship-requests"), None),
+            ("post", reverse("friendship-accept", args=[friendship.pk]), None),
+            ("delete", reverse("friendship-remove", args=[friendship.pk]), None),
+            ("get", reverse("friendship-list"), None),
+        ]
+
+        for method, url, data in cases:
+            with self.subTest(method=method, url=url):
+                response = getattr(self.client, method)(url, data)
+                self.assertIn(response.status_code, (401, 403))
+
+    def test_request_friendship_rejects_malformed_user_id(self):
+        self.client.force_authenticate(user=self.alice)
+
+        response = self.client.post(
+            reverse("friendship-request"),
+            {"user_id": "abc"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Friendship.objects.count(), 0)
+
+    def test_requested_by_must_be_a_participant(self):
+        friendship = Friendship(
+            user1=self.alice,
+            user2=self.bob,
+            requested_by=self.charlie,
+            status=Status.PENDING,
+        )
+
+        with self.assertRaises(ValidationError):
+            friendship.full_clean()
