@@ -1,7 +1,9 @@
 import { useState } from "react";
+import type { FormEvent } from "react";
 
 import type { User } from "@/features/auth/types";
 import { searchFriend, sendFriendRequest } from "../api/friendship";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import Button from "@/shared/ui/Button";
 import Heading from "@/shared/ui/Heading";
@@ -14,53 +16,47 @@ function FriendSearch() {
   const [query, setQuery] = useState("");
   const [traveler, setTraveler] = useState<User | null>(null);
   const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isSearching, setIsSearching] = useState(false);
-  const [isSending, setIsSending] = useState(false);
 
-  async function handleSearch() {
+  const {
+    submit: submitSearch,
+    isSubmitting: isSearching,
+    error: searchError,
+  } = useSubmitAction(async () => {
     const value = query.trim();
+    return searchFriend(value);
+  });
 
-    if (!value) {
-      setError("Saisissez un username ou un email.");
-      setTraveler(null);
-      return;
-    }
+  const {
+    submit: submitRequest,
+    isSubmitting: isSending,
+    error: requestError,
+    clearError: ClearRequestError,
+  } = useSubmitAction(async () => {
+    return sendFriendRequest(traveler.id);
+  });
 
-    setIsSearching(true);
-    setError(null);
-    setMessage(null);
+  async function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
     setTraveler(null);
+    setMessage(null);
+    ClearRequestError();
 
-    try {
-      const response = await searchFriend(value);
-      setTraveler(response.traveler);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Utilisateur introuvable.");
-    } finally {
-      setIsSearching(false);
+    const result = await submitSearch();
+
+    if (result.success && result.data) {
+      setTraveler(result.data.traveler);
     }
   }
 
   async function handleSendRequest() {
-    if (!traveler) {
-      return;
-    }
-
-    setIsSending(true);
-    setError(null);
     setMessage(null);
 
-    try {
-      await sendFriendRequest(traveler.id);
+    const result = await submitRequest();
+
+    if (result.success) {
       setTraveler(null);
       setMessage("Demande d'amitié envoyée.");
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Impossible d'envoyer la demande.",
-      );
-    } finally {
-      setIsSending(false);
     }
   }
 
@@ -71,41 +67,36 @@ function FriendSearch() {
           Amis
         </Heading>
       </div>
-
-      <div className="flex gap-3 sm:flex-row">
+      <form
+        onSubmit={handleSearchSubmit}
+        className="flex flex-col gap-3 sm:flex-row"
+      >
         <Input
           icon={<Icon name="search" size={18} className="text-muted" />}
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setMessage(null);
+          }}
           placeholder="Ajouter un ami · pseudo ou email"
           className="flex-1"
-          onKeyDown={(event) => {
-            if (event.key === "Enter") {
-              void handleSearch();
-            }
-          }}
         />
 
-        <Button
-          type="button"
-          variant="dark"
-          onClick={() => void handleSearch()}
-          disabled={isSearching}
-        >
+        <Button type="submit" variant="dark" disabled={isSearching}>
           {isSearching ? "Recherche..." : "Rechercher"}
         </Button>
-      </div>
-
-      {error && <Text tone="accent">{error}</Text>}
-
+      </form>
+      {searchError && <Text tone="accent">{searchError}</Text>}
+      {requestError && <Text tone="accent">{requestError}</Text>}
       {message && <Text tone="success">{message}</Text>}
-
       {traveler && (
         <div className="flex flex-col gap-4 rounded-md border border-border bg-surface-container p-4">
           <div className="flex items-center gap-3">
             <Avatar user={traveler} />
+
             <div className="flex min-w-0 flex-col">
               <Text>{traveler.username}</Text>
+
               <Text size="sm" tone="secondary">
                 {traveler.email}
               </Text>
@@ -116,7 +107,7 @@ function FriendSearch() {
             type="button"
             variant="primary"
             onClick={() => void handleSendRequest()}
-            disabled={isSending || !!message}
+            disabled={isSending}
           >
             {isSending ? "Envoi..." : "Envoyer une demande"}
           </Button>

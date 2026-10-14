@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { FriendshipRequest } from "../types";
 import {
@@ -6,6 +6,7 @@ import {
   getFriendRequests,
   removeFriendRequest,
 } from "../api/friendship";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
@@ -19,63 +20,50 @@ interface FriendRequestsProps {
 function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
   const [requests, setRequests] = useState<FriendshipRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loadingId, setLoadingId] = useState<number | null>(null);
+  const requestId = useRef<number | null>(null);
 
-  async function loadRequests() {
-    try {
+  const {
+    submit: submitAccept,
+    isSubmitting: isAccepting,
+    error: acceptError,
+  } = useSubmitAction(async () => {
+    return acceptFriendRequest(requestId.current);
+  });
+
+  const {
+    submit: submitReject,
+    isSubmitting: isRejecting,
+    error: rejectError,
+  } = useSubmitAction(async () => {
+    return removeFriendRequest(requestId.current);
+  });
+
+  const isSubmitting = isAccepting || isRejecting;
+  const displayedError = error || acceptError || rejectError;
+
+  useEffect(() => {
+    async function loadRequests() {
       const response = await getFriendRequests();
       setRequests(response.requests);
       setError(null);
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible de charger les demandes.",
-      );
     }
-  }
-
-  useEffect(() => {
     void loadRequests();
   }, []);
 
   async function handleAccept(id: number) {
-    setLoadingId(id);
-    setError(null);
-
-    try {
-      await acceptFriendRequest(id);
-
+    requestId.current = id;
+    const result = await submitAccept();
+    if (result.success) {
       setRequests((current) => current.filter((request) => request.id !== id));
-
       onFriendAccepted();
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible d'accepter la demande.",
-      );
-    } finally {
-      setLoadingId(null);
     }
   }
 
   async function handleReject(id: number) {
-    setLoadingId(id);
-    setError(null);
-
-    try {
-      await removeFriendRequest(id);
-
+    requestId.current = id;
+    const result = await submitReject();
+    if (result.success) {
       setRequests((current) => current.filter((request) => request.id !== id));
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible de rejeter la demande.",
-      );
-    } finally {
-      setLoadingId(null);
     }
   }
 
@@ -86,53 +74,47 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
           DEMANDES RECUES · {requests.length > 0 && requests.length}
         </Text>
       </div>
-
-      {error && <Text tone="accent">{error}</Text>}
-
+      {displayedError && <Text tone="accent">{displayedError}</Text>}
       {requests.length === 0 ? (
         <Text tone="muted">Aucune demande d'amitié en attente.</Text>
       ) : (
         <div className="flex flex-col gap-3">
-          {requests.map((request) => {
-            const isLoading = loadingId === request.id;
+          {requests.map((request) => (
+            <div
+              key={request.id}
+              className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-4"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar user={request.traveler} />
 
-            return (
-              <div
-                key={request.id}
-                className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-4"
-              >
-                <div className="flex items-center gap-3">
-                  <Avatar user={request.traveler} />
+                <div className="flex min-w-0 flex-col">
+                  <Text>{request.traveler.username}</Text>
 
-                  <div className="flex min-w-0 flex-col">
-                    <Text>{request.traveler.username}</Text>
-
-                    <Text size="sm" tone="secondary">
-                      {request.traveler.email}
-                    </Text>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    icon={<Icon name="check" size={16} />}
-                    variant="success"
-                    disabled={isLoading}
-                    onClick={() => void handleAccept(request.id)}
-                  />
-
-                  <Button
-                    type="button"
-                    icon={<Icon name="x" size={16} />}
-                    variant="danger"
-                    disabled={isLoading}
-                    onClick={() => void handleReject(request.id)}
-                  />
+                  <Text size="sm" tone="secondary">
+                    {request.traveler.email}
+                  </Text>
                 </div>
               </div>
-            );
-          })}
+
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  icon={<Icon name="check" size={16} />}
+                  variant="success"
+                  disabled={isSubmitting}
+                  onClick={() => void handleAccept(request.id)}
+                />
+
+                <Button
+                  type="button"
+                  icon={<Icon name="x" size={16} />}
+                  variant="danger"
+                  disabled={isSubmitting}
+                  onClick={() => void handleReject(request.id)}
+                />
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

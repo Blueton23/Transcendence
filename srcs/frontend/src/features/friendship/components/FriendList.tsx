@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type { Friendship } from "../types";
 import { getFriends, removeFriendRequest } from "../api/friendship";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
@@ -16,46 +17,35 @@ function FriendList({ refreshKey }: FriendListProps) {
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [confirmingId, setConfirmingId] = useState<number | null>(null);
-  const [loadingId, setLoadingId] = useState<number | null>(null);
+  const friendshipId = useRef<number | null>(null);
+
+  const {
+    submit: submitRemove,
+    isSubmitting,
+    error: removeError,
+  } = useSubmitAction(async () => {
+    return removeFriendRequest(friendshipId.current);
+  });
+
+  const displayedError = error || removeError;
 
   useEffect(() => {
     async function loadFriends() {
-      try {
-        const response = await getFriends();
-        setFriendships(response.friendships);
-        setError(null);
-      } catch (err) {
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Impossible de charger les amis.",
-        );
-      }
+      const response = await getFriends();
+      setFriendships(response.friendships);
+      setError(null);
     }
-
     void loadFriends();
   }, [refreshKey]);
 
-  async function handleRemove(friendshipId: number) {
-    setLoadingId(friendshipId);
-    setError(null);
-
-    try {
-      await removeFriendRequest(friendshipId);
-
+  async function handleRemove(id: number) {
+    friendshipId.current = id;
+    const result = await submitRemove();
+    if (result.success) {
       setFriendships((current) =>
-        current.filter(
-          (friendship) => friendship.friendshipId !== friendshipId,
-        ),
+        current.filter((friendship) => friendship.friendshipId !== id),
       );
-
       setConfirmingId(null);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Impossible de retirer cet ami.",
-      );
-    } finally {
-      setLoadingId(null);
     }
   }
 
@@ -67,7 +57,7 @@ function FriendList({ refreshKey }: FriendListProps) {
         </Text>
       </div>
 
-      {error && <Text tone="accent">{error}</Text>}
+      {displayedError && <Text tone="accent">{displayedError}</Text>}
 
       {friendships.length === 0 ? (
         <Text tone="muted">Vous n'avez pas encore d'amis.</Text>
@@ -76,7 +66,6 @@ function FriendList({ refreshKey }: FriendListProps) {
           {friendships.map((friendship) => {
             const friend = friendship.friend;
             const isConfirming = confirmingId === friendship.friendshipId;
-            const isLoading = loadingId === friendship.friendshipId;
 
             return (
               <div
@@ -108,7 +97,7 @@ function FriendList({ refreshKey }: FriendListProps) {
                     <Button
                       type="button"
                       variant="secondary"
-                      disabled={isLoading}
+                      disabled={isSubmitting}
                       onClick={() => setConfirmingId(null)}
                     >
                       Annuler
@@ -117,10 +106,10 @@ function FriendList({ refreshKey }: FriendListProps) {
                     <Button
                       type="button"
                       variant="danger"
-                      disabled={isLoading}
+                      disabled={isSubmitting}
                       onClick={() => void handleRemove(friendship.friendshipId)}
                     >
-                      Retirer
+                      {isSubmitting ? "Retrait..." : "Retirer"}
                     </Button>
                   </div>
                 )}
