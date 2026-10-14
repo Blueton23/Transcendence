@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 
 import type { Friendship } from "../types";
-import {
-  getFriends,
-  removeFriendRequest,
-} from "../api/friendship";
+import { getFriends, removeFriendRequest } from "../api/friendship";
 
 import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
@@ -55,9 +52,7 @@ function FriendList({ refreshKey }: FriendListProps) {
       setConfirmingId(null);
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Impossible de retirer cet ami.",
+        err instanceof Error ? err.message : "Impossible de retirer cet ami.",
       );
     } finally {
       setLoadingId(null);
@@ -80,10 +75,8 @@ function FriendList({ refreshKey }: FriendListProps) {
         <div className="grid gap-3">
           {friendships.map((friendship) => {
             const friend = friendship.friend;
-            const isConfirming =
-              confirmingId === friendship.friendshipId;
-            const isLoading =
-              loadingId === friendship.friendshipId;
+            const isConfirming = confirmingId === friendship.friendshipId;
+            const isLoading = loadingId === friendship.friendshipId;
 
             return (
               <div
@@ -104,9 +97,7 @@ function FriendList({ refreshKey }: FriendListProps) {
                     type="button"
                     icon={<Icon name="trash" size={16} />}
                     variant="danger"
-                    onClick={() =>
-                      setConfirmingId(friendship.friendshipId)
-                    }
+                    onClick={() => setConfirmingId(friendship.friendshipId)}
                   />
                 ) : (
                   <div className="flex items-center gap-2">
@@ -127,9 +118,7 @@ function FriendList({ refreshKey }: FriendListProps) {
                       type="button"
                       variant="danger"
                       disabled={isLoading}
-                      onClick={() =>
-                        void handleRemove(friendship.friendshipId)
-                      }
+                      onClick={() => void handleRemove(friendship.friendshipId)}
                     >
                       Retirer
                     </Button>
