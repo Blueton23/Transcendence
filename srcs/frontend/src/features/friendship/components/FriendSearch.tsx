@@ -92,7 +92,7 @@ function FriendSearch() {
       {traveler && (
         <div className="flex flex-col gap-4 rounded-md border border-border bg-surface-container p-4">
           <div className="flex items-center gap-3">
-            <Avatar user={traveler} />
+            <Avatar user={traveler} profile />
 
             <div className="flex min-w-0 flex-col">
               <Text>{traveler.username}</Text>

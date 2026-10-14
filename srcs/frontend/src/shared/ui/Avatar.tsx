@@ -1,12 +1,18 @@
-import { useAuth } from "@/features/auth/context/useAuth";
+import { useState } from "react";
 
-type AvatarSize = "xs" | "sm" | "md" | "lg";
+import { useAuth } from "@/features/auth/context/useAuth";
+import ProfileInfo from "@/features/profile/components/ProfileInfo";
+import Modal from "@/shared/ui/Modal";
+
+type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 type AvatarColor = "1" | "2" | "3" | "4";
 
 interface AvatarUser {
   profilePicture?: string | null;
   firstName?: string | null;
   lastName?: string | null;
+  username?: string;
+  email?: string;
 }
 
 interface AvatarProps {
@@ -14,6 +20,7 @@ interface AvatarProps {
   size?: AvatarSize;
   color?: AvatarColor;
   className?: string;
+  profile?: boolean;
 }
 
 const sizeStyles = {
@@ -39,16 +46,20 @@ function Avatar({
   size = "md",
   color = "1",
   className = "",
+  profile = false,
 }: AvatarProps) {
   const { currentUser } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   const avatarUser = user ?? currentUser;
   const avatarSize = sizeStyles[size];
   const avatarColor = colorStyles[color];
+
   const initials =
     `${avatarUser?.firstName?.charAt(0) ?? ""}${avatarUser?.lastName?.charAt(0) ?? ""}`.toUpperCase();
 
-  return (
-    <span className={`${baseStyle} ${avatarSize} ${avatarColor} ${className}`}>
+  const avatarContent = (
+    <>
       {avatarUser?.profilePicture ? (
         <img
           src={avatarUser.profilePicture}
@@ -60,7 +71,34 @@ function Avatar({
       ) : (
         "A"
       )}
-    </span>
+    </>
+  );
+
+  return (
+    <>
+      {profile ? (
+        <button
+          type="button"
+          onClick={() => setIsProfileOpen(true)}
+          aria-label="Voir le profil"
+          className={`${baseStyle} ${avatarSize} ${avatarColor} ${className} cursor-pointer`}
+        >
+          {avatarContent}
+        </button>
+      ) : (
+        <span
+          className={`${baseStyle} ${avatarSize} ${avatarColor} ${className}`}
+        >
+          {avatarContent}
+        </span>
+      )}
+
+      {profile && isProfileOpen && (
+        <Modal title="Profil" onClose={() => setIsProfileOpen(false)}>
+          <ProfileInfo user={user ?? undefined} />
+        </Modal>
+      )}
+    </>
   );
 }
 

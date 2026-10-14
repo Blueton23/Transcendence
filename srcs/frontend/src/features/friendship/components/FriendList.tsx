@@ -73,7 +73,7 @@ function FriendList({ refreshKey }: FriendListProps) {
                 className="flex items-center justify-between gap-3 rounded-md border border-border bg-surface-container p-4"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <Avatar user={friend} />
+                  <Avatar user={friend} profile />
 
                   <div className="flex min-w-0 flex-col">
                     <Text>{friend.username}</Text>
