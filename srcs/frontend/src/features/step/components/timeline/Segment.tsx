@@ -1,7 +1,7 @@
-import type { Segment } from "@/features/step/api/segmentApi";
 import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import { computeDurationLabel } from "@/features/step/utils/segmentDuration";
+import type { Segment } from "@/features/step/types";
 
 function DashedDivider() {
   return (
@@ -17,7 +17,7 @@ export function SegmentRow({ segment }: { segment: Segment }) {
     <div className="flex gap-3">
       <Icon name="car" size={16} className="text-brand-primary" />
       <Text font="mono" tone="muted" className="text-[10px] md:text-sm">
-        {durationHours} · {segment.distanceKm} KM
+        {durationHours} · {Math.round(segment.distanceKm)} KM
       </Text>
       <DashedDivider />
     </div>

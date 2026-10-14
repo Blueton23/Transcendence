@@ -3,6 +3,7 @@ from typing import ClassVar
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 from django.utils import timezone
@@ -50,8 +51,6 @@ class ParticipationStatus(models.TextChoices):
     LEFT = "l", "Left"
 
 
-# TODO quand l'app chat serait a faire
-# Pointer vers le last-read + un counter
 class Participation(models.Model):
     traveler = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -69,6 +68,9 @@ class Participation(models.Model):
         default=ParticipationStatus.INVITED,
     )
     left_at = models.DateTimeField(null=True, blank=True)
+    # Dernier passage dans le chat du voyage : les non-lus se deduisent des
+    # messages crees apres. Vide tant que le chat n'a jamais ete ouvert.
+    last_read_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -80,6 +82,19 @@ class Participation(models.Model):
 
     def __str__(self) -> str:
         return f"{self.traveler} -> {self.travel} ({self.status})"
+
+    def mark_read(self) -> None:
+        self.last_read_at = timezone.now()
+        self.save(update_fields=["last_read_at"])
+
+
+# LEFT compte comme membre : un ex-participant garde ce qu'il a produit.
+def is_travel_member(travel_id: int, traveler_id: int) -> bool:
+    return Participation.objects.filter(
+        travel_id=travel_id,
+        traveler_id=traveler_id,
+        status__in=[ParticipationStatus.ACCEPTED, ParticipationStatus.LEFT],
+    ).exists()
 
 
 class StepQuerySet(models.QuerySet):
@@ -103,10 +118,14 @@ class Step(TimeStampedModel):
     end_date = models.DateField()
     localisation = models.CharField(max_length=255)
     latitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
+        max_digits=10,
+        decimal_places=7,
+        validators=[MinValueValidator(-90), MaxValueValidator(90)],
     )
     longitude = models.DecimalField(
-        max_digits=9, decimal_places=6, null=True, blank=True
+        max_digits=10,
+        decimal_places=7,
+        validators=[MinValueValidator(-180), MaxValueValidator(180)],
     )
     deleted_at = models.DateTimeField(null=True, blank=True, db_index=True)
 

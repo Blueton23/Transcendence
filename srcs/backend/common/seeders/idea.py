@@ -20,8 +20,24 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
             lodging = idea_type == IdeaType.LODGING
             # Seul un hebergement place sur une etape peut etre chosen.
             if lodging:
-                start = fake.date_between(start_date="today", end_date="+30d")
-                end = fake.date_between(start_date=start, end_date="+40d")
+                if step is not None:
+                    start = fake.date_between(
+                        start_date=step.start_date,
+                        end_date=step.end_date,
+                    )
+                    end = fake.date_between(
+                        start_date=start,
+                        end_date=step.end_date,
+                    )
+                else:
+                    start = fake.date_between(
+                        start_date="today",
+                        end_date="+30d",
+                    )
+                    end = fake.date_between(
+                        start_date=start,
+                        end_date="+40d",
+                    )
             elif step is not None:
                 start = end = fake.date_between(
                     start_date=step.start_date,

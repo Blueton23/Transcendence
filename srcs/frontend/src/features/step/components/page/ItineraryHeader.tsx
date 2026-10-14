@@ -1,7 +1,5 @@
 import { TravelHeader } from "@/features/travel/components/TravelHeader";
 import type { Travel } from "@/features/travel/types";
-import { computeTotalKms } from "@/features/step/utils/segmentDuration";
-import type { Segment } from "@/features/step/api/segmentApi";
 import { ToggleMobileButton } from "@/features/step/components/mobile/ToggleMobileButton";
 import { useState } from "react";
 import IconButton from "@/shared/ui/IconButton";
@@ -9,11 +7,12 @@ import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import type { Step } from "@/features/step/types";
+import type { Route } from "@/features/map/types";
 
 export interface ItineraryHeaderProps {
   travel: Travel;
   steps: Step[];
-  segments: Segment[];
+  route: Route | null;
   mobileView: "list" | "map";
   onToggle: (view: "list" | "map") => void;
   refetch: () => void;
@@ -23,17 +22,16 @@ export interface ItineraryHeaderProps {
 export function ItineraryHeader({
   travel,
   steps,
-  segments,
+  route,
   mobileView,
   onToggle,
   refetch,
   isDetailView,
 }: ItineraryHeaderProps) {
-  const totalKms = computeTotalKms(segments);
   const [isAddStepOpen, setIsAddStepOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4 pb-4 md:pb-0">
-      <TravelHeader travel={travel} totalKms={totalKms} />
+      <TravelHeader travel={travel} totalKms={route?.totalDistanceKm ?? 0} />
       {!isDetailView && (
         <div className="flex justify-between gap-5 md:hidden">
           <div

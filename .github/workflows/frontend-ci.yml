@@ -3,13 +3,20 @@ name: Frontend CI
 on:
   push:
     branches: [main]
-    paths: ["srcs/frontend/**"]
+    paths: ["srcs/frontend/**", ".github/workflows/frontend-ci.yml"]
   pull_request:
-    paths: ["srcs/frontend/**"]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: ["srcs/frontend/**", ".github/workflows/frontend-ci.yml"]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   lint-and-build:
+    if: github.event.pull_request.draft != true
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     defaults:
       run:
         working-directory: srcs/frontend

@@ -1,28 +1,34 @@
 import type { ReactNode } from "react";
-import Card from "@/shared/ui/Card";
-
-function MapPlaceholder() {
-  return <Card className="min-h-64 md:h-full">I am a map</Card>;
-}
+import { ItineraryMap } from "@/features/map/components/ItineraryMap";
+import type { Step } from "@/features/step/types";
+import type { Route } from "@/features/map/types";
 
 interface ItineraryLayoutProps {
   mobileView: "list" | "map";
   children: ReactNode;
+  steps: Step[];
+  route: Route | null;
+  detailStep: Step | null;
 }
 
 export function ItineraryLayout({
   mobileView,
   children,
+  steps,
+  route,
+  detailStep,
 }: ItineraryLayoutProps) {
   return (
-    <div className="flex flex-col md:grid md:min-h-0 md:flex-1 md:grid-cols-2 md:gap-2">
+    <div className="flex flex-1 flex-col md:grid md:min-h-0 md:flex-1 md:grid-cols-2 md:gap-2">
       <div
-        className={`flex flex-col md:min-h-0 md:flex-1 md:gap-6 ${mobileView === "map" ? "hidden" : "flex"}`}
+        className={`flex flex-col md:min-h-0 md:flex-1 md:gap-6 ${mobileView === "map" ? "hidden md:flex" : "flex"}`}
       >
         {children}
       </div>
-      <div className={`md:block ${mobileView === "map" ? "block" : "hidden"}`}>
-        <MapPlaceholder />
+      <div
+        className={`md:block ${mobileView === "map" ? "flex flex-1 flex-col" : "hidden"}`}
+      >
+        <ItineraryMap steps={steps} detailStep={detailStep} route={route} />
       </div>
     </div>
   );

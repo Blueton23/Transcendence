@@ -116,6 +116,18 @@ class Idea(TimeStampedModel, ValidatedModel):
         if self.step_id and self.travel_id and self.step.travel_id != self.travel_id:
             errors["step"] = "The step must belong to the same travel as the idea."
 
+        if (
+            self.step_id
+            and not self.step.is_trashed
+            and self.start_date
+            and self.end_date
+            and (
+                self.start_date < self.step.start_date
+                or self.end_date > self.step.end_date
+            )
+        ):
+            errors["step"] = "The idea dates must be within the step dates."
+
         if self.type != IdeaType.LODGING and self.price_per_night is not None:
             errors["price_per_night"] = "Only a lodging can have a price per night."
 

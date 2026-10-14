@@ -14,12 +14,32 @@ class IdeaSerializer(serializers.ModelSerializer):
 
     step_id = serializers.PrimaryKeyRelatedField(
         source="step",
-        queryset=Step.objects.all(),
+        queryset=Step.objects.alive(),
         allow_null=True,
         required=False,
     )
 
     chosen_by_id = serializers.IntegerField(read_only=True)
+
+    vote_count = serializers.SerializerMethodField()
+    voted = serializers.SerializerMethodField()
+
+    def get_vote_count(self, obj):
+        if hasattr(obj, "vote_count"):
+            return obj.vote_count
+
+        return obj.reactions.count()
+
+    def get_voted(self, obj):
+        if hasattr(obj, "voted"):
+            return obj.voted
+
+        request = self.context.get("request")
+
+        if request is None or not request.user.is_authenticated:
+            return False
+
+        return obj.reactions.filter(traveler=request.user).exists()
 
     def save(self, **kwargs):
         try:
@@ -39,6 +59,8 @@ class IdeaSerializer(serializers.ModelSerializer):
             "title",
             "type",
             "status",
+            "vote_count",
+            "voted",
             "localisation",
             "note",
             "url",

@@ -1,4 +1,5 @@
-import { getSegments } from "@/features/step/api/segmentApi";
+import { useRoute } from "@/features/map/hooks/useRoute";
+import { useSteps } from "@/features/step/hooks/useSteps";
 import { CurrentTripCard } from "@/features/travel/components/CurrentTripCard";
 import { TravelList } from "@/features/travel/components/TravelList";
 import { useTravels } from "@/features/travel/hooks/useTravel";
@@ -11,6 +12,9 @@ import Text from "@/shared/ui/Text";
 
 function TravelPage() {
   const { travels, isLoading, error } = useTravels();
+  const nextTravel = isLoading || error ? undefined : getNextTravel(travels);
+  const { steps } = useSteps(nextTravel?.id ?? 0);
+  const { route } = useRoute(steps);
   if (isLoading) return null;
   if (error)
     return (
@@ -18,10 +22,6 @@ function TravelPage() {
         {error}
       </Text>
     );
-
-  const nextTravel = getNextTravel(travels);
-
-  const segments = getSegments();
 
   return (
     <div className="flex h-full min-h-0 flex-col gap-4 p-4 md:p-8">
@@ -31,9 +31,7 @@ function TravelPage() {
           Nouveau voyage
         </Button>
       </div>
-      {nextTravel && (
-        <CurrentTripCard travel={nextTravel} segments={segments} />
-      )}
+      {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
       <Card variant="default">
         Notification: je sais pas encore comment ca sera connecte
       </Card>

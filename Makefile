@@ -53,6 +53,9 @@ fclean:
 
 re: fclean up
 
+smoke:
+	./scripts/smoke.sh
+
 #######################################
 
 # Commandes db
@@ -75,6 +78,9 @@ print('✅ Connexion réussie à la base :', conn.info.dbname)"
 # Commandes Django/backend
 makemigrations:
 	$(COMPOSE) exec backend python manage.py makemigrations
+
+check-migrations:
+	$(COMPOSE) exec backend python manage.py makemigrations --check --dry-run
 
 migrate:
 	$(COMPOSE) exec backend python manage.py migrate
@@ -130,7 +136,7 @@ lint:
 
 #######################################
 
-.PHONY: up down start stop restart build ps images volumes logs clean fclean re \
+.PHONY: up down start stop restart build ps images volumes logs clean fclean re smoke \
 	psql test-db \
-	makemigrations migrate startapp createsuperuser seed unseed shell check test format-back format-check-back \
+	makemigrations check-migrations migrate startapp createsuperuser seed unseed shell check test format-back format-check-back \
 	lint-back lint-fix-back check-back fix-back format-front format-check-front front-install
