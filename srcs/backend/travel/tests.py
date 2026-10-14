@@ -554,6 +554,84 @@ class TravelViewTest(APITestCase):
         titles = [t["title"] for t in response.data]
         self.assertIn("Nouvelle aventure", titles)
 
+    # Tests for TravelJoinView
+
+    def test_unknown_invite_token(self):
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": "im_an_unknown_token"})
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("No Travel", response.data["message"])
+
+    def test_traveler_is_not_connected(self):
+
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_traveler_has_left_and_comes_back(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-leave", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        participation = Participation.objects.get(
+            travel=self.mon_voyage, traveler=self.traveler
+        )
+
+        self.assertEqual(participation.status, ParticipationStatus.LEFT)
+        self.assertIsNotNone(participation.left_at)
+
+        response = self.client.post(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+
+        participation.refresh_from_db()
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+        self.assertIsNone(participation.left_at)
+
+    def test_traveler_has_already_joined_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+        self.assertEqual(response.status_code, 200)
+        participation = Participation.objects.get(
+            travel=self.mon_voyage, traveler=self.traveler
+        )
+        self.assertEqual(response.data["is_member"], True)
+
+    def test_traveler_joins_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-join", kwargs={"token": self.autre_voyage.invite_token})
+        )
+        self.assertEqual(response.status_code, 200)
+        participation = Participation.objects.get(
+            travel=self.autre_voyage, traveler=self.traveler
+        )
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+
+    def test_traveler_non_member_sees_preview_without_joining(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": self.autre_voyage.invite_token})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["is_member"], False)
+        self.assertFalse(
+            Participation.objects.filter(
+                travel=self.autre_voyage, traveler=self.traveler
+            ).exists()
+        )
+
     # Test for LeaveTravelView
     def test_traveler_leaves_travel(self):
         self.client.force_authenticate(user=self.traveler)
