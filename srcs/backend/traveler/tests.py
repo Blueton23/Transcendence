@@ -159,7 +159,7 @@ class FriendshipModelTest(TestCase):
             requested_by=self.user_b,
         )
         self.assertEqual(friendship.requested_by, self.user_b)
-        self.assertIn(friendship, self.user_b.friendships_requested.all())
+        self.assertIn(friendship, self.user_b.friendships_requested_by.all())
 
     def test_duplicate_friendship_raises_integrity_error(self):
         Friendship.objects.create(
@@ -201,9 +201,9 @@ class FriendshipModelTest(TestCase):
             user1=self.user_a, user2=self.user_b, requested_by=self.user_a
         )
 
-        self.assertIn(friendship, self.user_a.friendships_as_user1.all())
-        self.assertIn(friendship, self.user_b.friendships_as_user2.all())
-        self.assertIn(friendship, self.user_a.friendships_requested.all())
+        self.assertIn(friendship, self.user_a.friendships_user1.all())
+        self.assertIn(friendship, self.user_b.friendships_user2.all())
+        self.assertIn(friendship, self.user_a.friendships_requested_by.all())
 
 
 # --- Serializer tests ---
