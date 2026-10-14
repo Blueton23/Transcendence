@@ -5,8 +5,8 @@ from .views import (
     StepDetailView,
     StepListView,
     TravelDetailView,
-    TravelListView,
     TravelJoinView,
+    TravelListView,
 )
 
 urlpatterns = [

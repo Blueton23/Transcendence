@@ -588,7 +588,7 @@ class TravelViewTest(APITestCase):
         response = self.client.post(
             reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
         )
-
+        self.assertEqual(response.status_code, 200)
         participation.refresh_from_db()
         self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
         self.assertIsNone(participation.left_at)
@@ -600,9 +600,6 @@ class TravelViewTest(APITestCase):
             reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
         )
         self.assertEqual(response.status_code, 200)
-        participation = Participation.objects.get(
-            travel=self.mon_voyage, traveler=self.traveler
-        )
         self.assertEqual(response.data["is_member"], True)
 
     def test_traveler_joins_travel(self):
