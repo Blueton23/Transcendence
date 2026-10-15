@@ -29,7 +29,7 @@ admin.site.register(Traveler, TravelerAdmin)
 
 
 class FriendshipAdmin(admin.ModelAdmin):
-    list_display = ("sender", "receiver", "status", "created_at")
+    list_display = ("user1", "user2", "requested_by", "status", "created_at")
     list_filter = ("status",)
 
 

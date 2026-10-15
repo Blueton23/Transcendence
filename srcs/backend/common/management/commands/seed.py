@@ -6,7 +6,12 @@ from common.seeders.clear import clear_seed_data
 from common.seeders.idea import seed_ideas, seed_reactions
 from common.seeders.spending import seed_spendings
 from common.seeders.travel import seed_participations, seed_steps, seed_travels
-from common.seeders.traveler import seed_friendships, seed_travelers
+from common.seeders.traveler import (
+    seed_dub_friendships,
+    seed_dub_travelers,
+    seed_friendships,
+    seed_travelers,
+)
 
 
 class Command(BaseCommand):
@@ -67,5 +72,13 @@ class Command(BaseCommand):
             fake, travelers, travels, options["spendings_per_travel"]
         )
         self.stdout.write(f"Created {len(spendings)} spendings.")
+
+        # Travelers DUB
+        dub_travelers = seed_dub_travelers()
+        self.stdout.write(f"Created {len(dub_travelers)} DUB travelers.")
+
+        # Friendships spécifiques des DUB
+        dub_friendships = seed_dub_friendships(dub_travelers)
+        self.stdout.write(f"Created {len(dub_friendships)} DUB friendships.")
 
         self.stdout.write(self.style.SUCCESS("Seed complete."))

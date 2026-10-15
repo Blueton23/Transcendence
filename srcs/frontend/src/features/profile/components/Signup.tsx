@@ -80,9 +80,7 @@ function Signup() {
 
             <Input
               name="firstName"
-              icon={
-                <Icon name="user" size={18} className="text-brand-primary" />
-              }
+              icon={<Icon name="user" size={18} className="text-muted" />}
               placeholder="Charlotte"
               type="text"
               value={form.firstName}
@@ -98,9 +96,7 @@ function Signup() {
 
             <Input
               name="lastName"
-              icon={
-                <Icon name="user" size={18} className="text-brand-primary" />
-              }
+              icon={<Icon name="user" size={18} className="text-muted" />}
               placeholder="Petit"
               type="text"
               value={form.lastName}
@@ -118,7 +114,7 @@ function Signup() {
 
           <Input
             name="username"
-            icon={<Icon name="user" size={18} className="text-brand-primary" />}
+            icon={<Icon name="user" size={18} className="text-muted" />}
             placeholder="charlotte.p"
             type="text"
             value={form.username}
@@ -136,9 +132,7 @@ function Signup() {
 
           <Input
             name="email"
-            icon={
-              <Icon name="email" size={18} className="text-brand-primary" />
-            }
+            icon={<Icon name="email" size={18} className="text-muted" />}
             placeholder="charlotte@peripl.com"
             type="email"
             value={form.email}
@@ -155,7 +149,7 @@ function Signup() {
 
           <Input
             name="password"
-            icon={<Icon name="lock" size={18} className="text-brand-primary" />}
+            icon={<Icon name="lock" size={18} className="text-muted" />}
             placeholder="••••••••"
             type="password"
             value={form.password}
@@ -174,7 +168,7 @@ function Signup() {
 
           <Input
             name="passwordConfirmation"
-            icon={<Icon name="lock" size={18} className="text-brand-primary" />}
+            icon={<Icon name="lock" size={18} className="text-muted" />}
             placeholder="••••••••"
             type="password"
             value={form.passwordConfirmation}

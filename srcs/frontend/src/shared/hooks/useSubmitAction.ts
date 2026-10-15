@@ -17,5 +17,10 @@ export function useSubmitAction<T>(action: () => Promise<T>) {
       setIsSubmitting(false);
     }
   }
-  return { submit, isSubmitting, error };
+
+  function clearError() {
+    setError(null);
+  }
+
+  return { submit, isSubmitting, error, clearError };
 }

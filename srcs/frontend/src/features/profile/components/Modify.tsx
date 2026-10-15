@@ -3,7 +3,6 @@ import type { ChangeEvent, FormEvent } from "react";
 
 import Button from "@/shared/ui/Button";
 import Input from "@/shared/ui/Input";
-import Avatar from "@/shared/ui/Avatar";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyProfile } from "../api/profile";
@@ -42,6 +41,7 @@ function Modify({ onSuccess }: ModifyProps) {
     event.preventDefault();
 
     const result = await submit();
+
     if (result.success && result.data) {
       setCurrentUser(result.data.traveler);
       onSuccess();
@@ -55,17 +55,13 @@ function Modify({ onSuccess }: ModifyProps) {
   return (
     <div className="w-full">
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* Avatar */}
-        <div className="flex w-24 justify-center">
-          <Avatar size="lg" color="1">
-            {currentUser.firstName?.charAt(0).toUpperCase()}
-            {currentUser.lastName?.charAt(0).toUpperCase()}
-          </Avatar>
+        {/* Photo de profil */}
+        <div className="flex items-center justify-start gap-3">
+          <ProfilePicture />
         </div>
 
         {/* Pseudo */}
         <label className="flex flex-col gap-2">
-          <ProfilePicture />
           <span className="text-sm font-semibold text-text-secondary">
             Pseudo
           </span>
@@ -132,23 +128,31 @@ function Modify({ onSuccess }: ModifyProps) {
             {error}
           </p>
         )}
-
-        {/* Bouton */}
-        <div className="mt-3">
-          <Button
-            type="submit"
-            variant="primary"
-            className="w-full rounded-full py-3"
-            disabled={isSubmitting}
-          >
-            {isSubmitting
-              ? "Enregistrement..."
-              : "Enregistrer les modifications"}
-          </Button>
-        </div>
       </form>
-      {/* Password */}
-      <ModifyPassword />
+
+      {/* Mot de passe */}
+      <div className="mt-6">
+        <ModifyPassword />
+      </div>
+
+      {/* Bouton principal */}
+      <div className="mt-4">
+        <Button
+          type="button"
+          variant="primary"
+          className="w-full rounded-full py-3"
+          disabled={isSubmitting}
+          onClick={() => {
+            const formElement = document.querySelector(
+              "form",
+            ) as HTMLFormElement | null;
+
+            formElement?.requestSubmit();
+          }}
+        >
+          {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+        </Button>
+      </div>
     </div>
   );
 }
