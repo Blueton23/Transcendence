@@ -3,24 +3,19 @@ import { useState } from "react";
 import { useAuth } from "@/features/auth/context/useAuth";
 import ProfileInfo from "@/features/profile/components/ProfileInfo";
 import Modal from "@/shared/ui/Modal";
+import type { ReactNode } from "react";
+import type { User } from "@/features/auth/types";
 
 type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 type AvatarColor = "1" | "2" | "3" | "4";
 
-interface AvatarUser {
-  profilePicture?: string | null;
-  firstName?: string | null;
-  lastName?: string | null;
-  username?: string;
-  email?: string;
-}
-
 interface AvatarProps {
-  user?: AvatarUser | null;
+  user?: User | null;
   size?: AvatarSize;
   color?: AvatarColor;
   className?: string;
   profile?: boolean;
+  children?: ReactNode;
 }
 
 const sizeStyles = {
@@ -47,6 +42,7 @@ function Avatar({
   color = "1",
   className = "",
   profile = false,
+  children,
 }: AvatarProps) {
   const { currentUser } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -68,6 +64,8 @@ function Avatar({
         />
       ) : initials ? (
         initials
+      ) : children ? (
+        children
       ) : (
         "A"
       )}
@@ -94,8 +92,12 @@ function Avatar({
       )}
 
       {profile && isProfileOpen && (
-        <Modal title="Profil" onClose={() => setIsProfileOpen(false)}>
-          <ProfileInfo user={user ?? undefined} />
+        <Modal
+          title="Profil"
+          icon="user"
+          onClose={() => setIsProfileOpen(false)}
+        >
+          <ProfileInfo user={user ?? undefined} icon full />
         </Modal>
       )}
     </>

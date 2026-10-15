@@ -32,6 +32,9 @@ function FriendSearch() {
     error: requestError,
     clearError: ClearRequestError,
   } = useSubmitAction(async () => {
+    if (!traveler) {
+      throw new Error("Aucun utilisateur sélectionné.");
+    }
     return sendFriendRequest(traveler.id);
   });
 
@@ -63,7 +66,7 @@ function FriendSearch() {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <Heading level={1} size="xl">
+        <Heading level={1} size="lg">
           Amis
         </Heading>
       </div>

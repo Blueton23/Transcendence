@@ -5,6 +5,7 @@ import Text from "../shared/ui/Text";
 import { useNavigate } from "react-router";
 import { useAuth } from "../features/auth/context/useAuth";
 import Avatar from "@/shared/ui/Avatar";
+import OnlineStatus from "@/shared/ui/OnlineStatus";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ function HomePage() {
           {isConnected ? currentUser.username : "Déconnecté"}{" "}
         </Text>
         <Avatar />
+        <OnlineStatus isOnline={currentUser.isOnline} />
       </div>
 
       <div className="flex w-full max-w-3xl flex-col items-center gap-6 text-center">

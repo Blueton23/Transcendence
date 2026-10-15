@@ -27,6 +27,9 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     isSubmitting: isAccepting,
     error: acceptError,
   } = useSubmitAction(async () => {
+    if (requestId.current === null) {
+      throw new Error("Identifiant de la demande manquant.");
+    }
     return acceptFriendRequest(requestId.current);
   });
 
@@ -35,6 +38,9 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     isSubmitting: isRejecting,
     error: rejectError,
   } = useSubmitAction(async () => {
+    if (requestId.current === null) {
+      throw new Error("Identifiant de la demande manquant.");
+    }
     return removeFriendRequest(requestId.current);
   });
 
@@ -103,7 +109,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
                   variant="success"
                   disabled={isSubmitting}
                   onClick={() => void handleAccept(request.id)}
-                />
+                ></Button>
 
                 <Button
                   type="button"
@@ -111,7 +117,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
                   variant="danger"
                   disabled={isSubmitting}
                   onClick={() => void handleReject(request.id)}
-                />
+                ></Button>
               </div>
             </div>
           ))}
