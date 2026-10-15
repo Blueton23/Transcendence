@@ -15,3 +15,7 @@ export interface CreateTravelData {
   endDate: string;
   title: string;
 }
+
+export interface Invitation extends Travel {
+  isMember: boolean;
+}

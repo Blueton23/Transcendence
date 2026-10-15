@@ -1,3 +1,4 @@
+import { extractToken } from "@/features/travel/utils/extractToken";
 import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
 import Divider from "@/shared/ui/Divider";
@@ -7,13 +8,15 @@ import IconBadge from "@/shared/ui/IconBadge";
 import IconButton from "@/shared/ui/IconButton";
 import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
+import { useState } from "react";
 
 interface ChoiceScreenProps {
   onCreate: () => void;
-  onJoin?: () => void;
+  onJoin: (token: string) => void;
 }
 
 export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
+  const [link, setLink] = useState("");
   return (
     <div className="flex flex-col gap-5">
       <Card
@@ -33,8 +36,12 @@ export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
       <Divider />
       <Text>J'ai un lien d'invitation</Text>
       <div className="flex flex-col gap-4 md:flex-row md:gap-2">
-        <Input placeholder="peripl.app/rejoindre/…"></Input>
-        <Button variant="dark" onClick={onJoin}>
+        <Input
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          placeholder="peripl.app/join/…"
+        ></Input>
+        <Button variant="dark" onClick={() => onJoin(extractToken(link))}>
           Continuer
         </Button>
       </div>

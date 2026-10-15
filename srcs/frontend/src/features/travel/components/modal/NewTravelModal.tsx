@@ -5,6 +5,7 @@ import type { Travel } from "@/features/travel/types";
 import type { IconName } from "@/shared/ui/Icon";
 import Modal from "@/shared/ui/Modal";
 import { useState } from "react";
+import { useNavigate } from "react-router";
 
 type Screen = "choice" | "form" | "created";
 
@@ -35,10 +36,17 @@ export function NewTravelModal({ onClose, refetch }: NewTravelModalProps) {
     created: "check",
   };
 
+  const navigate = useNavigate();
   return (
     <Modal icon={icons[screen]} title={titles[screen]} onClose={onClose}>
       {screen === "choice" && (
-        <ChoiceScreen onCreate={() => setScreen("form")} />
+        <ChoiceScreen
+          onCreate={() => setScreen("form")}
+          onJoin={(token) => {
+            onClose();
+            navigate(`/join/${token}`);
+          }}
+        />
       )}
       {screen === "form" && <FormScreen onCreated={handleCreated} />}
       {screen === "created" && created && (

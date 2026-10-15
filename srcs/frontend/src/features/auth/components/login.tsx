@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { login } from "../api/auth";
 import { useAuth } from "../context/useAuth";
@@ -16,6 +16,8 @@ import Icon from "@/shared/ui/Icon";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname ?? "/profile";
   const { setCurrentUser } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -31,7 +33,7 @@ function Login() {
 
     if (result.success && result.data) {
       setCurrentUser(result.data.traveler);
-      navigate("/profile");
+      navigate(from, { replace: true});
     }
   }
 
