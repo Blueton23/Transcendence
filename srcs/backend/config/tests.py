@@ -1,44 +1,10 @@
-import json
-
-from asgiref.testing import ApplicationCommunicator
 from channels.layers import get_channel_layer
 from django.test import SimpleTestCase
 
+from common.testing import WebsocketCommunicator
 from config.asgi import application
 
 ALLOWED_ORIGIN = [(b"origin", b"http://localhost")]
-
-
-# channels.testing.WebsocketCommunicator would need daphne installed,
-# so this is a minimal equivalent on top of asgiref.
-class WebsocketCommunicator(ApplicationCommunicator):
-    def __init__(self, app, path, headers=None):
-        super().__init__(
-            app,
-            {
-                "type": "websocket",
-                "path": path,
-                "headers": headers or [],
-                "query_string": b"",
-                "subprotocols": [],
-            },
-        )
-
-    async def connect(self):
-        await self.send_input({"type": "websocket.connect"})
-        response = await self.receive_output(timeout=2)
-        return response["type"] == "websocket.accept", response
-
-    async def send_json_to(self, data):
-        await self.send_input({"type": "websocket.receive", "text": json.dumps(data)})
-
-    async def receive_json_from(self):
-        response = await self.receive_output(timeout=2)
-        return json.loads(response["text"])
-
-    async def disconnect(self):
-        await self.send_input({"type": "websocket.disconnect", "code": 1000})
-        await self.wait(timeout=2)
 
 
 class PingConsumerTests(SimpleTestCase):

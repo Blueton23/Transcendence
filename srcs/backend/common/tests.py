@@ -1,13 +1,17 @@
 from io import StringIO
 from unittest.mock import patch
 
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase
+from django.test import SimpleTestCase, TestCase
 
 from chat.models import Message
+from common.realtime import broadcast, travel_group
 from common.seeders.clear import clear_seed_data
+from common.testing import WebsocketCommunicator
 from idea.models import Idea, Reaction
 from spending.models import Spending
 from travel.models import Participation, Step, Travel
@@ -158,3 +162,62 @@ class SeedSpendingsTest(TestCase):
                 self.assertEqual(spending.step.travel_id, spending.travel_id)
             if spending.idea is not None:
                 self.assertEqual(spending.idea.travel_id, spending.travel_id)
+
+
+class BroadcastTest(TestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.layer = get_channel_layer()
+        self.channel = async_to_sync(self.layer.new_channel)()
+        self.group = travel_group(42)
+        async_to_sync(self.layer.group_add)(self.group, self.channel)
+        self.addCleanup(
+            async_to_sync(self.layer.group_discard), self.group, self.channel
+        )
+
+    def test_travel_group_name(self):
+        self.assertEqual(self.group, "travel_42")
+
+    def test_sends_camelized_envelope_after_commit(self):
+        with self.captureOnCommitCallbacks(execute=True):
+            broadcast(
+                self.group,
+                "idea.created",
+                {"idea_id": 1, "created_by": {"display_name": "Ana"}},
+            )
+
+        message = async_to_sync(self.layer.receive)(self.channel)
+
+        self.assertEqual(
+            message,
+            {
+                "type": "idea.created",
+                "payload": {"ideaId": 1, "createdBy": {"displayName": "Ana"}},
+            },
+        )
+
+    def test_waits_for_commit(self):
+        with self.captureOnCommitCallbacks(execute=False) as callbacks:
+            broadcast(self.group, "idea.created", {})
+
+        self.assertEqual(len(callbacks), 1)
+
+
+class WebsocketCommunicatorTest(SimpleTestCase):
+    async def test_merges_extra_scope(self):
+        async def app(scope, receive, send):
+            await receive()
+            if scope["user"] == "ana" and scope["url_route"]["kwargs"]["id"] == 1:
+                await send({"type": "websocket.accept"})
+            else:
+                await send({"type": "websocket.close"})
+
+        communicator = WebsocketCommunicator(
+            app,
+            "/ws/test/",
+            scope={"user": "ana", "url_route": {"args": (), "kwargs": {"id": 1}}},
+        )
+        connected, _ = await communicator.connect()
+
+        self.assertTrue(connected)
