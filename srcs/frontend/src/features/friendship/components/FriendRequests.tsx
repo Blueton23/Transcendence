@@ -109,7 +109,9 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
                   variant="success"
                   disabled={isSubmitting}
                   onClick={() => void handleAccept(request.id)}
-                ></Button>
+                >
+                  Accepter
+                </Button>
 
                 <Button
                   type="button"
@@ -117,7 +119,9 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
                   variant="danger"
                   disabled={isSubmitting}
                   onClick={() => void handleReject(request.id)}
-                ></Button>
+                >
+                  Refuser
+                </Button>
               </div>
             </div>
           ))}

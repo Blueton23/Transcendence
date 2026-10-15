@@ -76,7 +76,9 @@ function FriendList({ refreshKey }: FriendListProps) {
                   icon={<Icon name="trash" size={16} />}
                   variant="danger"
                   onClick={() => setSelectedFriendship(friendship)}
-                />
+                >
+                  supprimer
+                </Button>
               </div>
             );
           })}

@@ -32,7 +32,7 @@ function HomePage() {
           {isConnected ? currentUser.username : "Déconnecté"}{" "}
         </Text>
         <Avatar />
-        <OnlineStatus isOnline={currentUser.isOnline} />
+        <OnlineStatus isOnline={currentUser && currentUser.isOnline} />
       </div>
 
       <div className="flex w-full max-w-3xl flex-col items-center gap-6 text-center">
