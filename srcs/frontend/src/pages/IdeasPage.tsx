@@ -7,7 +7,7 @@ import { IdeaStepFilter } from "@/features/idea/components/page/IdeaStepFilter";
 import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
 import { PlaceIdeaModal } from "@/features/idea/components/modal/PlaceIdeaModal";
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
-import type { IdeaFilter, StepFilter, StepOption } from "@/features/idea/types";
+import type { IdeaFilter, StepFilter } from "@/features/idea/types";
 import { filterIdeas } from "@/features/idea/utils/filterIdeas";
 import { useParams } from "react-router";
 import { useSteps } from "@/features/step/hooks/useSteps";
@@ -43,11 +43,6 @@ export function IdeasPage() {
     isLoading: isLoadingTravel,
     error: errorTravel,
   } = useTravel(travelId);
-
-  const stepOptions: StepOption[] = steps.map((step) => ({
-    id: step.id,
-    name: step.localisation,
-  }));
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
@@ -93,7 +88,7 @@ export function IdeasPage() {
       <div>
         <Text className="mb-1">Etape</Text>
         <IdeaStepFilter
-          steps={stepOptions}
+          steps={steps}
           stepActiveFilter={stepActiveFilter}
           onChange={setStepActiveFilter}
         />
@@ -109,7 +104,7 @@ export function IdeasPage() {
         )}
 
         {filteredIdeas.map((idea) => {
-          const step = stepOptions.find((step) => step.id === idea.stepId);
+          const step = steps.find((step) => step.id === idea.stepId);
 
           const proposer = travel.travelers.find(
             (traveler) => traveler.id === idea.travelerId,
@@ -121,7 +116,7 @@ export function IdeasPage() {
               idea={idea}
               proposerName={proposer?.name ?? "Inconnu"}
               proposerInitials={proposer?.initials ?? "?"}
-              stepName={step?.name}
+              stepName={step?.localisation}
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}
               onView={() => null}
@@ -136,7 +131,10 @@ export function IdeasPage() {
       {createIdeaModalOpen && (
         <CreateIdeaModal
           travelTitle={travel.title}
-          steps={stepOptions}
+          initialStepId={
+            typeof stepActiveFilter === "number" ? stepActiveFilter : undefined
+          }
+          steps={steps}
           onClose={() => setCreateIdeaModalOpen(false)}
           onCreate={handleCreateIdea}
         />
@@ -145,7 +143,7 @@ export function IdeasPage() {
       {ideaToPlace && (
         <PlaceIdeaModal
           idea={ideaToPlace}
-          steps={stepOptions}
+          steps={steps}
           onClose={() => setIdeaPlaceId(null)}
           onPlace={handlePlaceIdea}
         />
@@ -155,7 +153,7 @@ export function IdeasPage() {
         <EditIdeaModal
           travelTitle={travel.title}
           idea={editIdea}
-          steps={stepOptions}
+          steps={steps}
           onClose={() => setEditIdeaId(null)}
           onEdit={(input) => handleEditIdea(editIdea.id, input)}
         />

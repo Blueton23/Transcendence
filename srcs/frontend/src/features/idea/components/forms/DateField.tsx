@@ -9,12 +9,14 @@ interface DateFieldProps {
   dateRange: DateRange | undefined;
   setDateRange: (dateRange: DateRange | undefined) => void;
   datesError?: string;
+  bounds?: { from: Date; to: Date };
 }
 
 export function DateField({
   dateRange,
   setDateRange,
   datesError,
+  bounds,
 }: DateFieldProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const datesErrorId = useId();
@@ -56,6 +58,12 @@ export function DateField({
               setDatePickerOpen(false);
             }
           }}
+          disabled={
+            bounds ? { before: bounds.from, after: bounds.to } : undefined
+          }
+          defaultMonth={bounds?.from}
+          startMonth={bounds?.from}
+          endMonth={bounds?.to}
         />
       )}
     </div>

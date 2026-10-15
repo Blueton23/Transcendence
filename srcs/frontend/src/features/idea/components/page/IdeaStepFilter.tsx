@@ -1,11 +1,9 @@
 import type { StepFilter } from "@/features/idea/types";
+import type { Step } from "@/features/step/types";
 import Chip from "@/shared/ui/Chip";
 
 interface IdeaStepFilterProps {
-  steps: {
-    id: number;
-    name: string;
-  }[];
+  steps: Step[];
   stepActiveFilter: StepFilter;
   onChange: (filter: StepFilter) => void;
 }
@@ -27,7 +25,7 @@ export function IdeaStepFilter({
           active={stepActiveFilter === step.id}
           onClick={() => onChange(step.id)}
         >
-          {step.name}
+          {step.localisation}
         </Chip>
       ))}
 

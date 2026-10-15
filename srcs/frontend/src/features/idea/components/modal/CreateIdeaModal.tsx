@@ -2,15 +2,16 @@ import { useState } from "react";
 import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
-import type { StepOption } from "@/features/idea/types";
 import { validateIdeaForm } from "@/features/idea/utils/validateIdeaForm";
 import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
+import type { Step } from "@/features/step/types";
 
 export interface CreateIdeaModalProps {
   travelTitle: string;
-  steps: StepOption[];
+  steps: Step[];
+  initialStepId?: number;
   onClose: () => void;
   onCreate: (input: CreateIdeaInput) => Promise<void>;
 }
@@ -18,11 +19,12 @@ export interface CreateIdeaModalProps {
 export function CreateIdeaModal({
   travelTitle,
   steps,
+  initialStepId,
   onClose,
   onCreate,
 }: CreateIdeaModalProps) {
   const [values, setValues] = useState<IdeaFormValues>({
-    stepId: null,
+    stepId: initialStepId ?? null,
     type: "restaurant",
     title: "",
     url: "",

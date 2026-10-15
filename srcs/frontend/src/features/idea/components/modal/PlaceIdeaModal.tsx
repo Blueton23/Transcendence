@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Idea, PlaceIdeaInput, StepOption } from "@/features/idea/types";
+import type { Idea, PlaceIdeaInput } from "@/features/idea/types";
 import { PlaceIdeaForm } from "@/features/idea/components/forms/PlaceIdeaForm";
 import type { DateRange } from "@daypicker/react";
 import { formatDateToISO } from "@/features/idea/utils/formatDate";
@@ -7,10 +7,11 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
+import type { Step } from "@/features/step/types";
 
 interface PlaceIdeaModalProps {
   idea: Idea;
-  steps: StepOption[];
+  steps: Step[];
   onClose: () => void;
   onPlace: (ideaId: Idea["id"], input: PlaceIdeaInput) => Promise<void>;
 }

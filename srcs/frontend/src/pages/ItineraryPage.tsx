@@ -15,11 +15,8 @@ import { StickyHeader } from "@/shared/ui/StickyHeader";
 import { useRoute } from "@/features/map/hooks/useRoute";
 import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
-import type { StepOption } from "@/features/idea/types";
 
 // TODO(branchement): un fois que PR de david est branchee:
-// - useIdeas() devient useIdeas(travelId)
-// - handleCreateIdea doit appeler l'API (createIdea est encore un mock)
 // - recharger les etapes (refetch) apres la creation pour mettre a jour ideaCount
 
 function ItineraryPage() {
@@ -36,7 +33,7 @@ function ItineraryPage() {
     error: errorSteps,
     refetch,
   } = useSteps(travelId);
-  const { handleCreateIdea } = useIdeas();
+  const { handleCreateIdea } = useIdeas(travelId);
   const { route, isLoading: isLoadingRoute } = useRoute(steps);
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
@@ -45,12 +42,6 @@ function ItineraryPage() {
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
   const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
-
-  // A enlever une fois que c est connecter correctement du cote de David ou StepOption est Step[]
-  const stepOptions: StepOption[] = steps.map((step) => ({
-    id: step.id,
-    name: step.localisation,
-  }));
 
   const isLoading = isLoadingTravel || isLoadingSteps;
   const error = errorTravel || errorSteps;
@@ -115,9 +106,14 @@ function ItineraryPage() {
       )}
       {createIdeaModalOpen && (
         <CreateIdeaModal
-          steps={stepOptions}
+          travelTitle={travel.title}
+          steps={steps}
+          initialStepId={detailView?.id}
           onClose={() => setCreateIdeaModalOpen(false)}
-          onCreate={handleCreateIdea}
+          onCreate={async (input) => {
+            await handleCreateIdea(input);
+            refetch();
+          }}
         />
       )}
     </div>
