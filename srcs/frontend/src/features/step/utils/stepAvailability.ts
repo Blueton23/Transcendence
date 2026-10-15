@@ -1,5 +1,5 @@
 import type { Step } from "@/features/step/types";
-import { toApiDateString } from "@/features/step/utils/stepDates";
+import { toApiDateString } from "@/shared/utils/dates";
 import type { Travel } from "@/features/travel/types";
 
 export function canStartOn(

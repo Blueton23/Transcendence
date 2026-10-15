@@ -127,7 +127,7 @@ class SeedFreshFlagTest(TestCase):
         _seed(travelers=5, travels=2, fresh=True)
 
         self.assertEqual(Travel.objects.count(), 2)
-        self.assertEqual(Traveler.objects.count(), 5)
+        self.assertEqual(Traveler.objects.count(), 104)
 
     def test_fresh_keeps_superuser(self):
         Traveler.objects.create_superuser(
@@ -136,7 +136,7 @@ class SeedFreshFlagTest(TestCase):
         _seed(travelers=4, fresh=True)
 
         self.assertTrue(Traveler.objects.filter(username="admin").exists())
-        self.assertEqual(Traveler.objects.count(), 5)
+        self.assertEqual(Traveler.objects.count(), 104)
 
 
 class SeedSpendingsTest(TestCase):

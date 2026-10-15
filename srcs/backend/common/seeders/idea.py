@@ -31,12 +31,12 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
                     )
                 else:
                     start = fake.date_between(
-                        start_date="today",
-                        end_date="+30d",
+                        start_date=travel.start_date,
+                        end_date=travel.end_date,
                     )
                     end = fake.date_between(
                         start_date=start,
-                        end_date="+40d",
+                        end_date=travel.end_date,
                     )
             elif step is not None:
                 start = end = fake.date_between(
