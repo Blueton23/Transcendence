@@ -7,7 +7,7 @@ import { DatesPanel } from "@/features/step/components/add-step/DatesPanel";
 import type { Travel } from "@/features/travel/types";
 import { PlaceSuggestions } from "@/features/step/components/add-step/PlaceSuggestions";
 import { formatDateRange } from "@/features/step/utils/stepDates";
-import { StepDateField } from "@/features/step/components/modal/StepDateField";
+import { DateRangeField } from "@/shared/ui/DateRangeField";
 import { useStepForm } from "@/features/step/hooks/useStepForm";
 
 export interface StepFormModalProps {
@@ -66,7 +66,7 @@ export function StepFormModal({
             )}
           </div>
         </div>
-        <StepDateField
+        <DateRangeField
           label={formatDateRange(form.selected)}
           onClick={() =>
             form.setOpenPanel((current) =>
