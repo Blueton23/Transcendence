@@ -145,6 +145,7 @@ export function CreateIdeaForm({
           values={values}
           setValues={setValues}
           datesError={datesError}
+          bounds={bounds}
         />
       )}
     </>

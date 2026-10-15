@@ -4,17 +4,20 @@ import { DatePicker } from "@/shared/ui/DatePicker";
 import Text from "@/shared/ui/Text";
 import Input from "@/shared/ui/Input";
 import Icon from "@/shared/ui/Icon";
+import Card from "@/shared/ui/Card";
 
 interface AccommodationFieldsProps {
   values: IdeaFormValues;
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
   datesError?: string;
+  bounds?: { from: Date; to: Date };
 }
 
 export function AccommodationFields({
   values,
   setValues,
   datesError,
+  bounds,
 }: AccommodationFieldsProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const datesErrorId = useId();
@@ -72,19 +75,31 @@ export function AccommodationFields({
       )}
 
       {datePickerOpen && (
-        <DatePicker
-          selected={values.dateRange}
-          onSelect={(dateRange) => {
-            setValues((current) => ({
-              ...current,
-              dateRange,
-            }));
+        <Card variant="default" className={`z-20 mt-2 flex flex-col gap-4 p-6`}>
+          <div className="flex justify-center">
+            <div className="flex flex-col gap-2">
+              <DatePicker
+                selected={values.dateRange}
+                onSelect={(dateRange) => {
+                  setValues((current) => ({
+                    ...current,
+                    dateRange,
+                  }));
 
-            if (dateRange?.to) {
-              setDatePickerOpen(false);
-            }
-          }}
-        />
+                  if (dateRange?.to) {
+                    setDatePickerOpen(false);
+                  }
+                }}
+                disabled={
+                  bounds ? { before: bounds.from, after: bounds.to } : undefined
+                }
+                defaultMonth={bounds?.from}
+                startMonth={bounds?.from}
+                endMonth={bounds?.to}
+              />
+            </div>
+          </div>
+        </Card>
       )}
 
       <Text size="sm" className="mt-3 mb-1">

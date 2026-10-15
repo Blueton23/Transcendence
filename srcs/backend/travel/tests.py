@@ -5,6 +5,10 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from idea.models import (
+    Idea,
+    IdeaType,
+)
 from travel.models import (
     Participation,
     ParticipationStatus,
@@ -12,11 +16,6 @@ from travel.models import (
     Travel,
     TravelStatus,
     is_travel_member,
-)
-
-from idea.models import (
-    Idea,
-    IdeaType,
 )
 from travel.serializers import StepSerializer, TravelSerializer
 from traveler.models import Traveler
@@ -477,12 +476,14 @@ class StepSerializerTest(TestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         other_step = Step.objects.create(
             travel=self.travel,
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 5),
             end_date=datetime.date(2026, 6, 8),
+            **COORDS,
         )
         traveler = Traveler.objects.create_user(
             username="alice", password="Password-123!"
