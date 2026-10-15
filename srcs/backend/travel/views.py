@@ -19,6 +19,28 @@ from .permissions import IsTravelParticipant
 from .serializers import StepSerializer, TravelSerializer
 
 
+class TravelJoinView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get(self, request, token):
+        travel = get_object_or_404(Travel, invite_token=token)
+        data = TravelSerializer(travel).data
+        data["is_member"] = travel.participations.filter(
+            traveler=request.user,
+            status=ParticipationStatus.ACCEPTED,
+        ).exists()
+        return Response(data)
+
+    def post(self, request, token):
+        travel = get_object_or_404(Travel, invite_token=token)
+        Participation.objects.update_or_create(
+            traveler=request.user,
+            travel=travel,
+            defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
+        )
+        return Response(TravelSerializer(travel).data)
+
+
 class TravelListView(ParticipantScopedMixin, ListCreateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
