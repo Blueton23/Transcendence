@@ -33,7 +33,7 @@ function Login() {
 
     if (result.success && result.data) {
       setCurrentUser(result.data.traveler);
-      navigate(from, { replace: true});
+      navigate(from, { replace: true });
     }
   }
 
