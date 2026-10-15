@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "traveler",
     "travel",
     "idea",
+    "chat",
     "spending",
 ]
 

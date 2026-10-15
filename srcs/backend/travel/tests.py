@@ -11,6 +11,7 @@ from travel.models import (
     Step,
     Travel,
     TravelStatus,
+    is_travel_member,
 )
 
 from idea.models import (
@@ -19,6 +20,8 @@ from idea.models import (
 )
 from travel.serializers import StepSerializer, TravelSerializer
 from traveler.models import Traveler
+
+COORDS = {"latitude": 46.5197, "longitude": 6.6323}
 
 # --- Model tests ---
 
@@ -133,6 +136,36 @@ class ParticipationModelTest(TestCase):
         self.assertIn(participation, self.traveler.participations.all())
         self.assertIn(participation, self.travel.participations.all())
 
+    def test_last_read_at_is_empty_until_marked_read(self):
+        participation = Participation.objects.create(
+            traveler=self.traveler, travel=self.travel
+        )
+        self.assertIsNone(participation.last_read_at)
+
+        participation.mark_read()
+
+        participation.refresh_from_db()
+        self.assertIsNotNone(participation.last_read_at)
+
+    def test_is_travel_member_depends_on_status(self):
+        self.assertFalse(is_travel_member(self.travel.id, self.traveler.id))
+
+        participation = Participation.objects.create(
+            traveler=self.traveler, travel=self.travel
+        )
+        expected = {
+            ParticipationStatus.INVITED: False,
+            ParticipationStatus.ACCEPTED: True,
+            ParticipationStatus.REFUSED: False,
+            ParticipationStatus.LEFT: True,
+        }
+        for status, is_member in expected.items():
+            participation.status = status
+            participation.save()
+            self.assertEqual(
+                is_travel_member(self.travel.id, self.traveler.id), is_member
+            )
+
 
 class StepModelTest(TestCase):
     def setUp(self):
@@ -148,6 +181,8 @@ class StepModelTest(TestCase):
             "localisation": "Lyon",
             "start_date": datetime.date(2026, 6, 2),
             "end_date": datetime.date(2026, 6, 4),
+            "latitude": 46.5197,
+            "longitude": 6.6323,
         }
         data.update(overrides)
         return Step.objects.create(**data)
@@ -155,8 +190,6 @@ class StepModelTest(TestCase):
     def test_create_step_defaults(self):
         step = self._make_step()
         self.assertIsNone(step.priority)
-        self.assertIsNone(step.latitude)
-        self.assertIsNone(step.longitude)
         self.assertIsNone(step.deleted_at)
         self.assertFalse(step.is_trashed)
         self.assertIsNotNone(step.created_at)
@@ -369,6 +402,8 @@ class StepSerializerTest(TestCase):
                 "start_date": "2026-10-12",
                 "end_date": "2026-10-11",
                 "localisation": "Test",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             }
         )
         self.assertFalse(serializer.is_valid())
@@ -380,6 +415,7 @@ class StepSerializerTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         data = StepSerializer(step).data
 
@@ -405,8 +441,35 @@ class StepSerializerTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         self.assertEqual(StepSerializer(step).data["nights"], 2)
+
+    def test_rejects_coordinates_out_of_range(self):
+        serializer = StepSerializer(
+            data={
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-03",
+                "localisation": "Nice",
+                "latitude": -120,
+                "longitude": -200,
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("latitude", serializer.errors)
+        self.assertIn("longitude", serializer.errors)
+
+    def test_missing_coordinates(self):
+        serializer = StepSerializer(
+            data={
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-03",
+                "localisation": "Nice",
+            }
+        )
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("latitude", serializer.errors)
+        self.assertIn("longitude", serializer.errors)
 
     def test_idea_counts_is_computed(self):
         step = Step.objects.create(
@@ -489,6 +552,8 @@ class TravelViewTest(APITestCase):
                 "title": "Nouveau voyage",
                 "start_date": "2026-08-01",
                 "end_date": "2026-08-05",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -511,6 +576,8 @@ class TravelViewTest(APITestCase):
                 "title": "Nouvelle aventure",
                 "start_date": "2026-08-06",
                 "end_date": "2026-08-12",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -519,6 +586,81 @@ class TravelViewTest(APITestCase):
         self.assertEqual(len(response.data), 2)
         titles = [t["title"] for t in response.data]
         self.assertIn("Nouvelle aventure", titles)
+
+    # Tests for TravelJoinView
+
+    def test_unknown_invite_token(self):
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": "im_an_unknown_token"})
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("No Travel", response.data["message"])
+
+    def test_traveler_is_not_connected(self):
+
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_traveler_has_left_and_comes_back(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-leave", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        participation = Participation.objects.get(
+            travel=self.mon_voyage, traveler=self.traveler
+        )
+
+        self.assertEqual(participation.status, ParticipationStatus.LEFT)
+        self.assertIsNotNone(participation.left_at)
+
+        response = self.client.post(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+        self.assertEqual(response.status_code, 200)
+        participation.refresh_from_db()
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+        self.assertIsNone(participation.left_at)
+
+    def test_traveler_has_already_joined_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["is_member"], True)
+
+    def test_traveler_joins_travel(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("travel-join", kwargs={"token": self.autre_voyage.invite_token})
+        )
+        self.assertEqual(response.status_code, 200)
+        participation = Participation.objects.get(
+            travel=self.autre_voyage, traveler=self.traveler
+        )
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+
+    def test_traveler_non_member_sees_preview_without_joining(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": self.autre_voyage.invite_token})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["is_member"], False)
+        self.assertFalse(
+            Participation.objects.filter(
+                travel=self.autre_voyage, traveler=self.traveler
+            ).exists()
+        )
 
     # Test for LeaveTravelView
     def test_traveler_leaves_travel(self):
@@ -570,6 +712,7 @@ class StepViewTest(APITestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 1),
             end_date=datetime.date(2026, 6, 3),
+            **COORDS,
         )
 
         self.autre_voyage = Travel.objects.create(
@@ -578,11 +721,12 @@ class StepViewTest(APITestCase):
             end_date=datetime.date(2026, 7, 15),
         )
 
-        Step.objects.create(
+        self.autre_step = Step.objects.create(
             travel=self.autre_voyage,
             localisation="Paris",
             start_date=datetime.date(2026, 7, 3),
             end_date=datetime.date(2026, 7, 4),
+            **COORDS,
         )
 
     def test_list_returns_only_steps_of_this_travel(self):
@@ -620,6 +764,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-10",
                 "end_date": "2026-06-12",
                 "localisation": "Nice",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -635,6 +781,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-10",
                 "end_date": "2026-06-12",
                 "localisation": "Nice",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
 
@@ -650,6 +798,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-05-02",
                 "end_date": "2026-06-14",
                 "localisation": "Lyon",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
         self.assertEqual(response.status_code, 400)
@@ -664,6 +814,8 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-02",
                 "end_date": "2026-06-17",
                 "localisation": "Lyon",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
         self.assertEqual(response.status_code, 400)
@@ -678,7 +830,72 @@ class StepViewTest(APITestCase):
                 "start_date": "2026-06-02",
                 "end_date": "2026-06-04",
                 "localisation": "Lyon",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
             },
         )
         self.assertEqual(response.status_code, 400)
         self.assertIn("start_date", response.data["details"])
+
+    def test_403_is_traveler_has_not_accepted_participation(self):
+        other_traveler = Traveler.objects.create_user(
+            username="bobby", email="bobby@example.com", password="password123"
+        )
+        Participation.objects.create(
+            traveler=other_traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.INVITED,
+        )
+        self.client.force_authenticate(user=other_traveler)
+
+        response = self.client.get(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id})
+        )
+        self.assertEqual(response.status_code, 403)
+
+    def test_403_traveler_is_not_connected(self):
+        response = self.client.get(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id})
+        )
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_access_wrong_step_from_travel_id(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(
+            reverse(
+                "step-detail",
+                kwargs={"pk": self.autre_step.id, "travel_id": self.mon_voyage.id},
+            ),
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_patch_step_succeeds(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "step-detail",
+                kwargs={"pk": self.mon_step.id, "travel_id": self.mon_voyage.id},
+            ),
+            {"localisation": "Fribourg"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.mon_step.refresh_from_db()
+        self.assertEqual(self.mon_step.localisation, "Fribourg")
+
+    def test_patch_step_refused_if_not_participant(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.patch(
+            reverse(
+                "step-detail",
+                kwargs={"pk": self.autre_step.id, "travel_id": self.autre_voyage.id},
+            ),
+            {"localisation": "Fribourg"},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.mon_step.refresh_from_db()
+        self.assertEqual(self.autre_step.localisation, "Paris")

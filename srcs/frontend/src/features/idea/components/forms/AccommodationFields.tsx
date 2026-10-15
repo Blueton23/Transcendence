@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useId, useState, type Dispatch, type SetStateAction } from "react";
 import type { IdeaFormValues } from "@/features/idea/types";
 import { DatePicker } from "@/shared/ui/DatePicker";
 import Text from "@/shared/ui/Text";
@@ -8,13 +8,16 @@ import Icon from "@/shared/ui/Icon";
 interface AccommodationFieldsProps {
   values: IdeaFormValues;
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
+  datesError?: string;
 }
 
 export function AccommodationFields({
   values,
   setValues,
+  datesError,
 }: AccommodationFieldsProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
+  const datesErrorId = useId();
 
   return (
     <>
@@ -25,6 +28,7 @@ export function AccommodationFields({
           </Text>
 
           <Input
+            readOnly
             value={
               values.dateRange?.from
                 ? values.dateRange.from.toLocaleDateString("fr-CH")
@@ -33,6 +37,8 @@ export function AccommodationFields({
             icon={<Icon name="cal" size={18} />}
             iconLabel="Choisir les dates"
             onIconClick={() => setDatePickerOpen(true)}
+            aria-invalid={Boolean(datesError)}
+            aria-describedby={datesError ? datesErrorId : undefined}
           />
         </div>
 
@@ -42,6 +48,7 @@ export function AccommodationFields({
           </Text>
 
           <Input
+            readOnly
             value={
               values.dateRange?.to
                 ? values.dateRange.to.toLocaleDateString("fr-CH")
@@ -50,9 +57,19 @@ export function AccommodationFields({
             icon={<Icon name="cal" size={18} />}
             iconLabel="Choisir les dates"
             onIconClick={() => setDatePickerOpen(true)}
+            aria-invalid={Boolean(datesError)}
+            aria-describedby={datesError ? datesErrorId : undefined}
           />
         </div>
       </div>
+
+      {datesError && (
+        <div id={datesErrorId} role="alert">
+          <Text tone="accent" size="sm" className="mt-1">
+            {datesError}
+          </Text>
+        </div>
+      )}
 
       {datePickerOpen && (
         <DatePicker
@@ -77,6 +94,7 @@ export function AccommodationFields({
       <Input
         type="number"
         min={0}
+        step="0.01"
         value={values.pricePerNight}
         onChange={(event) =>
           setValues((current) => ({

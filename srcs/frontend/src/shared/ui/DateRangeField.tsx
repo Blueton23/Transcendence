@@ -1,11 +1,11 @@
 import Icon from "@/shared/ui/Icon";
 
-interface StepDateFieldProps {
+interface DateRangeFieldProps {
   label: string;
   onClick: () => void;
 }
 
-export function StepDateField({ label, onClick }: StepDateFieldProps) {
+export function DateRangeField({ label, onClick }: DateRangeFieldProps) {
   return (
     <button
       type="button"

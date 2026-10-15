@@ -19,6 +19,8 @@ from travel.models import (
 )
 from traveler.models import Traveler
 
+COORDS = {"latitude": 46.5197, "longitude": 6.6323}
+
 
 class IdeaModelTest(TestCase):
     def setUp(self):
@@ -37,6 +39,7 @@ class IdeaModelTest(TestCase):
             localisation="Lyon",
             start_date=datetime.date(2026, 6, 2),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
 
     def _make_idea(self, **overrides):
@@ -246,6 +249,60 @@ class IdeaModelTest(TestCase):
         with self.assertRaises(ValidationError):
             self._make_idea(type=IdeaType.LODGING)
 
+    def test_pool_lodging_start_before_travel_is_rejected(self):
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                type=IdeaType.LODGING,
+                start_date=datetime.date(2026, 5, 31),
+                end_date=datetime.date(2026, 6, 10),
+            )
+
+        self.assertIn("start_date", context.exception.message_dict)
+
+    def test_pool_lodging_end_after_travel_is_rejected(self):
+        with self.assertRaises(ValidationError) as context:
+            self._make_idea(
+                type=IdeaType.LODGING,
+                start_date=datetime.date(2026, 6, 1),
+                end_date=datetime.date(2026, 6, 16),
+            )
+
+        self.assertIn("end_date", context.exception.message_dict)
+
+    def test_pool_lodging_at_travel_is_allowed(self):
+        idea = self._make_idea(
+            type=IdeaType.LODGING,
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+
+        self.assertTrue(idea.is_in_pool)
+        self.assertEqual(idea.start_date, self.travel.start_date)
+        self.assertEqual(idea.end_date, self.travel.end_date)
+
+    def test_lodging_on_trashed_step_outside_travel_is_rejected(self):
+        idea = self._make_idea(
+            type=IdeaType.LODGING,
+            step=self.step,
+            start_date=self.step.start_date,
+            end_date=self.step.end_date,
+        )
+
+        self.step.soft_delete()
+        idea.refresh_from_db()
+
+        self.assertEqual(idea.step_id, self.step.id)
+        self.assertTrue(idea.is_in_pool)
+
+        idea.start_date = datetime.date(2026, 5, 31)
+        idea.end_date = datetime.date(2026, 6, 16)
+
+        with self.assertRaises(ValidationError) as context:
+            idea.save()
+
+        self.assertIn("start_date", context.exception.message_dict)
+        self.assertIn("end_date", context.exception.message_dict)
+
     def test_step_from_another_travel_is_rejected(self):
         other_travel = Travel.objects.create(
             title="Other trip",
@@ -257,6 +314,7 @@ class IdeaModelTest(TestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 7, 2),
             end_date=datetime.date(2026, 7, 4),
+            **COORDS,
         )
         with self.assertRaises(ValidationError):
             self._make_idea(
@@ -494,6 +552,7 @@ class IdeaSerializerTest(TestCase):
             localisation="Vouvry",
             start_date=datetime.date(2026, 6, 3),
             end_date=datetime.date(2026, 6, 3),
+            **COORDS,
         )
 
         # Autre Travel
@@ -512,6 +571,7 @@ class IdeaSerializerTest(TestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 7, 3),
             end_date=datetime.date(2026, 7, 3),
+            **COORDS,
         )
 
     # ========================================================================#
@@ -558,7 +618,7 @@ class IdeaSerializerTest(TestCase):
         self.assertEqual(data["travel_id"], self.travel.id)
         self.assertEqual(data["title"], "Brasserie")
         self.assertEqual(data["type"], IdeaType.RESTAURANT)
-        self.assertEqual(data["status"], IdeaStatus.SUGGESTED)
+        self.assertEqual(data["status"], "suggested")
         self.assertEqual(data["vote_count"], 0)
         self.assertFalse(data["voted"])
 
@@ -1154,6 +1214,7 @@ class IdeaViewTest(APITestCase):
             localisation="Paris",
             start_date=datetime.date(2026, 7, 3),
             end_date=datetime.date(2026, 7, 3),
+            **COORDS,
         )
 
         Idea.objects.create(
@@ -1435,6 +1496,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         trashed_step.soft_delete()
 
@@ -1639,6 +1701,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.client.force_authenticate(user=self.traveler)
@@ -1659,7 +1722,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.PLACED)
+        self.assertEqual(response.data["status"], "placed")
 
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.step, step)
@@ -1675,6 +1738,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.idea.step = step
@@ -1701,7 +1765,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.SUGGESTED)
+        self.assertEqual(response.data["status"], "suggested")
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -1717,6 +1781,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -1743,7 +1808,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.SUGGESTED)
+        self.assertEqual(response.data["status"], "suggested")
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -2242,6 +2307,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 4),
+            **COORDS,
         )
         trashed_step.soft_delete()
 
@@ -2278,6 +2344,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.client.force_authenticate(user=self.traveler)
@@ -2313,6 +2380,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 5),
+            **COORDS,
         )
 
         self.idea.step = step
@@ -2352,6 +2420,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2396,6 +2465,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2446,6 +2516,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2469,7 +2540,7 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], self.idea.id)
-        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["status"], "chosen")
         self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
 
         self.idea.refresh_from_db()
@@ -2487,6 +2558,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2534,7 +2606,7 @@ class IdeaViewTest(APITestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data["id"], self.idea.id)
-        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["status"], "chosen")
         self.assertEqual(response.data["chosen_by_id"], other_traveler.id)
 
         self.idea.refresh_from_db()
@@ -2556,6 +2628,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2603,7 +2676,7 @@ class IdeaViewTest(APITestCase):
         response = self.client.post(url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["status"], IdeaStatus.CHOSEN)
+        self.assertEqual(response.data["status"], "chosen")
         self.assertEqual(response.data["chosen_by_id"], self.traveler.id)
 
         self.idea.refresh_from_db()
@@ -2622,6 +2695,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2661,6 +2735,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2708,6 +2783,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2768,6 +2844,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2836,6 +2913,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.step = step
@@ -2904,6 +2982,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
+            **COORDS,
         )
 
         self.idea.type = IdeaType.LODGING
@@ -2950,6 +3029,7 @@ class IdeaViewTest(APITestCase):
             localisation="Lausanne",
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 8),
+            **COORDS,
         )
 
         Idea.objects.create(
@@ -3040,6 +3120,14 @@ class ReactionViewTest(APITestCase):
             traveler=self.other_traveler,
             travel=self.travel,
             status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.reaction_url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": self.travel.id,
+                "pk": self.idea.id,
+            },
         )
 
     # Tests réussi
@@ -3507,3 +3595,132 @@ class ReactionViewTest(APITestCase):
             self.assertFalse(Reaction.objects.exists())
 
             transaction.set_rollback(True)
+
+    # Test : Un participant peut consulter toutes les réactions de l'idée,
+    def test_get_returns_only_reactions_of_target_idea(self):
+        first = Reaction.objects.create(
+            traveler=self.traveler,
+            idea=self.idea,
+        )
+        second = Reaction.objects.create(
+            traveler=self.other_traveler,
+            idea=self.idea,
+        )
+
+        other_idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Autre restaurant",
+            type=IdeaType.RESTAURANT,
+        )
+        Reaction.objects.create(
+            traveler=self.traveler,
+            idea=other_idea,
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(
+            [item["id"] for item in response.data],
+            [first.id, second.id],
+        )
+        self.assertEqual(
+            [item["traveler_id"] for item in response.data],
+            [self.traveler.id, self.other_traveler.id],
+        )
+
+        for item in response.data:
+            self.assertEqual(item["idea_id"], self.idea.id)
+            self.assertIsNotNone(item["created_at"])
+
+        self.assertEqual(Reaction.objects.count(), 3)
+
+    # Test : Une idée sans réaction renvoie une liste vide
+    def test_get_returns_empty_list_without_reactions(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, [])
+        self.assertFalse(Reaction.objects.exists())
+
+    # Test : Un utilisateur anonyme ne peut pas consulter les réactions
+    def test_get_forbidden_if_not_authenticated(self):
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 403)
+
+    # Test : Un utilisateur extérieur au voyage ne peut pas accéder à la liste
+    def test_get_not_found_if_not_participant(self):
+        outsider = Traveler.objects.create_user(
+            username="Outside",
+            email="outside@example.com",
+            password="password123",
+        )
+        self.client.force_authenticate(user=outsider)
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 404)
+
+    # Test : Une invitation, un refus ou un départ ne donne pas accès aux réactions
+    def test_get_not_found_if_participation_not_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        participation = Participation.objects.get(
+            traveler=self.traveler,
+            travel=self.travel,
+        )
+
+        for participation_status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(status=participation_status):
+                participation.status = participation_status
+                participation.save(update_fields=["status"])
+
+                response = self.client.get(self.reaction_url)
+
+                self.assertEqual(response.status_code, 404)
+
+    # Test : Participant aux deux voyages, évite le mélange d'ID
+    def test_get_not_found_with_wrong_travel(self):
+        other_travel = Travel.objects.create(
+            title="Autre voyage",
+            start_date=datetime.date(2026, 7, 2),
+            end_date=datetime.date(2026, 7, 10),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.client.force_authenticate(user=self.traveler)
+
+        url = reverse(
+            "idea-reaction",
+            kwargs={
+                "travel_id": other_travel.id,
+                "pk": self.idea.id,
+            },
+        )
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    # Test : Une idée inexistante renvoie 404, pas une liste vide
+    def test_get_not_found_for_nonexistent_idea(self):
+        self.client.force_authenticate(user=self.traveler)
+        self.idea.delete()
+
+        response = self.client.get(self.reaction_url)
+
+        self.assertEqual(response.status_code, 404)

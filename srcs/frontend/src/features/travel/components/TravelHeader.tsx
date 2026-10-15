@@ -17,11 +17,11 @@ interface TravelHeaderProps {
   totalKms: number;
 }
 
-function TravelOptionsButton({ travelId }: { travelId: number }) {
+function TravelOptionsButton({ travel }: { travel: Travel }) {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const { submit, isSubmitting, error } = useSubmitAction(() =>
-    leaveTravel(travelId),
+    leaveTravel(travel.id),
   );
 
   const handleOnSubmit = async () => {
@@ -48,7 +48,16 @@ function TravelOptionsButton({ travelId }: { travelId: number }) {
           onClose={() => setIsOpen(false)}
           className="top-full right-0 mt-2"
         >
-          <MenuItem icon="edit">Créer le lien d'invitation</MenuItem>
+          <MenuItem
+            icon="edit"
+            onClick={async () => {
+              const link = `${window.location.origin}/join/${travel.inviteToken}`;
+              await navigator.clipboard.writeText(link);
+              setIsOpen(false);
+            }}
+          >
+            Copier le lien d'invitation
+          </MenuItem>
           <MenuItem icon="users">Gérer les voyageurs</MenuItem>
           <MenuItem icon="cal">Changer les dates</MenuItem>
           <Divider />
@@ -86,7 +95,7 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
           tone="inverse"
         >{`${totalKms} kms`}</Tag>
       </div>
-      <TravelOptionsButton travelId={travel.id} />
+      <TravelOptionsButton travel={travel} />
     </div>
   );
 }

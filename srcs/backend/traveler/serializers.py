@@ -6,7 +6,7 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.forms import PasswordChangeForm
 from rest_framework import serializers
 
-from .models import Traveler
+from .models import Friendship, Traveler
 
 
 class TravelerSerializer(serializers.ModelSerializer):
@@ -203,3 +203,28 @@ class TravelerUpdateProfilePictureSerializer(serializers.ModelSerializer):
             instance.profile_picture.storage.delete(old_picture_name)
 
         return instance
+
+
+class FriendshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friendship
+
+        fields: ClassVar[list[str]] = [
+            "id",
+            "user1",
+            "user2",
+            "requested_by",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
+
+        read_only_fields: ClassVar[list[str]] = [
+            "id",
+            "user1",
+            "user2",
+            "requested_by",
+            "status",
+            "created_at",
+            "updated_at",
+        ]

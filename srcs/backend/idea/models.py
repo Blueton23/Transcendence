@@ -149,6 +149,18 @@ class Idea(TimeStampedModel, ValidatedModel):
         elif not self.is_in_pool:
             errors["start_date"] = "An idea placed on a step must have dates."
 
+        if (
+            self.type == IdeaType.LODGING
+            and self.is_in_pool
+            and self.travel_id
+            and self.start_date
+            and self.end_date
+        ):
+            if self.start_date < self.travel.start_date:
+                errors["start_date"] = "The lodging cannot start before the travel."
+            if self.end_date > self.travel.end_date:
+                errors["end_date"] = "The lodging cannot end after the travel."
+
         if errors:
             raise ValidationError(errors)
 

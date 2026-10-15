@@ -10,6 +10,10 @@ export function useSteps(travelId: number) {
 
   useEffect(() => {
     async function loadSteps() {
+      if (!travelId) {
+        setIsLoading(false);
+        return;
+      }
       setError(null);
       try {
         const result = await getSteps(travelId);

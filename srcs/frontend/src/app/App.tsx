@@ -14,6 +14,7 @@ import HomePage from "../pages/HomePage";
 import ItineraryPage from "../pages/ItineraryPage";
 import { IdeasPage } from "@/pages/IdeasPage";
 import TravelPage from "@/pages/TravelPage";
+import JoinPage from "@/pages/JoinPage";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
@@ -27,8 +28,8 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/join/:slug" element={<PlaceHolder label="join" />} />
       <Route element={<ProtectedRoute />}>
+        <Route path="/join/:token" element={<JoinPage />} />
         <Route element={<AppLayout />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/trip" element={<TravelPage />} />

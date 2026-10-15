@@ -3,162 +3,241 @@ import type {
   CreateIdeaInput,
   PlaceIdeaInput,
   EditIdeaInput,
-  VoteIdea,
+  IdeaApiResponse,
 } from "@/features/idea/types";
 
-// get -> permet de récupérer une idée
-export function getIdeas(): Idea[] {
-  return [
-    {
-      id: 1,
-      travelId: 1,
-      travelerId: 1,
-      stepId: null,
-      chosenBy: null,
-      title: "Fondue chez Chez Vrony",
-      type: "restaurant",
-      status: "suggested",
-      localisation: "12 rue des Alpes, Annecy",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: null,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: null,
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
-    },
+import { getCookie } from "@/shared/api/cookies";
+import { translateIdeaError } from "./ideaErrors";
 
-    {
-      id: 2,
-      travelId: 1,
-      travelerId: 2,
-      stepId: null,
-      chosenBy: null,
-      title: "Pont suspendu Charles Kuonen",
-      type: "sightseeing",
-      status: "suggested",
-      localisation: "22 rue de la statut",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: null,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: null,
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
-    },
+import {
+  mapIdeaFromApi,
+  mapCreateIdeaToApi,
+} from "@/features/idea/api/ideaMapper";
+import { parseResponse } from "@/shared/api/errors";
 
-    {
-      id: 3,
-      travelId: 1,
-      travelerId: 2,
-      stepId: 1,
-      chosenBy: 2,
-      title: "Rando du Bachalpsee",
-      type: "activity",
-      status: "placed",
-      localisation: "15 rue des ponts",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: null,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: "2026-08-05T18:30:00Z",
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
-    },
+// Récupérer les idées du voyage
+export async function fetchIdeas(travelId: number): Promise<Idea[]> {
+  const response = await fetch(`/api/travels/${travelId}/ideas/`, {
+    method: "GET",
+    credentials: "include",
+  });
 
-    {
-      id: 4,
-      travelId: 1,
-      travelerId: 1,
-      stepId: 2,
-      chosenBy: 2,
-      title: "Backpackers Zermatt",
-      type: "accommodation",
-      status: "chosen",
-      localisation: "34 chemin du puit",
-      latitude: 45.899247,
-      longitude: 6.129384,
-      date: null,
-      pricePerNight: 48,
-      arrivalDate: null,
-      departureDate: null,
-      url: null,
-      note: null,
-      chosenAt: "2026-08-05T18:30:00Z",
-      createdAt: "2026-08-01T09:15:00Z",
-      updatedAt: "2026-08-05T18:30:00Z",
-    },
-  ];
+  const data = await parseResponse<IdeaApiResponse[]>(response);
+  return data.map(mapIdeaFromApi);
 }
 
-export function getIdeaVotes(): VoteIdea[] {
-  return [
-    {
-      ideaId: 1,
-      voteCount: 2,
-      voted: false,
+// Récupérer une idée du voyage
+export async function fetchIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<Idea> {
+  const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = await parseResponse<IdeaApiResponse>(response);
+  return mapIdeaFromApi(data);
+}
+
+// Créer une idée dans le voyage
+export async function postIdea(
+  travelId: number,
+  input: CreateIdeaInput,
+): Promise<Idea> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const payload = mapCreateIdeaToApi(input);
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
     },
-    {
-      ideaId: 2,
-      voteCount: 4,
-      voted: true,
+    body: JSON.stringify(payload),
+  });
+
+  const data =
+    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  return mapIdeaFromApi(data);
+}
+
+// Modifier une idée du voyage
+export async function patchIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+  input: EditIdeaInput,
+): Promise<Idea> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const payload = mapCreateIdeaToApi(input);
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
     },
-    {
-      ideaId: 3,
-      voteCount: 0,
-      voted: false,
+    body: JSON.stringify(payload),
+  });
+
+  const data =
+    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  return mapIdeaFromApi(data);
+}
+
+// Supprimer une idée du voyage
+export async function removeIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      "X-CSRFToken": csrfToken,
     },
-    {
-      ideaId: 4,
-      voteCount: 1,
-      voted: false,
+  });
+
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
+}
+
+// Placer une idée sur le voyage
+export async function patchIdeaPlacement(
+  travelId: number,
+  idea: Idea,
+  input: PlaceIdeaInput,
+): Promise<Idea> {
+  if (input.stepId === null) {
+    throw new Error("Choisis une étape pour cette idée");
+  }
+
+  const isAccommodation = idea.type === "accommodation";
+
+  if (!isAccommodation && !input.date) {
+    throw new Error("Choisis une date pour cette idée");
+  }
+
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const payload = isAccommodation
+    ? { stepId: input.stepId }
+    : {
+        stepId: input.stepId,
+        startDate: input.date,
+        endDate: input.date,
+      };
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/${idea.id}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
     },
-  ];
+    body: JSON.stringify(payload),
+  });
+
+  const data =
+    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  return mapIdeaFromApi(data);
 }
 
-// les fonctions suivant sont a modifier plus tard pour la connexion backend
+// Choisir un hébergement déjà placé sur une étape (PLACED a CHOOSEN)
+export async function chooseIdea(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<Idea> {
+  const csrfToken = getCookie("csrftoken");
 
-// fonction métier pour le bouton "Epingler une idée"
-export function createIdea(input: CreateIdeaInput): Idea {
-  return {
-    id: Date.now(),
-    travelId: 1,
-    travelerId: 1,
-    chosenBy: null,
-    ...input,
-    status: "suggested",
-    chosenAt: null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  };
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const response = await fetch(
+    `/api/travels/${travelId}/ideas/${ideaId}/choice/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    },
+  );
+
+  const data =
+    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  return mapIdeaFromApi(data);
 }
 
-// fonction métier pour le bouton "placer"
-export function placeIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
-  console.log(ideaId, input);
+// Voter pour une idée du voyage
+export async function addIdeaReaction(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+
+  const response = await fetch(
+    `/api/travels/${travelId}/ideas/${ideaId}/reaction/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    },
+  );
+  await parseResponse<unknown>(response);
 }
 
-export function deleteIdea(ideaId: Idea["id"]) {
-  console.log(ideaId);
-}
+// Retirer le vote sur une idée du voyage
+export async function removeIdeaReaction(
+  travelId: number,
+  ideaId: Idea["id"],
+): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
 
-export function editIdea(ideaId: Idea["id"], input: EditIdeaInput) {
-  console.log(ideaId, input);
-}
-
-// fonction métier pour le bouton de vote
-export function voteIdea(ideaId: Idea["id"]) {
-  console.log(ideaId);
+  if (!csrfToken) {
+    throw new Error("Token CSRF introuvable");
+  }
+  const response = await fetch(
+    `/api/travels/${travelId}/ideas/${ideaId}/reaction/`,
+    {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "X-CSRFToken": csrfToken,
+      },
+    },
+  );
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
 }
