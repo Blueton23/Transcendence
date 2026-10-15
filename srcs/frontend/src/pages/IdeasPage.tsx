@@ -7,35 +7,47 @@ import { IdeaStepFilter } from "@/features/idea/components/page/IdeaStepFilter";
 import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
 import { PlaceIdeaModal } from "@/features/idea/components/modal/PlaceIdeaModal";
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
-import type { IdeaFilter, StepFilter } from "@/features/idea/types";
+import type { IdeaFilter, StepFilter, StepOption } from "@/features/idea/types";
 import { filterIdeas } from "@/features/idea/utils/filterIdeas";
+import { useParams } from "react-router";
+import { useSteps } from "@/features/step/hooks/useSteps";
+import { useTravel } from "@/features/travel/hooks/useTravel";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 
-//A SUPPRIMER, mettre useStep dans la foncton princiale et dans le .map
-const mockSteps = [
-  { id: 1, name: "Interlaken" },
-  { id: 2, name: "Zermatt" },
-];
-
-const mockTravelers = [
-  { id: 1, name: "David", initials: "DL" },
-  { id: 2, name: "Alice", initials: "AM" },
-];
-
-/*----------------------------------------------------------------------------------*/
-
 // Fonction principale pour la page idée
 export function IdeasPage() {
+  const { id } = useParams();
+  const travelId = Number(id);
+
   const {
     ideas,
+    isLoading,
+    error,
     handleCreateIdea,
     handlePlaceIdea,
     handleDeleteIdea,
     handleEditIdea,
+    handleChooseIdea,
     handleVote,
-    voted,
-  } = useIdeas();
+  } = useIdeas(travelId);
+
+  const {
+    steps,
+    isLoading: isLoadingSteps,
+    error: errorSteps,
+  } = useSteps(travelId);
+
+  const {
+    travel,
+    isLoading: isLoadingTravel,
+    error: errorTravel,
+  } = useTravel(travelId);
+
+  const stepOptions: StepOption[] = steps.map((step) => ({
+    id: step.id,
+    name: step.localisation,
+  }));
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
@@ -48,6 +60,18 @@ export function IdeasPage() {
 
   const [editIdeaId, setEditIdeaId] = useState<number | null>(null);
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
+
+  if (isLoading || isLoadingSteps || isLoadingTravel) {
+    return <Text>Chargement des idées, des étapes et des voyageurs…</Text>;
+  }
+
+  if (error || errorSteps || errorTravel) {
+    return <Text>{error || errorSteps || errorTravel}</Text>;
+  }
+
+  if (!travel) {
+    return <Text>Voyage introuvable.</Text>;
+  }
 
   return (
     <div className="px-4 pt-8 md:px-8">
@@ -69,21 +93,27 @@ export function IdeasPage() {
       <div>
         <Text className="mb-1">Etape</Text>
         <IdeaStepFilter
-          steps={mockSteps}
+          steps={stepOptions}
           stepActiveFilter={stepActiveFilter}
           onChange={setStepActiveFilter}
         />
       </div>
 
       <div className="flex flex-col gap-3">
-        {filteredIdeas.map((idea) => {
-          const step = mockSteps.find((step) => step.id === idea.stepId);
+        {filteredIdeas.length === 0 && (
+          <Text tone="muted">
+            {ideas.length === 0
+              ? "Aucune idée pour ce voyage."
+              : "Aucune idée ne correspond aux filtres sélectionnés."}
+          </Text>
+        )}
 
-          const proposer = mockTravelers.find(
+        {filteredIdeas.map((idea) => {
+          const step = stepOptions.find((step) => step.id === idea.stepId);
+
+          const proposer = travel.travelers.find(
             (traveler) => traveler.id === idea.travelerId,
           );
-
-          const vote = voted.find((vote) => vote.ideaId === idea.id);
 
           return (
             <IdeaCard
@@ -91,14 +121,13 @@ export function IdeasPage() {
               idea={idea}
               proposerName={proposer?.name ?? "Inconnu"}
               proposerInitials={proposer?.initials ?? "?"}
-              voteCount={vote?.voteCount ?? 0}
-              voted={vote?.voted ?? false}
               stepName={step?.name}
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}
               onView={() => null}
               onEdit={() => setEditIdeaId(idea.id)}
               onDelete={() => handleDeleteIdea(idea.id)}
+              onChoose={() => handleChooseIdea(idea.id)}
             />
           );
         })}
@@ -106,7 +135,8 @@ export function IdeasPage() {
 
       {createIdeaModalOpen && (
         <CreateIdeaModal
-          steps={mockSteps}
+          travelTitle={travel.title}
+          steps={stepOptions}
           onClose={() => setCreateIdeaModalOpen(false)}
           onCreate={handleCreateIdea}
         />
@@ -115,7 +145,7 @@ export function IdeasPage() {
       {ideaToPlace && (
         <PlaceIdeaModal
           idea={ideaToPlace}
-          steps={mockSteps}
+          steps={stepOptions}
           onClose={() => setIdeaPlaceId(null)}
           onPlace={handlePlaceIdea}
         />
@@ -123,8 +153,9 @@ export function IdeasPage() {
 
       {editIdea && (
         <EditIdeaModal
+          travelTitle={travel.title}
           idea={editIdea}
-          steps={mockSteps}
+          steps={stepOptions}
           onClose={() => setEditIdeaId(null)}
           onEdit={(input) => handleEditIdea(editIdea.id, input)}
         />

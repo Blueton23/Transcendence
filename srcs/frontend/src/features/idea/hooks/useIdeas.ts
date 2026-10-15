@@ -1,52 +1,92 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type {
   Idea,
   CreateIdeaInput,
   PlaceIdeaInput,
   EditIdeaInput,
-  VoteIdea,
 } from "@/features/idea/types";
 import {
-  getIdeas,
-  createIdea,
-  placeIdea,
-  voteIdea,
-  editIdea,
-  getIdeaVotes,
-  deleteIdea,
+  fetchIdeas,
+  fetchIdea,
+  postIdea,
+  patchIdea,
+  removeIdea,
+  patchIdeaPlacement,
+  chooseIdea,
+  addIdeaReaction,
+  removeIdeaReaction,
 } from "@/features/idea/api/api.ideas";
 
-export function useIdeas() {
-  const [ideas, setIdeas] = useState<Idea[]>(() => getIdeas());
-  const [voted, setVoted] = useState<VoteIdea[]>(() => getIdeaVotes());
+export function useIdeas(travelId: number) {
+  const [ideas, setIdeas] = useState<Idea[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let ignore = false;
+    /* Gère le chargement des idées */
+    async function loadIdea() {
+      setIsLoading(true);
+      setError(null);
+      setIdeas([]);
+
+      try {
+        if (!Number.isSafeInteger(travelId) || travelId <= 0) {
+          throw new Error("Identifiant de voyage invalide");
+        }
+
+        const result = await fetchIdeas(travelId);
+
+        if (ignore) {
+          return;
+        }
+
+        setIdeas(result);
+      } catch (err) {
+        if (ignore) {
+          return;
+        }
+
+        setError(
+          err instanceof Error
+            ? err.message
+            : "Impossible de charger les idées",
+        );
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    loadIdea();
+
+    return () => {
+      ignore = true;
+    };
+  }, [travelId]);
 
   {
     /* Gère la création d'idée */
   }
-  function handleCreateIdea(input: CreateIdeaInput) {
-    const newIdea = createIdea(input);
+  async function handleCreateIdea(input: CreateIdeaInput): Promise<void> {
+    const newIdea = await postIdea(travelId, input);
 
-    setIdeas((currentIdeas) => [...currentIdeas, newIdea]);
-
-    setVoted((currentVotes) => [
-      ...currentVotes,
-      {
-        ideaId: newIdea.id,
-        voteCount: 0,
-        voted: false,
-      },
-    ]);
+    setIdeas((currentIdeas) => [newIdea, ...currentIdeas]);
   }
 
   {
-    /* Gère le placement d'idée */
+    /* Gère la modification d'idée */
   }
-  function handlePlaceIdea(ideaId: Idea["id"], input: PlaceIdeaInput) {
-    placeIdea(ideaId, input);
+  async function handleEditIdea(
+    ideaId: Idea["id"],
+    input: EditIdeaInput,
+  ): Promise<void> {
+    const updatedIdea = await patchIdea(travelId, ideaId, input);
 
     setIdeas((currentIdeas) =>
       currentIdeas.map((idea) =>
-        idea.id === ideaId ? { ...idea, ...input } : idea,
+        idea.id === updatedIdea.id ? updatedIdea : idea,
       ),
     );
   }
@@ -54,8 +94,8 @@ export function useIdeas() {
   {
     /* Gère la suppression d'idée */
   }
-  function handleDeleteIdea(ideaId: Idea["id"]) {
-    deleteIdea(ideaId);
+  async function handleDeleteIdea(ideaId: Idea["id"]): Promise<void> {
+    await removeIdea(travelId, ideaId);
 
     setIdeas((currentIdeas) =>
       currentIdeas.filter((idea) => idea.id !== ideaId),
@@ -63,20 +103,36 @@ export function useIdeas() {
   }
 
   {
-    /* Gère la modification d'idée */
+    /* Gère le placement d'idée */
   }
-  function handleEditIdea(ideaId: Idea["id"], input: EditIdeaInput) {
-    editIdea(ideaId, input);
+  async function handlePlaceIdea(
+    ideaId: Idea["id"],
+    input: PlaceIdeaInput,
+  ): Promise<void> {
+    const ideaToPlace = ideas.find((idea) => idea.id === ideaId);
+
+    if (!ideaToPlace) {
+      throw new Error("Idée introuvable.");
+    }
+
+    const updatedIdea = await patchIdeaPlacement(travelId, ideaToPlace, input);
 
     setIdeas((currentIdeas) =>
       currentIdeas.map((idea) =>
-        idea.id === ideaId
-          ? {
-              ...idea,
-              ...input,
-              updatedAt: new Date().toISOString(),
-            }
-          : idea,
+        idea.id === updatedIdea.id ? updatedIdea : idea,
+      ),
+    );
+  }
+
+  {
+    /* Gère le choix d’un hébergement déjà placé */
+  }
+  async function handleChooseIdea(ideaId: Idea["id"]): Promise<void> {
+    const updatedIdea = await chooseIdea(travelId, ideaId);
+
+    setIdeas((currentIdeas) =>
+      currentIdeas.map((idea) =>
+        idea.id === updatedIdea.id ? updatedIdea : idea,
       ),
     );
   }
@@ -84,29 +140,57 @@ export function useIdeas() {
   {
     /* Gère le vote */
   }
-  function handleVote(ideaId: Idea["id"]) {
-    voteIdea(ideaId);
+  async function handleVote(ideaId: Idea["id"]): Promise<void> {
+    const currentIdea = ideas.find((idea) => idea.id === ideaId);
 
-    setVoted((currentVotes) =>
-      currentVotes.map((vote) =>
-        vote.ideaId === ideaId
-          ? {
-              ...vote,
-              voted: !vote.voted,
-              voteCount: vote.voted ? vote.voteCount - 1 : vote.voteCount + 1,
-            }
-          : vote,
+    if (!currentIdea) {
+      throw new Error("État du vote introuvable.");
+    }
+
+    const nextVoted = !currentIdea.voted;
+
+    if (nextVoted) {
+      await addIdeaReaction(travelId, ideaId);
+    } else {
+      await removeIdeaReaction(travelId, ideaId);
+    }
+
+    setIdeas((currentIdeas) =>
+      currentIdeas.map((idea) =>
+        idea.id === ideaId ? { ...idea, voted: nextVoted } : idea,
       ),
     );
+
+    try {
+      const updatedIdea = await fetchIdea(travelId, ideaId);
+
+      setIdeas((currentIdeas) =>
+        currentIdeas.map((idea) =>
+          idea.id === ideaId
+            ? {
+                ...idea,
+                voteCount: updatedIdea.voteCount,
+                voted: updatedIdea.voted,
+              }
+            : idea,
+        ),
+      );
+    } catch {
+      throw new Error(
+        "La modification de ton vote a été enregistrée, mais le compteur n’a pas pu être actualisé. Recharge la page pour le synchroniser.",
+      );
+    }
   }
 
   return {
     ideas,
+    isLoading,
+    error,
     handleCreateIdea,
     handlePlaceIdea,
     handleDeleteIdea,
     handleEditIdea,
+    handleChooseIdea,
     handleVote,
-    voted,
   };
 }
