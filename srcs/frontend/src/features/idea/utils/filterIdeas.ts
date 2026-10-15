@@ -20,10 +20,10 @@ export function filterIdeas(
     /* Filtre étape */
   }
   if (stepActiveFilter === "none") {
-    filteredIdeas = filteredIdeas.filter((idea) => idea.stepId === null);
+    filteredIdeas = filteredIdeas.filter((idea) => idea.status === "suggested");
   } else if (stepActiveFilter !== "all") {
     filteredIdeas = filteredIdeas.filter(
-      (idea) => idea.stepId === stepActiveFilter,
+      (idea) => idea.status !== "suggested" && idea.stepId === stepActiveFilter,
     );
   }
 

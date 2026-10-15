@@ -128,6 +128,14 @@ class ReactionView(ParticipantScopedMixin, GenericAPIView):
     def get_queryset(self):
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
+    def get(self, request, travel_id, pk):
+        idea = self.get_object()
+
+        reactions = idea.reactions.order_by("created_at", "pk")
+        serializer = self.get_serializer(reactions, many=True)
+
+        return Response(serializer.data)
+
     def post(self, request, travel_id, pk):
         idea = self.get_object()
 

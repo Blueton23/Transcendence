@@ -1,12 +1,12 @@
 import Tag from "@/shared/ui/Tag";
 
 interface StepLabelProps {
-  stepId: number | null;
+  isInPool: boolean;
   stepName?: string;
 }
 
-export function StepLabel({ stepId, stepName }: StepLabelProps) {
-  if (stepId === null) {
+export function StepLabel({ isInPool, stepName }: StepLabelProps) {
+  if (isInPool) {
     return (
       <Tag tone="muted" className="whitespace-nowrap">
         Pool Général
