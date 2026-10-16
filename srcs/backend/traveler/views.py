@@ -13,6 +13,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.middleware.csrf import get_token
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -191,6 +192,49 @@ class LoginView(APIView):
                     traveler,
                     context={"request": request},
                 ).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+class ApiTokenView(APIView):
+    """Echange ton username + password contre la clé API.
+
+    La clé s'envoie ensuite dans le header : `Authorization: Token <clé>`.
+    """
+
+    # la personne n’a pas encore de clé, c’est justement ce qu’elle vient chercher. Elle prouve son identité avec le mot de passe dans le body, pas avec une session.
+    authentication_classes: ClassVar[list] = []
+    # autorise tout le monde à appeler la route. La sécurité vient du mot de passe vérifié juste après
+    permission_classes: ClassVar[list] = [AllowAny]
+
+    # valider les données entrantes, is_valid =  true si erreur
+    def post(self, request: Request) -> Response:
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        # fonction de Django qui vérifie les identifiants. Elle compare le mot de passe avec le hash stocké en base
+        traveler = authenticate(
+            request=request,
+            username=serializer.validated_data["username"],
+            password=serializer.validated_data["password"],
+        )
+
+        # Si le traveler n existe pas
+        if traveler is None:
+            return Response(
+                {"detail": "Identifiants invalides."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        # cherche un Token pour ce Traveler. S’il n’y en a pas, il le crée
+        # Une seule clé par utilisateur : on la crée au premier appel,
+        # puis on renvoie toujours la même.
+        token, _ = Token.objects.get_or_create(user=traveler)
+
+        return Response(
+            {
+                "token": token.key,
             },
             status=status.HTTP_200_OK,
         )

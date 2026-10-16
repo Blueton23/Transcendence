@@ -1256,3 +1256,105 @@ Le parcours d’un client externe :
 1. POST /api/auth/token/  {"username": "...", "password": "..."}   → {"token": "abc123..."}
 2. GET  /api/travels/     header  Authorization: Token abc123...    → ses voyages
 
+L'ajout de la vue se fait dans Traveler/view.py car c’est là que se trouvent déjà toutes les vues d’authentification
+
+Ajout du chemin dans Traveler/urls.py
+- path("auth/token", ApiTokenView.as_view(), name="auth-token"),
+
+Controle que la route soit brancher :
+- curl -i http://localhost:8080/api/auth/token/
+
+rend 405 car get pas n'est pas utiliser
+
+#### Tests curl :
+
+Test 1 : Test 1 : bons identifiants → on reçoit la clé
+```
+curl -i -X POST http://localhost:8080/api/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username": "dub1", "password": "123456qw."}'
+```
+
+Test 2 : deuxième appel → la même clé
+- La meme commande que le test 1 doit rendre 200, on récupère la clé existante
+
+Test 3 : mauvais mot de passe → 401
+- 401 veut dire « je ne sais pas qui tu es / tes identifiants sont faux
+
+Test 4 : champ manquant → 400
+```
+curl -i -X POST http://localhost:8080/api/auth/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username": "dub1"}'
+```
+
+Test 6 : utiliser la clé sur une route
+```
+curl -i http://localhost:8080/api/travels/ \
+  -H "Authorization: Token $TOKEN"
+```
+Remplacer $TOKEN par la clé api
+
+Test 7 : Créer un voyage avec la clé, sans CSRF
+```
+curl -i -X POST http://localhost:8080/api/travels/ \
+  -H "Authorization: Token $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Voyage API", "startDate": "2026-11-01", "endDate": "2026-11-10"}'
+```
+
+test depuis DRF
+{"username": "dub1", "password": "123456qw."} et POST, la clé apparait
+
+### Créer le PublicApiMixin :
+Dans common/mixins.py
+Fonction qui va procéder au deux authentification
+
+SessionAuthentication : la classe via settings.py. Elle lit le cookie de session et vérifie le CSRF.
+TokenAuthentication : la classe fournie par DRF qui lit Authorization: Token <clé> et cherche la clé dans la table authtoken_token
+
+rest_framework.authentication
+- contient les classes d’authentification
+
+### appliquer le mixin aux vues travel :
+
+Les vues rendus public :
+
+TravelListView :
+GET /api/travels/
+POST /api/travels/
+
+TravelDetailView :
+GET /api/travels/{id}/
+PUT /api/travels/{id}/
+PATCH /api/travels/{id}/
+
+StepListView :
+GET /api/travels/{travel_id}/steps/
+POST /api/travels/{travel_id}/steps/
+
+StepDetailView :
+GET /api/travels/{travel_id}/steps/{id}/
+PUT /api/travels/{travel_id}/steps/{id}/
+PATCH /api/travels/{travel_id}/steps/{id}/
+DELETE /api/travels/{travel_id}/steps/{id}/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+403 veut dire « je sais qui tu es, mais tu n’as pas le droit
+
+Bons identifiants	200	{"token": "..."}
+Mauvais identifiants ou compte désactivé	401	{"detail": "Identifiants invalides."}
+Champ manquant	400	enveloppe {status, code, message, details}
+Autre verbe que POST	405	enveloppe, avec le header Allow: POST, OPTIONS
