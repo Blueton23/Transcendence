@@ -13,10 +13,11 @@ import { Navigate } from "react-router";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import { StickyHeader } from "@/shared/ui/StickyHeader";
 import { useRoute } from "@/features/map/hooks/useRoute";
+import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
+import { useIdeas } from "@/features/idea/hooks/useIdeas";
 
-//TODO(branchement):
-// + ideaCount en dur : confirmer avec David si on utilisera annotate pour l idea courant
-// cote serializer comme ca step.ideaCount au lieu de la valeur en dur {2} inscrite dans le backend
+// TODO(branchement): un fois que PR de david est branchee:
+// - recharger les etapes (refetch) apres la creation pour mettre a jour ideaCount
 
 function ItineraryPage() {
   const { id } = useParams();
@@ -32,6 +33,7 @@ function ItineraryPage() {
     error: errorSteps,
     refetch,
   } = useSteps(travelId);
+  const { handleCreateIdea } = useIdeas(travelId);
   const { route, isLoading: isLoadingRoute } = useRoute(steps);
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
@@ -39,6 +41,7 @@ function ItineraryPage() {
   const detailView = steps.find((step) => step.id === detailStepId) ?? null;
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
+  const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
 
   const isLoading = isLoadingTravel || isLoadingSteps;
   const error = errorTravel || errorSteps;
@@ -90,7 +93,7 @@ function ItineraryPage() {
             />
           </div>
         )}
-        <TripActionsButton />
+        <TripActionsButton onPinIdea={() => setCreateIdeaModalOpen(true)} />
       </ItineraryLayout>
       {stepToModify && (
         <StepFormModal
@@ -99,6 +102,18 @@ function ItineraryPage() {
           travel={travel}
           refetch={refetch}
           onClose={() => setStepToModify(null)}
+        />
+      )}
+      {createIdeaModalOpen && (
+        <CreateIdeaModal
+          travelTitle={travel.title}
+          steps={steps}
+          initialStepId={detailView?.id}
+          onClose={() => setCreateIdeaModalOpen(false)}
+          onCreate={async (input) => {
+            await handleCreateIdea(input);
+            refetch();
+          }}
         />
       )}
     </div>

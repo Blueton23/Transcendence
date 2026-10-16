@@ -5,17 +5,18 @@ import type {
   IdeaFormValues,
 } from "@/features/idea/types";
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
-import type { StepOption } from "@/features/idea/types";
+
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import { validateIdeaForm } from "@/features/idea/utils/validateIdeaForm";
 import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
+import type { Step } from "@/features/step/types";
 
 export interface EditIdeaModalProps {
   travelTitle: string;
   idea: Idea;
-  steps: StepOption[];
+  steps: Step[];
   onClose: () => void;
   onEdit: (input: EditIdeaInput) => Promise<void>;
 }

@@ -5,6 +5,10 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from idea.models import (
+    Idea,
+    IdeaType,
+)
 from travel.models import (
     Participation,
     ParticipationStatus,
@@ -465,6 +469,36 @@ class StepSerializerTest(TestCase):
         self.assertFalse(serializer.is_valid())
         self.assertIn("latitude", serializer.errors)
         self.assertIn("longitude", serializer.errors)
+
+    def test_idea_counts_is_computed(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+            **COORDS,
+        )
+        other_step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 5),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        traveler = Traveler.objects.create_user(
+            username="alice", password="Password-123!"
+        )
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=traveler,
+            step=step,
+            title="Musée",
+            type=IdeaType.ACTIVITY,
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 2),
+        )
+        self.assertEqual(StepSerializer(step).data["idea_count"], 1)
+        self.assertEqual(StepSerializer(other_step).data["idea_count"], 0)
 
 
 # --- View tests ---
