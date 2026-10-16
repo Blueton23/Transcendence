@@ -1213,4 +1213,28 @@ Commande :
 | `make test ARGS="idea.tests.IdeaSerializerTest idea.tests.ReactionSerializerTest"` | Validation, représentation et champs protégés. |
 | `make test ARGS="idea.tests.IdeaViewTest idea.tests.ReactionViewTest"` | Routes, permissions et actions de l’API. |
 
-### detail a venir pour module api
+### Module Major - A public API :
+Une API publique, c'est une API accessible depuis l'extérieur d'une application, une connexion est obligatoire. La documentation est visible par tous le monde.
+
+Dans le projet deux conditions doivent être respectées :
+- Être authentifié : l'utilisateur doit être connecté à son compte.
+- Être autorisé : l'utilisateur doit être un participant accepté du voyage concerné.
+
+Le module ajoute une nouvelle façon de s’authentifier. Il ne touche pas aux permissions : un utilisateur qui passe par la clé API ne voit que ses propres voyages, exactement comme sur le site.
+Utilisation : Un client externe : curl, Postman, un script, une autre app
+
+Ce que fait TokenAuthentication (la classe DRF) à chaque requête
+- Elle lit le header Authorization.
+- Elle vérifie que le premier mot est Token (c’est l’attribut keyword = "Token" dans le code DRF).
+- Elle cherche la clé dans la table des tokens. Si la clé n’existe pas, elle répond « Invalid token. »
+- Elle vérifie que l’utilisateur est actif (user.is_active). Un compte désactivé est refusé, même avec une clé valide.
+- Elle remplit request.user (le Traveler) et request.auth (l’objet Token).
+
+#### Mise en place authtoken :
+Ajout dans settings/APP rest_framework.authtoken, permet de créer le modèle Token
+
+Le modèle Token, qui crée la table authtoken_token avec trois colonnes :
+- key : la clé elle-même, clé primaire de 40 caractères hexadécimaux. Elle est générée par secrets.
+- user : un OneToOneField vers AUTH_USER_MODEL, veut dire une seule clé par utilisateur. si un Traveler est supprimé, sa clé l’est aussi.
+- created : la date de création de la clé.
+
