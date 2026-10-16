@@ -1230,6 +1230,17 @@ Ce que fait TokenAuthentication (la classe DRF) à chaque requête
 - Elle vérifie que l’utilisateur est actif (user.is_active). Un compte désactivé est refusé, même avec une clé valide.
 - Elle remplit request.user (le Traveler) et request.auth (l’objet Token).
 
+Cette classe n'est pas ajoute dans REST_FRAMEWORK["DEFAULT_AUTHENTICATION_CLASSES"],
+sinon toutes les routes accepteraient la clé, y compris le changement de mot de passe, le profil ou les amis, question de sécurité
+
+| Élément | Responsabilité |
+|---|---|
+| `rest_framework.authtoken` | Fournit le modèle qui stocke les tokens. |
+| `TokenAuthentication` | Lit et vérifie le token envoyé dans la requête. |
+| `request.user` | Représente l'utilisateur authentifié. |
+| `permission_classes` | Vérifie ce que cet utilisateur a le droit de faire. |
+
+
 #### Mise en place authtoken :
 Ajout dans settings/APP rest_framework.authtoken, permet de créer le modèle Token
 
@@ -1237,4 +1248,11 @@ Le modèle Token, qui crée la table authtoken_token avec trois colonnes :
 - key : la clé elle-même, clé primaire de 40 caractères hexadécimaux. Elle est générée par secrets.
 - user : un OneToOneField vers AUTH_USER_MODEL, veut dire une seule clé par utilisateur. si un Traveler est supprimé, sa clé l’est aussi.
 - created : la date de création de la clé.
+
+#### Créer la vue qui donne la clé :
+Il faut une route où un utilisateur externe envoie son username + mot de passe et reçoit sa clé API en retour. C’est l’équivalent de LoginView, sauf qu’au lieu d’ouvrir une session (cookie), elle renvoie une clé à mettre dans le header Authorization.
+
+Le parcours d’un client externe :
+1. POST /api/auth/token/  {"username": "...", "password": "..."}   → {"token": "abc123..."}
+2. GET  /api/travels/     header  Authorization: Token abc123...    → ses voyages
 
