@@ -13,6 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.mixins import PublicApiMixin
+
 from .mixins import ParticipantScopedMixin
 from .models import Participation, ParticipationStatus, Step, Travel
 from .permissions import IsTravelParticipant
@@ -41,7 +43,7 @@ class TravelJoinView(APIView):
         return Response(TravelSerializer(travel).data)
 
 
-class TravelListView(ParticipantScopedMixin, ListCreateAPIView):
+class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
@@ -55,12 +57,12 @@ class TravelListView(ParticipantScopedMixin, ListCreateAPIView):
             )
 
 
-class TravelDetailView(ParticipantScopedMixin, RetrieveUpdateAPIView):
+class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
 
-class StepListView(ListCreateAPIView):
+class StepListView(PublicApiMixin, ListCreateAPIView):
     queryset = Step.objects.alive()
     serializer_class = StepSerializer
     permission_classes: ClassVar[list] = [IsAuthenticated, IsTravelParticipant]
@@ -72,7 +74,9 @@ class StepListView(ListCreateAPIView):
         serializer.save(travel_id=self.kwargs["travel_id"])
 
 
-class StepDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
+class StepDetailView(
+    PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
+):
     queryset = Step.objects.alive()
     serializer_class = StepSerializer
     participation_path = "travel__participations"
