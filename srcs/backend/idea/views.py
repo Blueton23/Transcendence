@@ -13,6 +13,7 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from common.mixins import PublicApiMixin
 from idea.models import Idea, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
 from travel.mixins import ParticipantScopedMixin
@@ -23,7 +24,7 @@ from travel.permissions import IsTravelParticipant
 
 
 # Liste plusieurs objets (GET, POST)
-class IdeaListView(ListCreateAPIView):
+class IdeaListView(PublicApiMixin, ListCreateAPIView):
     queryset = Idea.objects.all()
     serializer_class = IdeaSerializer
     permission_classes: ClassVar[list] = [
@@ -56,7 +57,9 @@ class IdeaListView(ListCreateAPIView):
 
 
 # Récupérer un seul objet (GET, PATCH, PUT, DELETE)
-class IdeaDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
+class IdeaDetailView(
+    PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
+):
     queryset = Idea.objects.all()
     serializer_class = IdeaSerializer
     participation_path = "travel__participations"

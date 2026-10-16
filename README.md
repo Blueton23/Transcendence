@@ -1339,9 +1339,21 @@ PUT /api/travels/{travel_id}/steps/{id}/
 PATCH /api/travels/{travel_id}/steps/{id}/
 DELETE /api/travels/{travel_id}/steps/{id}/
 
+IdeaListView
+IdeaDetailView
 
 
-
+test pour creer une idee
+```
+   curl -i -X POST http://localhost:8080/api/travels/<TRAVEL_ID>/ideas/ \
+     -H "Authorization: Token $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"title": "Musée des Beaux-Arts", "type": "s"}'
+```
+```
+   curl -i http://localhost:8080/api/travels/<TRAVEL_ID>/ideas/ \
+     -H "Authorization: Token $TOKEN"
+```
 
 
 
