@@ -1507,6 +1507,12 @@ Pour transmettre la vraie IP, nginx.conf ajoute un header :
 - DRF avec NUM_PROXIES = 1 : sélectionne la dernière adresse du header.
 - Redis : stocke le compteur des tentatives dans cette adresse
 
+#### appliquer les limites :
+- toutes les vues publiques → scope public_api (100/minute), en passant par le PublicApiMixin ;
+- la route de la clé → scope auth_token (5/minute), directement sur ApiTokenView.
 
 
-
+Les deux attributs à poser sur une vue
+Attribut	Rôle	Valeur
+throttle_classes	Le mécanisme : comment compter	[ScopedRateThrottle]
+throttle_scope	Le compteur : quel nom de limite utiliser dans settings.py	"public_api" ou "auth_token"

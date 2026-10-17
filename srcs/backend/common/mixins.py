@@ -1,6 +1,7 @@
 from typing import ClassVar
 
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.throttling import ScopedRateThrottle
 
 
 class PublicApiMixin:
@@ -12,6 +13,9 @@ class PublicApiMixin:
     L'ordre compte : SessionAuthentication reste en premier pour garder
     le 403 (et non 401) sur les requêtes non authentifiées.
 
+    Rate limiting : scope "public_api" (limite définie dans settings.py),
+    un compteur par utilisateur partagé par toutes les vues publiques.
+
     À placer en premier dans les classes parentes de la vue.
     """
 
@@ -19,3 +23,5 @@ class PublicApiMixin:
         SessionAuthentication,
         TokenAuthentication,
     ]
+    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
+    throttle_scope = "public_api"

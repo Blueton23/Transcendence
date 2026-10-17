@@ -136,10 +136,10 @@ REST_FRAMEWORK = {
         "djangorestframework_camel_case.parser.CamelCaseFormParser",
         "djangorestframework_camel_case.parser.CamelCaseMultiPartParser",
     ],
-    # Rate limiting : limites par "scope", appliquées vue par vue avec
+    # Rate limiting : limites par "scope", appliquées vue par vue
     "DEFAULT_THROTTLE_RATES": {
         "public_api": "100/minute",
-        "auth_token": "5/min",
+        "auth_token": "5/minute",
     },
     # 1 proxy (nginx) devant Django : l'IP réelle du client est la dernière (non falsifiable)
     "NUM_PROXIES": 1,
