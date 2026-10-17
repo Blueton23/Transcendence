@@ -1561,17 +1561,63 @@ il ne peut donc pas savoir :
 - ce qu’il recevra en retour, et avec quels codes ;
 - comment s’authentifier et quelles limites s’appliquent.
 
+3 choses sont mises en place :
+
+drf-spectacular :
+drf-spectacular lit le code et GÉNÈRE :
+
+OpenAPI : le « schéma » :
+servi à /api/schema/   (fichier YAML/JSON, pour les machines)
+
+Swagger UI : la page de doc :
+servie à /api/docs/    (page web, pour les humains)
 
 
+OpenApi :
+OpenAPI est un format standard pour décrire une API REST
+C’est un gros fichier JSON ou YAML qui liste toutes les routes, leurs paramètres, leurs bodies, leurs réponses et l’authentification
+
+Swagger UI le lit pour afficher une page de doc ;
+Postman peut l’importer pour créer toutes les requêtes d’un coup ;
+
+Il sera servi à /api/schema/.
 
 
+Swagger UI : la page de doc
+Swagger UI est une page web qui lit le schéma OpenAPI et l’affiche de façon lisible : une section par route, les champs, des exemples, et surtout un bouton « Try it out » pour envoyer de vraies requêtes depuis le navigateur, ainsi qu’un bouton « Authorize » pour coller sa clé API. Elle sera servie à /api/docs/
 
 
+drf-spectacular : le générateur :
 
+drf-spectacular le génère automatiquement en inspectant ton code
+Les urlpatterns
+Les convertisseurs d’URL (<int:travel_id>)
+Les vues génériques (ListCreateAPIView…)
+serializer_class et ses champs
+authentication_classes
+Les docstrings des vues
 
+Installation de drf-spectacular dans requirement
 
+Installer drf_spectacular dansd APPS de setting
+Pourquoi c’est une app Django : drf-spectacular contient des templates, notamment la page HTML de Swagger UI
 
+Mise en place de SPECTACULAR_SETTINGS dans settings
+titre
+description de tous ce qui concerne l api
+Version de notre API v1
 
+### Brancher les routes /api/schema/ et /api/docs/ :
 
+ajout de deux route :
 
+/api/schema/
+SpectacularAPIView
+Le schéma OpenAPI (YAML ou JSON)
+Les machines (Swagger UI, Postman, générateurs de client)
+
+/api/docs/
+SpectacularSwaggerView
+La page Swagger UI (HTML)
+Les humains
 

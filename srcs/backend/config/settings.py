@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "channels",
     "rest_framework.authtoken",
     "rest_framework",
+    "drf_spectacular",
     "common",
     "traveler",
     "travel",
@@ -144,6 +145,23 @@ REST_FRAMEWORK = {
     },
     # 1 proxy (nginx) devant Django : l'IP réelle du client est la dernière (non falsifiable)
     "NUM_PROXIES": 1,
+    # Documentation : drf-spectacular génère le schéma OpenAPI de chaque vue
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Transcendence - API Publique",
+    "DESCRIPTION": (
+        "API publique de Transcendence : voyages, étapes et idées.\n\n"
+        "**Authentification** : obtenir sa clé avec `POST /api/auth/token/` "
+        "(username + password), puis l'envoyer dans le header "
+        "`Authorization: Token <clé>`.\n\n"
+        "**Rate limiting** : 100 requêtes/minute par utilisateur sur l'API, "
+        "5 tentatives/minute par IP sur `/api/auth/token/`. "
+        "Au-delà : `429 Too Many Requests` + header `Retry-After`.\n\n"
+        "**Format** : JSON en camelCase (`startDate`, `endDate`…)."
+    ),
+    "VERSION": "1.0.0",
 }
 
 # Database
