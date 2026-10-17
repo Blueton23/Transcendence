@@ -1488,9 +1488,24 @@ nombre de seconde restante avant expiration
 docker compose exec redis redis-cli -n 1 TTL ":1:test_cle"
 
 #### déclarer les limites dans settings.py :
+DEFAULT_THROTTLE_RATES :
+Déclare le nombre de requete autoriser pour les deux scope
+scope public pour les vue public
+scope auth token pour la génération de clé
 
+ScopedRateThrottle viendra chercher la limite correspondante au scope
 
+Pour limiter tout les vue du site : DEFAULT_THROTTLE_CLASSES serait utilisé
 
+explication NUM_PROXIES :
+Pour Django, la connexion vient de nginx
+
+Pour transmettre la vraie IP, nginx.conf ajoute un header :
+- proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+- Nginx : ajoute l'adresse IP de la connexion à X-Forwarded-For.
+- DRF avec NUM_PROXIES = 1 : sélectionne la dernière adresse du header.
+- Redis : stocke le compteur des tentatives dans cette adresse
 
 
 
