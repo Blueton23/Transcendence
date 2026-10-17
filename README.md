@@ -570,6 +570,7 @@ AuthMiddlewareStack permet de retrouver l’utilisateur associé à la session
 
 ## 6.3 Rôle de Redis :
 Redis est configuré comme couche de communication de Channels, via la bibliothèque channels-redis
+Redis sert de canal de communication entre les workers.
 
 Cette couche permet d’envoyer des messages à des canaux ou à des groupes de canaux. Elle fournit un intermédiaire commun lorsque les consommateurs sont exécutés dans plusieurs processus.
 
@@ -1355,11 +1356,32 @@ test pour creer une idee
      -H "Authorization: Token $TOKEN"
 ```
 
+```
+curl -i -X DELETE http://localhost:8080/api/travels/<TRAVEL_ID>/ideas/<IDEA_ID>/ \
+  -H "Authorization: Token $TOKEN"
+```
 
 
+recap des api public
 
-
-
+POST	/api/auth/token/	200	400, 401
+GET	/api/travels/	200	403
+POST	/api/travels/	201	400, 403
+GET	/api/travels/{id}/	200	403, 404
+PUT	/api/travels/{id}/	200	400, 403, 404
+PATCH	/api/travels/{id}/	200	400, 403, 404
+GET	/api/travels/{travel_id}/steps/	200	403
+POST	/api/travels/{travel_id}/steps/	201	400, 403
+GET	/api/travels/{travel_id}/steps/{id}/	200	403, 404
+PUT	/api/travels/{travel_id}/steps/{id}/	200	400, 403, 404
+PATCH	/api/travels/{travel_id}/steps/{id}/	200	400, 403, 404
+DELETE	/api/travels/{travel_id}/steps/{id}/	204 (soft delete)	403, 404
+GET	/api/travels/{travel_id}/ideas/	200	403
+POST	/api/travels/{travel_id}/ideas/	201	400, 403
+GET	/api/travels/{travel_id}/ideas/{id}/	200	403, 404
+PUT	/api/travels/{travel_id}/ideas/{id}/	200	400, 403, 404
+PATCH	/api/travels/{travel_id}/ideas/{id}/	200	400, 403, 404
+DELETE	/api/travels/{travel_id}/ideas/{id}/	204 (définitif)	403, 404
 
 
 
@@ -1370,3 +1392,106 @@ Bons identifiants	200	{"token": "..."}
 Mauvais identifiants ou compte désactivé	401	{"detail": "Identifiants invalides."}
 Champ manquant	400	enveloppe {status, code, message, details}
 Autre verbe que POST	405	enveloppe, avec le header Allow: POST, OPTIONS
+
+
+#### rate limiting :
+Limiter le nombre de requêtes qu’un client peut faire dans une période donnée, par exemple 100 requêtes par minute. Au-delà, le serveur refuse, sans même exécuter la vue, jusqu’à ce que la période soit passée.
+
+Le rate limiting est indispensable et protège contre le brute-force, 
+sans limite, un script peut tester des milliers de mots de passe par minute sur POST /api/auth/token/
+
+toutes les vues publiques partagent un seul compteur
+
+Ce que reçoit un client bloqué :
+Un code 429 Too Many Requests, avec un header Retry-After qui donne le nombre de secondes à attendre
+
+l’exception s’appelle Throttled, dépassement de limite
+
+Sur ApiTokenView (AllowAny), chaque tentative est comptée, bonne ou mauvaise
+
+Comment DRF reconnaît le client :
+- Utilisateur connecté (session ou clé) → par son id. La limite suit donc la personne, quel que soit l’ordinateur ou le réseau.
+- Anonyme → par son adresse IP. C’est le cas sur ApiTokenView, où personne n’est encore identifié.
+
+Où sont stockés les compteurs : le cache:
+
+DRF garde pour chaque client la liste des heures de ses dernières requêtes, sous une clé du type throttle_public_api_12
+
+À chaque requête :$
+- retire les heures plus vieilles que la période (par exemple plus d’une minute) ;
+- compte ce qui reste : si on a atteint la limite, il répond 429 ;
+- sinon, il ajoute l’heure actuelle et laisse passer.
+
+Cette liste est rangée dans le cache Django
+
+Les classes de DRF :
+Classe	Principe
+AnonRateThrottle	Une limite pour tous les anonymes (par IP)
+UserRateThrottle	Une limite pour tous les utilisateurs connectés (par id)
+ScopedRateThrottle	Une limite par « scope » (un nom qu’on donne à un groupe de vues)
+
+#### Brancher le cache Django sur Redis :
+
+Redis est fait pour :
+- partagé : tous les workers lisent et écrivent au même endroit, donc il y a un seul compteur par client ;
+- expiration automatique : chaque clé peut avoir une durée de vie, et les compteurs disparaissent tout seuls ;
+- rapide : tout est en mémoire, la vérification ne ralentit pas les requêtes ;
+
+Redis comme cache partagé
+Ici, Redis sert de stockage temporaire partagé pour le compteur de limite
+Evite que chaque worker a son propre cache donc 4 fois plus de limite
+
+
+```
+Worker 1 ──┐
+Worker 2 ──┤
+Worker 3 ──┼──> Redis (compteur = 8/10)
+Worker 4 ──┘
+```
+
+Un worker ne correspond pas à un utilisateur.
+Un worker est un processus capable de traiter les requêtes de plusieurs utilisateurs.
+ils existent déjà et sont partagés entre tous les utilisateurs.
+
+```
+             Utilisateur 1
+                  │
+          Plusieurs requêtes
+                  │
+          ┌───────┴───────┐
+          │               │
+      GET /ideas      POST /ideas
+          │               │
+      Worker 1        Worker 3
+          │               │
+        Django          Django
+```
+
+"BACKEND": "django.core.cache.backends.redis.RedisCache"
+Le moteur de cache, ici Redis, fourni par Django
+
+ajout de redis dans requirement, pour separer redis_cache et redis_channel
+
+
+Controler que le cache fonctionne :
+
+make shell
+
+from django.core.cache import cache
+cache.set("test_cle", "bonjour", 100)
+cache.get("test_cle")
+
+voir la cle dans le cache
+docker compose exec redis redis-cli -n 1 KEYS '*'
+
+nombre de seconde restante avant expiration
+docker compose exec redis redis-cli -n 1 TTL ":1:test_cle"
+
+#### déclarer les limites dans settings.py :
+
+
+
+
+
+
+
