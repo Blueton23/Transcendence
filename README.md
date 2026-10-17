@@ -1516,3 +1516,7 @@ Les deux attributs à poser sur une vue
 Attribut	Rôle	Valeur
 throttle_classes	Le mécanisme : comment compter	[ScopedRateThrottle]
 throttle_scope	Le compteur : quel nom de limite utiliser dans settings.py	"public_api" ou "auth_token"
+
+
+dans traveler/views : ApiTokenView
+- ajout du rate limite pour les requete des cle api

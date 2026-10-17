@@ -17,6 +17,7 @@ from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .models import Friendship, Status
@@ -207,6 +208,8 @@ class ApiTokenView(APIView):
     authentication_classes: ClassVar[list] = []
     # autorise tout le monde à appeler la route. La sécurité vient du mot de passe vérifié juste après
     permission_classes: ClassVar[list] = [AllowAny]
+    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
+    throttle_scope = "auth_token"
 
     # valider les données entrantes, is_valid =  true si erreur
     def post(self, request: Request) -> Response:
