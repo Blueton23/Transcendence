@@ -108,6 +108,7 @@ CHANNEL_LAYERS = {
 }
 
 # Cache Django : stocke les compteurs du rate limiting (DRF throttling).
+# Redis base no.1, séparée de la no.0 utilisée par Channels.
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",

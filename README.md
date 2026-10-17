@@ -1520,3 +1520,58 @@ throttle_scope	Le compteur : quel nom de limite utiliser dans settings.py	"publi
 
 dans traveler/views : ApiTokenView
 - ajout du rate limite pour les requete des cle api
+
+
+
+test curl :
+
+
+
+docker compose exec redis redis-cli -n 1 KEYS '*throttle*'
+docker compose exec redis redis-cli -n 1 TTL ":1:throttle_auth_token_172.18.0.1"
+
+
+test pour num_proxies :
+curl -i -X POST http://localhost:8080/api/auth/token/ \
+  -H "Content-Type: application/json" \
+  -H "X-Forwarded-For: 10.0.0.$i" \                 autre adresse ip
+  -d '{"username": "jean", "password": "mauvais"}'
+
+
+  Récapitulatif de l’étape 3 (pour tes notes)
+Ce qui a été ajouté
+Fichier	Changement	Rôle
+config/settings.py	CACHES → Redis base n°1	Compteurs partagés entre workers, expiration automatique
+config/settings.py	DEFAULT_THROTTLE_RATES	public_api : 100/minute, auth_token : 5/minute
+config/settings.py	NUM_PROXIES: 1	Vraie IP derrière nginx, header X-Forwarded-For non falsifiable
+common/mixins.py	throttle_classes + throttle_scope = "public_api"	Limite toutes les vues publiques d’un coup
+traveler/views.py	throttle_classes + throttle_scope = "auth_token"	Bloque le brute-force sur la route de la clé
+Le comportement
+Scope	Limite	Compté par	Appliqué à
+auth_token	5 / minute	IP (client anonyme)	POST /api/auth/token/
+public_api	100 / minute	id de l’utilisateur	les 17 routes travels, steps, ideas
+(aucun)	pas de limite	—	le reste du site (profil, amis…)
+
+### la documentation (drf-spectacular + Swagger) :
+une doc est indispensable pour une API publique, car un client externe n'a pas accès au code
+
+il ne peut donc pas savoir :
+- quelles routes existent, et avec quels verbes (GET, POST…) ;
+- quels champs envoyer, de quel type et lesquels sont obligatoires ;
+- ce qu’il recevra en retour, et avec quels codes ;
+- comment s’authentifier et quelles limites s’appliquent.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
