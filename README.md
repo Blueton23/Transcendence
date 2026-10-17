@@ -1611,6 +1611,8 @@ Version de notre API v1
 
 ajout de deux route :
 
+Les views sont fournis par par drf-spectacular
+
 /api/schema/
 SpectacularAPIView
 Le schéma OpenAPI (YAML ou JSON)
@@ -1620,4 +1622,14 @@ Les machines (Swagger UI, Postman, générateurs de client)
 SpectacularSwaggerView
 La page Swagger UI (HTML)
 Les humains
+
+en plaçant la doc avant les include, on garantit qu’aucune route ajoutée plus tard dans une app ne pourra la masquer.
+
+curl -i http://localhost:8080/api/schema/ | head -12
+
+
+version json
+curl -s "http://localhost:8080/api/schema/?format=json" | python3 -m json.tool | head -20
+
+
 
