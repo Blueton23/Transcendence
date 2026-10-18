@@ -210,9 +210,10 @@ class ApiTokenView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
     throttle_classes: ClassVar[list] = [ScopedRateThrottle]
     throttle_scope = "auth_token"
+    # Affichée dans la doc Swagger (filtre : common/schema.py)
     public_api = True
 
-    # valider les données entrantes, is_valid =  true si erreur
+    # Valide le body ; si un champ manque → erreur levée → 400 automatique
     def post(self, request: Request) -> Response:
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -224,7 +225,7 @@ class ApiTokenView(APIView):
             password=serializer.validated_data["password"],
         )
 
-        # Si le traveler n existe pas
+        # Identifiants invalides (username inconnu, mauvais mot de passe ou compte désactivé)
         if traveler is None:
             return Response(
                 {"detail": "Identifiants invalides."},

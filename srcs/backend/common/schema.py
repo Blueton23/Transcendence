@@ -1,4 +1,4 @@
-def public_endpoints_only(endpoints: list[tuple], *kwargs: object) -> list[tuple]:
+def public_endpoints_only(endpoints: list[tuple], **kwargs: object) -> list[tuple]:
     """Hook drf-spectacular : ne garde dans la doc que les vues de l'API publique.
 
     Une vue est publique si elle déclare `public_api = True`

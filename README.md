@@ -1655,7 +1655,7 @@ Cette fonction sert à filtrer les endpoints de ton API pour que drf-spectacular
 
 - Liste des endpoints découverts par drf-spectacular.
 - Indique que endpoints est une liste contenant des tuples. (tuples = liste d élément non modifiable)
-- Accepte des arguments nommés supplémentaires.
+- Accepte des arguments nommés supplémentaires. (exemple si la fonction endpoint de drf change ca casse pas)
 - Indique que la fonction retourne une liste de tuples.
 
 Cela préprare la liste de ce que ca doit envoyer
@@ -1698,6 +1698,11 @@ drf-spectacular découvre les endpoints
 Ajout de la fonction public_endpoints_only dans settings SPECTACULAR_SETTINGS
 
 
+@extend_schema :
+drf-spectacular fournit @extend_schema pour décrire à la main ce qu’il ne peut pas deviner. C’est purement de la documentation : le comportement de la vue ne change pas d’une ligne.
+car ApiTokenView est une vue sans serializer
+
+Aucune donnee complexe a transformer donc pas de serializer
 
 
 
@@ -1708,10 +1713,21 @@ Ajout de la fonction public_endpoints_only dans settings SPECTACULAR_SETTINGS
 
 
 
-@extend_schema
+
+
+
+
+
+
+
+
+
 
 
 https://www.docstring.fr/blog/creer-une-api-rest-avec-django-rest-framework/#documentation-automatique-de-lapi
 
 https://www.pygab.dev/blog/de-lapi-a-la-doc-un-guide-pratique-avec-drf-spectacular/
 
+https://drf-spectacular.readthedocs.io/en/latest/customization.html#step-7-preprocessing-hooks
+
+https://drf-spectacular.readthedocs.io/en/latest/customization.html#step-2-extend-schema
