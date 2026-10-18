@@ -22,6 +22,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .models import Friendship, Status
+from .schema import traveler_auth_schema
 from .serializers import (
     LoginSerializer,
     TravelerCreateSerializer,
@@ -199,12 +200,8 @@ class LoginView(APIView):
         )
 
 
+@traveler_auth_schema
 class ApiTokenView(APIView):
-    """Echange ton username + password contre la clé API.
-
-    La clé s'envoie ensuite dans le header : `Authorization: Token <clé>`.
-    """
-
     # la personne n’a pas encore de clé, c’est justement ce qu’elle vient chercher. Elle prouve son identité avec le mot de passe dans le body, pas avec une session.
     authentication_classes: ClassVar[list] = []
     # autorise tout le monde à appeler la route. La sécurité vient du mot de passe vérifié juste après

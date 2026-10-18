@@ -153,13 +153,15 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Transcendence - API Publique",
     "DESCRIPTION": (
         "API publique de Transcendence : voyages, étapes et idées.\n\n"
-        "**Authentification** : obtenir sa clé avec `POST /api/auth/token/` "
-        "(username + password), puis l'envoyer dans le header "
-        "`Authorization: Token <clé>`.\n\n"
-        "**Rate limiting** : 100 requêtes/minute par utilisateur sur l'API, "
-        "5 tentatives/minute par IP sur `/api/auth/token/`. "
-        "Au-delà : `429 Too Many Requests` + header `Retry-After`.\n\n"
-        "**Format** : JSON en camelCase (`startDate`, `endDate`…)."
+        "**Authentification** : \n\n"
+        "- Obtenir sa clé avec `POST /api/auth/token/`. \n\n"
+        "- Envoyer dans le header `Authorization: Token <clé>`.\n\n"
+        "**Rate limiting** : \n\n"
+        "- 100 requêtes/minute par utilisateur sur l'API. \n\n"
+        "- 5 requêtes/minute par IP sur `/api/auth/token/`. \n\n"
+        "- Dépassement : `429 Too Many Requests` + header `Retry-After`.\n\n"
+        "**Format** : \n\n"
+        "- JSON en camelCase."
     ),
     "VERSION": "1.0.0",
     # Ne documente que les vues marquées public_api = True
