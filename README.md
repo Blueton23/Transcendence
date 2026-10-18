@@ -1729,6 +1729,7 @@ dans les serializer de idea et travel, ceux en methodfield, ajout de la vrai sor
 
 
 
+
 https://www.docstring.fr/blog/creer-une-api-rest-avec-django-rest-framework/#documentation-automatique-de-lapi
 
 https://www.pygab.dev/blog/de-lapi-a-la-doc-un-guide-pratique-avec-drf-spectacular/

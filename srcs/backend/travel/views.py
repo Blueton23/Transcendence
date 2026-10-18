@@ -43,6 +43,7 @@ class TravelJoinView(APIView):
         )
         return Response(TravelSerializer(travel).data)
 
+
 @extend_schema(tags=["Travels list"])
 class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
     queryset = Travel.objects.all()
@@ -57,10 +58,12 @@ class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
                 status=ParticipationStatus.ACCEPTED,
             )
 
+
 @extend_schema(tags=["Travel detail"])
 class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
+
 
 @extend_schema(tags=["Steps list"])
 class StepListView(PublicApiMixin, ListCreateAPIView):
@@ -73,6 +76,7 @@ class StepListView(PublicApiMixin, ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(travel_id=self.kwargs["travel_id"])
+
 
 @extend_schema(tags=["Step detail"])
 class StepDetailView(
