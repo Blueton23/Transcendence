@@ -13,7 +13,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.middleware.csrf import get_token
 from drf_spectacular.utils import extend_schema
-from rest_framework import serializers, status
+from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request

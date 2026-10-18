@@ -2,19 +2,22 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 ideas_list_schema = extend_schema_view(
     get=extend_schema(
-        summary="Liste les idées.",
-        description="Récupère la liste des idées du voyage auxquels l'utilisateur a accès.",
+        summary="Liste les idées d'un voyage.",
+        description=(
+            "Récupère les idées du voyage, avec leur nombre de votes (`voteCount`) "
+            "et si l'utilisateur a voté (`voted`)."
+        ),
     ),
     post=extend_schema(
         summary="Créer une idée.",
-        description="Créer une nouvelle idée.",
+        description=("Créer une nouvelle idée.l'utilisateur en devient l'auteur."),
     ),
 )
 
 idea_detail_schema = extend_schema_view(
     get=extend_schema(
         summary="Consulter une idée.",
-        description="Récupère les informations détaillées d'une idée accessible à l'utilisateur.",
+        description="Récupère le détail d'une idée du voyage.",
     ),
     put=extend_schema(
         summary="Remplacer une idée.",
@@ -26,6 +29,6 @@ idea_detail_schema = extend_schema_view(
     ),
     delete=extend_schema(
         summary="Supprime une idée.",
-        description="Supprime une idée auxquels l'utilisateur a accès.",
+        description="Suppression définitive de l'idée et de ses votes.",
     ),
 )

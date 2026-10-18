@@ -27,7 +27,7 @@ from .schema import idea_detail_schema, ideas_list_schema
 
 
 # Liste plusieurs objets (GET, POST)
-@extend_schema(tags=["Ideas list"])
+@extend_schema(tags=["Ideas"])
 @ideas_list_schema
 class IdeaListView(PublicApiMixin, ListCreateAPIView):
     queryset = Idea.objects.all()
@@ -62,7 +62,7 @@ class IdeaListView(PublicApiMixin, ListCreateAPIView):
 
 
 # Récupérer un seul objet (GET, PATCH, PUT, DELETE)
-@extend_schema(tags=["Idea detail"])
+@extend_schema(tags=["Ideas"])
 @idea_detail_schema
 class IdeaDetailView(
     PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView

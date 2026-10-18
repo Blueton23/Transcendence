@@ -26,5 +26,5 @@ api_token_schema = extend_schema_view(
             401: OpenApiResponse(description="Identifiants invalides."),
             429: OpenApiResponse(description="Trop de tentatives (5/minute par IP)."),
         },
-    ),
+    )
 )
