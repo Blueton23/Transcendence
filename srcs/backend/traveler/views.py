@@ -210,6 +210,7 @@ class ApiTokenView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
     throttle_classes: ClassVar[list] = [ScopedRateThrottle]
     throttle_scope = "auth_token"
+    public_api = True
 
     # valider les données entrantes, is_valid =  true si erreur
     def post(self, request: Request) -> Response:

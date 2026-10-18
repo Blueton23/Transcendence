@@ -1632,4 +1632,66 @@ version json
 curl -s "http://localhost:8080/api/schema/?format=json" | python3 -m json.tool | head -20
 
 
+voir combien de route sont public
+
+curl -s "http://localhost:8080/api/schema/?format=json" \
+  | python3 -c "import sys, json; d = json.load(sys.stdin); print(len(d['paths'])); print('\n'.join(d['paths']))"
+
+#### n’afficher que les routes publiques
+
+Pour afficher que les route publique on met en place un hook
+Pour filtrer les routes, on utilise un hook de preprocessing -> appeler avant d'analyser les vue
+
+Comment reconnaître une vue publique : un marqueur public_api = True
+
+le public_api est ajouter dans common/mixins.py et traveler/view dans ApiTokenView
+
+Pour rendre une vue publique dans la doc, il suffit d’écrire public_api = True (ou d’utiliser le mixin).
+
+Mise en place d'un filtre endpoint :
+
+Creer dans common/schema
+Cette fonction sert à filtrer les endpoints de ton API pour que drf-spectacular affiche uniquement ceux que tu as déclarés publics dans la documentation OpenAPI/Swagger.
+
+- Liste des endpoints découverts par drf-spectacular.
+- Indique que endpoints est une liste contenant des tuples. (tuples = liste d élément non modifiable)
+- Accepte des arguments nommés supplémentaires.
+- Indique que la fonction retourne une liste de tuples.
+
+Cela préprare la liste de ce que ca doit envoyer
+- url
+- et la method, get, post etc
+
+Dans la boucle for on parcout la liste et reparti les valeurs trouver
+
+la partie getattr :
+- Récupère la classe correspondant à la vue. (exemple : TravelListView)
+- Vérifie si cette classe possède l'attribut public_api.
+- Si cet attribut vaut : True, lors la condition est vraie et l'endpoint est conservé. sinon ignoré
+
+```
+drf-spectacular découvre les endpoints
+                  |
+                  v
+        Parcourt chaque endpoint
+                  |
+                  v
+      Récupère la classe de la vue
+              callback.cls
+                  |
+                  v
+     Recherche l'attribut public_api
+                  |
+          +-------+-------+
+          |               |
+          v               v
+     public_api=True    False ou absent
+          |               |
+          v               v
+      Conserver         Ignorer
+          |               |
+          v               |
+   Documentation          |
+       OpenAPI             |
+```
 

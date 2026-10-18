@@ -25,3 +25,4 @@ class PublicApiMixin:
     ]
     throttle_classes: ClassVar[list] = [ScopedRateThrottle]
     throttle_scope = "public_api"
+    public_api = True
