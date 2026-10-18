@@ -3,6 +3,7 @@ from typing import ClassVar
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -42,7 +43,7 @@ class TravelJoinView(APIView):
         )
         return Response(TravelSerializer(travel).data)
 
-
+@extend_schema(tags=["Travels list"])
 class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
@@ -56,12 +57,12 @@ class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
                 status=ParticipationStatus.ACCEPTED,
             )
 
-
+@extend_schema(tags=["Travel detail"])
 class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
-
+@extend_schema(tags=["Steps list"])
 class StepListView(PublicApiMixin, ListCreateAPIView):
     queryset = Step.objects.alive()
     serializer_class = StepSerializer
@@ -73,7 +74,7 @@ class StepListView(PublicApiMixin, ListCreateAPIView):
     def perform_create(self, serializer):
         serializer.save(travel_id=self.kwargs["travel_id"])
 
-
+@extend_schema(tags=["Step detail"])
 class StepDetailView(
     PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
 ):

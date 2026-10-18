@@ -215,7 +215,7 @@ class ApiTokenView(APIView):
     public_api = True
 
     @extend_schema(
-        tags=["auth"],
+        tags=["auth token"],
         request=LoginSerializer,
         responses={
             200: inline_serializer(

@@ -1710,6 +1710,7 @@ Sert uniquement pour la doc
 dans la doc le schema est mis en place
 
 
+dans les serializer de idea et travel, ceux en methodfield, ajout de la vrai sortie calculuer pour la doc
 
 
 

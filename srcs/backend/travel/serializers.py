@@ -33,10 +33,10 @@ class TravelSerializer(serializers.ModelSerializer):
     travelers = serializers.SerializerMethodField()
     nights = serializers.SerializerMethodField()
 
-    def get_status(self, obj):
+    def get_status(self, obj) -> str:
         return "current" if obj.status == "c" else "finished"
 
-    def get_travelers(self, obj):
+    def get_travelers(self, obj) -> list[dict]:
         accepted = obj.participations.filter(status=ParticipationStatus.ACCEPTED)
         return [
             {
@@ -47,7 +47,7 @@ class TravelSerializer(serializers.ModelSerializer):
             for participation in accepted
         ]
 
-    def get_nights(self, obj):
+    def get_nights(self, obj) -> int:
         return (obj.end_date - obj.start_date).days
 
     def validate(self, attrs):
@@ -82,10 +82,10 @@ class StepSerializer(serializers.ModelSerializer):
     idea_count = serializers.SerializerMethodField()
     travel_id = serializers.IntegerField(read_only=True)
 
-    def get_nights(self, obj):
+    def get_nights(self, obj) -> int:
         return (obj.end_date - obj.start_date).days
 
-    def get_idea_count(self, obj):
+    def get_idea_count(self, obj) -> int:
         return obj.ideas.count()
 
     def validate(self, attrs):

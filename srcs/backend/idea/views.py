@@ -4,6 +4,7 @@ from django.db import transaction
 from django.db.models import Count, Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import (
     GenericAPIView,
@@ -24,6 +25,7 @@ from travel.permissions import IsTravelParticipant
 
 
 # Liste plusieurs objets (GET, POST)
+@extend_schema(tags=["Ideas list"])
 class IdeaListView(PublicApiMixin, ListCreateAPIView):
     queryset = Idea.objects.all()
     serializer_class = IdeaSerializer
@@ -57,6 +59,7 @@ class IdeaListView(PublicApiMixin, ListCreateAPIView):
 
 
 # Récupérer un seul objet (GET, PATCH, PUT, DELETE)
+@extend_schema(tags=["Idea detail"])
 class IdeaDetailView(
     PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
 ):
