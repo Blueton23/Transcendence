@@ -162,6 +162,8 @@ SPECTACULAR_SETTINGS = {
         "**Format** : JSON en camelCase (`startDate`, `endDate`…)."
     ),
     "VERSION": "1.0.0",
+    # Ne documente que les vues marquées public_api = True
+    "PREPROCESSING_HOOKS": ["common.schema.public_endpoints_only"],
 }
 
 # Database

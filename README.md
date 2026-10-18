@@ -1695,3 +1695,23 @@ drf-spectacular découvre les endpoints
        OpenAPI             |
 ```
 
+Ajout de la fonction public_endpoints_only dans settings SPECTACULAR_SETTINGS
+
+
+
+
+
+
+
+
+
+
+
+
+@extend_schema
+
+
+https://www.docstring.fr/blog/creer-une-api-rest-avec-django-rest-framework/#documentation-automatique-de-lapi
+
+https://www.pygab.dev/blog/de-lapi-a-la-doc-un-guide-pratique-avec-drf-spectacular/
+
