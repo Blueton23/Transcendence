@@ -1704,6 +1704,10 @@ car ApiTokenView est une vue sans serializer
 
 Aucune donnee complexe a transformer donc pas de serializer
 
+ajout de ceci dans traveler view apitokenview
+Sert uniquement pour la doc
+
+dans la doc le schema est mis en place
 
 
 
@@ -1731,3 +1735,5 @@ https://www.pygab.dev/blog/de-lapi-a-la-doc-un-guide-pratique-avec-drf-spectacul
 https://drf-spectacular.readthedocs.io/en/latest/customization.html#step-7-preprocessing-hooks
 
 https://drf-spectacular.readthedocs.io/en/latest/customization.html#step-2-extend-schema
+
+https://drf-spectacular.readthedocs.io/en/stable/drf_spectacular.html#drf_spectacular.utils.extend_schema

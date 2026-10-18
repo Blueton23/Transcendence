@@ -12,7 +12,8 @@ from django.contrib.auth import (
 from django.db import IntegrityError
 from django.db.models import Q
 from django.middleware.csrf import get_token
-from rest_framework import status
+from drf_spectacular.utils import OpenApiResponse, extend_schema, inline_serializer
+from rest_framework import serializers, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
@@ -212,6 +213,20 @@ class ApiTokenView(APIView):
     throttle_scope = "auth_token"
     # Affichée dans la doc Swagger (filtre : common/schema.py)
     public_api = True
+
+    @extend_schema(
+        tags=["auth"],
+        request=LoginSerializer,
+        responses={
+            200: inline_serializer(
+                name="ApiToken",
+                fields={"token": serializers.CharField()},
+            ),
+            400: OpenApiResponse(description="Champ manquant dans le body."),
+            401: OpenApiResponse(description="Identifiants invalides."),
+            429: OpenApiResponse(description="Trop de tentatives (5/minute par IP)."),
+        },
+    )
 
     # Valide le body ; si un champ manque → erreur levée → 400 automatique
     def post(self, request: Request) -> Response:
