@@ -161,7 +161,12 @@ SPECTACULAR_SETTINGS = {
         "- 5 requêtes/minute par IP sur `/api/auth/token/`. \n\n"
         "- Dépassement : `429 Too Many Requests` + header `Retry-After`.\n\n"
         "**Format** : \n\n"
-        "- JSON en camelCase."
+        "- JSON en camelCase. \n\n"
+        "**Erreurs** : \n\n"
+        "- `400` données invalides \n\n"
+        "- `403` non authentifié ou accès refusé \n\n"
+        "- `404` introuvable \n\n"
+        "- Format : `{status, code, message, details}`."
     ),
     "VERSION": "1.0.0",
     # Ne documente que les vues marquées public_api = True

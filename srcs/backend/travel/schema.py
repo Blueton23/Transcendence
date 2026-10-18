@@ -8,7 +8,7 @@ travels_list_schema = extend_schema_view(
     post=extend_schema(
         summary="Créer un voyage",
         description=(
-            "Crée un nouveau voyage"
+            "Crée un nouveau voyage. \n\n"
             "L'utilisateur qui le crée en devient automatiquement participant."
         ),
     ),
@@ -31,13 +31,13 @@ travel_detail_schema = extend_schema_view(
 
 steps_list_schema = extend_schema_view(
     get=extend_schema(
-        summary="Liste des étapes d'un voyage.",
+        summary="Liste des étapes d'un voyage",
         description="Récupère les étapes du voyage.",
     ),
     post=extend_schema(
         summary="Créer une étape",
         description=(
-            "Crée une nouvelle étape."
+            "Crée une nouvelle étape. \n\n"
             "Les dates doivent être comprises dans celles du voyage et ne pas chevaucher une autre étape."
         ),
     ),
