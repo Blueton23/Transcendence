@@ -19,6 +19,12 @@ from common.mixins import PublicApiMixin
 from .mixins import ParticipantScopedMixin
 from .models import Participation, ParticipationStatus, Step, Travel
 from .permissions import IsTravelParticipant
+from .schema import (
+    step_detail_schema,
+    steps_list_schema,
+    travel_detail_schema,
+    travels_list_schema,
+)
 from .serializers import StepSerializer, TravelSerializer
 
 
@@ -45,6 +51,7 @@ class TravelJoinView(APIView):
 
 
 @extend_schema(tags=["Travels list"])
+@travels_list_schema
 class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
@@ -60,12 +67,14 @@ class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
 
 
 @extend_schema(tags=["Travel detail"])
+@travel_detail_schema
 class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
 
 @extend_schema(tags=["Steps list"])
+@steps_list_schema
 class StepListView(PublicApiMixin, ListCreateAPIView):
     queryset = Step.objects.alive()
     serializer_class = StepSerializer
@@ -79,6 +88,7 @@ class StepListView(PublicApiMixin, ListCreateAPIView):
 
 
 @extend_schema(tags=["Step detail"])
+@step_detail_schema
 class StepDetailView(
     PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
 ):
