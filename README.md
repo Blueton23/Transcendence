@@ -1712,6 +1712,8 @@ dans la doc le schema est mis en place
 
 dans les serializer de idea et travel, ceux en methodfield, ajout de la vrai sortie calculuer pour la doc
 
+ajout des fichier schema dans les model ou les vue sont public
+permet de mettre en place la doc pour swagger
 
 
 

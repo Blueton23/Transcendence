@@ -21,11 +21,14 @@ from travel.mixins import ParticipantScopedMixin
 from travel.models import Step
 from travel.permissions import IsTravelParticipant
 
+from .schema import idea_detail_schema, ideas_list_schema
+
 # ---Idea---#
 
 
 # Liste plusieurs objets (GET, POST)
 @extend_schema(tags=["Ideas list"])
+@ideas_list_schema
 class IdeaListView(PublicApiMixin, ListCreateAPIView):
     queryset = Idea.objects.all()
     serializer_class = IdeaSerializer
@@ -60,6 +63,7 @@ class IdeaListView(PublicApiMixin, ListCreateAPIView):
 
 # Récupérer un seul objet (GET, PATCH, PUT, DELETE)
 @extend_schema(tags=["Idea detail"])
+@idea_detail_schema
 class IdeaDetailView(
     PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
 ):
