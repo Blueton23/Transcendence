@@ -164,6 +164,11 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     # Ne documente que les vues marquées public_api = True
     "PREPROCESSING_HOOKS": ["common.schema.public_endpoints_only"],
+    # Le schéma affiche les champs en camelCase, comme l'API réelle
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields",
+    ],
 }
 
 # Database
