@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 ideas_list_schema = extend_schema_view(
     get=extend_schema(
-        summary="Liste les idées d'un voyage",
+        summary="Lister les idées d'un voyage",
         description=(
             "Récupère les idées du voyage, avec leur nombre de votes (`voteCount`) "
             "et si l'utilisateur a voté (`voted`)."
@@ -28,7 +28,7 @@ idea_detail_schema = extend_schema_view(
         description="Modifie partiellement les données d'une idée.",
     ),
     delete=extend_schema(
-        summary="Supprime une idée",
+        summary="Supprimer une idée",
         description="Suppression définitive de l'idée et de ses votes.",
     ),
 )

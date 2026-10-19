@@ -1741,3 +1741,9 @@ https://drf-spectacular.readthedocs.io/en/latest/customization.html#step-7-prepr
 https://drf-spectacular.readthedocs.io/en/latest/customization.html#step-2-extend-schema
 
 https://drf-spectacular.readthedocs.io/en/stable/drf_spectacular.html#drf_spectacular.utils.extend_schema
+
+
+
+ajout de test dans common pour utiliser la cle
+
+et test dans traveler pour l obtenir

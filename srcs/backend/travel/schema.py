@@ -2,7 +2,7 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 
 travels_list_schema = extend_schema_view(
     get=extend_schema(
-        summary="Liste mes voyages",
+        summary="Lister mes voyages",
         description="Récupère les voyages dont l'utilisateur est participant.",
     ),
     post=extend_schema(
@@ -31,7 +31,7 @@ travel_detail_schema = extend_schema_view(
 
 steps_list_schema = extend_schema_view(
     get=extend_schema(
-        summary="Liste des étapes d'un voyage",
+        summary="Lister des étapes d'un voyage",
         description="Récupère les étapes du voyage.",
     ),
     post=extend_schema(

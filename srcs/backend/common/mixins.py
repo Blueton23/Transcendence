@@ -14,4 +14,5 @@ class PublicApiMixin:
     # Rate limiting : scope "public_api" (limite définie dans settings.py)
     throttle_classes: ClassVar[list] = [ScopedRateThrottle]
     throttle_scope = "public_api"
+    # Affichée dans la doc Swagger (filtre : common/schema.py)
     public_api = True

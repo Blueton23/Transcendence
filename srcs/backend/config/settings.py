@@ -166,6 +166,7 @@ SPECTACULAR_SETTINGS = {
         "- `400` données invalides \n\n"
         "- `403` non authentifié ou accès refusé \n\n"
         "- `404` introuvable \n\n"
+        "- `429` trop de requêtes \n\n"
         "- Format : `{status, code, message, details}`."
     ),
     "VERSION": "1.0.0",
