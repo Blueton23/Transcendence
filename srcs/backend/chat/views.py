@@ -1,5 +1,4 @@
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -87,18 +86,7 @@ class TravelUnreadCountView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, travel_id):
-        print("Utilisateur connecté :", request.user.pk)
-        print("Voyage demandé :", travel_id)
 
-        print(
-            "Participations de cet utilisateur :",
-            list(
-                Participation.objects.filter(
-                    traveler=request.user,
-                    travel_id=travel_id,
-                ).values("id", "status", "travel_id")
-            ),
-        )
         participation = Participation.objects.filter(
             travel_id=travel_id,
             traveler=request.user,
@@ -139,7 +127,6 @@ class TravelMarkReadView(APIView):
                 status=403,
             )
 
-        participation.last_read_at = timezone.now()
-        participation.save(update_fields=["last_read_at"])
+        participation.mark_read()
 
         return Response({"success": True})

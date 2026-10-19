@@ -51,7 +51,7 @@ function getTripNavItems(
   ];
 }
 
-
+//SDU : possible de faire un fonction generique par la suite?
 function useUnreadCount(tripId: string): number {
   const [unreadCount, setUnreadCount] = useState(0);
 
