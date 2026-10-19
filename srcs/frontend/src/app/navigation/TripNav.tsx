@@ -1,3 +1,5 @@
+
+import { useEffect, useState } from "react";
 import NavPill, { NavPillMobile } from "./NavPill";
 import IconBadge from "../../shared/ui/IconBadge";
 import Text from "../../shared/ui/Text";
@@ -5,6 +7,7 @@ import Icon from "../../shared/ui/Icon";
 import Divider from "../../shared/ui/Divider";
 import { Link } from "react-router";
 import type { IconName } from "../../shared/ui/Icon";
+import { getUnreadCount } from "@/features/chat/api/chatApi";
 
 interface TripNavProps {
   tripId: string;
@@ -21,7 +24,10 @@ interface TripNavItem {
 // - "ideas" : nombre d'idées à placer (Idea sans step) calculable à partir des idées
 // - "chat"  : messages NON LUS --> nécessite un LastMessageReadAt par participation côté backend.
 // TODO(backend): brancher ces compteurs sur les vraies données.
-function getTripNavItems(tripId: string): TripNavItem[] {
+function getTripNavItems(
+  tripId: string,
+  unreadCount: number,
+): TripNavItem[] {
   return [
     { to: `/trip/${tripId}/itinerary`, iconName: "route", label: "Itinéraire" },
     {
@@ -35,7 +41,7 @@ function getTripNavItems(tripId: string): TripNavItem[] {
       to: `/trip/${tripId}/chat`,
       iconName: "chat",
       label: "Discussion",
-      badgeCount: 3,
+      badgeCount: unreadCount,
     },
     {
       to: `/trip/${tripId}/assistant`,
@@ -45,8 +51,31 @@ function getTripNavItems(tripId: string): TripNavItem[] {
   ];
 }
 
+
+function useUnreadCount(tripId: string): number {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchUnreadCount() {
+      try {
+        const result = await getUnreadCount(Number(tripId));
+        setUnreadCount(result.unreadCount);
+      } catch (error) {
+        console.error("Impossible de récupérer le nombre de messages non lus :", error);
+      }
+    }
+
+    fetchUnreadCount();
+  }, [tripId]);
+
+  return unreadCount;
+}
+
+
 export function TripNavDesktop({ tripId }: TripNavProps) {
-  const items = getTripNavItems(tripId);
+  const unreadCount = useUnreadCount(tripId);
+  const items = getTripNavItems(tripId, unreadCount);
+
   return (
     <div className="flex flex-col gap-8">
       <Link
@@ -74,7 +103,9 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
 }
 
 export function TripNavMobile({ tripId }: TripNavProps) {
-  const items = getTripNavItems(tripId);
+  const unreadCount = useUnreadCount(tripId);
+  const items = getTripNavItems(tripId, unreadCount);
+
   return (
     <div className="flex gap-1">
       {items.map((item) => (
