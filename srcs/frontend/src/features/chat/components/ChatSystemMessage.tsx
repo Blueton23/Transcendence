@@ -4,9 +4,7 @@ interface ChatSystemMessageProps {
   body: string;
 }
 
-export default function ChatSystemMessage({
-  body,
-}: ChatSystemMessageProps) {
+export default function ChatSystemMessage({ body }: ChatSystemMessageProps) {
   return (
     <div className="py-2 text-center">
       <Text size="sm" tone="muted">

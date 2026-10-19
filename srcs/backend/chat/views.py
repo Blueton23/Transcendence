@@ -1,5 +1,5 @@
-
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -37,13 +37,19 @@ class TravelMessageListCreateView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        messages = Message.objects.filter(
-            travel=travel,
-        ).select_related("traveler").order_by("created_at", "id")
+        messages = (
+            Message.objects.filter(
+                travel=travel,
+            )
+            .select_related("traveler")
+            .order_by("created_at", "id")
+        )
 
-        participation.mark_read()
-
-        serializer = MessageSerializer(messages, many=True)
+        serializer = MessageSerializer(
+            messages,
+            many=True,
+            context={"request": request, "participation": participation},
+        )
         return Response(serializer.data)
 
     def post(self, request, travel_id):
@@ -75,3 +81,50 @@ class TravelMessageListCreateView(APIView):
             MessageSerializer(message).data,
             status=status.HTTP_201_CREATED,
         )
+
+
+class TravelUnreadCountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, travel_id):
+        participation = Participation.objects.filter(
+            travel_id=travel_id,
+            traveler=request.user,
+            status__in=["ACCEPTED", "LEFT"],
+        ).first()
+
+        if participation is None:
+            return Response(
+                {"detail": "Vous n'avez pas accès à ce voyage."},
+                status=403,
+            )
+
+        count = Message.objects.unread_for(participation).count()
+
+        return Response({"unread_count": count})
+
+
+class TravelMarkReadView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, travel_id):
+
+        participation = Participation.objects.filter(
+            travel_id=travel_id,
+            traveler=request.user,
+            status__in=[
+                ParticipationStatus.ACCEPTED,
+                ParticipationStatus.LEFT,
+            ],
+        ).first()
+
+        if participation is None:
+            return Response(
+                {"detail": "Vous n'avez pas accès à ce voyage."},
+                status=403,
+            )
+
+        participation.last_read_at = timezone.now()
+        participation.save(update_fields=["last_read_at"])
+
+        return Response({"success": True})

@@ -23,7 +23,11 @@ export default function ChatTimeline({
   error,
 }: ChatTimelineProps) {
   if (isLoading) {
-    return <p className="p-5 text-sm text-text-secondary">Chargement des messages…</p>;
+    return (
+      <p className="p-5 text-sm text-text-secondary">
+        Chargement des messages…
+      </p>
+    );
   }
 
   if (error) {

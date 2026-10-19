@@ -1,4 +1,3 @@
-
 import Text from "../../../shared/ui/Text";
 import type { ChatMessage as ChatMessageType } from "../types";
 

@@ -9,8 +9,9 @@ export default function ChatPage() {
   const parsedId = Number(id);
   const isValidId = Boolean(id) && Number.isInteger(parsedId) && parsedId > 0;
 
-  const { messages, unreadCount, isLoading, error, sendMessage } =
-    useChat(isValidId ? parsedId : 0);
+  const { messages, unreadCount, isLoading, error, sendMessage } = useChat(
+    isValidId ? parsedId : 0,
+  );
 
   if (!isValidId) {
     return <p className="p-5">Identifiant de voyage invalide.</p>;
@@ -21,11 +22,7 @@ export default function ChatPage() {
       <ChatHeader unreadCount={unreadCount} />
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-4">
-        <ChatTimeline
-          messages={messages}
-          isLoading={isLoading}
-          error={error}
-        />
+        <ChatTimeline messages={messages} isLoading={isLoading} error={error} />
       </div>
 
       <ChatComposer onSend={sendMessage} />

@@ -39,7 +39,7 @@ function App() {
             <Route path="itinerary" element={<ItineraryPage />} />
             <Route path="ideas" element={<IdeasPage />} />
             <Route path="expenses" element={<PlaceHolder label="expenses" />} />
-            <Route path="chat" element={<ChatPage/>} />
+            <Route path="chat" element={<ChatPage />} />
             <Route
               path="assistant"
               element={<PlaceHolder label="assistant" />}

@@ -4,9 +4,7 @@ interface ChatDateSeparatorProps {
   date: string;
 }
 
-export default function ChatDateSeparator({
-  date,
-}: ChatDateSeparatorProps) {
+export default function ChatDateSeparator({ date }: ChatDateSeparatorProps) {
   const formattedDate = new Intl.DateTimeFormat("fr-FR", {
     day: "numeric",
     month: "long",

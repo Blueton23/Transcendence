@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Button from "../../../shared/ui/Button";
 import Text from "../../../shared/ui/Text";
@@ -64,10 +63,7 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
         )}
       </div>
 
-      <Button
-        type="submit"
-        disabled={!body.trim() || isSending}
-      >
+      <Button type="submit" disabled={!body.trim() || isSending}>
         {isSending ? "Envoi…" : "Envoyer"}
       </Button>
     </form>

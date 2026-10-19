@@ -1,6 +1,9 @@
-
 import { useCallback, useEffect, useState } from "react";
-import { getMessages, sendMessage as postMessage } from "../api/chatApi";
+import {
+  getMessages,
+  sendMessage as postMessage,
+  markMessagesAsRead,
+} from "../api/chatApi";
 import type { ApiChatMessage, ChatMessage } from "../types";
 
 function toChatMessage(message: ApiChatMessage): ChatMessage {
@@ -8,8 +11,6 @@ function toChatMessage(message: ApiChatMessage): ChatMessage {
     ...message,
     author: message.travelerName,
     type: message.isSystem ? "system" : "user",
-    // Le backend ne fournit pas encore le statut non lu de chaque message.
-    isUnread: false,
   };
 }
 
@@ -36,6 +37,7 @@ export function useChat(travelId: number) {
         if (!cancelled) {
           setMessages(result.map(toChatMessage));
         }
+        await markMessagesAsRead(travelId);
       } catch {
         if (!cancelled) {
           setError("Impossible de charger les messages.");
@@ -89,8 +91,7 @@ export function useChat(travelId: number) {
           return [...current, newMessage].sort(
             (a, b) =>
               new Date(a.createdAt).getTime() -
-                new Date(b.createdAt).getTime() ||
-              a.id - b.id,
+                new Date(b.createdAt).getTime() || a.id - b.id,
           );
         });
       } catch (sendError) {
