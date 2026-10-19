@@ -3,6 +3,7 @@ def public_endpoints_only(endpoints: list[tuple], **kwargs: object) -> list[tupl
 
     Une vue est publique si elle déclare `public_api = True`
     (automatique avec PublicApiMixin).
+    Utiliser dans settings.
     """
     return [
         (path, path_regex, method, callback)
