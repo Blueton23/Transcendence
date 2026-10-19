@@ -6,4 +6,5 @@ urlpatterns = [
     path("api/", include("traveler.urls")),
     path("api/travels/", include("travel.urls")),
     path("api/travels/", include("idea.urls")),
+    path("api/travels/", include("chat.urls")),
 ]
