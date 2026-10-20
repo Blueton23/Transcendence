@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import type { ChatMessage as ChatMessageType } from "../types";
 import ChatDateSeparator from "./ChatDateSeparator";
 import ChatMessage from "./ChatMessage";
@@ -22,6 +22,15 @@ export default function ChatTimeline({
   isLoading,
   error,
 }: ChatTimelineProps) {
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "auto",
+      block: "end",
+    });
+  }, [messages, isLoading]);
+  
   if (isLoading) {
     return (
       <p className="p-5 text-sm text-text-secondary">
@@ -34,21 +43,21 @@ export default function ChatTimeline({
     return <p className="p-5 text-sm text-text-secondary">{error}</p>;
   }
 
-  let previousDay: string | null = null;
-  let unreadSeparatorShown = false;
+  const firstUnreadIndex = messages.findIndex(
+    (message) => message.isUnread,
+  );
 
   return (
     <div className="flex flex-col">
-      {messages.map((message) => {
+      {messages.map((message, index) => {
         const dayKey = getDayKey(message.createdAt);
-        const showDate = dayKey !== previousDay;
-        previousDay = dayKey;
+        const previousMessage = messages[index - 1];
 
-        const showUnread = message.isUnread && !unreadSeparatorShown;
+        const showDate =
+          !previousMessage ||
+          getDayKey(previousMessage.createdAt) !== dayKey;
 
-        if (showUnread) {
-          unreadSeparatorShown = true;
-        }
+        const showUnread = index === firstUnreadIndex;
 
         return (
           <Fragment key={message.id}>
@@ -64,6 +73,7 @@ export default function ChatTimeline({
           </Fragment>
         );
       })}
+      <div ref={bottomRef} />
     </div>
   );
 }
