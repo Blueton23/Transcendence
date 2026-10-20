@@ -53,7 +53,9 @@ function IdeaDay({
 
       {open && (
         <>
-          {night && night.chosen && <ChosenNight night={night.chosen} />}
+          {night && night.chosen && (
+            <ChosenNight night={night.chosen} actions={actions} />
+          )}
           {night && !night?.chosen && night?.proposals.length > 0 && (
             <ProposalsNights proposals={night.proposals} />
           )}
