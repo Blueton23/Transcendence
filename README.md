@@ -667,7 +667,21 @@ for i in $(seq 1 101); do
     -H "Authorization: Token <clé>"
 done | sort | uniq -c
 ```
-Après le test, `docker compose exec redis redis-cli -n 1 FLUSHDB` remet les compteurs à zéro.
+
+**Voir les compteurs : KEYS**
+```bash
+docker compose exec redis redis-cli -n 1 KEYS '*'
+```
+
+**Voir le temps restant : TTL**
+```bash
+docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_1'
+```
+
+**Après le test remet les compteurs à zéro**
+```bash
+docker compose exec redis redis-cli -n 1 FLUSHDB
+```
 
 ---
 
