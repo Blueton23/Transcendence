@@ -3,8 +3,8 @@ import Icon from "@/shared/ui/Icon";
 
 interface StepButtonProps {
   isInPool: boolean;
-  onPlace: () => void;
-  onView: () => void;
+  onPlace?: () => void;
+  onView?: () => void;
   disabled?: boolean;
 }
 

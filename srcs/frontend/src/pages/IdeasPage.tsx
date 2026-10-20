@@ -14,6 +14,7 @@ import { useSteps } from "@/features/step/hooks/useSteps";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
+import { getProposer } from "@/features/idea/utils/getProposer";
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
@@ -106,9 +107,7 @@ export function IdeasPage() {
         {filteredIdeas.map((idea) => {
           const step = steps.find((step) => step.id === idea.stepId);
 
-          const proposer = travel.travelers.find(
-            (traveler) => traveler.id === idea.travelerId,
-          );
+          const proposer = getProposer(travel, idea);
 
           return (
             <IdeaCard

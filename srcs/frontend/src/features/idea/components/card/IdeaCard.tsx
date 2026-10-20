@@ -17,8 +17,8 @@ export interface IdeaCardProps {
   proposerName: string;
   proposerInitials: string;
   stepName?: string;
-  onPlace: () => void;
-  onView: () => void;
+  onPlace?: () => void;
+  onView?: () => void;
   onVote: () => Promise<void>;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -82,7 +82,9 @@ export function IdeaCard({
                 proposerName={proposerName}
                 proposerInitials={proposerInitials}
               />
-              <StepLabel isInPool={isInPool} stepName={stepName} />
+              {(isInPool || stepName) && (
+                <StepLabel isInPool={isInPool} stepName={stepName} />
+              )}
               {idea.type === "accommodation" && idea.status === "chosen" && (
                 <Text size="sm">Hébergement choisi</Text>
               )}
@@ -132,12 +134,14 @@ export function IdeaCard({
           </div>
 
           <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">
-            <StepButton
-              isInPool={isInPool}
-              onPlace={onPlace}
-              onView={onView}
-              disabled={isActionPending}
-            />
+            {(onPlace || onView) && (
+              <StepButton
+                isInPool={isInPool}
+                onPlace={onPlace}
+                onView={onView}
+                disabled={isActionPending}
+              />
+            )}
           </div>
         </div>
       </div>

@@ -1,16 +1,18 @@
-import type { Step } from "@/features/step/types";
+import type { IdeaActions, Step } from "@/features/step/types";
 import Divider from "@/shared/ui/Divider";
 import type { Travel } from "@/features/travel/types";
 import { IdeaSection } from "@/features/step/components/detail/IdeaSection";
 import { AccommodationSection } from "@/features/step/components/detail/AccommodationSection";
 import { StepDetailHeader } from "@/features/step/components/detail/StepDetailHeader";
 import { StepInfo } from "@/features/step/components/detail/StepInfo";
+import type { Idea } from "@/features/idea/types";
 
 interface StepDetailProps {
   step: Step;
   dateLabel: string;
   travel: Travel;
-  // ideas: Idea[];
+  ideas: Idea[];
+  actions: IdeaActions;
   onModify: () => void;
   onBack: () => void;
 }
@@ -22,6 +24,8 @@ export function StepDetail({
   onModify,
   onBack,
   travel,
+  ideas,
+  actions,
 }: StepDetailProps) {
   const hasNights = step.nights > 0;
   // const ideas = .... recuperer ici les idee du step
@@ -33,7 +37,12 @@ export function StepDetail({
       <StepInfo step={step} dateLabel={dateLabel} hasNights={hasNights} />
       <Divider />
       {hasNights && <AccommodationSection />}
-      <IdeaSection step={step} travel={travel} />
+      <IdeaSection
+        step={step}
+        travel={travel}
+        ideas={ideas}
+        actions={actions}
+      />
     </div>
   );
 }

@@ -1,17 +1,26 @@
-import type { Step } from "@/features/step/types";
+import type { IdeaActions, Step } from "@/features/step/types";
 import type { Travel } from "@/features/travel/types";
 import { getStepDays } from "@/features/step/utils/getStepDays";
 import { useState } from "react";
 import Icon from "@/shared/ui/Icon";
 import Tag from "@/shared/ui/Tag";
-import Text from "@/shared/ui/Text";
+import type { Idea } from "@/features/idea/types";
+import {
+  lodgingsByNight,
+  type Night,
+} from "@/features/step/utils/lodgingsByNight";
+import { IdeaCard } from "@/features/idea/components/card/IdeaCard";
+import { getProposer } from "@/features/idea/utils/getProposer";
 
 interface IdeaDayProps {
   label: string;
-  // ideas: Idea[];
+  ideas: Idea[];
+  travel: Travel;
+  actions: IdeaActions;
+  night?: Night;
 }
 
-function IdeaDay({ label }: IdeaDayProps) {
+function IdeaDay({ label, ideas, travel, night, actions }: IdeaDayProps) {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-2">
@@ -32,8 +41,33 @@ function IdeaDay({ label }: IdeaDayProps) {
         </Tag>
       </div>
 
-      {open && <Text>Pas d'idée épinglée</Text>}
-      {/* idea si y en a pas et sinon afficher sous le chevron les iddes avec idea.map */}
+      {open && (
+        <>
+          {night && night.chosen && <div>Chosen night details</div>}
+          {night && !night?.chosen && night?.proposals.length > 0 && (
+            <div>Night proposals available</div>
+          )}
+          {night && !night.chosen && night.proposals.length === 0 && (
+            <div>No night proposals</div>
+          )}
+          {ideas.length > 0 &&
+            ideas.map((idea) => {
+              const proposer = getProposer(travel, idea);
+              return (
+                <IdeaCard
+                  key={idea.id}
+                  idea={idea}
+                  onDelete={() => actions.onDelete(idea.id)}
+                  onEdit={() => actions.onEdit(idea.id)}
+                  onVote={() => actions.onVote(idea.id)}
+                  onChoose={() => actions.onChoose(idea.id)}
+                  proposerName={proposer.name}
+                  proposerInitials={proposer.initials}
+                />
+              );
+            })}
+        </>
+      )}
     </div>
   );
 }
@@ -41,14 +75,32 @@ function IdeaDay({ label }: IdeaDayProps) {
 interface IdeaSectionProps {
   step: Step;
   travel: Travel;
+  ideas: Idea[];
+  actions: IdeaActions;
 }
 
-export function IdeaSection({ step, travel }: IdeaSectionProps) {
-  const days = getStepDays({ step, travelStartDate: travel.startDate });
+export function IdeaSection({
+  step,
+  ideas,
+  travel,
+  actions,
+}: IdeaSectionProps) {
+  const days = getStepDays({ step });
+  const nights = lodgingsByNight(ideas, step);
+  const stepIdeas = ideas.filter(
+    (i) => i.stepId === step.id && i.type !== "accommodation",
+  );
   return (
     <div className="flex flex-col gap-4">
       {days.map((day) => (
-        <IdeaDay key={day} label={day} />
+        <IdeaDay
+          key={day.date}
+          travel={travel}
+          label={day.label}
+          ideas={stepIdeas.filter((i) => i.date === day.date)}
+          night={nights.find((n) => n.date === day.date)}
+          actions={actions}
+        />
       ))}
     </div>
   );

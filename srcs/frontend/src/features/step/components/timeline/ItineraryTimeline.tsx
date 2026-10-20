@@ -3,9 +3,11 @@ import { StepCard } from "@/features/step/components/card/StepCard";
 import { SegmentRow } from "@/features/step/components/timeline/Segment";
 import { Fragment } from "react/jsx-runtime";
 import type { Segment, Step } from "@/features/step/types";
+import type { Idea } from "@/features/idea/types";
 
 export interface ItineraryTimelineProps {
   steps: Step[];
+  ideas: Idea[];
   segments: (Segment | null)[];
   dateLabels: string[];
   onDetailView: (step: Step) => void;
@@ -15,6 +17,7 @@ export interface ItineraryTimelineProps {
 
 export function ItineraryTimeline({
   steps,
+  ideas,
   segments,
   dateLabels,
   onDetailView,
@@ -25,6 +28,12 @@ export function ItineraryTimeline({
     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
       {steps.map((step, index) => {
         const segment = segments[index - 1];
+        const lodging = ideas.find(
+          (i) =>
+            i.stepId === step.id &&
+            i.type === "accommodation" &&
+            i.status === "chosen",
+        );
         return (
           <Fragment key={step.id}>
             {segment && (
@@ -36,6 +45,7 @@ export function ItineraryTimeline({
             <StepPositionBadge position={index + 1} />
             <StepCard
               step={step}
+              lodging={lodging}
               dateLabel={dateLabels[index]}
               onClick={() => onDetailView(step)}
               onModify={() => onModifyStep(step)}
