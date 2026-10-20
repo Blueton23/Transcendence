@@ -9,6 +9,8 @@ from django.utils import timezone
 from rest_framework.serializers import ValidationError as DRFValidationError
 from rest_framework.test import APITestCase
 
+from common.realtime import travel_group
+from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
 from travel.models import (
@@ -3724,3 +3726,182 @@ class ReactionViewTest(APITestCase):
         response = self.client.get(self.reaction_url)
 
         self.assertEqual(response.status_code, 404)
+
+
+# ========================================================================#
+# Diffusion des événements sur le socket du voyage
+# ========================================================================#
+
+
+class IdeaBroadcastTest(BroadcastListenerMixin, APITestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="Jean", email="jean@exemple.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.idea = Idea.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            title="Restaurant japonais",
+            type=IdeaType.RESTAURANT,
+        )
+        self.client.force_authenticate(user=self.traveler)
+        self.listen_to(travel_group(self.travel.id))
+
+    def url(self, name, **kwargs):
+        return reverse(name, kwargs={"travel_id": self.travel.id, **kwargs})
+
+    def request(self, method, url, data=None):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = getattr(self.client, method)(url, data, format="json")
+        return response, callbacks
+
+    # Test : la création diffuse idea.created, en camelCase et sans "voted"
+    def test_create_broadcasts_idea_created(self):
+        response, _ = self.request(
+            "post",
+            self.url("idea-list"),
+            {"title": "Musée", "type": IdeaType.ACTIVITY},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "idea.created")
+        self.assertEqual(event["payload"]["id"], response.data["id"])
+        self.assertEqual(event["payload"]["travelId"], self.travel.id)
+        self.assertEqual(event["payload"]["voteCount"], 0)
+        self.assertNotIn("voted", event["payload"])
+
+    # Test : la modification diffuse idea.updated
+    def test_update_broadcasts_idea_updated(self):
+        response, _ = self.request(
+            "patch", self.url("idea-detail", pk=self.idea.id), {"title": "Sushi"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "idea.updated")
+        self.assertEqual(event["payload"]["title"], "Sushi")
+
+    # Test : la suppression diffuse idea.deleted avec seulement l'id
+    def test_delete_broadcasts_idea_deleted(self):
+        idea_id = self.idea.id
+        response, _ = self.request("delete", self.url("idea-detail", pk=idea_id))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "idea.deleted", "payload": {"id": idea_id}},
+        )
+
+    # Test : choisir un hébergement diffuse idea.updated avec le statut chosen
+    def test_choice_broadcasts_idea_updated(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            **COORDS,
+        )
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        response, _ = self.request("post", self.url("idea-choice", pk=self.idea.id))
+
+        self.assertEqual(response.status_code, 200)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "idea.updated")
+        self.assertEqual(event["payload"]["status"], "chosen")
+        self.assertEqual(event["payload"]["chosenById"], self.traveler.id)
+
+    # Test : un hébergement déjà choisi ne diffuse rien
+    def test_choice_already_chosen_broadcasts_nothing(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            **COORDS,
+        )
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.chosen_by = self.traveler
+        self.idea.chosen_at = timezone.now()
+        self.idea.save()
+
+        response, callbacks = self.request(
+            "post", self.url("idea-choice", pk=self.idea.id)
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(callbacks, [])
+
+    # Test : une requête refusée ne diffuse rien
+    def test_invalid_create_broadcasts_nothing(self):
+        response, callbacks = self.request(
+            "post", self.url("idea-list"), {"type": IdeaType.ACTIVITY}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(callbacks, [])
+
+    # Test : voter diffuse reaction.created avec le nouveau compteur
+    def test_vote_broadcasts_reaction_created(self):
+        response, _ = self.request("post", self.url("idea-reaction", pk=self.idea.id))
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "reaction.created",
+                "payload": {
+                    "ideaId": self.idea.id,
+                    "travelerId": self.traveler.id,
+                    "voteCount": 1,
+                },
+            },
+        )
+
+    # Test : retirer son vote diffuse reaction.deleted avec le nouveau compteur
+    def test_unvote_broadcasts_reaction_deleted(self):
+        Reaction.objects.create(traveler=self.traveler, idea=self.idea)
+
+        response, _ = self.request("delete", self.url("idea-reaction", pk=self.idea.id))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "reaction.deleted",
+                "payload": {
+                    "ideaId": self.idea.id,
+                    "travelerId": self.traveler.id,
+                    "voteCount": 0,
+                },
+            },
+        )
+
+    # Test : retirer un vote inexistant ne diffuse rien
+    def test_unvote_without_vote_broadcasts_nothing(self):
+        response, callbacks = self.request(
+            "delete", self.url("idea-reaction", pk=self.idea.id)
+        )
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(callbacks, [])

@@ -1,6 +1,9 @@
+import asyncio
 import json
 
+from asgiref.sync import async_to_sync
 from asgiref.testing import ApplicationCommunicator
+from channels.layers import get_channel_layer
 
 
 class WebsocketCommunicator(ApplicationCommunicator):
@@ -35,3 +38,25 @@ class WebsocketCommunicator(ApplicationCommunicator):
     async def disconnect(self):
         await self.send_input({"type": "websocket.disconnect", "code": 1000})
         await self.wait(timeout=2)
+
+
+class BroadcastListenerMixin:
+    """Subscribes a channel to a group on the real channel layer, so a test
+    can check what a view broadcast. Wrap the request in
+    `self.captureOnCommitCallbacks(execute=True)`: broadcast waits for the
+    commit, which TestCase never does on its own.
+    """
+
+    def listen_to(self, group):
+        layer = get_channel_layer()
+        self.listen_channel = async_to_sync(layer.new_channel)()
+        async_to_sync(layer.group_add)(group, self.listen_channel)
+        self.addCleanup(async_to_sync(layer.group_discard), group, self.listen_channel)
+
+    def receive_event(self, timeout=2):
+        async def receive():
+            return await asyncio.wait_for(
+                get_channel_layer().receive(self.listen_channel), timeout
+            )
+
+        return async_to_sync(receive)()
