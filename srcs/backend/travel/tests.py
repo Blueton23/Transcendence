@@ -1,10 +1,23 @@
 import datetime
+from unittest.mock import patch
 
+from asgiref.sync import sync_to_async
+from channels.layers import get_channel_layer
+from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from common.realtime import travel_group
+from common.testing import WebsocketCommunicator
+from config.asgi import application
+from travel.consumers import (
+    CLOSE_NOT_AUTHENTICATED,
+    CLOSE_NOT_PARTICIPANT,
+    TravelConsumer,
+)
 from travel.models import (
     Participation,
     ParticipationStatus,
@@ -866,3 +879,178 @@ class StepViewTest(APITestCase):
         self.assertEqual(response.status_code, 404)
         self.mon_step.refresh_from_db()
         self.assertEqual(self.autre_step.localisation, "Paris")
+
+
+# --- WebSocket tests ---
+
+
+# TransactionTestCase: database_sync_to_async closes the connection that
+# TestCase keeps open for its wrapping transaction.
+class TravelConsumerTest(TransactionTestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Mon voyage",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        self.participation = Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+    def communicator(self, user, travel_id=None):
+        return WebsocketCommunicator(
+            TravelConsumer.as_asgi(),
+            f"/ws/travels/{travel_id or self.travel.id}/",
+            scope={
+                "user": user,
+                "url_route": {
+                    "args": (),
+                    "kwargs": {"travel_id": travel_id or self.travel.id},
+                },
+            },
+        )
+
+    async def assert_closed_with(self, communicator, code):
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+        message = await communicator.receive_output(timeout=2)
+        self.assertEqual(message, {"type": "websocket.close", "code": code})
+        await communicator.disconnect()
+
+    async def group_send(self, message):
+        await get_channel_layer().group_send(travel_group(self.travel.id), message)
+
+    async def test_participant_receives_group_events(self):
+        communicator = self.communicator(self.traveler)
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        event = {"type": "idea.created", "payload": {"ideaId": 1}}
+        await self.group_send(event)
+
+        self.assertEqual(await communicator.receive_json_from(), event)
+        await communicator.disconnect()
+
+    async def test_anonymous_is_closed_with_4401(self):
+        await self.assert_closed_with(
+            self.communicator(AnonymousUser()), CLOSE_NOT_AUTHENTICATED
+        )
+
+    async def test_stranger_is_closed_with_4403(self):
+        stranger = await sync_to_async(Traveler.objects.create_user)(
+            username="bob", email="bob@example.com", password="password123"
+        )
+        await self.assert_closed_with(
+            self.communicator(stranger), CLOSE_NOT_PARTICIPANT
+        )
+
+    async def test_non_accepted_participations_are_closed_with_4403(self):
+        for status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            with self.subTest(status=status):
+                self.participation.status = status
+                await self.participation.asave()
+                await self.assert_closed_with(
+                    self.communicator(self.traveler), CLOSE_NOT_PARTICIPANT
+                )
+
+    async def test_unknown_travel_is_closed_with_4403(self):
+        await self.assert_closed_with(
+            self.communicator(self.traveler, travel_id=999999),
+            CLOSE_NOT_PARTICIPANT,
+        )
+
+    async def test_rejected_socket_does_not_join_group(self):
+        communicator = self.communicator(AnonymousUser())
+        await communicator.connect()
+        await communicator.receive_output(timeout=2)
+
+        await self.group_send({"type": "idea.created", "payload": {}})
+
+        self.assertTrue(await communicator.receive_nothing(timeout=0.2))
+        await communicator.disconnect()
+
+    async def test_disconnect_leaves_group(self):
+        layer = get_channel_layer()
+        communicator = self.communicator(self.traveler)
+        await communicator.connect()
+
+        with patch.object(
+            layer, "group_discard", wraps=layer.group_discard
+        ) as group_discard:
+            await communicator.disconnect()
+
+        group_discard.assert_awaited_once()
+        self.assertEqual(group_discard.await_args.args[0], travel_group(self.travel.id))
+
+    async def test_client_messages_are_ignored(self):
+        communicator = self.communicator(self.traveler)
+        await communicator.connect()
+
+        await communicator.send_json_to({"message": "hello"})
+
+        self.assertTrue(await communicator.receive_nothing(timeout=0.2))
+        await communicator.disconnect()
+
+
+class TravelSocketRoutingTest(TransactionTestCase):
+    """Goes through config.asgi.application: route, origin check and session
+    auth from a real cookie."""
+
+    ORIGIN = (b"origin", b"http://localhost")
+
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Mon voyage",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+    def communicator(self, cookie=None):
+        headers = [self.ORIGIN]
+        if cookie:
+            headers.append((b"cookie", cookie.encode()))
+        return WebsocketCommunicator(
+            application, f"/ws/travels/{self.travel.id}/", headers=headers
+        )
+
+    async def test_logged_in_participant_stays_connected(self):
+        await sync_to_async(self.client.force_login)(self.traveler)
+        session_id = self.client.cookies[settings.SESSION_COOKIE_NAME].value
+        communicator = self.communicator(f"{settings.SESSION_COOKIE_NAME}={session_id}")
+
+        connected, _ = await communicator.connect()
+
+        self.assertTrue(connected)
+        self.assertTrue(await communicator.receive_nothing(timeout=0.2))
+        await communicator.disconnect()
+
+    async def test_no_session_is_closed_with_4401(self):
+        communicator = self.communicator()
+
+        connected, _ = await communicator.connect()
+        message = await communicator.receive_output(timeout=2)
+
+        self.assertTrue(connected)
+        self.assertEqual(
+            message, {"type": "websocket.close", "code": CLOSE_NOT_AUTHENTICATED}
+        )
+        await communicator.disconnect()

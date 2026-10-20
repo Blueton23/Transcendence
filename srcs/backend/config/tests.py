@@ -1,3 +1,5 @@
+import asyncio
+
 from channels.layers import get_channel_layer
 from django.test import SimpleTestCase
 
@@ -51,3 +53,14 @@ class ChannelLayerTests(SimpleTestCase):
 
         self.assertEqual(message, {"type": "test.message", "n": 1})
         await layer.group_discard("ci-test-group", channel)
+
+    async def test_idle_receive_outlives_blocking_pop(self):
+        # channels_redis blocks on BZPOPMIN for brpop_timeout seconds; a
+        # shorter redis socket_timeout makes idle sockets crash (1006).
+        layer = get_channel_layer()
+        channel = await layer.new_channel()
+
+        with self.assertRaises(asyncio.TimeoutError):
+            await asyncio.wait_for(
+                layer.receive(channel), timeout=layer.brpop_timeout + 1
+            )

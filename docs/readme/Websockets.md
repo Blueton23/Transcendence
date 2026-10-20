@@ -14,11 +14,12 @@ La tuyauterie est faite ; il ne manque que la couche applicative.
 | Channel layer Redis | `CHANNEL_LAYERS` dans `srcs/backend/config/settings.py` |
 | Proxy nginx pour `/ws/` | `srcs/nginx/nginx.conf` |
 | Consumer d'exemple (`PingConsumer`) | `srcs/backend/config/consumers.py` |
+| Socket d'un voyage (`TravelConsumer`, `ws/travels/<travel_id>/`) | `srcs/backend/travel/consumers.py` |
 | Tests et smoke test | `srcs/backend/config/tests.py`, `scripts/smoke.sh` |
 | `WebsocketCommunicator` pour les tests | `srcs/backend/common/testing.py` |
 | Helpers de diffusion (`broadcast`, `travel_group`) | `srcs/backend/common/realtime.py` |
 
-Reste à décider et à construire : qui peut se connecter, quels événements existent, et comment React les consomme.
+Reste à construire : quels événements existent, et comment React les consomme.
 
 ## Le modèle mental
 
@@ -45,17 +46,18 @@ Navigateur A ──POST /api/travels/42/ideas/──> vue DRF ── save ──
 
 Deux règles qui piègent tout le monde :
 
-- **Nommage des handlers** : un `group_send` avec `{"type": "idea.created", ...}` appelle la méthode `idea_created` sur chaque consumer du groupe (les points deviennent des underscores).
+- **Nommage des handlers** : un `group_send` avec `{"type": "idea.created", ...}` appelle la méthode `idea_created` sur chaque consumer du groupe (les points deviennent des underscores). `TravelConsumer` contourne cette règle : tout message du groupe qui a une clé `payload` (donc tout ce qu'envoie `broadcast`) est transmis tel quel au client, sans handler à écrire par événement.
 - **ORM en code async** : les consumers sont async et l'ORM est sync, donc chaque requête passe par `database_sync_to_async`. La validation de `Message` interroge la base, donc cela vaut aussi pour l'enregistrement d'un message.
 
 ## Auth et sécurité
 
 - **Le login fonctionne tel quel.** L'app utilise des cookies de session et le socket est same-origin via nginx, donc `AuthMiddlewareStack` lit le cookie et remplit `self.scope["user"]`. Aucun token n'est nécessaire.
 - **Le CSRF ne s'applique pas aux WebSockets.** La protection équivalente est `AllowedHostsOriginValidator`, déjà présent dans `config/asgi.py`. À conserver.
-- **Rien ne rejette encore les utilisateurs anonymes.** `PingConsumer` accepte tout le monde. Un vrai consumer doit vérifier `is_authenticated` et que l'utilisateur a une participation `ACCEPTED` au voyage.
+- **Contrôle à la connexion.** `TravelConsumer` vérifie `is_authenticated` et que l'utilisateur a une participation `ACCEPTED` au voyage. `PingConsumer`, lui, accepte tout le monde.
 - **Utiliser la même règle que `IsTravelParticipant`, pas `is_travel_member`.** Ce dernier autorise aussi `LEFT`, ce qui est correct pour les anciens messages mais pas pour l'accès en direct.
 - **La permission n'est vérifiée qu'à la connexion.** Si quelqu'un quitte un voyage ou en est retiré, son socket ouvert reste dans le groupe tant qu'il n'est pas expulsé par un événement de groupe qui fait fermer ce consumer.
-- **Codes de fermeture** : fermer avant `accept()` ne montre au navigateur qu'un échec générique 1006. Pour dire au frontend « ne réessaie pas, tu n'as pas le droit », il faut accepter puis fermer avec un code personnalisé, par exemple 4401 (non connecté) ou 4403 (pas participant).
+- **Codes de fermeture** : fermer avant `accept()` ne montre au navigateur qu'un échec générique 1006. Pour dire au frontend « ne réessaie pas, tu n'as pas le droit », il faut accepter puis fermer avec un code personnalisé, 4401 (non connecté) ou 4403 (pas participant, voyage inexistant compris), définis dans `travel/consumers.py`.
+- **Rejoindre le groupe avant `accept()`.** Dès que le socket est ouvert, le frontend recharge via REST ; si le consumer rejoignait le groupe après, un événement envoyé entre les deux serait perdu.
 
 ## Choix de conception
 
@@ -82,7 +84,7 @@ Deux règles qui piègent tout le monde :
 ## Points d'attention dans ce repo
 
 - **Note prod de nginx** : le commentaire en haut de `srcs/nginx/nginx.conf` dit de supprimer « les deux lignes Upgrade/Connection » pour la prod. Ce n'est vrai que pour `location /` (rechargement à chaud de Vite). Celles de `location /ws/` doivent rester, sinon les WebSockets cassent en prod.
-- **Tester des consumers authentifiés** : le `WebsocketCommunicator` de `common.testing` accepte un argument `scope` fusionné dans le scope. Tester le consumer directement (`TravelConsumer.as_asgi()`, sans passer par `config.asgi.application` dont le `URLRouter` remplit lui-même `url_route` et dont la pile d'auth résout l'utilisateur depuis la session) avec par exemple `scope={"user": traveler, "url_route": {"args": (), "kwargs": {"travel_id": travel.id}}}`. Pour tester toute la pile, passer un vrai cookie de session dans les headers.
+- **Tester des consumers authentifiés** : utiliser `TransactionTestCase` et non `TestCase`, car `database_sync_to_async` ferme la connexion que `TestCase` garde ouverte pour sa transaction (erreur « the connection is closed »). Le `WebsocketCommunicator` de `common.testing` accepte un argument `scope` fusionné dans le scope. Tester le consumer directement (`TravelConsumer.as_asgi()`, sans passer par `config.asgi.application` dont le `URLRouter` remplit lui-même `url_route` et dont la pile d'auth résout l'utilisateur depuis la session) avec par exemple `scope={"user": traveler, "url_route": {"args": (), "kwargs": {"travel_id": travel.id}}}`. Pour tester toute la pile, passer un vrai cookie de session dans les headers (voir `TravelSocketRoutingTest` dans `travel/tests.py`).
 - **HTTPS en prod** : une page HTTPS ne peut ouvrir que du `wss://`, d'où la nécessité de dériver l'URL du protocole de la page.
 
 ## Ce que demande le sujet
@@ -99,7 +101,7 @@ Deux règles qui piègent tout le monde :
 ## Découpage en commits proposé
 
 1. ~~Déplacer le communicator de test dans `common` et ajouter un helper de diffusion qui camelize l'enveloppe.~~ Fait.
-2. Ajouter `TravelConsumer` avec les contrôles d'auth et de participation, l'entrée et la sortie du groupe, et les tests.
+2. ~~Ajouter `TravelConsumer` avec les contrôles d'auth et de participation, l'entrée et la sortie du groupe, et les tests.~~ Fait.
 3. Ajouter les endpoints REST du chat (liste, envoi, marquer comme lu) avec la diffusion de `chat.message`.
 4. Ajouter le hook frontend `useTravelSocket` et l'interface du chat.
 5. Diffuser les événements idées, étapes et votes depuis les vues existantes, et les appliquer côté frontend.

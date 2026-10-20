@@ -6,6 +6,7 @@ from asgiref.testing import ApplicationCommunicator
 class WebsocketCommunicator(ApplicationCommunicator):
     # Extra `scope` entries (e.g. `user`, `url_route`) are merged into the
     # scope, which lets tests connect as a user without a session cookie.
+    # tldr if we used daphne we would not have to do that
     def __init__(self, app, path, headers=None, scope=None):
         super().__init__(
             app,
