@@ -1,3 +1,4 @@
+import Avatar from "@/shared/ui/Avatar";
 import Text from "../../../shared/ui/Text";
 import type { ChatMessage as ChatMessageType } from "../types";
 
@@ -24,9 +25,13 @@ export default function ChatMessage({
         isOwnMessage ? "items-end" : "items-start"
       }`}
     >
-      <Text size="sm" tone="secondary">
-        {message.author || "Ancien participant"} · {time}
-      </Text>
+      <div className="flex items-center gap-3">
+        <Avatar user={message.author} />
+
+        <Text size="sm" tone="secondary">
+          {message.author || "Ancien participant"} · {time}
+        </Text>
+      </div>
 
       <div className="w-fit max-w-full rounded-lg bg-surface-container px-4 py-3">
         <Text>{message.body}</Text>
