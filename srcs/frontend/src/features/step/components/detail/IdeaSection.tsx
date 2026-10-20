@@ -9,8 +9,7 @@ import {
   lodgingsByNight,
   type Night,
 } from "@/features/step/utils/lodgingsByNight";
-import { IdeaCard } from "@/features/idea/components/card/IdeaCard";
-import { getProposer } from "@/features/idea/utils/getProposer";
+import { DayIdeas } from "@/features/step/components/detail/DayIdeas";
 
 interface IdeaDayProps {
   label: string;
@@ -50,22 +49,9 @@ function IdeaDay({ label, ideas, travel, night, actions }: IdeaDayProps) {
           {night && !night.chosen && night.proposals.length === 0 && (
             <div>No night proposals</div>
           )}
-          {ideas.length > 0 &&
-            ideas.map((idea) => {
-              const proposer = getProposer(travel, idea);
-              return (
-                <IdeaCard
-                  key={idea.id}
-                  idea={idea}
-                  onDelete={() => actions.onDelete(idea.id)}
-                  onEdit={() => actions.onEdit(idea.id)}
-                  onVote={() => actions.onVote(idea.id)}
-                  onChoose={() => actions.onChoose(idea.id)}
-                  proposerName={proposer.name}
-                  proposerInitials={proposer.initials}
-                />
-              );
-            })}
+          {ideas.length > 0 && (
+            <DayIdeas ideas={ideas} travel={travel} actions={actions} />
+          )}
         </>
       )}
     </div>
