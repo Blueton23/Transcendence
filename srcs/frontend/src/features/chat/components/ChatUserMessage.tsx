@@ -21,20 +21,24 @@ export default function ChatMessage({
 
   return (
     <article
-      className={`flex flex-col gap-1 py-2 ${
-        isOwnMessage ? "items-end" : "items-start"
+      className={`flex gap-3 py-2 ${
+        isOwnMessage ? "flex-row-reverse" : "flex-row"
       }`}
     >
-      <div className="flex items-center gap-3">
-        <Avatar user={message.author} />
+      <Avatar user={message.author} />
 
+      <div
+        className={`flex min-w-0 max-w-full flex-col gap-1 ${
+          isOwnMessage ? "items-end" : "items-start"
+        }`}
+      >
         <Text size="sm" tone="secondary">
           {message.author || "Ancien participant"} · {time}
         </Text>
-      </div>
 
-      <div className="w-fit max-w-full rounded-lg bg-surface-container px-4 py-3">
-        <Text>{message.body}</Text>
+        <div className="w-fit max-w-full rounded-lg bg-surface-container px-4 py-3 [overflow-wrap:anywhere]">
+          <Text>{message.body}</Text>
+        </div>
       </div>
     </article>
   );
