@@ -112,9 +112,3 @@ export interface IdeaFormValues {
   pricePerNight: string;
   dateRange: DateRange | undefined;
 }
-
-// Représente les différentes steps
-export interface StepOption {
-  id: number;
-  name: string;
-}

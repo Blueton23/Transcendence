@@ -1,5 +1,4 @@
 import { TypeSelector } from "@/features/idea/components/forms/TypeSelector";
-import type { StepOption } from "@/features/idea/types";
 import { useId, type Dispatch, type SetStateAction } from "react";
 import type { IdeaFormValues } from "@/features/idea/types";
 import { DateField } from "@/features/idea/components/forms/DateField";
@@ -7,9 +6,10 @@ import { AccommodationFields } from "@/features/idea/components/forms/Accommodat
 import Text from "@/shared/ui/Text";
 import Select from "@/shared/ui/Select";
 import Input from "@/shared/ui/Input";
+import type { Step } from "@/features/step/types";
 
 interface IdeaFormProps {
-  steps: StepOption[];
+  steps: Step[];
   values: IdeaFormValues;
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
   titleError?: string;
@@ -26,6 +26,11 @@ export function CreateIdeaForm({
   const isAccommodation = values.type === "accommodation";
   const titleId = useId();
   const titleErrorId = `${titleId}-error`;
+
+  const step = steps.find((s) => s.id === values.stepId);
+  const bounds = step
+    ? { from: new Date(step.startDate), to: new Date(step.endDate) }
+    : undefined;
 
   return (
     <>
@@ -45,10 +50,9 @@ export function CreateIdeaForm({
         className="mb-4"
       >
         <option value="">Pool général</option>
-
         {steps.map((step) => (
           <option key={step.id} value={step.id}>
-            {step.name}
+            {step.localisation}
           </option>
         ))}
       </Select>
@@ -63,6 +67,7 @@ export function CreateIdeaForm({
             }))
           }
           datesError={datesError}
+          bounds={bounds}
         />
       )}
 
@@ -140,6 +145,7 @@ export function CreateIdeaForm({
           values={values}
           setValues={setValues}
           datesError={datesError}
+          bounds={bounds}
         />
       )}
     </>

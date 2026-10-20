@@ -4,17 +4,20 @@ import type { DateRange } from "@daypicker/react";
 import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import Input from "@/shared/ui/Input";
+import Card from "@/shared/ui/Card";
 
 interface DateFieldProps {
   dateRange: DateRange | undefined;
   setDateRange: (dateRange: DateRange | undefined) => void;
   datesError?: string;
+  bounds?: { from: Date; to: Date };
 }
 
 export function DateField({
   dateRange,
   setDateRange,
   datesError,
+  bounds,
 }: DateFieldProps) {
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const datesErrorId = useId();
@@ -46,17 +49,29 @@ export function DateField({
       )}
 
       {datePickerOpen && (
-        <DatePicker
-          singleDay
-          selected={dateRange}
-          onSelect={(newDateRange) => {
-            setDateRange(newDateRange);
+        <Card variant="default" className={`z-20 mt-2 flex flex-col gap-4 p-6`}>
+          <div className="flex justify-center">
+            <div className="flex flex-col gap-2">
+              <DatePicker
+                singleDay
+                selected={dateRange}
+                onSelect={(newDateRange) => {
+                  setDateRange(newDateRange);
 
-            if (newDateRange?.from) {
-              setDatePickerOpen(false);
-            }
-          }}
-        />
+                  if (newDateRange?.from) {
+                    setDatePickerOpen(false);
+                  }
+                }}
+                disabled={
+                  bounds ? { before: bounds.from, after: bounds.to } : undefined
+                }
+                defaultMonth={bounds?.from}
+                startMonth={bounds?.from}
+                endMonth={bounds?.to}
+              />
+            </div>
+          </div>
+        </Card>
       )}
     </div>
   );
