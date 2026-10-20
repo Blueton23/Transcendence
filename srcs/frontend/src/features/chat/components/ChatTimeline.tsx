@@ -1,13 +1,13 @@
 import { Fragment, useEffect, useRef } from "react";
-import type { ChatMessage as ChatMessageType } from "../types";
+import type { ChatMessage } from "../types";
 import ChatDateSeparator from "./ChatDateSeparator";
-import ChatMessage from "./ChatMessage";
+import ChatUserMessage from "./ChatUserMessage";
 import ChatSystemMessage from "./ChatSystemMessage";
 import UnreadSeparator from "./UnreadSeparator";
 import { useAuth } from "@/features/auth/context/useAuth";
 
 interface ChatTimelineProps {
-  messages: ChatMessageType[];
+  messages: ChatMessage[];
   isLoading: boolean;
   error: string | null;
 }
@@ -67,7 +67,7 @@ export default function ChatTimeline({
             {message.type === "system" ? (
               <ChatSystemMessage body={message.body} />
             ) : (
-              <ChatMessage
+              <ChatUserMessage
                 message={message}
                 currentUserId={currentUser?.id ?? null}
               />
