@@ -52,6 +52,7 @@ function ItineraryPage() {
   const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
   const [editIdeaId, setEditIdeaId] = useState<number | null>(null);
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
+  const [lodgingDate, setLodgingDate] = useState<string | null>(null);
 
   const ideaActions: IdeaActions = {
     onVote: handleVote,
@@ -97,6 +98,10 @@ function ItineraryPage() {
             travel={travel}
             ideas={ideas}
             actions={ideaActions}
+            onAddLodging={(date) => {
+              setLodgingDate(date);
+              setCreateIdeaModalOpen(true);
+            }}
           />
         ) : (
           <div className="flex flex-col gap-4 md:min-h-0 md:flex-1">
@@ -128,8 +133,16 @@ function ItineraryPage() {
         <CreateIdeaModal
           travelTitle={travel.title}
           steps={steps}
-          initialStepId={detailView?.id}
-          onClose={() => setCreateIdeaModalOpen(false)}
+          initialType={lodgingDate ? "accommodation" : undefined}
+          initialDateRange={
+            lodgingDate
+              ? { from: new Date(lodgingDate), to: undefined }
+              : undefined
+          }
+          onClose={() => {
+            setCreateIdeaModalOpen(false);
+            setLodgingDate(null);
+          }}
           onCreate={async (input) => {
             await handleCreateIdea(input);
             refetch();

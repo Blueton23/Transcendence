@@ -10,6 +10,9 @@ import {
   type Night,
 } from "@/features/step/utils/lodgingsByNight";
 import { DayIdeas } from "@/features/step/components/detail/DayIdeas";
+import { ChosenNight } from "@/features/step/components/detail/ChosenNight";
+import { NoNight } from "@/features/step/components/detail/NoNight";
+import { ProposalsNights } from "@/features/step/components/detail/ProposalsNights";
 
 interface IdeaDayProps {
   label: string;
@@ -17,9 +20,17 @@ interface IdeaDayProps {
   travel: Travel;
   actions: IdeaActions;
   night?: Night;
+  onAddLodging: (date: string) => void;
 }
 
-function IdeaDay({ label, ideas, travel, night, actions }: IdeaDayProps) {
+function IdeaDay({
+  label,
+  ideas,
+  travel,
+  night,
+  actions,
+  onAddLodging,
+}: IdeaDayProps) {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex flex-col gap-2">
@@ -42,12 +53,12 @@ function IdeaDay({ label, ideas, travel, night, actions }: IdeaDayProps) {
 
       {open && (
         <>
-          {night && night.chosen && <div>Chosen night details</div>}
+          {night && night.chosen && <ChosenNight night={night.chosen} />}
           {night && !night?.chosen && night?.proposals.length > 0 && (
-            <div>Night proposals available</div>
+            <ProposalsNights proposals={night.proposals} />
           )}
           {night && !night.chosen && night.proposals.length === 0 && (
-            <div>No night proposals</div>
+            <NoNight onAddLodging={() => onAddLodging(night.date)} />
           )}
           {ideas.length > 0 && (
             <DayIdeas ideas={ideas} travel={travel} actions={actions} />
@@ -63,6 +74,7 @@ interface IdeaSectionProps {
   travel: Travel;
   ideas: Idea[];
   actions: IdeaActions;
+  onAddLodging: (date: string) => void;
 }
 
 export function IdeaSection({
@@ -70,6 +82,7 @@ export function IdeaSection({
   ideas,
   travel,
   actions,
+  onAddLodging,
 }: IdeaSectionProps) {
   const days = getStepDays({ step });
   const nights = lodgingsByNight(ideas, step);
@@ -86,6 +99,7 @@ export function IdeaSection({
           ideas={stepIdeas.filter((i) => i.date === day.date)}
           night={nights.find((n) => n.date === day.date)}
           actions={actions}
+          onAddLodging={onAddLodging}
         />
       ))}
     </div>

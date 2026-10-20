@@ -1,5 +1,9 @@
 import { useState } from "react";
-import type { CreateIdeaInput, IdeaFormValues } from "@/features/idea/types";
+import type {
+  CreateIdeaInput,
+  IdeaFormValues,
+  IdeaType,
+} from "@/features/idea/types";
 import { CreateIdeaForm } from "@/features/idea/components/forms/CreateIdeaForm";
 import { ideaFormInput } from "@/features/idea/utils/ideaFormInput";
 import { validateIdeaForm } from "@/features/idea/utils/validateIdeaForm";
@@ -7,11 +11,14 @@ import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 import type { Step } from "@/features/step/types";
+import type { DateRange } from "@daypicker/react";
 
 export interface CreateIdeaModalProps {
   travelTitle: string;
   steps: Step[];
   initialStepId?: number;
+  initialType?: IdeaType;
+  initialDateRange?: DateRange;
   onClose: () => void;
   onCreate: (input: CreateIdeaInput) => Promise<void>;
 }
@@ -20,17 +27,19 @@ export function CreateIdeaModal({
   travelTitle,
   steps,
   initialStepId,
+  initialType,
+  initialDateRange,
   onClose,
   onCreate,
 }: CreateIdeaModalProps) {
   const [values, setValues] = useState<IdeaFormValues>({
     stepId: initialStepId ?? null,
-    type: "restaurant",
+    type: initialType ?? "restaurant",
     title: "",
     url: "",
     note: "",
     pricePerNight: "",
-    dateRange: undefined,
+    dateRange: initialDateRange ?? undefined,
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);

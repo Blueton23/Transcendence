@@ -13,6 +13,7 @@ interface StepDetailProps {
   travel: Travel;
   ideas: Idea[];
   actions: IdeaActions;
+  onAddLodging: (date: string) => void;
   onModify: () => void;
   onBack: () => void;
 }
@@ -21,6 +22,7 @@ interface StepDetailProps {
 export function StepDetail({
   step,
   dateLabel,
+  onAddLodging,
   onModify,
   onBack,
   travel,
@@ -42,6 +44,7 @@ export function StepDetail({
         travel={travel}
         ideas={ideas}
         actions={actions}
+        onAddLodging={onAddLodging}
       />
     </div>
   );
