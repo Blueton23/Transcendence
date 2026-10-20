@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
@@ -11,7 +13,7 @@ from .serializers import MessageSerializer
 
 
 class TravelMessageListCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def get_travel(self, travel_id):
         return get_object_or_404(Travel, pk=travel_id)
@@ -83,7 +85,7 @@ class TravelMessageListCreateView(APIView):
 
 
 class TravelUnreadCountView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def get(self, request, travel_id):
 
@@ -108,7 +110,7 @@ class TravelUnreadCountView(APIView):
 
 
 class TravelMarkReadView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def post(self, request, travel_id):
 

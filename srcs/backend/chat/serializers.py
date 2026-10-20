@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from rest_framework import serializers
 
 from .models import Message
@@ -9,7 +11,7 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = [
+        fields: ClassVar[list[str]] = [
             "id",
             "traveler",
             "traveler_name",
@@ -18,7 +20,7 @@ class MessageSerializer(serializers.ModelSerializer):
             "is_system",
             "is_unread",
         ]
-        read_only_fields = [
+        read_only_fields: ClassVar[list[str]] = [
             "id",
             "traveler",
             "traveler_name",
