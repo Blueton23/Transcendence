@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import NavPill, { NavPillMobile } from "./NavPill";
 import IconBadge from "../../shared/ui/IconBadge";
@@ -24,10 +23,7 @@ interface TripNavItem {
 // - "ideas" : nombre d'idées à placer (Idea sans step) calculable à partir des idées
 // - "chat"  : messages NON LUS --> nécessite un LastMessageReadAt par participation côté backend.
 // TODO(backend): brancher ces compteurs sur les vraies données.
-function getTripNavItems(
-  tripId: string,
-  unreadCount: number,
-): TripNavItem[] {
+function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
   return [
     { to: `/trip/${tripId}/itinerary`, iconName: "route", label: "Itinéraire" },
     {
@@ -61,7 +57,10 @@ function useUnreadCount(tripId: string): number {
         const result = await getUnreadCount(Number(tripId));
         setUnreadCount(result.unreadCount);
       } catch (error) {
-        console.error("Impossible de récupérer le nombre de messages non lus :", error);
+        console.error(
+          "Impossible de récupérer le nombre de messages non lus :",
+          error,
+        );
       }
     }
 
@@ -70,7 +69,6 @@ function useUnreadCount(tripId: string): number {
 
   return unreadCount;
 }
-
 
 export function TripNavDesktop({ tripId }: TripNavProps) {
   const unreadCount = useUnreadCount(tripId);

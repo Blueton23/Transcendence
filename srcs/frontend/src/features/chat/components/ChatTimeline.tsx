@@ -4,6 +4,7 @@ import ChatDateSeparator from "./ChatDateSeparator";
 import ChatMessage from "./ChatMessage";
 import ChatSystemMessage from "./ChatSystemMessage";
 import UnreadSeparator from "./UnreadSeparator";
+import { useAuth } from "@/features/auth/context/useAuth";
 
 interface ChatTimelineProps {
   messages: ChatMessageType[];
@@ -23,6 +24,7 @@ export default function ChatTimeline({
   error,
 }: ChatTimelineProps) {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { currentUser } = useAuth();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -30,7 +32,7 @@ export default function ChatTimeline({
       block: "end",
     });
   }, [messages, isLoading]);
-  
+
   if (isLoading) {
     return (
       <p className="p-5 text-sm text-text-secondary">
@@ -43,9 +45,7 @@ export default function ChatTimeline({
     return <p className="p-5 text-sm text-text-secondary">{error}</p>;
   }
 
-  const firstUnreadIndex = messages.findIndex(
-    (message) => message.isUnread,
-  );
+  const firstUnreadIndex = messages.findIndex((message) => message.isUnread);
 
   return (
     <div className="flex flex-col">
@@ -54,8 +54,7 @@ export default function ChatTimeline({
         const previousMessage = messages[index - 1];
 
         const showDate =
-          !previousMessage ||
-          getDayKey(previousMessage.createdAt) !== dayKey;
+          !previousMessage || getDayKey(previousMessage.createdAt) !== dayKey;
 
         const showUnread = index === firstUnreadIndex;
 
@@ -68,7 +67,10 @@ export default function ChatTimeline({
             {message.type === "system" ? (
               <ChatSystemMessage body={message.body} />
             ) : (
-              <ChatMessage message={message} />
+              <ChatMessage
+                message={message}
+                currentUserId={currentUser?.id ?? null}
+              />
             )}
           </Fragment>
         );
