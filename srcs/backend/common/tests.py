@@ -121,6 +121,9 @@ class UnseedCommandTest(TestCase):
         self.assertEqual(Travel.objects.count(), 0)
 
 
+"""@TODO fix the hang ind the following tests"""
+
+
 class SeedFreshFlagTest(TestCase):
     def test_fresh_clears_previous_seed_first(self):
         _seed(travelers=8, travels=4)

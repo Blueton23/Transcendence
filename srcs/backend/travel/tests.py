@@ -11,16 +11,16 @@ from django.urls import reverse
 from rest_framework.test import APITestCase
 
 from common.realtime import travel_group
-from common.testing import WebsocketCommunicator
+from common.testing import BroadcastListenerMixin, WebsocketCommunicator
 from config.asgi import application
+from idea.models import (
+    Idea,
+    IdeaType,
+)
 from travel.consumers import (
     CLOSE_NOT_AUTHENTICATED,
     CLOSE_NOT_PARTICIPANT,
     TravelConsumer,
-)
-from idea.models import (
-    Idea,
-    IdeaType,
 )
 from travel.models import (
     Participation,
@@ -916,6 +916,88 @@ class StepViewTest(APITestCase):
 
 
 # --- WebSocket tests ---
+
+
+class StepBroadcastTest(BroadcastListenerMixin, APITestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Mon voyage",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 3),
+            **COORDS,
+        )
+        self.client.force_authenticate(user=self.traveler)
+        self.listen_to(travel_group(self.travel.id))
+
+    def request(self, method, url, data=None):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = getattr(self.client, method)(url, data, format="json")
+        return response, callbacks
+
+    def detail_url(self):
+        return reverse(
+            "step-detail", kwargs={"travel_id": self.travel.id, "pk": self.step.id}
+        )
+
+    def test_create_broadcasts_step_created(self):
+        response, _ = self.request(
+            "post",
+            reverse("step-list", kwargs={"travel_id": self.travel.id}),
+            {
+                "localisation": "Annecy",
+                "start_date": "2026-06-05",
+                "end_date": "2026-06-07",
+                **COORDS,
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "step.created")
+        self.assertEqual(event["payload"]["id"], response.data["id"])
+        self.assertEqual(event["payload"]["travelId"], self.travel.id)
+        self.assertEqual(event["payload"]["startDate"], "2026-06-05")
+
+    def test_update_broadcasts_step_updated(self):
+        response, _ = self.request("patch", self.detail_url(), {"localisation": "Nice"})
+
+        self.assertEqual(response.status_code, 200)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "step.updated")
+        self.assertEqual(event["payload"]["localisation"], "Nice")
+
+    def test_delete_broadcasts_step_deleted(self):
+        response, _ = self.request("delete", self.detail_url())
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "step.deleted", "payload": {"id": self.step.id}},
+        )
+
+    def test_invalid_update_broadcasts_nothing(self):
+        response, callbacks = self.request(
+            "patch", self.detail_url(), {"end_date": "2026-05-01"}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(callbacks, [])
 
 
 # TransactionTestCase: database_sync_to_async closes the connection that

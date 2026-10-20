@@ -13,6 +13,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.realtime import broadcast, travel_group
+
 from .mixins import ParticipantScopedMixin
 from .models import Participation, ParticipationStatus, Step, Travel
 from .permissions import IsTravelParticipant
@@ -60,6 +62,10 @@ class TravelDetailView(ParticipantScopedMixin, RetrieveUpdateAPIView):
     serializer_class = TravelSerializer
 
 
+def broadcast_step(event_type, step):
+    broadcast(travel_group(step.travel_id), event_type, StepSerializer(step).data)
+
+
 class StepListView(ListCreateAPIView):
     queryset = Step.objects.alive()
     serializer_class = StepSerializer
@@ -69,7 +75,9 @@ class StepListView(ListCreateAPIView):
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
     def perform_create(self, serializer):
-        serializer.save(travel_id=self.kwargs["travel_id"])
+        broadcast_step(
+            "step.created", serializer.save(travel_id=self.kwargs["travel_id"])
+        )
 
 
 class StepDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
@@ -80,8 +88,13 @@ class StepDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
+    def perform_update(self, serializer):
+        broadcast_step("step.updated", serializer.save())
+
     def perform_destroy(self, instance):
         instance.soft_delete()
+        # Ideas placed on this step go back to the pool: clients refetch them.
+        broadcast(travel_group(instance.travel_id), "step.deleted", {"id": instance.id})
         # TODO: message system a rajouter dans la chat + bouton "restaurer"une fois l-app chat prete
 
 
