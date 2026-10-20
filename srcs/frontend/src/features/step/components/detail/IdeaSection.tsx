@@ -57,7 +57,11 @@ function IdeaDay({
             <ChosenNight night={night.chosen} actions={actions} />
           )}
           {night && !night?.chosen && night?.proposals.length > 0 && (
-            <ProposalsNights proposals={night.proposals} />
+            <ProposalsNights
+              proposals={night.proposals}
+              travel={travel}
+              actions={actions}
+            />
           )}
           {night && !night.chosen && night.proposals.length === 0 && (
             <NoNight onAddLodging={() => onAddLodging(night.date)} />

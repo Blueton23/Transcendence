@@ -10,6 +10,7 @@ import Text from "@/shared/ui/Text";
 import IconBadge from "@/shared/ui/IconBadge";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
+import Button from "@/shared/ui/Button";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -17,6 +18,7 @@ export interface IdeaCardProps {
   proposerName: string;
   proposerInitials: string;
   stepName?: string;
+  chooseButton?: boolean;
   onPlace?: () => void;
   onView?: () => void;
   onVote: () => Promise<void>;
@@ -33,6 +35,7 @@ export function IdeaCard({
   proposerName,
   proposerInitials,
   stepName,
+  chooseButton,
   onPlace,
   onView,
   onVote,
@@ -120,7 +123,7 @@ export function IdeaCard({
                 void submitDelete();
               }}
               onChoose={
-                canChoose
+                canChoose && !chooseButton
                   ? () => {
                       if (isActionPending) {
                         return;
@@ -134,13 +137,24 @@ export function IdeaCard({
           </div>
 
           <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">
-            {(onPlace || onView) && (
-              <StepButton
-                isInPool={isInPool}
-                onPlace={onPlace}
-                onView={onView}
+            {chooseButton ? (
+              <Button
+                variant="dark"
+                size="sm"
+                onClick={() => submitChoose()}
                 disabled={isActionPending}
-              />
+              >
+                Choisir
+              </Button>
+            ) : (
+              (onPlace || onView) && (
+                <StepButton
+                  isInPool={isInPool}
+                  onPlace={onPlace}
+                  onView={onView}
+                  disabled={isActionPending}
+                />
+              )
             )}
           </div>
         </div>

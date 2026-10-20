@@ -133,6 +133,7 @@ function ItineraryPage() {
         <CreateIdeaModal
           travelTitle={travel.title}
           steps={steps}
+          initialStepId={detailView?.id}
           initialType={lodgingDate ? "accommodation" : undefined}
           initialDateRange={
             lodgingDate
