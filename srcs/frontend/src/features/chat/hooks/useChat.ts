@@ -64,7 +64,7 @@ export function useChat(travelId: number) {
             setError("Impossible d'actualiser les messages.");
           }
         });
-    }, 5000);
+    }, 500000);
 
     return () => {
       cancelled = true;

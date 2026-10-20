@@ -1,4 +1,5 @@
-import Text from "../../../shared/ui/Text";
+import Text from "@/shared/ui/Text";
+import Divider from "@/shared/ui/Divider";
 
 interface ChatDateSeparatorProps {
   date: string;
@@ -13,11 +14,17 @@ export default function ChatDateSeparator({ date }: ChatDateSeparatorProps) {
 
   return (
     <div className="flex items-center gap-3 py-4">
-      <div className="h-px flex-1 bg-border" />
+      <div className="flex-1">
+        <Divider />
+      </div>
+
       <Text tone="muted" size="sm">
         {formattedDate}
       </Text>
-      <div className="h-px flex-1 bg-border" />
+
+      <div className="flex-1">
+        <Divider />
+      </div>
     </div>
   );
 }

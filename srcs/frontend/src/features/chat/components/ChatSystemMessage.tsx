@@ -1,4 +1,4 @@
-import Text from "../../../shared/ui/Text";
+import Badge from "@/shared/ui/Badge";
 
 interface ChatSystemMessageProps {
   body: string;
@@ -6,10 +6,8 @@ interface ChatSystemMessageProps {
 
 export default function ChatSystemMessage({ body }: ChatSystemMessageProps) {
   return (
-    <div className="py-2 text-center">
-      <Text size="sm" tone="muted">
-        Info : {body}
-      </Text>
+    <div className="flex justify-center py-2">
+      <Badge variant="error">Info : {body}</Badge>
     </div>
   );
 }

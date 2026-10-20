@@ -1,5 +1,5 @@
 import Avatar from "@/shared/ui/Avatar";
-import Text from "../../../shared/ui/Text";
+import Text from "@/shared/ui/Text";
 import type { ChatMessage as ChatMessageType } from "../types";
 
 interface ChatMessageProps {
@@ -7,7 +7,7 @@ interface ChatMessageProps {
   currentUserId: number | null;
 }
 
-export default function ChatMessage({
+export default function ChatUserMessage({
   message,
   currentUserId,
 }: ChatMessageProps) {
@@ -21,14 +21,12 @@ export default function ChatMessage({
 
   return (
     <article
-      className={`flex gap-3 py-2 ${
-        isOwnMessage ? "flex-row-reverse" : "flex-row"
-      }`}
+      className={`flex gap-3 py-2 ${isOwnMessage ? "flex-row-reverse" : ""}`}
     >
       <Avatar user={message.author} />
 
       <div
-        className={`flex min-w-0 max-w-full flex-col gap-1 ${
+        className={`flex max-w-[80%] min-w-0 flex-col gap-1 ${
           isOwnMessage ? "items-end" : "items-start"
         }`}
       >
@@ -36,7 +34,13 @@ export default function ChatMessage({
           {message.author || "Ancien participant"} · {time}
         </Text>
 
-        <div className="w-fit max-w-full rounded-lg bg-surface-container px-4 py-3 [overflow-wrap:anywhere]">
+        <div
+          className={`rounded-lg px-4 py-3 [overflow-wrap:anywhere] ${
+            isOwnMessage
+              ? "border border-border-control bg-surface-raised text-white"
+              : "bg-surface-container"
+          }`}
+        >
           <Text>{message.body}</Text>
         </div>
       </div>

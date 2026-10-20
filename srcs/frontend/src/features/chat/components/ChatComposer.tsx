@@ -1,6 +1,9 @@
-import { useState } from "react";
-import Button from "../../../shared/ui/Button";
-import Text from "../../../shared/ui/Text";
+import { useRef, useState } from "react";
+import type { FormEvent, KeyboardEvent } from "react";
+
+import Button from "@/shared/ui/Button";
+import Text from "@/shared/ui/Text";
+import Icon from "@/shared/ui/Icon";
 
 interface ChatComposerProps {
   onSend: (body: string) => Promise<void>;
@@ -11,7 +14,9 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
     const content = body.trim();
@@ -23,6 +28,9 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
     try {
       await onSend(content);
       setBody("");
+
+      // Conserver le focus pour écrire le message suivant.
+      requestAnimationFrame(() => textareaRef.current?.focus());
     } catch (sendError) {
       setError(
         sendError instanceof Error
@@ -34,38 +42,56 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
     }
   }
 
+  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (
+      event.key === "Enter" &&
+      !event.shiftKey &&
+      !event.nativeEvent.isComposing
+    ) {
+      event.preventDefault();
+      event.currentTarget.form?.requestSubmit();
+    }
+  }
+
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex items-end gap-3 border-t border-border bg-surface p-4"
+      className="border-t border-border bg-surface p-4"
     >
-      <div className="flex-1">
+      <div className="flex items-center gap-3">
         <textarea
+          ref={textareaRef}
+          id="chat-message"
+          name="message"
           value={body}
           onChange={(event) => setBody(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              event.preventDefault();
-              event.currentTarget.form?.requestSubmit();
-            }
-          }}
+          onKeyDown={handleKeyDown}
           placeholder="Écrire un message…"
-          aria-label="Message à envoyer"
-          rows={2}
           maxLength={2000}
-          className="min-h-12 w-full resize-y rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text outline-none focus:border-brand-primary"
+          disabled={isSending}
+          aria-describedby={error ? "chat-message-error" : undefined}
+          className="min-h-12 min-w-0 flex-1 resize-y rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text transition-colors outline-none placeholder:text-muted focus:border-brand-primary focus:ring-1 focus:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
         />
 
-        {error && (
-          <Text tone="accent" size="sm" className="mt-1">
-            {error}
-          </Text>
-        )}
+        <Button
+          type="submit"
+          variant="primary"
+          disabled={!body.trim() || isSending}
+        >
+          <span className="inline-flex items-center gap-2">
+            <Icon name="arrow" size={16} />
+            {isSending ? "Envoi…" : "Envoyer"}
+          </span>
+        </Button>
       </div>
 
-      <Button type="submit" disabled={!body.trim() || isSending}>
-        {isSending ? "Envoi…" : "Envoyer"}
-      </Button>
+      {error && (
+        <div id="chat-message-error" role="alert" className="mt-2">
+          <Text tone="accent" size="sm">
+            {error}
+          </Text>
+        </div>
+      )}
     </form>
   );
 }

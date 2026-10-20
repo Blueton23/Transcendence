@@ -1,10 +1,13 @@
 import { Fragment, useEffect, useRef } from "react";
 import type { ChatMessage } from "../types";
+
+import { useAuth } from "@/features/auth/context/useAuth";
+import Text from "@/shared/ui/Text";
+
 import ChatDateSeparator from "./ChatDateSeparator";
 import ChatUserMessage from "./ChatUserMessage";
 import ChatSystemMessage from "./ChatSystemMessage";
-import UnreadSeparator from "./UnreadSeparator";
-import { useAuth } from "@/features/auth/context/useAuth";
+import UnreadSeparator from "./ChatUnreadSeparator";
 
 interface ChatTimelineProps {
   messages: ChatMessage[];
@@ -35,20 +38,28 @@ export default function ChatTimeline({
 
   if (isLoading) {
     return (
-      <p className="p-5 text-sm text-text-secondary">
-        Chargement des messages…
-      </p>
+      <div className="p-5">
+        <Text tone="secondary" size="sm">
+          Chargement des messages…
+        </Text>
+      </div>
     );
   }
 
   if (error) {
-    return <p className="p-5 text-sm text-text-secondary">{error}</p>;
+    return (
+      <div className="p-5">
+        <Text tone="accent" size="sm">
+          {error}
+        </Text>
+      </div>
+    );
   }
 
   const firstUnreadIndex = messages.findIndex((message) => message.isUnread);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-4">
       {messages.map((message, index) => {
         const dayKey = getDayKey(message.createdAt);
         const previousMessage = messages[index - 1];
@@ -75,6 +86,7 @@ export default function ChatTimeline({
           </Fragment>
         );
       })}
+
       <div ref={bottomRef} />
     </div>
   );

@@ -1,8 +1,10 @@
 import { useParams } from "react-router";
-import ChatHeader from "../features/chat/components/ChatHeader";
-import ChatTimeline from "../features/chat/components/ChatTimeline";
-import ChatComposer from "../features/chat/components/ChatComposer";
-import { useChat } from "../features/chat/hooks/useChat";
+
+import ChatHeader from "@/features/chat/components/ChatHeader";
+import ChatTimeline from "@/features/chat/components/ChatTimeline";
+import ChatComposer from "@/features/chat/components/ChatComposer";
+import { useChat } from "@/features/chat/hooks/useChat";
+import Text from "@/shared/ui/Text";
 
 export default function ChatPage() {
   const { id } = useParams<{ id: string }>();
@@ -14,7 +16,11 @@ export default function ChatPage() {
   );
 
   if (!isValidId) {
-    return <p className="p-5">Identifiant de voyage invalide.</p>;
+    return (
+      <div className="p-5">
+        <Text tone="accent">Identifiant de voyage invalide.</Text>
+      </div>
+    );
   }
 
   return (
