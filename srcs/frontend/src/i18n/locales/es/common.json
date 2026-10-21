@@ -23,7 +23,7 @@
   "auth": {
     "createAccount": "Crear mi cuenta",
     "login": "Iniciar sesión",
-    "loggingIn": "Iniciando sesión…",
+    "logginIn": "Iniciando sesión…",
     "loginSubtitle": "Inicia sesión para encontrar tus viajes",
     "noAccount": "¿Aún no tienes cuenta?",
     "password": "Contraseña",

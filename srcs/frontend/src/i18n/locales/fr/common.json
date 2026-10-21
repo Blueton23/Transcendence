@@ -24,7 +24,7 @@
   "auth": {
     "createAccount": "Créer mon compte",
     "login": "Se connecter",
-    "loggingIn": "Connexion…",
+    "logginIn": "Connexion…",
     "loginSubtitle": "Connectez-vous pour retrouver vos voyages",
     "noAccount": "Pas encore de compte ?",
     "password": "Mot de passe",

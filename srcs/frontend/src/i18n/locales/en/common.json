@@ -23,7 +23,7 @@
   "auth": {
     "createAccount": "Create my account",
     "login": "Log in",
-    "loggingIn": "Logging in…",
+    "logginIn": "Logging in…",
     "loginSubtitle": "Log in to find your trips",
     "noAccount": "No account yet?",
     "password": "Password",
