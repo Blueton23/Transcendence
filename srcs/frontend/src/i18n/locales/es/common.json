@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "trips": "Mis viajes",
+    "profile": "Perfil",
+    "home": "Inicio",
+    "itinerary": "Itinerario",
+    "ideas": "Ideas",
+    "expenses": "Gastos",
+    "chat": "Chat",
+    "assistant": "Asistente AI"
+  },
+  "actions": {
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "modify": "Editar",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "cancel": "Cancelar",
+    "loading": "Cargando…",
+    "continue": "Continuar"
+  },
+  "auth": {
+    "createAccount": "Crear mi cuenta",
+    "login": "Iniciar sesión",
+    "loggingIn": "Iniciando sesión…",
+    "loginSubtitle": "Inicia sesión para encontrar tus viajes",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "password": "Contraseña",
+    "newPassword": "Nueva contraseña",
+    "oldPassword": "contraseña actual",
+    "confirmPassword": "Confirmar contraseña",
+    "changePassword": "Cambiar contraseña",
+    "username": "Nombre de usuario",
+    "welcomeBack": "Bienvenido de nuevo",
+    "errors": {
+      "csrfInit": "No se pudo inicializar la protección CSRF.",
+      "invalidCredentials": "Credenciales no válidas.",
+      "logoutFailed": "No se pudo cerrar la sesión.",
+      "notAuthenticated": "Usuario no autenticado."
+    }
+  },
+  "errors": { "csrfMissing": "Token CSRF no encontrado." }
+}

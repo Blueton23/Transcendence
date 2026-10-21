@@ -1,0 +1,43 @@
+{
+  "nav": {
+    "trips": "My trips",
+    "profile": "Profile",
+    "home": "Home",
+    "itinerary": "Itinerary",
+    "ideas": "Ideas",
+    "expenses": "Expenses",
+    "chat": "Chat",
+    "assistant": "AI assistant"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving...",
+    "modify": "Edit",
+    "delete": "Delete",
+    "close": "Close",
+    "cancel": "Cancel",
+    "loading": "Loading",
+    "continue": "Continue"
+  },
+  "auth": {
+    "createAccount": "Create my account",
+    "login": "Log in",
+    "loggingIn": "Logging in…",
+    "loginSubtitle": "Log in to find your trips",
+    "noAccount": "No account yet?",
+    "password": "Password",
+    "newPassword": "New Password",
+    "oldPassword": "Old Password",
+    "confirmPassword": "Confirm password",
+    "changePassword": "Change password",
+    "username": "Username",
+    "welcomeBack": "Welcome back",
+    "errors": {
+      "csrfInit": "Could not initialise CSRF protection.",
+      "invalidCredentials": "Invalid credentials.",
+      "logoutFailed": "Could not log out.",
+      "notAuthenticated": "User not authenticated."
+    }
+  },
+  "errors": { "csrfMissing": "CSRF token not found." }
+}
