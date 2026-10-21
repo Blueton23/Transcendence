@@ -11,10 +11,6 @@ export default function ChatPage() {
   const parsedId = Number(id);
   const isValidId = Boolean(id) && Number.isInteger(parsedId) && parsedId > 0;
 
-  const { messages, unreadCount, isLoading, error, sendMessage } = useChat(
-    isValidId ? parsedId : 0,
-  );
-
   if (!isValidId) {
     return (
       <div className="p-5">
@@ -22,6 +18,13 @@ export default function ChatPage() {
       </div>
     );
   }
+
+  return <ValidChatPage travelId={parsedId} />;
+}
+
+function ValidChatPage({ travelId }: { travelId: number }) {
+  const { messages, unreadCount, isLoading, error, sendMessage } =
+    useChat(travelId);
 
   return (
     <section className="flex h-full min-h-0 flex-col overflow-hidden bg-surface">

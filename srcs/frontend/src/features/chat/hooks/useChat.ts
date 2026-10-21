@@ -88,8 +88,7 @@ export function useChat(travelId: number) {
 
         return [...current, newMessage].sort(
           (a, b) =>
-            new Date(a.createdAt).getTime() -
-              new Date(b.createdAt).getTime() ||
+            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime() ||
             a.id - b.id,
         );
       });
