@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { login } from "../api/auth";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "@/features/auth/context/useAuth";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import Button from "@/shared/ui/Button";

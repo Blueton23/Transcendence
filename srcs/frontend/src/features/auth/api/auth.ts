@@ -1,5 +1,5 @@
 import type { AuthResponse, LoginData } from "../types";
-import { getCookie } from "../../../shared/api/cookies";
+import { getCookie } from "@/shared/api/cookies";
 
 const API_BASE_URL = "/api";
 
