@@ -11,11 +11,13 @@ import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 function FriendSearch() {
   const [query, setQuery] = useState("");
   const [traveler, setTraveler] = useState<User | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const {
     submit: submitSearch,
@@ -33,7 +35,7 @@ function FriendSearch() {
     clearError: ClearRequestError,
   } = useSubmitAction(async () => {
     if (!traveler) {
-      throw new Error("Aucun utilisateur sélectionné.");
+      throw new Error(t("friendship.errors.noUserSelected"));
     }
     return sendFriendRequest(traveler.id);
   });
@@ -59,7 +61,7 @@ function FriendSearch() {
 
     if (result.success) {
       setTraveler(null);
-      setMessage("Demande d'amitié envoyée.");
+      setMessage(t("friendship.requestSent"));
     }
   }
 
@@ -67,7 +69,7 @@ function FriendSearch() {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
         <Heading level={1} size="lg">
-          Amis
+          {t("friendship.title")}
         </Heading>
       </div>
       <form
@@ -81,12 +83,12 @@ function FriendSearch() {
             setQuery(event.target.value);
             setMessage(null);
           }}
-          placeholder="Ajouter un ami · pseudo ou email"
+          placeholder={t("friendship.search")}
           className="flex-1"
         />
 
         <Button type="submit" variant="dark" disabled={isSearching}>
-          {isSearching ? "Recherche..." : "Rechercher"}
+          {isSearching ? t("actions.searching") : t("friendship.search")}
         </Button>
       </form>
       {searchError && <Text tone="accent">{searchError}</Text>}
@@ -112,7 +114,7 @@ function FriendSearch() {
             onClick={() => void handleSendRequest()}
             disabled={isSending}
           >
-            {isSending ? "Envoi..." : "Envoyer une demande"}
+            {isSending ? t("friendship.sending") : t("friendship.sendRequest")}
           </Button>
         </div>
       )}

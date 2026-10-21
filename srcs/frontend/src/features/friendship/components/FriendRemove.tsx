@@ -40,7 +40,7 @@ function FriendRemove({
   return (
     <Modal
       icon="trash"
-      title={`Retirer ${username} de vos amis ?`}
+      title={t("friendship.removeTitle", { username })}
       size="narrow"
       onClose={onCancel}
     >
@@ -63,7 +63,7 @@ function FriendRemove({
             disabled={isSubmitting}
             onClick={() => void handleRemove()}
           >
-            {isSubmitting ? "Suppression..." : "Retirer"}
+            {isSubmitting ? t("friendship.removing") : t("friendship.remove")}
           </Button>
         </div>
       </div>

@@ -17,7 +17,8 @@
     "close": "Close",
     "cancel": "Cancel",
     "loading": "Loading",
-    "continue": "Continue"
+    "continue": "Continue",
+    "searching": "Searching…"
   },
   "auth": {
     "createAccount": "Create my account",
@@ -37,6 +38,28 @@
       "invalidCredentials": "Invalid credentials.",
       "logoutFailed": "Could not log out.",
       "notAuthenticated": "User not authenticated."
+    }
+  },
+  "friendship": {
+    "accept": "Accept",
+    "decline": "Decline",
+    "myFriends": "MY FRIENDS · {{count}}",
+    "noFriends": "You don't have any friends yet.",
+    "noRequests": "No pending friend requests.",
+    "receivedRequests": "RECEIVED REQUESTS",
+    "remove": "Remove",
+    "removeTitle": "Remove {{username}} from your friends?",
+    "removing": "Removing…",
+    "requestSent": "Friend request sent.",
+    "search": "Search",
+    "searchPlaceholder": "Add a friend · username or email",
+    "sendRequest": "Send a request",
+    "sending": "Sending…",
+    "title": "Friends",
+    "errors": {
+      "loadFailed": "Could not load your friends list.",
+      "missingRequestId": "Request ID missing.",
+      "noUserSelected": "No user selected."
     }
   },
   "errors": { "csrfMissing": "CSRF token not found." }

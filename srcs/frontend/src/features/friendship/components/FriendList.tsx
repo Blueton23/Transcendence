@@ -10,6 +10,7 @@ import Icon from "@/shared/ui/Icon";
 
 import FriendRemove from "./FriendRemove";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 
 interface FriendListProps {
   refreshKey: number;
@@ -28,7 +29,7 @@ function FriendList({ refreshKey }: FriendListProps) {
         setFriendships(response.friendships);
         setError(null);
       } catch {
-        setError("Impossible de charger votre liste d'amis.");
+        setError(i18n.t("friendship.errors.loadFailed"));
       }
     }
 
@@ -47,13 +48,15 @@ function FriendList({ refreshKey }: FriendListProps) {
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-1">
-        <Text tone="muted">MES AMIS · {friendships.length}</Text>
+        <Text tone="muted">
+          {t("friendship.myFriends", { count: friendships.length })}
+        </Text>
       </div>
 
       {error && <Text tone="accent">{error}</Text>}
 
       {friendships.length === 0 ? (
-        <Text tone="muted">Vous n'avez pas encore d'amis.</Text>
+        <Text tone="muted">{t("friendship.noFriends")}</Text>
       ) : (
         <div className="grid gap-3">
           {friendships.map((friendship) => {

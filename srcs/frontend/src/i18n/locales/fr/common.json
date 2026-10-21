@@ -18,7 +18,8 @@
     "cancel": "Annuler",
     "close": "Fermer",
     "continue": "Continuer",
-    "loading": "Chargement..."
+    "loading": "Chargement...",
+    "searching": "Recherche…"
   },
   "auth": {
     "createAccount": "Créer mon compte",
@@ -38,6 +39,28 @@
       "invalidCredentials": "Identifiants invalides.",
       "logoutFailed": "Impossible de se déconnecter.",
       "notAuthenticated": "Utilisateur non authentifié."
+    }
+  },
+  "friendship": {
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "myFriends": "MES AMIS · {{count}}",
+    "noFriends": "Vous n'avez pas encore d'amis.",
+    "noRequests": "Aucune demande d'amitié en attente.",
+    "receivedRequests": "DEMANDES REÇUES",
+    "remove": "Retirer",
+    "removeTitle": "Retirer {{username}} de vos amis ?",
+    "removing": "Suppression…",
+    "requestSent": "Demande d'amitié envoyée.",
+    "search": "Rechercher",
+    "searchPlaceholder": "Ajouter un ami · pseudo ou email",
+    "sendRequest": "Envoyer une demande",
+    "sending": "Envoi…",
+    "title": "Amis",
+    "errors": {
+      "loadFailed": "Impossible de charger votre liste d'amis.",
+      "missingRequestId": "Identifiant de la demande manquant.",
+      "noUserSelected": "Aucun utilisateur sélectionné."
     }
   },
   "errors": { "csrfMissing": "Token CSRF introuvable." }
