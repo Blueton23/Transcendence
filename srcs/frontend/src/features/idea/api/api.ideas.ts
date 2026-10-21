@@ -8,6 +8,7 @@ import type {
 
 import { getCookie } from "@/shared/api/cookies";
 import { translateIdeaError } from "./ideaErrors";
+import i18n from "@/i18n";
 
 import {
   mapIdeaFromApi,
@@ -48,7 +49,7 @@ export async function postIdea(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const payload = mapCreateIdeaToApi(input);
@@ -77,7 +78,7 @@ export async function patchIdea(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const payload = mapCreateIdeaToApi(input);
@@ -105,7 +106,7 @@ export async function removeIdea(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
@@ -140,7 +141,7 @@ export async function patchIdeaPlacement(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const payload = isAccommodation
@@ -174,7 +175,7 @@ export async function chooseIdea(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(
@@ -201,7 +202,7 @@ export async function addIdeaReaction(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(
@@ -225,7 +226,7 @@ export async function removeIdeaReaction(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
   const response = await fetch(
     `/api/travels/${travelId}/ideas/${ideaId}/reaction/`,
