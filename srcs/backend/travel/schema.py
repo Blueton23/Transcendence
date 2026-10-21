@@ -70,32 +70,16 @@ travels_list_schema = extend_schema_view(
     get=extend_schema(
         summary="Lister mes voyages",
         description=(
-            "Récupère les voyages dont l'utilisateur est participant, du plus "
-            "récent au plus ancien.\n\n"
-            "**Accès** : tout utilisateur authentifié. Les voyages des autres "
-            "utilisateurs n'apparaissent pas.\n\n"
-            "**Réponse** : l'`id` de chaque voyage sert de `travel_id` dans "
-            "les autres routes."
+            "Voyages dont l'utilisateur est participant, du plus récent au plus ancien."
         ),
     ),
     post=extend_schema(
         summary="Créer un voyage",
         description=(
-            "Crée un nouveau voyage. L'utilisateur qui le crée en devient "
-            "automatiquement participant.\n\n"
-            "**Accès** : tout utilisateur authentifié.\n\n"
-            "**Body** :\n\n"
-            "- `title` (obligatoire) : nom du voyage, 50 caractères maximum.\n"
-            "- `startDate` (obligatoire) : premier jour du voyage, format "
-            "`AAAA-MM-JJ`.\n"
-            "- `endDate` (obligatoire) : dernier jour du voyage, format "
-            "`AAAA-MM-JJ`, le même jour que `startDate` ou après.\n"
-            "- `status`, `nights`, `travelers` et `inviteToken` sont calculés "
-            "par le serveur : inutile de les envoyer.\n\n"
-            "**Réponses** : `201` voyage créé (son `id` sert de `travel_id`) "
-            "; `400` champ invalide (le champ fautif est dans `details`).\n\n"
-            "Inviter d'autres participants se fait depuis le site (lien "
-            "d'invitation)."
+            "Crée un voyage. L'utilisateur en devient participant.\n\n"
+            "**Règles** :\n"
+            "- `endDate` : le même jour que `startDate` ou après.\n"
+            "- Inviter d'autres participants se fait depuis le site."
         ),
         examples=[TRAVEL_EXAMPLE],
     ),
@@ -105,96 +89,57 @@ travel_detail_schema = extend_schema_view(
     get=extend_schema(
         summary="Consulter un voyage",
         description=(
-            "Récupère le détail d'un voyage.\n\n"
-            "**Accès** : participants du voyage (sinon `404`).\n\n"
-            "Un voyage ne se supprime pas avec l'API : on le quitte depuis le "
-            "site."
+            "Détail d'un voyage.\n\n"
+            "**Règles** :\n"
+            "- Réservé aux participants du voyage (sinon `404`)."
         ),
     ),
     put=extend_schema(
         summary="Remplacer un voyage",
         description=(
-            "Remplace le titre et les dates du voyage : les 3 champs sont "
-            "obligatoires.\n\n"
-            "**Accès** : tout participant du voyage (sinon `404`).\n\n"
-            "**Body** :\n\n"
-            "- `title` (obligatoire) : nom du voyage, 50 caractères maximum.\n"
-            "- `startDate` (obligatoire) : premier jour du voyage, format "
-            "`AAAA-MM-JJ`.\n"
-            "- `endDate` (obligatoire) : dernier jour du voyage, format "
-            "`AAAA-MM-JJ`, le même jour que `startDate` ou après.\n"
-            "- `status`, `nights`, `travelers` et `inviteToken` sont calculés "
-            "par le serveur : inutile de les envoyer.\n\n"
-            "**Attention** : changer les dates du voyage ne déplace pas ses "
-            "étapes.\n\n"
-            "**Réponses** : `200` voyage modifié ; `400` champ invalide."
+            "Remplace le titre et les dates du voyage.\n\n"
+            "**Règles** :\n"
+            "- Tout participant du voyage peut le modifier (sinon `404`).\n"
+            "- `endDate` : le même jour que `startDate` ou après."
         ),
         examples=[TRAVEL_EXAMPLE],
     ),
     patch=extend_schema(
         summary="Modifier un voyage",
         description=(
-            "Modifie seulement les champs envoyés : le titre, les dates, ou "
-            "les deux.\n\n"
-            "**Accès** : tout participant du voyage (sinon `404`).\n\n"
-            "**Body** : tous les champs sont facultatifs, n'envoyer que ceux "
-            "qui changent.\n\n"
-            "- `title` : nom du voyage, 50 caractères maximum.\n"
-            "- `startDate` : premier jour du voyage, format `AAAA-MM-JJ`.\n"
-            "- `endDate` : dernier jour du voyage, format `AAAA-MM-JJ`, le "
-            "même jour que `startDate` ou après.\n"
-            "- `status`, `nights`, `travelers` et `inviteToken` sont calculés "
-            "par le serveur : inutile de les envoyer.\n\n"
-            "Les règles s'appliquent au résultat final.\n\n"
-            "**Attention** : changer les dates du voyage ne déplace pas ses "
-            "étapes.\n\n"
-            "**Réponses** : `200` voyage modifié ; `400` champ invalide."
+            "Modifie le titre, les dates, ou les deux : seuls les champs envoyés "
+            "changent.\n\n"
+            "**Règles** :\n"
+            "- Tout participant du voyage peut le modifier (sinon `404`).\n"
+            "- `endDate` : le même jour que `startDate` ou après.\n"
+            "- Changer les dates du voyage ne déplace pas ses étapes."
         ),
         examples=TRAVEL_PATCH_EXAMPLE,
     ),
 )
 
-
 steps_list_schema = extend_schema_view(
     get=extend_schema(
         summary="Lister les étapes d'un voyage",
         description=(
-            "Récupère les étapes du voyage `travel_id`, dans l'ordre "
-            "chronologique. Les étapes supprimées n'apparaissent pas.\n\n"
-            "**Accès** : participants du voyage (sinon `403`).\n\n"
-            "**Réponse** : l'`id` de chaque étape sert de `stepId` pour "
-            "placer une idée ; `nights` est le nombre de nuits, `ideaCount` "
-            "le nombre d'idées placées sur l'étape."
+            "Étapes du voyage, dans l'ordre chronologique.\n\n"
+            "**Règles** :\n"
+            "- Réservé aux participants du voyage (sinon `403`)."
         ),
     ),
     post=extend_schema(
         summary="Créer une étape",
         description=(
-            "Crée une étape dans le voyage `travel_id`.\n\n"
-            "**Accès** : participants du voyage (sinon `403`).\n\n"
-            "**Body** :\n\n"
-            "- `localisation` (obligatoire) : nom du lieu, 255 caractères "
-            "maximum.\n"
-            "- `startDate` (obligatoire) : premier jour de l'étape, format "
-            "`AAAA-MM-JJ`, dans les dates du voyage.\n"
-            "- `endDate` (obligatoire) : dernier jour de l'étape, format "
-            "`AAAA-MM-JJ`, dans les dates du voyage, le même jour que "
+            "Crée une étape dans le voyage.\n\n"
+            "**Règles** :\n"
+            "- Réservé aux participants du voyage (sinon `403`).\n"
+            "- Dates comprises dans celles du voyage, `endDate` le même jour que "
             "`startDate` ou après.\n"
-            "- `latitude` (obligatoire) : entre -90 et 90, 7 décimales "
-            "maximum, envoyée comme texte entre guillemets (ex. "
-            "`45.7640000`).\n"
-            "- `longitude` (obligatoire) : entre -180 et 180, même format "
-            "(ex. `4.8357000`).\n"
-            "- `priority` (facultatif) : entier supérieur ou égal à 0, ordre "
-            "entre des étapes aux mêmes dates.\n\n"
-            "**Règles** :\n\n"
-            "- Les étapes d'un voyage ne se chevauchent pas : une étape peut "
-            "seulement commencer le jour où la précédente se termine.\n"
-            "- Les coordonnées sont fournies par le client : sur une carte, "
-            "ou avec un service de géocodage (par exemple Nominatim "
-            "d'OpenStreetMap).\n\n"
-            "**Réponses** : `201` étape créée ; `400` règle non respectée (le "
-            "champ fautif est dans `details`)."
+            "- Pas de chevauchement avec une autre étape : une étape peut "
+            "commencer le jour où la précédente se termine.\n"
+            "- `latitude` entre -90 et 90, `longitude` entre -180 et 180 : "
+            "fournies par le client (carte ou géocodage).\n"
+            "- `priority` (facultatif) : ordre entre des étapes aux mêmes dates."
         ),
         examples=[STEP_EXAMPLE],
     ),
@@ -204,84 +149,51 @@ step_detail_schema = extend_schema_view(
     get=extend_schema(
         summary="Consulter une étape",
         description=(
-            "Récupère le détail d'une étape du voyage.\n\n"
-            "**Accès** : participants du voyage (sinon `404`)."
+            "Détail d'une étape du voyage.\n\n"
+            "**Règles** :\n"
+            "- Réservé aux participants du voyage (sinon `404`)."
         ),
     ),
     put=extend_schema(
         summary="Remplacer une étape",
         description=(
-            "Remplace toutes les données de l'étape : envoyer tous les "
-            "champs, y compris `priority` (`null` s'il ne sert pas), sinon il "
-            "garde son ancienne valeur.\n\n"
-            "**Accès** : participants du voyage (sinon `404`).\n\n"
-            "**Body** :\n\n"
-            "- `localisation` (obligatoire) : nom du lieu, 255 caractères "
-            "maximum.\n"
-            "- `startDate` (obligatoire) : premier jour de l'étape, format "
-            "`AAAA-MM-JJ`, dans les dates du voyage.\n"
-            "- `endDate` (obligatoire) : dernier jour de l'étape, format "
-            "`AAAA-MM-JJ`, dans les dates du voyage, le même jour que "
+            "Remplace toute l'étape : envoyer tous les champs, `priority` compris "
+            "(`null` s'il ne sert pas).\n\n"
+            "**Règles** :\n"
+            "- Réservé aux participants du voyage (sinon `404`).\n"
+            "- Dates comprises dans celles du voyage, `endDate` le même jour que "
             "`startDate` ou après.\n"
-            "- `latitude` (obligatoire) : entre -90 et 90, 7 décimales "
-            "maximum, envoyée comme texte entre guillemets (ex. "
-            "`45.7640000`).\n"
-            "- `longitude` (obligatoire) : entre -180 et 180, même format "
-            "(ex. `4.8357000`).\n"
-            "- `priority` (facultatif) : entier supérieur ou égal à 0, ordre "
-            "entre des étapes aux mêmes dates.\n\n"
-            "**Règles** :\n\n"
-            "- Les étapes d'un voyage ne se chevauchent pas : une étape peut "
-            "seulement commencer le jour où la précédente se termine.\n"
-            "- Les coordonnées sont fournies par le client : sur une carte, "
-            "ou avec un service de géocodage (par exemple Nominatim "
-            "d'OpenStreetMap).\n\n"
-            "**Réponses** : `200` étape modifiée ; `400` règle non respectée."
+            "- Pas de chevauchement avec une autre étape : une étape peut "
+            "commencer le jour où la précédente se termine.\n"
+            "- `latitude` entre -90 et 90, `longitude` entre -180 et 180."
         ),
         examples=[STEP_PUT_EXAMPLE],
     ),
     patch=extend_schema(
         summary="Modifier une étape",
         description=(
-            "Modifie seulement les champs envoyés. Pour changer de lieu, "
-            "envoyer `localisation`, `latitude` et `longitude` ensemble.\n\n"
-            "**Accès** : participants du voyage (sinon `404`).\n\n"
-            "**Body** : tous les champs sont facultatifs, n'envoyer que ceux "
-            "qui changent.\n\n"
-            "- `localisation` : nom du lieu, 255 caractères maximum.\n"
-            "- `startDate` : premier jour de l'étape, format `AAAA-MM-JJ`, "
-            "dans les dates du voyage.\n"
-            "- `endDate` : dernier jour de l'étape, format `AAAA-MM-JJ`, dans "
-            "les dates du voyage, le même jour que `startDate` ou après.\n"
-            "- `latitude` : entre -90 et 90, 7 décimales maximum, envoyée "
-            "comme texte entre guillemets (ex. `45.7640000`).\n"
-            "- `longitude` : entre -180 et 180, même format (ex. "
-            "`4.8357000`).\n"
-            "- `priority` : entier supérieur ou égal à 0, ordre entre des "
-            "étapes aux mêmes dates.\n\n"
-            "**Règles** :\n\n"
-            "- Les étapes d'un voyage ne se chevauchent pas : une étape peut "
-            "seulement commencer le jour où la précédente se termine.\n"
-            "- Les coordonnées sont fournies par le client : sur une carte, "
-            "ou avec un service de géocodage (par exemple Nominatim "
-            "d'OpenStreetMap).\n\n"
-            "Les règles s'appliquent au résultat final.\n\n"
-            "**Réponses** : `200` étape modifiée ; `400` règle non respectée."
+            "Modifie les champs envoyés. Pour changer de lieu, envoyer "
+            "`localisation`, `latitude` et `longitude` ensemble.\n\n"
+            "**Règles** :\n"
+            "- Réservé aux participants du voyage (sinon `404`).\n"
+            "- Dates comprises dans celles du voyage, `endDate` le même jour que "
+            "`startDate` ou après.\n"
+            "- Pas de chevauchement avec une autre étape : une étape peut "
+            "commencer le jour où la précédente se termine.\n"
+            "- `latitude` entre -90 et 90, `longitude` entre -180 et 180."
         ),
         examples=STEP_PATCH_EXAMPLE,
     ),
     delete=extend_schema(
         summary="Supprimer une étape",
         description=(
-            "Suppression douce : l'étape part à la corbeille. Elle n'apparaît "
-            "plus dans l'API (`404`), et son id ne peut plus servir de "
-            "`stepId`.\n\n"
-            "**Accès** : participants du voyage (sinon `404`).\n\n"
-            "**Conséquence** : les idées placées sur l'étape retournent dans "
-            "le pool. Les restaurants, activités et lieux gardent leur date : "
-            "pour les modifier ensuite, envoyer aussi `startDate` et "
-            "`endDate` à `null`.\n\n"
-            "**Réponse** : `204` étape supprimée."
+            "Suppression douce : l'étape n'apparaît plus dans l'API et ne peut "
+            "plus servir de `stepId`.\n\n"
+            "**Règles** :\n"
+            "- Réservé aux participants du voyage (sinon `404`).\n"
+            "- Les idées de l'étape retournent dans le pool. Les restaurants, "
+            "activités et lieux gardent leur date : pour les modifier ensuite, "
+            "envoyer aussi `startDate` et `endDate` à `null`."
         ),
     ),
 )
