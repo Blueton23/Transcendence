@@ -7,6 +7,7 @@ from .models import Message
 
 class MessageSerializer(serializers.ModelSerializer):
     traveler_name = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
     is_unread = serializers.SerializerMethodField()
 
     class Meta:
@@ -15,6 +16,7 @@ class MessageSerializer(serializers.ModelSerializer):
             "id",
             "traveler",
             "traveler_name",
+            "user",
             "body",
             "created_at",
             "is_system",
@@ -24,6 +26,7 @@ class MessageSerializer(serializers.ModelSerializer):
             "id",
             "traveler",
             "traveler_name",
+            "user",
             "created_at",
             "is_system",
             "is_unread",
@@ -31,6 +34,28 @@ class MessageSerializer(serializers.ModelSerializer):
 
     def get_traveler_name(self, obj):
         return str(obj.traveler) if obj.traveler else "Ancien participant"
+
+    def get_user(self, obj):
+        traveler = obj.traveler
+
+        if traveler is None:
+            return None
+
+        profile_picture = None
+        picture_field = getattr(traveler, "profile_picture", None)
+
+        if picture_field:
+            try:
+                profile_picture = picture_field.url
+            except (ValueError, AttributeError):
+                profile_picture = None
+
+        return {
+            "id": traveler.pk,
+            "first_name": traveler.first_name,
+            "last_name": traveler.last_name,
+            "profile_picture": profile_picture,
+        }
 
     def get_is_unread(self, obj):
         participation = self.context.get("participation")

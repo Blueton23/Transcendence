@@ -39,7 +39,9 @@ export function useChat(travelId: number) {
         }
 
         await markMessagesAsRead(travelId);
-      } catch {
+      } catch (error) {
+        console.error("Erreur lors du chargement des messages :", error);
+
         if (!cancelled) {
           setError("Impossible de charger les messages.");
         }

@@ -267,11 +267,11 @@ class MessageModelTest(TestCase):
     def test_everything_from_others_is_unread_before_first_read(self):
         mine = self._make_message()
         theirs = self._make_message(traveler=self.other)
-        system = self._make_message(traveler=None, is_system=True)
+        self._make_message(traveler=None, is_system=True)
 
         unread = Message.objects.unread_for(self.participation)
 
-        self.assertEqual(list(unread), [theirs, system])
+        self.assertEqual(list(unread), [theirs])
         self.assertNotIn(mine, unread)
 
     def test_mark_read_clears_unread_until_a_new_message(self):

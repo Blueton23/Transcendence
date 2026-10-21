@@ -23,7 +23,7 @@ export default function ChatUserMessage({
     <article
       className={`flex gap-3 py-2 ${isOwnMessage ? "flex-row-reverse" : ""}`}
     >
-      <Avatar user={message.author} />
+      <Avatar user={message.user} />
 
       <div
         className={`flex max-w-[80%] min-w-0 flex-col gap-1 ${
