@@ -177,6 +177,8 @@ SPECTACULAR_SETTINGS = {
         "drf_spectacular.hooks.postprocess_schema_enums",
         "drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields",
     ],
+    # La doc montre exactement les champs à envoyer et ceux qui sont obligatoires.
+    "COMPONENT_SPLIT_REQUEST": True,
 }
 
 # Database
