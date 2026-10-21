@@ -1,5 +1,6 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema, extend_schema_view
 
+# Affiche les valeurs obligatoire à entrer par le client externe dans swagger
 IDEA_EXAMPLE = [
     OpenApiExample(
         "IdeaInPool",
@@ -108,6 +109,25 @@ IDEA_PATCH_EXAMPLE = [
     ),
 ]
 
+# =====================================================================#
+
+# Règles sur les données d'une idée : identiques pour POST, PUT et PATCH
+IDEA_RULES = (
+    "- `stepId` : une étape du même voyage ; absent ou `null` = idée "
+    "dans le pool.\n"
+    "- `startDate` et `endDate` : toujours ensemble.\n"
+    "- Restaurant, activité, lieu (`r`, `a`, `s`) : sans dates dans le "
+    "pool ; un seul jour dans l'étape s'ils sont placés.\n"
+    "- Hébergement (`l`) : dates obligatoires, dans le voyage (pool) ou "
+    "dans l'étape (placé).\n"
+    "- `pricePerNight` : seulement pour un hébergement.\n"
+    "- Choisir un hébergement et voter se font depuis le site."
+)
+
+# =====================================================================#
+
+
+# Affiche les détails explicatifs de chaque vues
 ideas_list_schema = extend_schema_view(
     get=extend_schema(
         summary="Lister les idées d'un voyage",
@@ -126,16 +146,7 @@ ideas_list_schema = extend_schema_view(
         description=(
             "Crée une idée dans le voyage. L'utilisateur en devient l'auteur.\n\n"
             "**Règles** :\n"
-            "- Réservé aux participants du voyage (sinon `403`).\n"
-            "- `stepId` : une étape du même voyage ; absent ou `null` = idée "
-            "dans le pool.\n"
-            "- `startDate` et `endDate` : toujours ensemble.\n"
-            "- Restaurant, activité, lieu (`r`, `a`, `s`) : sans dates dans le "
-            "pool ; un seul jour dans l'étape s'ils sont placés.\n"
-            "- Hébergement (`l`) : dates obligatoires, dans le voyage (pool) ou "
-            "dans l'étape (placé).\n"
-            "- `pricePerNight` : seulement pour un hébergement.\n"
-            "- Choisir un hébergement et voter se font depuis le site."
+            "- Réservé aux participants du voyage (sinon `403`).\n" + IDEA_RULES
         ),
         examples=IDEA_EXAMPLE,
     ),
@@ -157,13 +168,7 @@ idea_detail_schema = extend_schema_view(
             "s'ils ne servent pas (voir les exemples).\n\n"
             "**Règles** :\n"
             "- Tout participant du voyage peut la modifier (sinon `404`).\n"
-            "- `stepId` : une étape du même voyage ; `null` = idée dans le pool.\n"
-            "- `startDate` et `endDate` : toujours ensemble.\n"
-            "- Restaurant, activité, lieu (`r`, `a`, `s`) : sans dates dans le "
-            "pool ; un seul jour dans l'étape s'ils sont placés.\n"
-            "- Hébergement (`l`) : dates obligatoires, dans le voyage (pool) ou "
-            "dans l'étape (placé).\n"
-            "- `pricePerNight` : seulement pour un hébergement."
+            + IDEA_RULES
         ),
         examples=IDEA_PUT_EXAMPLE,
     ),
@@ -178,10 +183,7 @@ idea_detail_schema = extend_schema_view(
             "`null` sauf pour un hébergement.\n\n"
             "**Règles** :\n"
             "- Tout participant du voyage peut la modifier (sinon `404`).\n"
-            "- `stepId` : une étape du même voyage.\n"
-            "- Restaurant, activité, lieu : un seul jour, dans l'étape.\n"
-            "- Hébergement : ses dates doivent être dans l'étape.\n"
-            "- `pricePerNight` : seulement pour un hébergement."
+            + IDEA_RULES
         ),
         examples=IDEA_PATCH_EXAMPLE,
     ),

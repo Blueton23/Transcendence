@@ -1,5 +1,6 @@
 from drf_spectacular.utils import OpenApiExample, extend_schema, extend_schema_view
 
+# Affiche les valeurs obligatoire à entrer par le client externe dans swagger
 TRAVEL_EXAMPLE = OpenApiExample(
     "Travel",
     summary="Voyage complet (titre et dates)",
@@ -41,7 +42,7 @@ STEP_EXAMPLE = OpenApiExample(
 
 STEP_PUT_EXAMPLE = OpenApiExample(
     "Step",
-    summary="Etape complète (tous les champs)",
+    summary="Étape complète (tous les champs)",
     value={**STEP_EXAMPLE.value, "priority": None},
     request_only=True,
 )
@@ -65,7 +66,22 @@ STEP_PATCH_EXAMPLE = [
     ),
 ]
 
+# =====================================================================#
 
+# Règles sur les données d'une étape : identiques pour POST, PUT et PATCH
+STEP_RULES = (
+    "- Dates comprises dans celles du voyage, `endDate` le même jour que "
+    "`startDate` ou après.\n"
+    "- Pas de chevauchement avec une autre étape : une étape peut "
+    "commencer le jour où la précédente se termine.\n"
+    "- `latitude` entre -90 et 90, `longitude` entre -180 et 180 : "
+    "fournies par le client (carte ou géocodage).\n"
+    "- `priority` (facultatif) : ordre entre des étapes aux mêmes dates."
+)
+
+# =====================================================================#
+
+# Affiche les détails explicatifs de chaque vues
 travels_list_schema = extend_schema_view(
     get=extend_schema(
         summary="Lister mes voyages",
@@ -132,14 +148,7 @@ steps_list_schema = extend_schema_view(
         description=(
             "Crée une étape dans le voyage.\n\n"
             "**Règles** :\n"
-            "- Réservé aux participants du voyage (sinon `403`).\n"
-            "- Dates comprises dans celles du voyage, `endDate` le même jour que "
-            "`startDate` ou après.\n"
-            "- Pas de chevauchement avec une autre étape : une étape peut "
-            "commencer le jour où la précédente se termine.\n"
-            "- `latitude` entre -90 et 90, `longitude` entre -180 et 180 : "
-            "fournies par le client (carte ou géocodage).\n"
-            "- `priority` (facultatif) : ordre entre des étapes aux mêmes dates."
+            "- Réservé aux participants du voyage (sinon `403`).\n" + STEP_RULES
         ),
         examples=[STEP_EXAMPLE],
     ),
@@ -160,12 +169,7 @@ step_detail_schema = extend_schema_view(
             "Remplace toute l'étape : envoyer tous les champs, `priority` compris "
             "(`null` s'il ne sert pas).\n\n"
             "**Règles** :\n"
-            "- Réservé aux participants du voyage (sinon `404`).\n"
-            "- Dates comprises dans celles du voyage, `endDate` le même jour que "
-            "`startDate` ou après.\n"
-            "- Pas de chevauchement avec une autre étape : une étape peut "
-            "commencer le jour où la précédente se termine.\n"
-            "- `latitude` entre -90 et 90, `longitude` entre -180 et 180."
+            "- Réservé aux participants du voyage (sinon `404`).\n" + STEP_RULES
         ),
         examples=[STEP_PUT_EXAMPLE],
     ),
@@ -175,12 +179,7 @@ step_detail_schema = extend_schema_view(
             "Modifie les champs envoyés. Pour changer de lieu, envoyer "
             "`localisation`, `latitude` et `longitude` ensemble.\n\n"
             "**Règles** :\n"
-            "- Réservé aux participants du voyage (sinon `404`).\n"
-            "- Dates comprises dans celles du voyage, `endDate` le même jour que "
-            "`startDate` ou après.\n"
-            "- Pas de chevauchement avec une autre étape : une étape peut "
-            "commencer le jour où la précédente se termine.\n"
-            "- `latitude` entre -90 et 90, `longitude` entre -180 et 180."
+            "- Réservé aux participants du voyage (sinon `404`).\n" + STEP_RULES
         ),
         examples=STEP_PATCH_EXAMPLE,
     ),
