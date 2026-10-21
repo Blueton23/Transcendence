@@ -10,13 +10,12 @@ import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { deleteStep } from "@/features/step/api/stepApi";
 import { formatNights } from "@/shared/utils/formatNights";
-import type { Idea } from "@/features/idea/types";
 import type { Step } from "@/features/step/types";
 
 interface StepCardProps {
   step: Step;
   dateLabel: string;
-  lodging?: Idea;
+  lodging?: { lodged: number; total: number };
   onModify: () => void;
   onClick?: () => void;
   refetch: () => void;
@@ -91,15 +90,11 @@ function StepDescription({
 }: Pick<StepCardProps, "step" | "lodging">) {
   return (
     <Text tone="muted" size="sm">
-      {lodging && (
-        <>
-          <Text as="span" tone="accent">
-            [lodging.title]
-          </Text>
-          {" · "}
-        </>
-      )}
-      {formatNights(step.nights)} · {step.ideaCount} idées épinglées
+      {formatNights(step.nights)}
+      {lodging &&
+        lodging.total > 0 &&
+        ` · ${lodging.lodged}/${lodging.total} hébergement`}
+      {` · ${step.ideaCount} idées épinglées`}
     </Text>
   );
 }

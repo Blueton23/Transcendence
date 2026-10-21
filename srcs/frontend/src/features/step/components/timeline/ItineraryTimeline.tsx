@@ -4,6 +4,7 @@ import { SegmentRow } from "@/features/step/components/timeline/Segment";
 import { Fragment } from "react/jsx-runtime";
 import type { Segment, Step } from "@/features/step/types";
 import type { Idea } from "@/features/idea/types";
+import { lodgingsByNight } from "@/features/step/utils/lodgingsByNight";
 
 export interface ItineraryTimelineProps {
   steps: Step[];
@@ -28,12 +29,11 @@ export function ItineraryTimeline({
     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
       {steps.map((step, index) => {
         const segment = segments[index - 1];
-        const lodging = ideas.find(
-          (i) =>
-            i.stepId === step.id &&
-            i.type === "accommodation" &&
-            i.status === "chosen",
-        );
+        const nights = lodgingsByNight(ideas, step);
+        const lodging = {
+          lodged: nights.filter((n) => n.chosen).length,
+          total: nights.length,
+        };
         return (
           <Fragment key={step.id}>
             {segment && (
