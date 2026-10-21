@@ -32,7 +32,7 @@ export function StepDetail({
   // const ideas = .... recuperer ici les idee du step
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
       <StepDetailHeader onBack={onBack} onModify={onModify} />
 
       <StepInfo step={step} dateLabel={dateLabel} hasNights={hasNights} />
