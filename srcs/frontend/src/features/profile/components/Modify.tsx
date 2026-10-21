@@ -9,6 +9,7 @@ import { modifyProfile } from "../api/profile";
 import { useAuth } from "../../auth/context/useAuth";
 import ModifyPassword from "./ModifyPassword";
 import ProfilePicture from "./ProfilePicture";
+import { useTranslation } from "react-i18next";
 
 interface ModifyProps {
   onSuccess: () => void;
@@ -16,6 +17,7 @@ interface ModifyProps {
 
 function Modify({ onSuccess }: ModifyProps) {
   const { currentUser, setCurrentUser } = useAuth();
+  const { t } = useTranslation();
 
   const [form, setForm] = useState({
     firstName: currentUser?.firstName ?? "",
@@ -63,7 +65,7 @@ function Modify({ onSuccess }: ModifyProps) {
         {/* Pseudo */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Pseudo
+            ${t("auth.username")}
           </span>
 
           <Input
@@ -150,7 +152,7 @@ function Modify({ onSuccess }: ModifyProps) {
             formElement?.requestSubmit();
           }}
         >
-          {isSubmitting ? "Enregistrement..." : "Enregistrer"}
+          {isSubmitting ? `${t("actions.saving")}` : `${t("actions.save")}`}
         </Button>
       </div>
     </div>

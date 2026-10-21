@@ -2,6 +2,7 @@ import IconButton from "@/shared/ui/IconButton";
 import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
 import Button from "@/shared/ui/Button";
+import { useTranslation } from "react-i18next";
 
 export function StepDetailHeader({
   onBack,
@@ -10,6 +11,7 @@ export function StepDetailHeader({
   onBack: () => void;
   onModify: () => void;
 }) {
+  const { t } = useTranslation();
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center gap-5">
@@ -26,7 +28,7 @@ export function StepDetailHeader({
         variant="ghost"
         icon={<Icon name="edit" size={16} />}
       >
-        Modifier
+        {t("actions.modify")}
       </Button>
     </div>
   );

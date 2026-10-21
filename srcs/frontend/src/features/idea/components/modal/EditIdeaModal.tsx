@@ -12,6 +12,7 @@ import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 import type { Step } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
 export interface EditIdeaModalProps {
   travelTitle: string;
@@ -58,6 +59,7 @@ export function EditIdeaModal({
   const { titleError, datesError } = validateIdeaForm(values);
 
   const hasTrashedStep = idea.status === "suggested" && idea.stepId !== null;
+  const { t } = useTranslation();
 
   if (hasTrashedStep) {
     return (
@@ -78,7 +80,7 @@ export function EditIdeaModal({
           className="w-full"
           onClick={onClose}
         >
-          Fermer
+          {t("actions.close")}
         </Button>
       </Modal>
     );
@@ -154,7 +156,7 @@ export function EditIdeaModal({
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Enregistrement…" : "Enregistrer"}
+          {isSubmitting ? "Enregistrement…" : `${t("actions.save")}`}
         </Button>
       </form>
     </Modal>

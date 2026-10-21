@@ -5,6 +5,7 @@ import { removeFriendRequest } from "../api/friendship";
 import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
+import { useTranslation } from "react-i18next";
 
 interface FriendRemoveProps {
   friendshipId: number;
@@ -34,6 +35,7 @@ function FriendRemove({
       onRemoved(friendshipId);
     }
   }
+  const { t } = useTranslation();
 
   return (
     <Modal
@@ -52,7 +54,7 @@ function FriendRemove({
             disabled={isSubmitting}
             onClick={onCancel}
           >
-            Annuler
+            {t("actions.cancel")}
           </Button>
 
           <Button

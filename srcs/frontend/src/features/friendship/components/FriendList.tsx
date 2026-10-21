@@ -9,6 +9,7 @@ import Avatar from "@/shared/ui/Avatar";
 import Icon from "@/shared/ui/Icon";
 
 import FriendRemove from "./FriendRemove";
+import { useTranslation } from "react-i18next";
 
 interface FriendListProps {
   refreshKey: number;
@@ -41,6 +42,7 @@ function FriendList({ refreshKey }: FriendListProps) {
 
     setSelectedFriendship(null);
   }
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-5">
@@ -77,7 +79,7 @@ function FriendList({ refreshKey }: FriendListProps) {
                   variant="danger"
                   onClick={() => setSelectedFriendship(friendship)}
                 >
-                  supprimer
+                  {t("actions.delete")}
                 </Button>
               </div>
             );

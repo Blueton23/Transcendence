@@ -7,6 +7,7 @@ import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 import type { Step } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
 export interface CreateIdeaModalProps {
   travelTitle: string;
@@ -38,6 +39,7 @@ export function CreateIdeaModal({
   const [hasSubmitted, setHasSubmitted] = useState(false);
 
   const { titleError, datesError } = validateIdeaForm(values);
+  const { t } = useTranslation();
 
   return (
     <Modal
@@ -104,7 +106,7 @@ export function CreateIdeaModal({
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Enregistrement…" : "Enregistrer"}
+          {isSubmitting ? "Enregistrement…" : `${t("actions.save")}`}
         </Button>
       </form>
     </Modal>

@@ -3,6 +3,7 @@ import IconButton from "@/shared/ui/IconButton";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import MenuItem from "@/shared/ui/MenuItem";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface IdeaOptionsMenuProps {
   onEdit: () => void;
@@ -18,6 +19,7 @@ export function IdeaOptionsMenu({
   disabled = false,
 }: IdeaOptionsMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="relative">
@@ -54,7 +56,7 @@ export function IdeaOptionsMenu({
               setMenuOpen(false);
             }}
           >
-            Modifier
+            {t("actions.modify")}
           </MenuItem>
 
           <MenuItem
@@ -65,7 +67,7 @@ export function IdeaOptionsMenu({
               setMenuOpen(false);
             }}
           >
-            Supprimer
+            {t("actions.delete")}
           </MenuItem>
         </DropdownMenu>
       )}

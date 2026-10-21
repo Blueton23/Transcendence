@@ -11,6 +11,7 @@ import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
 import Text from "@/shared/ui/Text";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function TravelPage() {
   const { travels, isLoading, error, refetch } = useTravels();
@@ -18,6 +19,7 @@ function TravelPage() {
   const [newTravelOpen, setNewTravelOpen] = useState(false);
   const { steps } = useSteps(nextTravel?.id ?? 0);
   const { route } = useRoute(steps);
+  const { t } = useTranslation();
   if (isLoading) return null;
   if (error)
     return (
@@ -29,7 +31,7 @@ function TravelPage() {
   return (
     <div className="flex flex-col gap-4 p-4 md:p-8">
       <div className="flex items-center justify-between">
-        <Heading size="lg">Mes Voyages</Heading>
+        <Heading size="lg">{t("nav.trips")}</Heading>
         <Button
           variant="primary"
           icon={<Icon name="plus" size={18} />}

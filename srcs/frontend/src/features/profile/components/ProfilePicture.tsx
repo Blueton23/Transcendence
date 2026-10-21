@@ -7,11 +7,13 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyProfilePicture } from "../api/profile";
 import { useAuth } from "../../auth/context/useAuth";
+import { useTranslation } from "react-i18next";
 
 function ProfilePicture() {
   const { currentUser, setCurrentUser } = useAuth();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   const { submit, isSubmitting, error } = useSubmitAction(() => {
     if (!selectedFile) {
@@ -83,7 +85,7 @@ function ProfilePicture() {
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Enregistrement..." : "Enregistrer la photo"}
+            {isSubmitting ? `${t("actions.save")}` : "Enregistrer la photo"}
           </Button>
         </div>
       )}

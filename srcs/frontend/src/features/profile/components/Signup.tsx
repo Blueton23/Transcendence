@@ -14,6 +14,7 @@ import Input from "@/shared/ui/Input";
 import Icon from "@/shared/ui/Icon";
 import IconBadge from "@/shared/ui/IconBadge";
 import Text from "@/shared/ui/Text";
+import { useTranslation } from "react-i18next";
 
 const INITIAL_FORM: SignupData = {
   firstName: "",
@@ -30,6 +31,7 @@ function Signup() {
   const [form, setForm] = useState<SignupData>(INITIAL_FORM);
 
   const { submit, isSubmitting, error } = useSubmitAction(() => signup(form));
+  const { t } = useTranslation();
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -109,7 +111,7 @@ function Signup() {
         {/* Pseudo */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Pseudo
+            ${t("auth.username")}
           </span>
 
           <Input
@@ -144,7 +146,7 @@ function Signup() {
         {/* Mot de passe */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Mot de passe
+            {t("auth.password")}
           </span>
 
           <Input
@@ -163,7 +165,7 @@ function Signup() {
         {/* Confirmation du mot de passe */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Confirmer le mot de passe
+            {t("auth.confirmPassword")}
           </span>
 
           <Input
@@ -190,7 +192,7 @@ function Signup() {
             className="w-full rounded-full py-3"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Création..." : "Créer mon compte"}
+            {isSubmitting ? "Création..." : t("auth.createAccount")}
           </Button>
         </div>
         {/* Lien vers la connexion */}
@@ -202,7 +204,7 @@ function Signup() {
             onClick={() => navigate("/login")}
             className="font-medium text-brand-primary hover:underline"
           >
-            Se connecter
+            {t("auth.login")}
           </button>
         </div>
       </form>
