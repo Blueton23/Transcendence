@@ -29,8 +29,9 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
             <Text tone="success" font="mono">
               {night.pricePerNight && `${night.pricePerNight} CHF/nuit · `}
               {lodgingCountNights(night)} · du{" "}
-              {night.arrivalDate && night.departureDate &&
-              `${formatDate(new Date(night.arrivalDate))} au ${" "}
+              {night.arrivalDate &&
+                night.departureDate &&
+                `${formatDate(new Date(night.arrivalDate))} au ${" "}
               ${formatDate(new Date(night.departureDate))}`}
             </Text>
           </div>

@@ -17,9 +17,6 @@ import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModa
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
 
-// TODO(branchement): un fois que PR de david est branchee:
-// - recharger les etapes (refetch) apres la creation pour mettre a jour ideaCount
-
 function ItineraryPage() {
   const { id } = useParams();
   const travelId = Number(id);

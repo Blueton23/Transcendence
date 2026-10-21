@@ -80,7 +80,6 @@ export function IdeaCard({
 
             <div className="flex min-w-0 flex-col items-start gap-1 md:flex-row md:items-center md:gap-1.5">
               <SecondaryInfo
-                ideaType={idea.type}
                 pricePerNight={idea.pricePerNight}
                 proposerName={proposerName}
                 proposerInitials={proposerInitials}
