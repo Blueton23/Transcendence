@@ -37,6 +37,7 @@ export function useChat(travelId: number) {
         if (!cancelled) {
           setMessages(result.map(toChatMessage));
         }
+
         await markMessagesAsRead(travelId);
       } catch {
         if (!cancelled) {
@@ -77,31 +78,21 @@ export function useChat(travelId: number) {
       const content = body.trim();
       if (!content) return;
 
-      setError(null);
+      const result = await postMessage(travelId, { body: content });
+      const newMessage = toChatMessage(result);
 
-      try {
-        const result = await postMessage(travelId, { body: content });
-        const newMessage = toChatMessage(result);
+      setMessages((current) => {
+        if (current.some((message) => message.id === newMessage.id)) {
+          return current;
+        }
 
-        setMessages((current) => {
-          if (current.some((message) => message.id === newMessage.id)) {
-            return current;
-          }
-
-          return [...current, newMessage].sort(
-            (a, b) =>
-              new Date(a.createdAt).getTime() -
-                new Date(b.createdAt).getTime() || a.id - b.id,
-          );
-        });
-      } catch (sendError) {
-        setError(
-          sendError instanceof Error
-            ? sendError.message
-            : "Impossible d'envoyer le message.",
+        return [...current, newMessage].sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() -
+              new Date(b.createdAt).getTime() ||
+            a.id - b.id,
         );
-        throw sendError;
-      }
+      });
     },
     [travelId],
   );

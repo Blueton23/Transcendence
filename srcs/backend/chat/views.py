@@ -34,7 +34,7 @@ class TravelMessageListCreateView(APIView):
 
         if participation is None:
             return Response(
-                {"detail": "Tu n'as pas accès à ce voyage."},
+                {"detail": "Vous n'avez pas accès à ce voyage."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -64,7 +64,7 @@ class TravelMessageListCreateView(APIView):
 
         if not is_active_member:
             return Response(
-                {"detail": "Tu dois être membre du voyage pour envoyer un message."},
+                {"detail": "Vous devez être membre du voyage pour envoyer un message."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -101,7 +101,7 @@ class TravelUnreadCountView(APIView):
         if participation is None:
             return Response(
                 {"detail": "Vous n'avez pas accès à ce voyage.."},
-                status=403,
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         count = Message.objects.unread_for(participation).count()
@@ -126,7 +126,7 @@ class TravelMarkReadView(APIView):
         if participation is None:
             return Response(
                 {"detail": "Vous n'avez pas accès à ce voyage."},
-                status=403,
+                status=status.HTTP_403_FORBIDDEN,
             )
 
         participation.mark_read()

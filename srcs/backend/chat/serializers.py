@@ -30,7 +30,7 @@ class MessageSerializer(serializers.ModelSerializer):
         ]
 
     def get_traveler_name(self, obj):
-        return str(obj.traveler) if obj.traveler else "Ancien membre"
+        return str(obj.traveler) if obj.traveler else "Ancien participant"
 
     def get_is_unread(self, obj):
         participation = self.context.get("participation")
