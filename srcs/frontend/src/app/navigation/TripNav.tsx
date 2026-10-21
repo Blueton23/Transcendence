@@ -5,6 +5,7 @@ import Icon from "../../shared/ui/Icon";
 import Divider from "../../shared/ui/Divider";
 import { Link } from "react-router";
 import type { IconName } from "../../shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface TripNavProps {
   tripId: string;
@@ -23,30 +24,39 @@ interface TripNavItem {
 // TODO(backend): brancher ces compteurs sur les vraies données.
 function getTripNavItems(tripId: string): TripNavItem[] {
   return [
-    { to: `/trip/${tripId}/itinerary`, iconName: "route", label: "Itinéraire" },
+    {
+      to: `/trip/${tripId}/itinerary`,
+      iconName: "route",
+      label: "nav.itinerary",
+    },
     {
       to: `/trip/${tripId}/ideas`,
       iconName: "pinplus",
-      label: "Idées",
+      label: "nav.ideas",
       badgeCount: 2,
     },
-    { to: `/trip/${tripId}/expenses`, iconName: "wallet", label: "Dépenses" },
+    {
+      to: `/trip/${tripId}/expenses`,
+      iconName: "wallet",
+      label: "nav.expenses",
+    },
     {
       to: `/trip/${tripId}/chat`,
       iconName: "chat",
-      label: "Discussion",
+      label: "nav.chat",
       badgeCount: 3,
     },
     {
       to: `/trip/${tripId}/assistant`,
       iconName: "spark",
-      label: "Assistant IA",
+      label: "nav.assistant",
     },
   ];
 }
 
 export function TripNavDesktop({ tripId }: TripNavProps) {
   const items = getTripNavItems(tripId);
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-8">
       <Link
@@ -54,7 +64,7 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
         className="font-md flex items-center gap-2 text-xs text-text-secondary"
       >
         <Icon name="back" size={16} />
-        Mes voyages
+        {t("nav.trips")}
       </Link>
       <div className="flex items-center gap-4">
         <IconBadge color="brand" name="mtn" />
@@ -66,7 +76,7 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
       <Divider />
       <div className="flex flex-col gap-1">
         {items.map((item) => (
-          <NavPill key={item.to} {...item} />
+          <NavPill key={item.to} {...item} label={t(item.label)} />
         ))}
       </div>
     </div>
