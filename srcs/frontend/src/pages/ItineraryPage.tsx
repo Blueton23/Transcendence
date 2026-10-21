@@ -8,7 +8,7 @@ import { StepDetail } from "@/features/step/components/page/StepDetail";
 import type { IdeaActions, Step } from "@/features/step/types";
 import { TripActionsButton } from "@/features/step/components/page/TripActionsButton";
 import { useSteps } from "@/features/step/hooks/useSteps";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import { Navigate } from "react-router";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import { StickyHeader } from "@/shared/ui/StickyHeader";
@@ -42,7 +42,10 @@ function ItineraryPage() {
   const { route, isLoading: isLoadingRoute } = useRoute(steps);
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
-  const [detailStepId, setDetailStepId] = useState<number | null>(null);
+  const [searchParams] = useSearchParams();
+  const [detailStepId, setDetailStepId] = useState<number | null>(
+    Number(searchParams.get("step")) || null,
+  );
   const detailView = steps.find((step) => step.id === detailStepId) ?? null;
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
