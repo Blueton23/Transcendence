@@ -234,6 +234,8 @@ flowchart LR
 
 La configuration actuelle est faite pour le **développement** (rechargement à chaud, code source monté, HTTP sur le port 8080). Les changements prévus pour la production sont écrits en commentaires `# POUR LA PROD` en haut de `docker-compose.yml`, des Dockerfiles, de `nginx.conf` et de `.env.example` : HTTPS sur le port 443 dans Nginx, construire le frontend au lieu de lancer le serveur de développement, lancer Uvicorn avec plusieurs workers au lieu de `--reload`, ne plus monter le code source, et de vraies valeurs secrètes dans le `.env`.
 
+#
+#
 
 # Fonctionnalité : Idées et votes (`idea` / `reaction`)
 
@@ -457,6 +459,8 @@ Les boutons d'action utilisent `useSubmitAction` (partagé) : le bouton est **d�
 | 8 | Placer un hébergement, puis menu `…` → « Choisir cet hébergement » | L'hébergement est marqué comme choisi | `POST /choice/` → `200`, statut `chosen` |
 | 9 | Connecté, ouvrir `http://localhost:8080/api/travels/{id}/ideas/` dans le navigateur | La page de l'API navigable de DRF affiche la liste en JSON camelCase, avec `voteCount` et `voted` | Le backend répond directement, sans le frontend |
 
+#
+#
 
 # Module : API publique (Major, 2 points)
 
@@ -476,7 +480,7 @@ Ce module permet à **un programme extérieur** (un script, Postman, une autre a
 | Documentation | `/api/docs/` (Swagger) et `/api/schema/` (OpenAPI 3), en accès libre |
 | Au moins 5 endpoints GET, POST, PUT, DELETE | 7 URL, 18 opérations, les 4 verbes |
 
-**Le choix d'implémentation** : on **ne duplique pas** les routes (pas de `/api/public/...`). Les routes existantes, déjà utilisées par le frontend, **acceptent aussi la clé API**, et ce **vue par vue** : seules les vues choisies comme publiques l'acceptent, toutes les autres (profil, amis, mot de passe…) restent réservées au site. La documentation, elle, n'est pas protégée et ne décrit **que** ces routes publiques.
+**Le choix d'implémentation** : Les routes existantes, déjà utilisées par le frontend, **acceptent aussi la clé API**, et ce **vue par vue** : seules les vues choisies comme publiques l'acceptent, toutes les autres (profil, amis, mot de passe…) restent réservées au site. La documentation, elle, n'est pas protégée et ne décrit **que** ces routes publiques.
 
 ## Périmètre de ma contribution
 
@@ -484,8 +488,8 @@ Le module entier : clé API, accès par vue, rate limiting, documentation et tes
 
 ## Architecture : le parcours d'une requête
 
-```mermaid
-flowchart LR
+```
+ordre des requêtes
     client["Client externe<br/>(script, Postman…)"] -->|"Authorization: Token &lt;clé&gt;"| nginx["Nginx"]
     nginx --> auth["1. Authentification<br/>Session, puis Token"]
     auth --> perm["2. Permissions<br/>participant du voyage ?"]
@@ -686,10 +690,10 @@ docker compose exec redis redis-cli -n 1 FLUSHDB
 ---
 
 ### Ressources
-https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication
-https://www.django-rest-framework.org/api-guide/throttling/
-https://drf-spectacular.readthedocs.io/en/latest/customization.html
-https://swagger.io/docs/specification/v3_0/authentication/api-keys/
+- https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication
+- https://www.django-rest-framework.org/api-guide/throttling/
+- https://drf-spectacular.readthedocs.io/en/latest/customization.html
+- https://swagger.io/docs/specification/v3_0/authentication/api-keys/
 
 ## Choix techniques et limites connues
 

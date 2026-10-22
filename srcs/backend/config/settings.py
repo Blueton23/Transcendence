@@ -153,39 +153,27 @@ SPECTACULAR_SETTINGS = {
     "TITLE": "Transcendence - API Publique",
     # Règles communes à toutes les routes (affichées en haut de la doc)
     "DESCRIPTION": (
-        "API publique de Transcendence : voyages, étapes et idées.\n\n"
-        "**Authentification** : \n\n"
-        "- Obtenir sa clé avec `POST /api/auth/token/`. \n\n"
-        "- Envoyer dans le header `Authorization: Token <clé>`.\n\n"
-        "**Accès** : \n\n"
-        "- La clé donne les mêmes droits que l'utilisateur sur le site. \n\n"
-        "- Les routes `/api/travels/{travel_id}/...` sont réservées aux "
-        "participants du voyage : sinon `403` sur une liste, `404` sur un détail. \n\n"
-        "- Les ids (`travel_id`, `stepId`, `id`) s'obtiennent avec les routes `GET`.\n\n"
-        "**Modifier** : \n\n"
-        "- `PATCH` : seuls les champs envoyés changent. \n\n"
-        "- `PUT` : envoyer tous les champs ; un champ facultatif absent garde "
-        "son ancienne valeur.\n\n"
-        "**Rate limiting** : \n\n"
-        "- 100 requêtes/minute par utilisateur sur l'API. \n\n"
-        "- 5 requêtes/minute par IP sur `/api/auth/token/`. \n\n"
-        "- Dépassement : `429 Too Many Requests` + header `Retry-After`.\n\n"
-        "**Format** : \n\n"
-        "- JSON en camelCase. \n\n"
-        "- Dates au format `AAAA-MM-JJ`. \n\n"
-        "- Décimales (coordonnées, prix) envoyées comme texte : `45.7640000` "
-        "entre guillemets. \n\n"
-        "- Les champs calculés par le serveur (lecture seule) sont ignorés.\n\n"
-        "**Erreurs** : \n\n"
-        "- `400` données invalides (le champ fautif est dans `details`) \n\n"
-        "- `403` non authentifié ou accès refusé \n\n"
-        "- `404` introuvable \n\n"
-        "- `429` trop de requêtes \n\n"
-        "- Format : `{status, code, message, details}`."
+        "## Gestion des voyages, étapes et idées.\n\n"
+        "### Authentification\n\n"
+        "1. Obtenir une clé avec `POST /api/auth/token/`.\n"
+        "2. Envoyer `Authorization: Token <clé>`.\n\n"
+        "### Accès\n\n"
+        "- **403** : accès refusé.\n"
+        "- **404** : ressource introuvable.\n\n"
+        "### Rate limiting\n\n"
+        "> **Attention :** l'API est limitée à 100 requêtes/minute.\n\n"
+        "### Format\n\n"
+        "- JSON en `camelCase`.\n"
+        "- Dates au format `AAAA-MM-JJ`.\n\n"
+        "### Erreurs\n\n"
+        "- `400` : données invalides.\n"
+        "- `403` : accès refusé.\n"
+        "- `404` : introuvable.\n"
+        "- `429` : trop de requêtes.\n"
     ),
     "VERSION": "1.0.0",
     # Ne documente que les vues marquées public_api = True
-    "PREPROCESSING_HOOKS": ["common.schema.public_endpoints_only"],
+    "PREPROCESSING_HOOKS": ["common.hook.public_endpoints_only"],
     # Le schéma affiche les champs en camelCase, comme l'API réelle
     "POSTPROCESSING_HOOKS": [
         "drf_spectacular.hooks.postprocess_schema_enums",

@@ -93,7 +93,7 @@ travels_list_schema = extend_schema_view(
         summary="Créer un voyage",
         description=(
             "Crée un voyage. L'utilisateur en devient participant.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- `endDate` : le même jour que `startDate` ou après.\n"
             "- Inviter d'autres participants se fait depuis le site."
         ),
@@ -106,7 +106,7 @@ travel_detail_schema = extend_schema_view(
         summary="Consulter un voyage",
         description=(
             "Détail d'un voyage.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`)."
         ),
     ),
@@ -114,7 +114,7 @@ travel_detail_schema = extend_schema_view(
         summary="Remplacer un voyage",
         description=(
             "Remplace le titre et les dates du voyage.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Tout participant du voyage peut le modifier (sinon `404`).\n"
             "- `endDate` : le même jour que `startDate` ou après."
         ),
@@ -125,7 +125,7 @@ travel_detail_schema = extend_schema_view(
         description=(
             "Modifie le titre, les dates, ou les deux : seuls les champs envoyés "
             "changent.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Tout participant du voyage peut le modifier (sinon `404`).\n"
             "- `endDate` : le même jour que `startDate` ou après.\n"
             "- Changer les dates du voyage ne déplace pas ses étapes."
@@ -139,7 +139,7 @@ steps_list_schema = extend_schema_view(
         summary="Lister les étapes d'un voyage",
         description=(
             "Étapes du voyage, dans l'ordre chronologique.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `403`)."
         ),
     ),
@@ -147,7 +147,7 @@ steps_list_schema = extend_schema_view(
         summary="Créer une étape",
         description=(
             "Crée une étape dans le voyage.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `403`).\n" + STEP_RULES
         ),
         examples=[STEP_EXAMPLE],
@@ -159,7 +159,7 @@ step_detail_schema = extend_schema_view(
         summary="Consulter une étape",
         description=(
             "Détail d'une étape du voyage.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`)."
         ),
     ),
@@ -168,7 +168,7 @@ step_detail_schema = extend_schema_view(
         description=(
             "Remplace toute l'étape : envoyer tous les champs, `priority` compris "
             "(`null` s'il ne sert pas).\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`).\n" + STEP_RULES
         ),
         examples=[STEP_PUT_EXAMPLE],
@@ -178,7 +178,7 @@ step_detail_schema = extend_schema_view(
         description=(
             "Modifie les champs envoyés. Pour changer de lieu, envoyer "
             "`localisation`, `latitude` et `longitude` ensemble.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`).\n" + STEP_RULES
         ),
         examples=STEP_PATCH_EXAMPLE,
@@ -188,7 +188,7 @@ step_detail_schema = extend_schema_view(
         description=(
             "Suppression douce : l'étape n'apparaît plus dans l'API et ne peut "
             "plus servir de `stepId`.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`).\n"
             "- Les idées de l'étape retournent dans le pool. Les restaurants, "
             "activités et lieux gardent leur date : pour les modifier ensuite, "

@@ -104,7 +104,7 @@ IDEA_PATCH_EXAMPLE = [
     OpenApiExample(
         "EditNote",
         summary="Modifier la note",
-        value={"note": "Réserver une table pour 4"},
+        value={"note": "Réserver une table"},
         request_only=True,
     ),
 ]
@@ -137,7 +137,7 @@ ideas_list_schema = extend_schema_view(
             "- `suggested` (dans le pool) \n\n"
             "- `placed` (sur une étape) \n\n"
             "- `chosen` (hébergement choisi). \n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `403`)."
         ),
     ),
@@ -145,7 +145,7 @@ ideas_list_schema = extend_schema_view(
         summary="Créer une idée",
         description=(
             "Crée une idée dans le voyage. L'utilisateur en devient l'auteur.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `403`).\n" + IDEA_RULES
         ),
         examples=IDEA_EXAMPLE,
@@ -157,7 +157,7 @@ idea_detail_schema = extend_schema_view(
         summary="Consulter une idée",
         description=(
             "Détail d'une idée du voyage.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`)."
         ),
     ),
@@ -166,7 +166,7 @@ idea_detail_schema = extend_schema_view(
         description=(
             "Remplace toute l'idée : envoyer tous les champs, `null` ou vides "
             "s'ils ne servent pas (voir les exemples).\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Tout participant du voyage peut la modifier (sinon `404`).\n"
             + IDEA_RULES
         ),
@@ -181,7 +181,7 @@ idea_detail_schema = extend_schema_view(
             "- **placer** un hébergement : `stepId` seul ;\n"
             "- **remettre dans le pool** : `stepId` à `null`, et les dates à "
             "`null` sauf pour un hébergement.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Tout participant du voyage peut la modifier (sinon `404`).\n"
             + IDEA_RULES
         ),
@@ -191,7 +191,7 @@ idea_detail_schema = extend_schema_view(
         summary="Supprimer une idée",
         description=(
             "Suppression définitive de l'idée et de ses votes.\n\n"
-            "**Règles** :\n"
+            "### Règles\n\n"
             "- Tout participant du voyage peut la supprimer (sinon `404`)."
         ),
     ),
