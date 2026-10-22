@@ -397,6 +397,8 @@ class IdeaModelTest(TestCase):
             )
 
     def test_non_overlapping_chosen_lodgings_on_same_step_are_allowed(self):
+        self.step.end_date = datetime.date(2026, 6, 6)
+        self.step.save()
         self._make_idea(
             type=IdeaType.LODGING,
             step=self.step,
@@ -409,10 +411,18 @@ class IdeaModelTest(TestCase):
             type=IdeaType.LODGING,
             step=self.step,
             start_date=datetime.date(2026, 6, 4),
-            end_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 5),
             chosen_at=timezone.now(),
         )
         self.assertEqual(second.status, IdeaStatus.CHOSEN)
+
+    def test_lodging_with_same_start_and_end_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                type=IdeaType.LODGING,
+                start_date=datetime.date(2026, 6, 3),
+                end_date=datetime.date(2026, 6, 3),
+            )
 
     def test_chosen_lodging_does_not_overlap_with_itself(self):
         idea = self._make_idea(

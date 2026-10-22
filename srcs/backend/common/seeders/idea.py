@@ -1,7 +1,20 @@
+from datetime import timedelta
+
 from django.utils import timezone
 from faker import Faker
 
 from idea.models import Idea, IdeaType, Reaction
+
+
+def _lodging_dates(fake: Faker, first_day, last_day):
+    """Arrivée et départ d'un hébergement : au moins une nuit, ou None si c'est impossible."""
+    if (last_day - first_day).days < 1:
+        return None
+    start = fake.date_between(
+        start_date=first_day, end_date=last_day - timedelta(days=1)
+    )
+    end = fake.date_between(start_date=start + timedelta(days=1), end_date=last_day)
+    return start, end
 
 
 def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> list:
@@ -18,26 +31,21 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
                 step = fake.random_element(elements=steps)
 
             lodging = idea_type == IdeaType.LODGING
-            # Seul un hebergement place sur une etape peut etre chosen.
+            lodging_dates = None
             if lodging:
-                if step is not None:
-                    start = fake.date_between(
-                        start_date=step.start_date,
-                        end_date=step.end_date,
-                    )
-                    end = fake.date_between(
-                        start_date=start,
-                        end_date=step.end_date,
-                    )
-                else:
-                    start = fake.date_between(
-                        start_date=travel.start_date,
-                        end_date=travel.end_date,
-                    )
-                    end = fake.date_between(
-                        start_date=start,
-                        end_date=travel.end_date,
-                    )
+                first, last = (
+                    (step.start_date, step.end_date)
+                    if step is not None
+                    else (travel.start_date, travel.end_date)
+                )
+                lodging_dates = _lodging_dates(fake, first, last)
+                if lodging_dates is None:
+                    # aucune nuit possible (étape ou voyage d'un seul jour)
+                    idea_type = IdeaType.RESTAURANT
+                    lodging = False
+
+            if lodging:
+                start, end = lodging_dates
             elif step is not None:
                 start = end = fake.date_between(
                     start_date=step.start_date,

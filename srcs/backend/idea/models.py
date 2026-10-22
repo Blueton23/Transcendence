@@ -161,6 +161,14 @@ class Idea(TimeStampedModel, ValidatedModel):
             if self.end_date > self.travel.end_date:
                 errors["end_date"] = "The lodging cannot end after the travel."
 
+        if (
+            self.type == IdeaType.LODGING
+            and self.start_date
+            and self.end_date
+            and self.start_date == self.end_date
+        ):
+            errors["end_date"] = "A lodging must span at least one night."
+
         if errors:
             raise ValidationError(errors)
 
