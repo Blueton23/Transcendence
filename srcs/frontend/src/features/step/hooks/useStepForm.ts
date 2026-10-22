@@ -8,6 +8,7 @@ import type { Step } from "@/features/step/types";
 import type { Place } from "@/features/map/types";
 import { searchPlace } from "@/features/map/api/mapboxApi";
 import { usePlaceSuggestions } from "@/features/map/hooks/usePlaceSuggestions";
+import { useTranslation } from "react-i18next";
 
 type OpenPanel = "place" | "calendar" | null;
 
@@ -27,6 +28,7 @@ function placeFromStep(step?: Step): Place | null {
 }
 
 export function useStepForm({ step, travel, onSuccess }: UseStepFormProps) {
+  const { t } = useTranslation();
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const [query, setQuery] = useState("");
   const [place, setPlace] = useState<Place | null>(placeFromStep(step));
@@ -41,7 +43,7 @@ export function useStepForm({ step, travel, onSuccess }: UseStepFormProps) {
   const { suggestions, isLoading } = usePlaceSuggestions(query);
   const { submit, isSubmitting, error } = useSubmitAction(async () => {
     if (!selected?.from || !selected?.to) {
-      throw new Error("Sélectionne des dates avant de valider.");
+      throw new Error(t("travel.errors.datesRequired"));
     }
     const chosen = place ?? (await searchPlace(query))[0];
     if (!chosen)

@@ -11,6 +11,7 @@ import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { deleteStep } from "@/features/step/api/stepApi";
 import { formatNights } from "@/shared/utils/formatNights";
+import { useTranslation } from "react-i18next";
 
 //TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
 // pas un champ stocke dans Step
@@ -50,6 +51,7 @@ function StepOptionsButton({
   setIsOpen,
 }: StepOptionsButtonProps) {
   // rajouter error une fois que bandeau error en place
+  const { t } = useTranslation();
   const { submit, isSubmitting } = useSubmitAction(() =>
     deleteStep(travelId, stepId),
   );
@@ -65,7 +67,7 @@ function StepOptionsButton({
     <div className={StepOptionsStyle} onClick={(e) => e.stopPropagation()}>
       <IconButton
         icon={<Icon name="dots" size={16} />}
-        label="Options"
+        label={t("actions.options")}
         onClick={() => setIsOpen(!isOpen)}
         onMouseDown={(e) => e.stopPropagation()}
       />

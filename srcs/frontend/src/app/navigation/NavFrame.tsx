@@ -1,3 +1,4 @@
+import { LanguageSwitcher } from "@/app/navigation/LanguageSwitcher";
 import type { ReactNode } from "react";
 
 interface NavFrameProps {
@@ -8,6 +9,9 @@ export function NavFrameDesktop({ children }: NavFrameProps) {
   return (
     <div className="hidden md:flex md:w-62.5 md:flex-col md:p-6">
       {children}
+      <div className="mt-auto">
+        <LanguageSwitcher />
+      </div>
     </div>
   );
 }
