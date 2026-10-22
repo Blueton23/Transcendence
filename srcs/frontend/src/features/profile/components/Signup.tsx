@@ -65,7 +65,7 @@ function Signup() {
         <IconBadge color="purple" name="mtn" />
 
         <Heading level={1} size="lg">
-          {t("profile.signupTile")}
+          {t("profile.signupTitle")}
         </Heading>
 
         <Text tone="secondary">{t("profile.signupSubtitle")}</Text>
@@ -192,7 +192,7 @@ function Signup() {
             className="w-full rounded-full py-3"
             disabled={isSubmitting}
           >
-            {isSubmitting ? t("auth.creation") : t("auth.createAccount")}
+            {isSubmitting ? t("auth.creating") : t("auth.createAccount")}
           </Button>
         </div>
         {/* Lien vers la connexion */}
