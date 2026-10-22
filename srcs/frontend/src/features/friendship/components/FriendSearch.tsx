@@ -83,7 +83,7 @@ function FriendSearch() {
             setQuery(event.target.value);
             setMessage(null);
           }}
-          placeholder={t("friendship.search")}
+          placeholder={t("friendship.searchPlaceholder")}
           className="flex-1"
         />
 
