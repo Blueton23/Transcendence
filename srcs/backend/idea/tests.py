@@ -3083,6 +3083,45 @@ class IdeaViewTest(APITestCase):
         self.assertIsNone(second.chosen_by)
         self.assertIsNone(second.chosen_at)
 
+    def test_choosing_adjacent_lodging_via_endpoint_is_allowed(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel déjà choisi",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            chosen_by=self.traveler,
+            chosen_at=timezone.now(),
+        )
+        second = Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel suivant",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 6),
+            end_date=datetime.date(2026, 6, 7),
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={"travel_id": self.travel.id, "pk": second.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
+
 
 # ========================================================================#
 # --- Reaction -> views tests --- #

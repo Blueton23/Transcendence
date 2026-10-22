@@ -182,8 +182,8 @@ class Idea(TimeStampedModel, ValidatedModel):
                     step_id=self.step_id,
                     type=IdeaType.LODGING,
                     chosen_at__isnull=False,
-                    start_date__lte=self.end_date,
-                    end_date__gte=self.start_date,
+                    start_date__lt=self.end_date,
+                    end_date__gt=self.start_date,
                 )
                 .exclude(pk=self.pk)
                 .exists()
