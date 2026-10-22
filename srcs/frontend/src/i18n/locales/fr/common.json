@@ -19,6 +19,7 @@
     "close": "Fermer",
     "continue": "Continuer",
     "loading": "Chargement...",
+    "options": "Options",
     "searching": "Recherche…"
   },
   "auth": {
@@ -75,6 +76,42 @@
       "missingRequestId": "Identifiant de la demande manquant.",
       "noUserSelected": "Aucun utilisateur sélectionné."
     }
+  },
+  "travel": {
+    "addTravel": "Ajouter un voyage",
+    "changeDates": "Changer les dates",
+    "copied": "Copié ✓",
+    "copy": "Copier",
+    "copyInviteLink": "Copier le lien d'invitation",
+    "createMyTravel": "Créer mon voyage",
+    "createTravel": "Créer un voyage",
+    "creating": "Création...",
+    "errors": {
+      "createFailed": "Impossible de créer le voyage.",
+      "datesRequired": "Sélectionne des dates avant de valider.",
+      "joinFailed": "Impossible de rejoindre le voyage.",
+      "leaveFailed": "Impossible de quitter le voyage.",
+      "notFound": "Aucun voyage trouvé.",
+      "titleRequired": "Indique un titre avant de valider.",
+      "unknown": "Le voyage n'existe pas."
+    },
+    "haveInviteLink": "J'ai un lien d'invitation",
+    "invitation": "INVITATION À REJOINDRE",
+    "inviteLink": "Lien d'invitation",
+    "inviteTravelers": "Invite tes voyageurs pour planifier ensemble {{title}}",
+    "joinTravel": "Rejoindre le voyage",
+    "kms": "{{count}} kms",
+    "leave": "Quitter le voyage",
+    "manageTravelers": "Gérer les voyageurs",
+    "newTravel": "Nouveau voyage",
+    "openTravel": "Ouvrir le voyage",
+    "searchFriend": "Rechercher un ami",
+    "searchFriendPlaceholder": "Pseudo ou prénom...",
+    "skipForNow": "Passer pour l'instant",
+    "titleLabel": "Titre du voyage",
+    "titlePlaceholder": "Titre de mon voyage",
+    "travelCreated": "Voyage créé : {{title}}",
+    "travelersOnBoard": "{{count}} voyageurs déjà à bord"
   },
   "errors": { "csrfMissing": "Token CSRF introuvable." }
 }

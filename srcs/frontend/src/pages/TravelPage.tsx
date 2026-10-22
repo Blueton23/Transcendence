@@ -37,7 +37,7 @@ function TravelPage() {
           icon={<Icon name="plus" size={18} />}
           onClick={() => setNewTravelOpen(true)}
         >
-          Nouveau voyage
+          {t("travel.newTravel")}
         </Button>
       </div>
       {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}

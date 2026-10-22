@@ -5,6 +5,7 @@ import type { Travel } from "@/features/travel/types";
 import type { IconName } from "@/shared/ui/Icon";
 import Modal from "@/shared/ui/Modal";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 type Screen = "choice" | "form" | "created";
@@ -17,6 +18,7 @@ export interface NewTravelModalProps {
 export function NewTravelModal({ onClose, refetch }: NewTravelModalProps) {
   const [screen, setScreen] = useState<Screen>("choice");
   const [created, setCreated] = useState<Travel | null>(null);
+  const { t } = useTranslation();
 
   const handleCreated = (travel: Travel) => {
     setCreated(travel);
@@ -25,9 +27,11 @@ export function NewTravelModal({ onClose, refetch }: NewTravelModalProps) {
   };
 
   const titles: Record<Screen, string> = {
-    choice: "Nouveau voyage",
-    form: "Créer un voyage",
-    created: created ? `${created.title} créé` : "",
+    choice: t("travel.newTravel"),
+    form: t("travel.createTravel"),
+    created: created
+      ? `${t("travel.travelCreated", { title: created.title })}`
+      : "",
   };
 
   const icons: Record<Screen, IconName> = {

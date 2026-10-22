@@ -8,6 +8,7 @@ import IconButton from "@/shared/ui/IconButton";
 import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
 import { formatNights } from "@/shared/utils/formatNights";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 interface TravelListProps {
@@ -17,6 +18,7 @@ interface TravelListProps {
 
 export function TravelList({ travels, onAdd }: TravelListProps) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <div className="grid auto-rows-fr grid-cols-1 gap-2 md:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
       {travels.map((travel) => (
@@ -49,11 +51,11 @@ export function TravelList({ travels, onAdd }: TravelListProps) {
         <IconButton
           variant="ghost"
           icon={<Icon name="plus" size={18} />}
-          label="Ajouter une voyage"
+          label={t("travel.addTravel")}
           className="text-border-collection!"
         ></IconButton>
         <Heading size="sm" className="text-border-collection!">
-          Ajouter un voyage
+          {t("travel.addTravel")}
         </Heading>
       </Card>
     </div>

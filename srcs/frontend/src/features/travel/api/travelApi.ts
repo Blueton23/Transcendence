@@ -1,4 +1,5 @@
 import type { CreateTravelData, Travel } from "@/features/travel/types";
+import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
 import { getApiErrorMessage } from "@/shared/api/errors";
 
@@ -12,7 +13,9 @@ export async function getTravel(travelId: number): Promise<Travel> {
 
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(getApiErrorMessage(result) || "aucun voyage trouvé");
+    throw new Error(
+      getApiErrorMessage(result) || i18n.t("travel.errors.notFound"),
+    );
   }
   return result;
 }
@@ -25,7 +28,9 @@ export async function getTravels(): Promise<Travel[]> {
 
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(getApiErrorMessage(result) || "aucun voyage trouvé");
+    throw new Error(
+      getApiErrorMessage(result) || i18n.t("travel.errors.notFound"),
+    );
   }
   return result;
 }
@@ -34,7 +39,7 @@ export async function createTravel(data: CreateTravelData): Promise<Travel> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/travels/`, {
@@ -50,7 +55,7 @@ export async function createTravel(data: CreateTravelData): Promise<Travel> {
   const result = await response.json();
   if (!response.ok) {
     throw new Error(
-      getApiErrorMessage(result) || "impossible de créer le voyage",
+      getApiErrorMessage(result) || i18n.t("travel.errors.createFailed"),
     );
   }
   return result;
@@ -66,7 +71,9 @@ export async function getInvitation(
 
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(getApiErrorMessage(result) || "le voyage n'existe pas");
+    throw new Error(
+      getApiErrorMessage(result) || i18n.t("travel.errors.unknown"),
+    );
   }
   return result;
 }
@@ -75,7 +82,7 @@ export async function joinTravel(token: string): Promise<Travel> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/travels/join/${token}/`, {
@@ -90,7 +97,7 @@ export async function joinTravel(token: string): Promise<Travel> {
   const result = await response.json();
   if (!response.ok) {
     throw new Error(
-      getApiErrorMessage(result) || "impossible de rejoindre le voyage",
+      getApiErrorMessage(result) || i18n.t("travel.errors.joinFailed"),
     );
   }
   return result;
@@ -100,7 +107,7 @@ export async function leaveTravel(travelId: number): Promise<void> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/travels/${travelId}/leave/`, {
@@ -115,7 +122,7 @@ export async function leaveTravel(travelId: number): Promise<void> {
   if (!response.ok) {
     const result = await response.json();
     throw new Error(
-      getApiErrorMessage(result) || "impossible de quitter le voyage",
+      getApiErrorMessage(result) || i18n.t("travel.errors.leaveFailed"),
     );
   }
 }

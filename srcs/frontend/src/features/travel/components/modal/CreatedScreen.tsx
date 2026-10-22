@@ -4,6 +4,7 @@ import Card from "@/shared/ui/Card";
 import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface CreatedScreenProps {
   travel: Travel;
@@ -13,6 +14,7 @@ interface CreatedScreenProps {
 //TODO: branchement une fois que friendship est terminé
 export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
   const [copied, setCopied] = useState(false);
+  const { t } = useTranslation();
 
   const handleCopy = async () => {
     try {
@@ -29,14 +31,14 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
     <div className="flex flex-col gap-3">
       <Text font="mono" tone="muted">
         {" "}
-        Invite tes voyageurs pour planifier ensemble {travel.title}
+        {t("travel.inviteTravelers")} {travel.title}
       </Text>
       <div className="flex flex-col items-start gap-1">
-        <Text>Rechercher un ami</Text>
-        <Input placeholder="Pseudo ou prenom..."></Input>
+        <Text>{t("travel.searchFriend")}</Text>
+        <Input placeholder={t("travel.searchFriendPlaceholder")}></Input>
       </div>
       <div className="flex flex-col items-start gap-1">
-        <Text>Lien d'invitation</Text>
+        <Text>{t("travel.inviteLink")}</Text>
         <Card className="flex w-full items-center justify-between bg-surface-control p-2! pl-4!">
           <Text font="mono">{link}</Text>
           <Button
@@ -45,13 +47,13 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
             onClick={handleCopy}
             className="md:px-4! md:py-1.5!"
           >
-            {copied ? "Copié ✓" : "Copier"}
+            {copied ? t("travel.copied") : t("travel.copy")}
           </Button>
         </Card>
       </div>
 
       <Button variant="ghost" className="w-full underline" onClick={onClose}>
-        Passer pour l'instant
+        {t("travel.skipForNow")}
       </Button>
     </div>
   );

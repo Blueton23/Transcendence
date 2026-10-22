@@ -17,6 +17,7 @@
     "close": "Close",
     "cancel": "Cancel",
     "loading": "Loading",
+    "options": "Options",
     "continue": "Continue",
     "searching": "Searching…"
   },
@@ -74,6 +75,42 @@
       "missingRequestId": "Request ID missing.",
       "noUserSelected": "No user selected."
     }
+  },
+  "travel": {
+    "addTravel": "Add a trip",
+    "changeDates": "Change dates",
+    "copied": "Copied ✓",
+    "copy": "Copy",
+    "copyInviteLink": "Copy invitation link",
+    "createMyTravel": "Create my trip",
+    "createTravel": "Create a trip",
+    "creating": "Creating...",
+    "errors": {
+      "createFailed": "Could not create the trip.",
+      "datesRequired": "Select dates before confirming.",
+      "joinFailed": "Could not join the trip.",
+      "leaveFailed": "Could not leave the trip.",
+      "notFound": "No trip found.",
+      "titleRequired": "Enter a title before confirming.",
+      "unknown": "The trip does not exist."
+    },
+    "haveInviteLink": "I have an invitation link",
+    "invitation": "INVITATION TO JOIN",
+    "inviteLink": "Invitation link",
+    "inviteTravelers": "Invite your travellers to plan {{title}} together",
+    "joinTravel": "Join the trip",
+    "kms": "{{count}} km",
+    "leave": "Leave the trip",
+    "manageTravelers": "Manage travellers",
+    "newTravel": "New trip",
+    "openTravel": "Open trip",
+    "searchFriend": "Search for a friend",
+    "searchFriendPlaceholder": "Username or first name...",
+    "skipForNow": "Skip for now",
+    "titleLabel": "Trip title",
+    "titlePlaceholder": "My trip title",
+    "travelCreated": "Trip created: {{title}}",
+    "travelersOnBoard": "{{count}} travellers already on board"
   },
   "errors": { "csrfMissing": "CSRF token not found." }
 }
