@@ -22,6 +22,7 @@
   },
   "auth": {
     "createAccount": "Create my account",
+    "creating": "Creating…",
     "login": "Log in",
     "logginIn": "Logging in…",
     "loginSubtitle": "Log in to find your trips",
@@ -39,6 +40,18 @@
       "logoutFailed": "Could not log out.",
       "notAuthenticated": "User not authenticated."
     }
+  },
+  "profile": {
+    "alreadyAccount": "Already have an account?",
+    "changeAvatar": "Change avatar",
+    "editProfile": "Edit profile",
+    "email": "Email",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "savePhoto": "Save photo",
+    "signupSubtitle": "Join your future road trips",
+    "signupTitle": "Create an account",
+    "errors": { "noImage": "No image selected." }
   },
   "friendship": {
     "accept": "Accept",

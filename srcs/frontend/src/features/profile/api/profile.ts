@@ -11,6 +11,7 @@ import type {
 import { getCsrfToken } from "../../auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
 import { parseResponse } from "@/shared/api/errors";
+import i18n from "@/i18n";
 
 const API_BASE_URL = "/api";
 
@@ -18,7 +19,7 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
   await getCsrfToken();
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/travelers/create/`, {

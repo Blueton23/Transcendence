@@ -6,10 +6,12 @@ import { useNavigate } from "react-router";
 import { useAuth } from "../features/auth/context/useAuth";
 import Avatar from "@/shared/ui/Avatar";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
+import { useTranslation } from "react-i18next";
 
 function HomePage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  const { t } = useTranslation();
 
   async function handleLogout() {
     try {
@@ -45,7 +47,7 @@ function HomePage() {
 
         <div className="flex flex-wrap justify-center gap-3">
           <Button variant="primary" onClick={() => navigate("/signup")}>
-            Créer un compte
+            {t("profile.signupTitle")}
           </Button>
 
           <Button variant="outline" onClick={() => navigate("/login")}>

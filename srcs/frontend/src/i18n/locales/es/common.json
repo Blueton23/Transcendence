@@ -22,6 +22,7 @@
   },
   "auth": {
     "createAccount": "Crear mi cuenta",
+    "creating": "Creando…",
     "login": "Iniciar sesión",
     "logginIn": "Iniciando sesión…",
     "loginSubtitle": "Inicia sesión para encontrar tus viajes",
@@ -39,6 +40,18 @@
       "logoutFailed": "No se pudo cerrar la sesión.",
       "notAuthenticated": "Usuario no autenticado."
     }
+  },
+  "profile": {
+    "alreadyAccount": "¿Ya tienes una cuenta?",
+    "changeAvatar": "Cambiar avatar",
+    "editProfile": "Editar perfil",
+    "email": "Correo electrónico",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "savePhoto": "Guardar foto",
+    "signupSubtitle": "Únete a tus próximos road trips",
+    "signupTitle": "Crear una cuenta",
+    "errors": { "noImage": "Ninguna imagen seleccionada." }
   },
   "friendship": {
     "accept": "Aceptar",

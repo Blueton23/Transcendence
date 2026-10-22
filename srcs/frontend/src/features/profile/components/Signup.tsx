@@ -65,10 +65,10 @@ function Signup() {
         <IconBadge color="purple" name="mtn" />
 
         <Heading level={1} size="lg">
-          Créer un compte
+          {t("profile.signupTile")}
         </Heading>
 
-        <Text tone="secondary">Rejoignez vos futurs road trips</Text>
+        <Text tone="secondary">{t("profile.signupSubtitle")}</Text>
       </div>
 
       {/* Formulaire */}
@@ -77,7 +77,7 @@ function Signup() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Prénom
+              {t("profile.firstName")}
             </span>
 
             <Input
@@ -93,7 +93,7 @@ function Signup() {
 
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Nom
+              {t("profile.lastName")}
             </span>
 
             <Input
@@ -129,7 +129,7 @@ function Signup() {
         {/* Email */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Email
+            {t("profile.email")}
           </span>
 
           <Input
@@ -192,12 +192,12 @@ function Signup() {
             className="w-full rounded-full py-3"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Création..." : t("auth.createAccount")}
+            {isSubmitting ? t("auth.creation") : t("auth.createAccount")}
           </Button>
         </div>
         {/* Lien vers la connexion */}
         <div className="flex items-center justify-center gap-1 text-sm">
-          <Text tone="muted">Déjà un compte ?</Text>
+          <Text tone="muted">{t("profile.alreadyAccount")}</Text>
 
           <button
             type="button"

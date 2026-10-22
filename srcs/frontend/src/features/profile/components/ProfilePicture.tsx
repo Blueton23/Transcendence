@@ -17,7 +17,7 @@ function ProfilePicture() {
 
   const { submit, isSubmitting, error } = useSubmitAction(() => {
     if (!selectedFile) {
-      throw new Error("Aucune image sélectionnée.");
+      throw new Error(t("profile.errors.noImage"));
     }
 
     return modifyProfilePicture(selectedFile);
@@ -72,7 +72,7 @@ function ProfilePicture() {
         onClick={handleSelectPicture}
         disabled={isSubmitting}
       >
-        Changer l'avatar
+        {t("profile.changeAvatar")}
       </Button>
 
       {selectedFile && (
@@ -85,7 +85,9 @@ function ProfilePicture() {
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
-            {isSubmitting ? `${t("actions.save")}` : "Enregistrer la photo"}
+            {isSubmitting
+              ? `${t("actions.save")}`
+              : `${t("profile.savePhoto")}`}
           </Button>
         </div>
       )}
