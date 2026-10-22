@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router";
 
 import Text from "../shared/ui/Text";
 import { AppLayout } from "./AppLayout";
+import { TripLayout } from "./TripLayout";
 
 import ProtectedRoute from "../features/auth/components/ProtectedRoute";
 
@@ -33,7 +34,7 @@ function App() {
         <Route element={<AppLayout />}>
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/trip" element={<TravelPage />} />
-          <Route path="/trip/:id">
+          <Route path="/trip/:id" element={<TripLayout />}>
             <Route index element={<Navigate to="itinerary" replace />} />
             <Route path="itinerary" element={<ItineraryPage />} />
             <Route path="ideas" element={<IdeasPage />} />
