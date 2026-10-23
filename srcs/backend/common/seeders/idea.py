@@ -56,17 +56,19 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
 
             chosen = False
 
-            if lodging and step is not None and fake.boolean(chance_of_getting_true=30):
+            if lodging and step is not None:
                 overlaps = Idea.objects.filter(
                     step=step,
                     type=IdeaType.LODGING,
                     chosen_at__isnull=False,
-                    start_date__lte=end,
-                    end_date__gte=start,
+                    start_date__lt=end,
+                    end_date__gt=start,
                 ).exists()
 
-                chosen = not overlaps
+                if overlaps:
+                    step = None
 
+                chosen = fake.boolean(chance_of_getting_true=30)
             ideas.append(
                 Idea.objects.create(
                     travel=travel,

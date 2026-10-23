@@ -3042,7 +3042,7 @@ class IdeaViewTest(APITestCase):
             **COORDS,
         )
 
-        Idea.objects.create(
+        first = Idea.objects.create(
             travel=self.travel,
             traveler=self.traveler,
             title="Hotel déjà choisi",
@@ -3050,8 +3050,6 @@ class IdeaViewTest(APITestCase):
             step=step,
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
-            chosen_by=self.traveler,
-            chosen_at=timezone.now(),
         )
 
         second = Idea.objects.create(
@@ -3066,6 +3064,10 @@ class IdeaViewTest(APITestCase):
 
         self.client.force_authenticate(user=self.traveler)
 
+        first.chosen_by = self.traveler
+        first.chosen_at = timezone.now()
+        first.save()
+
         response = self.client.post(
             reverse(
                 "idea-choice",
@@ -3077,11 +3079,43 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("chosen_at", response.data["details"])
+        self.assertIn("start_date", response.data["details"])
 
         second.refresh_from_db()
         self.assertIsNone(second.chosen_by)
         self.assertIsNone(second.chosen_at)
+
+    # Test : un hébergement ne peut pas être ajouté sur une période déjà choisie
+    def test_lodging_overlapping_chosen_lodging_is_rejected(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel choisi",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            chosen_by=self.traveler,
+            chosen_at=timezone.now(),
+        )
+
+        with self.assertRaises(ValidationError):
+            Idea.objects.create(
+                travel=self.travel,
+                traveler=self.traveler,
+                title="Autre hôtel",
+                type=IdeaType.LODGING,
+                step=step,
+                start_date=datetime.date(2026, 6, 5),
+                end_date=datetime.date(2026, 6, 7),
+            )
 
     def test_choosing_adjacent_lodging_via_endpoint_is_allowed(self):
         step = Step.objects.create(

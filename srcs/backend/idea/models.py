@@ -174,8 +174,9 @@ class Idea(TimeStampedModel, ValidatedModel):
 
         if (
             self.type == IdeaType.LODGING
-            and self.chosen_at is not None
             and self.step_id
+            and self.start_date
+            and self.end_date
         ):
             overlapping = (
                 Idea.objects.filter(
@@ -191,7 +192,7 @@ class Idea(TimeStampedModel, ValidatedModel):
             if overlapping:
                 raise ValidationError(
                     {
-                        "chosen_at": (
+                        "start_date": (
                             "Another chosen lodging on this step overlaps these dates."
                         )
                     }
