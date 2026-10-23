@@ -89,6 +89,7 @@ export function DatesPanel({
               startMonth={new Date(travel.startDate)}
               endMonth={new Date(travel.endDate)}
               markedDays={noNightDays}
+              numberOfMonths={1}
             />
 
             <label className="flex items-center gap-2 font-sans text-md font-semibold">

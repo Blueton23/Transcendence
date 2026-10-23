@@ -11,6 +11,7 @@ import type { Step } from "@/features/step/types";
 interface IdeaFormProps {
   steps: Step[];
   values: IdeaFormValues;
+  lockStep?: boolean;
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
   titleError?: string;
   datesError?: string;
@@ -19,6 +20,7 @@ interface IdeaFormProps {
 export function CreateIdeaForm({
   steps,
   values,
+  lockStep,
   setValues,
   titleError,
   datesError,
@@ -40,6 +42,7 @@ export function CreateIdeaForm({
 
       <Select
         value={values.stepId ?? ""}
+        disabled={lockStep}
         onChange={(event) =>
           setValues((current) => ({
             ...current,

@@ -1,4 +1,3 @@
-import type { Step, StepIdeaPreview } from "@/features/step/types";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
@@ -11,23 +10,16 @@ import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { deleteStep } from "@/features/step/api/stepApi";
 import { formatNights } from "@/shared/utils/formatNights";
+import type { Step } from "@/features/step/types";
 
-//TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
-// pas un champ stocke dans Step
 interface StepCardProps {
   step: Step;
   dateLabel: string;
-  ideaPreview?: StepIdeaPreview;
+  lodging?: { lodged: number; total: number };
   onModify: () => void;
   onClick?: () => void;
   refetch: () => void;
 }
-
-const ideaPreviewTones = {
-  proposed: "accent",
-  selected: "accent",
-  reserved: "success",
-} as const;
 
 const StepOptionsStyle =
   "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
@@ -94,19 +86,15 @@ function StepOptionsButton({
 
 function StepDescription({
   step,
-  ideaPreview,
-}: Pick<StepCardProps, "step" | "ideaPreview">) {
+  lodging,
+}: Pick<StepCardProps, "step" | "lodging">) {
   return (
     <Text tone="muted" size="sm">
-      {ideaPreview && (
-        <>
-          <Text as="span" tone={ideaPreviewTones[ideaPreview.status]}>
-            {ideaPreview.label}
-          </Text>
-          {" · "}
-        </>
-      )}
-      {formatNights(step.nights)} · {step.ideaCount} idées épinglées
+      {formatNights(step.nights)}
+      {lodging &&
+        lodging.total > 0 &&
+        ` · ${lodging.lodged}/${lodging.total} hébergement`}
+      {` · ${step.ideaCount} idées épinglées`}
     </Text>
   );
 }
@@ -115,7 +103,7 @@ function StepDescription({
 export function StepCard({
   step,
   dateLabel,
-  ideaPreview,
+  lodging,
   onClick,
   onModify,
   refetch,
@@ -134,7 +122,7 @@ export function StepCard({
         <Heading level={2}>{step.localisation}</Heading>
       </div>
       <div className="flex items-center">
-        <StepDescription step={step} ideaPreview={ideaPreview} />
+        <StepDescription step={step} lodging={lodging} />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
       <StepOptionsButton

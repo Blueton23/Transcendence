@@ -9,11 +9,12 @@ import { PlaceIdeaModal } from "@/features/idea/components/modal/PlaceIdeaModal"
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
 import type { IdeaFilter, StepFilter } from "@/features/idea/types";
 import { filterIdeas } from "@/features/idea/utils/filterIdeas";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useSteps } from "@/features/step/hooks/useSteps";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
+import { getProposer } from "@/features/idea/utils/getProposer";
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
@@ -44,6 +45,8 @@ export function IdeasPage() {
     error: errorTravel,
   } = useTravel(travelId);
 
+  const navigate = useNavigate();
+
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
   const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
@@ -67,7 +70,6 @@ export function IdeasPage() {
   if (!travel) {
     return <Text>Voyage introuvable.</Text>;
   }
-
   return (
     <div className="px-4 pt-8 md:px-8">
       <div className="mb-6 flex items-center justify-between">
@@ -93,7 +95,6 @@ export function IdeasPage() {
           onChange={setStepActiveFilter}
         />
       </div>
-
       <div className="flex flex-col gap-3">
         {filteredIdeas.length === 0 && (
           <Text tone="muted">
@@ -106,9 +107,7 @@ export function IdeasPage() {
         {filteredIdeas.map((idea) => {
           const step = steps.find((step) => step.id === idea.stepId);
 
-          const proposer = travel.travelers.find(
-            (traveler) => traveler.id === idea.travelerId,
-          );
+          const proposer = getProposer(travel, idea);
 
           return (
             <IdeaCard
@@ -119,7 +118,9 @@ export function IdeasPage() {
               stepName={step?.localisation}
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}
-              onView={() => null}
+              onView={() =>
+                navigate(`/trip/${travelId}/itinerary?step=${idea.stepId}`)
+              }
               onEdit={() => setEditIdeaId(idea.id)}
               onDelete={() => handleDeleteIdea(idea.id)}
               onChoose={() => handleChooseIdea(idea.id)}

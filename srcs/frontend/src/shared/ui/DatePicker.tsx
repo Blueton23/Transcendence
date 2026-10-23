@@ -12,6 +12,7 @@ interface DatePickerProps {
   startMonth?: Date;
   endMonth?: Date;
   markedDays?: Date[];
+  numberOfMonths?: 1 | 2;
 }
 
 export function DatePicker({
@@ -23,14 +24,15 @@ export function DatePicker({
   endMonth,
   markedDays,
   singleDay = false,
+  numberOfMonths,
 }: DatePickerProps) {
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
   if (singleDay) {
     return (
       <DayPicker
         locale={fr}
         mode="single"
-        numberOfMonths={isDesktop ? 2 : 1}
+        numberOfMonths={numberOfMonths ?? (isDesktop ? 2 : 1)}
         navLayout="around"
         selected={selected?.from}
         onSelect={(date) =>
@@ -51,7 +53,7 @@ export function DatePicker({
       locale={fr}
       mode="range"
       resetOnSelect
-      numberOfMonths={isDesktop ? 2 : 1}
+      numberOfMonths={numberOfMonths ?? (isDesktop ? 2 : 1)}
       navLayout="around"
       selected={selected}
       onSelect={onSelect}

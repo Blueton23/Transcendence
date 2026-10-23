@@ -2,7 +2,11 @@ import type { DateRange } from "@daypicker/react";
 import type { Step } from "../types";
 
 export function formatDayLabel(date: Date): string {
-  return new Intl.DateTimeFormat("fr-CH", { weekday: "short", day: "numeric" })
+  return new Intl.DateTimeFormat("fr-CH", {
+    weekday: "short",
+    day: "numeric",
+    month: "numeric",
+  })
     .format(date)
     .replace(".", "");
 }

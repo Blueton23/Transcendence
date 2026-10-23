@@ -13,11 +13,11 @@ export interface Step {
   updatedAt: string;
 }
 
-// TODO(branchement): placeholder en attendant le vrai type Idea de fetaures/idea
-// A supprimer une fois le vrai type disponible
-export interface StepIdeaPreview {
-  label: string;
-  status: "proposed" | "selected" | "reserved";
+export interface IdeaActions {
+  onVote: (id: number) => Promise<void>;
+  onEdit: (id: number) => void;
+  onDelete: (id: number) => Promise<void>;
+  onChoose: (id: number) => Promise<void>;
 }
 
 export interface Segment {

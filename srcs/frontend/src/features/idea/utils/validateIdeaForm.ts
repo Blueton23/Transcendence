@@ -19,8 +19,8 @@ export function validateIdeaForm(values: IdeaFormValues): IdeaFormErrors {
   if (isAccommodation) {
     if (!startDate || !endDate) {
       datesError = "Les dates d’arrivée et de départ sont obligatoires.";
-    } else if (formatDateToISO(endDate) < formatDateToISO(startDate)) {
-      datesError = "La date de départ ne peut pas précéder la date d’arrivée.";
+    } else if (formatDateToISO(endDate) <= formatDateToISO(startDate)) {
+      datesError = "La date de départ doit être après la date d’arrivée.";
     }
   } else if (values.stepId !== null && !startDate) {
     datesError = "Choisis une date pour cette idée.";

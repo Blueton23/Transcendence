@@ -4,9 +4,11 @@ import { TotalSegment } from "../timeline/TotalSegment";
 import { AddStepForm } from "@/features/step/components/add-step";
 import type { Travel } from "@/features/travel/types";
 import type { Route } from "@/features/map/types";
+import type { Idea } from "@/features/idea/types";
 
 interface ItineraryListPanelProps {
   steps: Step[];
+  ideas: Idea[];
   route: Route | null;
   isLoadingRoute: boolean;
   travel: Travel;
@@ -18,6 +20,7 @@ interface ItineraryListPanelProps {
 
 export function ItineraryListPanel({
   steps,
+  ideas,
   route,
   isLoadingRoute,
   travel,
@@ -35,6 +38,7 @@ export function ItineraryListPanel({
       <div className="flex flex-col gap-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
         <ItineraryTimeline
           steps={steps}
+          ideas={ideas}
           segments={segments}
           dateLabels={dateLabels}
           onDetailView={onDetailView}
