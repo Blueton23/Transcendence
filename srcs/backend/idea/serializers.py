@@ -25,7 +25,7 @@ class IdeaSerializer(serializers.ModelSerializer):
     vote_count = serializers.SerializerMethodField()
     voted = serializers.SerializerMethodField()
 
-    def get_status(self, obj):
+    def get_status(self, obj) -> str:
         statuses = {
             "s": "suggested",
             "p": "placed",
@@ -33,13 +33,13 @@ class IdeaSerializer(serializers.ModelSerializer):
         }
         return statuses[obj.status]
 
-    def get_vote_count(self, obj):
+    def get_vote_count(self, obj) -> int:
         if hasattr(obj, "vote_count"):
             return obj.vote_count
 
         return obj.reactions.count()
 
-    def get_voted(self, obj):
+    def get_voted(self, obj) -> bool:
         if hasattr(obj, "voted"):
             return obj.voted
 
