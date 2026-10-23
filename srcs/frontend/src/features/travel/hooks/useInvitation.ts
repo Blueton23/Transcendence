@@ -15,9 +15,7 @@ export function useInvitation(token: string) {
         const result = await getInvitation(token);
         setTravel(result);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : i18n.t("step.errors.generic"),
-        );
+        setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
       } finally {
         setIsLoading(false);
       }

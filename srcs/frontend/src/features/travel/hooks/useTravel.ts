@@ -16,9 +16,7 @@ export function useTravel(travelId: number) {
         const result = await getTravel(travelId);
         setTravel(result);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : i18n.t("step.errors.generic"),
-        );
+        setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
       } finally {
         setIsLoading(false);
       }
@@ -42,9 +40,7 @@ export function useTravels() {
         const result = await getTravels();
         setTravels(result);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : i18n.t("step.errors.generic"),
-        );
+        setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
       } finally {
         setIsLoading(false);
       }

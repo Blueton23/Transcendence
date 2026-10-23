@@ -63,7 +63,7 @@ export function useRoute(steps: Step[]) {
       } catch (err) {
         if (!cancelled)
           setError(
-            err instanceof Error ? err.message : i18n.t("step.errors.generic"),
+            err instanceof Error ? err.message : i18n.t("errors.generic"),
           );
       } finally {
         if (!cancelled) setIsLoading(false);

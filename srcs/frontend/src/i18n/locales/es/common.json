@@ -207,5 +207,8 @@
       "updateFailed": "No se pudo editar la etapa."
     }
   },
-  "errors": { "csrfMissing": "Token CSRF no encontrado." }
+  "errors": {
+    "csrfMissing": "Token CSRF no encontrado.",
+    "generic": "Error"
+  }
 }

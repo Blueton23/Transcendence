@@ -208,5 +208,8 @@
       "updateFailed": "Impossible de modifier l'étape."
     }
   },
-  "errors": { "csrfMissing": "errors.csrfMissing" }
+  "errors": {
+    "csrfMissing": "errors.csrfMissing",
+    "generic": "Error"
+  }
 }

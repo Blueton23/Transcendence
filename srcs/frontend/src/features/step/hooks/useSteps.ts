@@ -20,9 +20,7 @@ export function useSteps(travelId: number) {
         const result = await getSteps(travelId);
         setSteps(result);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : i18n.t("step.errors.generic"),
-        );
+        setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
       } finally {
         setIsLoading(false);
       }
