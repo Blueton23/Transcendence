@@ -131,6 +131,10 @@
     "unknownProposer": "Desconocido",
     "viewStep": "Ver la etapa"
   },
+  "legal": {
+    "privacy": "Política de privacidad",
+    "terms": "Condiciones de uso"
+  },
   "nav": {
     "assistant": "Asistente AI",
     "chat": "Chat",

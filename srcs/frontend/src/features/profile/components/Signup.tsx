@@ -111,7 +111,7 @@ function Signup() {
         {/* Pseudo */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            ${t("auth.username")}
+            {t("auth.username")}
           </span>
 
           <Input

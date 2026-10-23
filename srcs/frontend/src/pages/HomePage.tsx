@@ -7,6 +7,7 @@ import { useAuth } from "../features/auth/context/useAuth";
 import Avatar from "@/shared/ui/Avatar";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
 import { useTranslation } from "react-i18next";
+import { Footer } from "@/app/Footer";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -60,6 +61,9 @@ function HomePage() {
           <Button variant="outline" onClick={() => navigate("/profile")}>
             Profil
           </Button>
+        </div>
+        <div className="pt-10">
+          <Footer />
         </div>
       </div>
     </main>

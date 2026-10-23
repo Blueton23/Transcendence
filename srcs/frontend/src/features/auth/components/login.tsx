@@ -40,17 +40,17 @@ function Login() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
+    <div className="flex items-center justify-center p-6">
       <div className="w-full max-w-3xl">
         <Card variant="default">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
               <IconBadge color="purple" name="mtn" />
               <Heading level={1} size="lg">
-                ${t("auth.welcomeBack")}
+                {t("auth.welcomeBack")}
               </Heading>
 
-              <Text tone="secondary">t("auth.loginSubtitle")</Text>
+              <Text tone="secondary">{t("auth.loginSubtitle")}</Text>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -59,7 +59,7 @@ function Login() {
                   htmlFor="username"
                   className="text-sm font-medium text-text-secondary"
                 >
-                  ${t("auth.username")}
+                  {t("auth.username")}
                 </label>
 
                 <Input
@@ -130,7 +130,7 @@ function Login() {
           </form>
         </Card>
       </div>
-    </main>
+    </div>
   );
 }
 

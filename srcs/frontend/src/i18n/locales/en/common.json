@@ -131,6 +131,10 @@
     "unknownProposer": "Unknown",
     "viewStep": "View stop"
   },
+  "legal": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service"
+  },
   "nav": {
     "assistant": "AI assistant",
     "chat": "Chat",
