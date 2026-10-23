@@ -1,9 +1,7 @@
 import NavPill, { NavPillMobile } from "./NavPill";
 import IconBadge from "../../shared/ui/IconBadge";
 import Text from "../../shared/ui/Text";
-import Icon from "../../shared/ui/Icon";
 import Divider from "../../shared/ui/Divider";
-import { Link } from "react-router";
 import type { IconName } from "../../shared/ui/Icon";
 
 interface TripNavProps {
@@ -49,13 +47,6 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
   const items = getTripNavItems(tripId);
   return (
     <div className="flex flex-col gap-8">
-      <Link
-        to="/trip"
-        className="font-md flex items-center gap-2 text-xs text-text-secondary"
-      >
-        <Icon name="back" size={16} />
-        Mes voyages
-      </Link>
       <div className="flex items-center gap-4">
         <IconBadge color="brand" name="mtn" />
         <Text size="md" className="font-bold">
