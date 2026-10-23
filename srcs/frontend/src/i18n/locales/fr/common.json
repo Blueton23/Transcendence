@@ -1,64 +1,57 @@
 {
-  "nav": {
-    "trips": "Mes voyages",
-    "profile": "Profil",
-    "home": "Accueil",
-    "itinerary": "Itinéraire",
-    "ideas": "Idées",
-    "expenses": "Dépenses",
-    "chat": "Discussion",
-    "assistant": "Assistant IA"
-  },
-
   "actions": {
-    "save": "Enregistrer",
-    "saving": "Enregistrement...",
-    "modify": "Modifier",
-    "delete": "Supprimer",
     "cancel": "Annuler",
+    "change": "Changer",
     "close": "Fermer",
     "continue": "Continuer",
-    "loading": "Chargement...",
+    "delete": "Supprimer",
     "language": "Langue",
+    "loading": "Chargement...",
+    "modify": "Modifier",
     "options": "Options",
+    "save": "Enregistrer",
+    "saving": "Enregistrement...",
     "searching": "Recherche…"
   },
   "auth": {
+    "changePassword": "Changer le mot de passe",
+    "confirmNewPassword": "Confirmer le nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
     "createAccount": "Créer mon compte",
     "creating": "Création...",
-    "login": "Se connecter",
-    "logginIn": "Connexion…",
-    "loginSubtitle": "Connectez-vous pour retrouver vos voyages",
-    "noAccount": "Pas encore de compte ?",
-    "password": "Mot de passe",
-    "newPassword": "Nouveau mot de passe",
-    "oldPassword": "Ancien mot de passe",
-    "confirmPassword": "Confirmer le mot de passe",
-    "changePassword": "Changer le mot de passe",
-    "username": "Pseudo",
-    "welcomeBack": "Bon retour",
     "errors": {
       "csrfInit": "Impossible d'initialiser la protection CSRF.",
       "invalidCredentials": "Identifiants invalides.",
       "logoutFailed": "Impossible de se déconnecter.",
       "notAuthenticated": "Utilisateur non authentifié."
-    }
+    },
+    "logginIn": "Connexion…",
+    "login": "Se connecter",
+    "loginSubtitle": "Connectez-vous pour retrouver vos voyages",
+    "newPassword": "Nouveau mot de passe",
+    "noAccount": "Pas encore de compte ?",
+    "oldPassword": "Ancien mot de passe",
+    "password": "Mot de passe",
+    "username": "Pseudo",
+    "welcomeBack": "Bon retour"
   },
-  "profile": {
-    "alreadyAccount": "Déjà un compte ?",
-    "changeAvatar": "Changer l'avatar",
-    "editProfile": "Modifier le profil",
-    "email": "Email",
-    "firstName": "Prénom",
-    "lastName": "Nom",
-    "savePhoto": "Enregistrer la photo",
-    "signupSubtitle": "Rejoignez vos futurs road trips",
-    "signupTitle": "Créer un compte",
-    "errors": { "noImage": "Aucune image sélectionnée." }
+  "errors": {
+    "csrfMissing": "errors.csrfMissing",
+    "generic": "Error",
+    "invalidResponse": "Réponse serveur invalide.",
+    "mapbox": "Erreur Mapbox",
+    "server": "Erreur serveur.",
+    "serverWithStatus": "Erreur serveur ({{status}} {{statusText}})",
+    "unexpected": "Une erreur est survenue."
   },
   "friendship": {
     "accept": "Accepter",
     "decline": "Refuser",
+    "errors": {
+      "loadFailed": "Impossible de charger votre liste d'amis.",
+      "missingRequestId": "Identifiant de la demande manquant.",
+      "noUserSelected": "Aucun utilisateur sélectionné."
+    },
     "myFriends": "MES AMIS · {{count}}",
     "noFriends": "Vous n'avez pas encore d'amis.",
     "noRequests": "Aucune demande d'amitié en attente.",
@@ -69,79 +62,129 @@
     "requestSent": "Demande d'amitié envoyée.",
     "search": "Rechercher",
     "searchPlaceholder": "Ajouter un ami · pseudo ou email",
-    "sendRequest": "Envoyer une demande",
     "sending": "Envoi…",
-    "title": "Amis",
-    "errors": {
-      "loadFailed": "Impossible de charger votre liste d'amis.",
-      "missingRequestId": "Identifiant de la demande manquant.",
-      "noUserSelected": "Aucun utilisateur sélectionné."
-    }
+    "sendRequest": "Envoyer une demande",
+    "title": "Amis"
   },
   "idea": {
-    "types": {
-      "restaurant": "Restaurant",
-      "accommodation": "Hébergement",
-      "activity": "Activité",
-      "sightseeing": "À voir"
+    "addVote": "Ajouter mon vote",
+    "choose": "Choisir",
+    "chooseLodging": "Choisir cet hébergement",
+    "chosenLodging": "Hébergement choisi",
+    "editIdea": "Modifier l'idée",
+    "errors": {
+      "createFailed": "Impossible de créer l'idée.",
+      "dateRequired": "Choisis une date pour cette idée.",
+      "datesOutsideStep": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée.",
+      "departureBeforeArrival": "La date de départ doit être après la date d'arrivée.",
+      "editFailed": "Impossible de modifier l'idée.",
+      "invalidTravelId": "Identifiant de voyage invalide.",
+      "loadFailed": "Impossible de charger les idées.",
+      "lodgingAfterTravel": "L'hébergement ne peut pas se terminer après la fin du voyage.",
+      "lodgingBeforeTravel": "L'hébergement ne peut pas commencer avant le début du voyage.",
+      "lodgingDatesRequired": "Les dates d'arrivée et de départ sont obligatoires.",
+      "lodgingOverlap": "Un hébergement est déjà choisi sur cette étape pour des dates qui chevauchent celles-ci.",
+      "notFound": "Idée introuvable.",
+      "stepRequired": "Choisis une étape pour cette idée.",
+      "titleRequired": "Le titre est obligatoire.",
+      "voteNotFound": "État du vote introuvable.",
+      "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser."
     },
     "filters": {
-      "allTypes": "Tous",
       "allSteps": "Toutes",
+      "allTypes": "Tous",
       "noStep": "Sans étape"
     },
+    "form": {
+      "arrival": "Arrivée",
+      "arrivalDate": "Date d'arrivée",
+      "chooseDates": "Choisir les dates",
+      "chooseStep": "Choisir une étape",
+      "date": "Date",
+      "departure": "Départ",
+      "departureDate": "Date de départ",
+      "link": "Lien",
+      "name": "Nom",
+      "note": "Note",
+      "openCalendar": "Ouvrir le calendrier",
+      "pricePerNight": "Prix par nuit",
+      "step": "Étape",
+      "type": "Type"
+    },
+    "options": "Options de l'idée",
     "page": {
       "empty": "Aucune idée pour ce voyage.",
       "noMatch": "Aucune idée ne correspond aux filtres sélectionnés."
     },
-    "pool": "Pool général",
-    "unknownProposer": "Inconnu",
     "pinIdea": "Épingler une idée",
-    "editIdea": "Modifier l'idée",
-    "placeIdea": "Placer l'idée",
-    "viewStep": "Voir l'étape",
     "place": "Placer",
-    "choose": "Choisir",
-    "chooseLodging": "Choisir cet hébergement",
-    "chosenLodging": "Hébergement choisi",
-    "options": "Options de l'idée",
-    "addVote": "Ajouter mon vote",
+    "placeIdea": "Placer l'idée",
+    "pool": "Pool général",
     "removeVote": "Retirer mon vote",
     "trashedStep": "Cette idée est liée à une étape à la corbeille. Restaure cette étape ou replace l'idée sur une étape active avant de la modifier.",
-    "form": {
-      "step": "Étape",
-      "chooseStep": "Choisir une étape",
-      "type": "Type",
-      "name": "Nom",
-      "link": "Lien",
-      "note": "Note",
-      "date": "Date",
-      "arrival": "Arrivée",
-      "departure": "Départ",
-      "arrivalDate": "Date d'arrivée",
-      "departureDate": "Date de départ",
-      "pricePerNight": "Prix par nuit",
-      "openCalendar": "Ouvrir le calendrier",
-      "chooseDates": "Choisir les dates"
+    "types": {
+      "accommodation": "Hébergement",
+      "activity": "Activité",
+      "restaurant": "Restaurant",
+      "sightseeing": "À voir"
     },
+    "unknownProposer": "Inconnu",
+    "viewStep": "Voir l'étape"
+  },
+  "nav": {
+    "assistant": "Assistant IA",
+    "chat": "Discussion",
+    "expenses": "Dépenses",
+    "home": "Accueil",
+    "ideas": "Idées",
+    "itinerary": "Itinéraire",
+    "profile": "Profil",
+    "trips": "Mes voyages"
+  },
+  "profile": {
+    "alreadyAccount": "Déjà un compte ?",
+    "changeAvatar": "Changer l'avatar",
+    "editProfile": "Modifier le profil",
+    "email": "Email",
     "errors": {
-      "titleRequired": "Le titre est obligatoire.",
-      "lodgingDatesRequired": "Les dates d'arrivée et de départ sont obligatoires.",
-      "departureBeforeArrival": "La date de départ doit être après la date d'arrivée.",
-      "dateRequired": "Choisis une date pour cette idée.",
-      "stepRequired": "Choisis une étape pour cette idée.",
-      "createFailed": "Impossible de créer l'idée.",
-      "editFailed": "Impossible de modifier l'idée.",
-      "loadFailed": "Impossible de charger les idées.",
-      "invalidTravelId": "Identifiant de voyage invalide.",
-      "notFound": "Idée introuvable.",
-      "voteNotFound": "État du vote introuvable.",
-      "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser.",
-      "datesOutsideStep": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée.",
-      "lodgingOverlap": "Un hébergement est déjà choisi sur cette étape pour des dates qui chevauchent celles-ci.",
-      "lodgingBeforeTravel": "L'hébergement ne peut pas commencer avant le début du voyage.",
-      "lodgingAfterTravel": "L'hébergement ne peut pas se terminer après la fin du voyage."
-    }
+      "noImage": "Aucune image sélectionnée."
+    },
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "picture": "Photo de profil",
+    "savePhoto": "Enregistrer la photo",
+    "signupSubtitle": "Rejoignez vos futurs road trips",
+    "signupTitle": "Créer un compte",
+    "title": "Profil",
+    "view": "Voir le profil"
+  },
+  "step": {
+    "actions": "Action",
+    "add": "Ajouter une étape",
+    "addExpense": "Ajouter une dépense",
+    "adding": "Ajout...",
+    "addLodging": "+ Proposer",
+    "addStep": "Ajouter l'étape",
+    "backToItinerary": "Retour à l'itinéraire",
+    "delete": "Supprimer l'étape",
+    "detail": "Détail d'étape",
+    "edit": "Modifier l'étape",
+    "errors": {
+      "createFailed": "Impossible de créer l'étape.",
+      "deleteFailed": "Impossible de supprimer l'étape.",
+      "loadFailed": "Aucune étape enregistrée.",
+      "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
+      "updateFailed": "Impossible de modifier l'étape."
+    },
+    "list": "Liste",
+    "map": "Carte",
+    "noLodging": "Aucun hébergement n'est encore prévu",
+    "noNightHere": "je ne passe pas de nuit ici",
+    "noResults": "Aucun résultat",
+    "placeAndDates": "Lieu et dates",
+    "placePlaceholder": "Où vous arrêtez-vous ensuite ?",
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Modifications en cours"
   },
   "travel": {
     "addTravel": "Ajouter un voyage",
@@ -158,6 +201,7 @@
       "joinFailed": "Impossible de rejoindre le voyage.",
       "leaveFailed": "Impossible de quitter le voyage.",
       "notFound": "Aucun voyage trouvé.",
+      "sameDates": "Sélectionne une date de fin différente de la date de début",
       "titleRequired": "Indique un titre avant de valider.",
       "unknown": "Le voyage n'existe pas."
     },
@@ -178,38 +222,5 @@
     "titlePlaceholder": "Titre de mon voyage",
     "travelCreated": "Voyage créé : {{title}}",
     "travelersOnBoard": "{{count}} voyageurs déjà à bord"
-  },
-  "step": {
-    "actions": "Action",
-    "add": "Ajouter une étape",
-    "addExpense": "Ajouter une dépense",
-    "addLodging": "+ Proposer",
-    "addStep": "Ajouter l'étape",
-    "adding": "Ajout...",
-    "backToItinerary": "Retour à l'itinéraire",
-    "delete": "Supprimer l'étape",
-    "detail": "Détail d'étape",
-    "edit": "Modifier l'étape",
-    "list": "Liste",
-    "map": "Carte",
-    "noLodging": "Aucun hébergement n'est encore prévu",
-    "noNightHere": "je ne passe pas de nuit ici",
-    "noResults": "Aucun résultat",
-    "placeAndDates": "Lieu et dates",
-    "placePlaceholder": "Où vous arrêtez-vous ensuite ?",
-    "saveChanges": "Enregistrer les modifications",
-    "saving": "Modifications en cours",
-    "errors": {
-      "createFailed": "Impossible de créer l'étape.",
-      "deleteFailed": "Impossible de supprimer l'étape.",
-      "generic": "Erreur",
-      "loadFailed": "Aucune étape enregistrée.",
-      "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
-      "updateFailed": "Impossible de modifier l'étape."
-    }
-  },
-  "errors": {
-    "csrfMissing": "errors.csrfMissing",
-    "generic": "Error"
   }
 }

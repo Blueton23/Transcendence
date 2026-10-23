@@ -23,7 +23,7 @@ export function AppNavDesktop() {
         ></NavPill>
       </div>
       <Button variant="outline" onClick={() => navigate("/")}>
-        Accueil
+        {t("nav.home")}
       </Button>
     </div>
   );

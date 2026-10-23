@@ -68,7 +68,7 @@ export function ModifyPassword() {
             onClick={handleEdit}
             className="text-sm font-semibold text-red-500"
           >
-            Changer
+            {t("actions.change")}
           </button>
         )}
       </div>
@@ -109,7 +109,7 @@ export function ModifyPassword() {
 
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Confirmer le nouveau mot de passe
+              {t("auth.confirmNewPassword")}
             </span>
 
             <Input
@@ -142,7 +142,7 @@ export function ModifyPassword() {
               onClick={handleCancel}
               disabled={isSubmitting}
             >
-              Annuler
+              {t("actions.cancel")}
             </Button>
           </div>
 
