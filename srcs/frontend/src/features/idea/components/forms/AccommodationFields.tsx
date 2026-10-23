@@ -5,6 +5,7 @@ import Text from "@/shared/ui/Text";
 import Input from "@/shared/ui/Input";
 import Icon from "@/shared/ui/Icon";
 import Card from "@/shared/ui/Card";
+import { useTranslation } from "react-i18next";
 
 interface AccommodationFieldsProps {
   values: IdeaFormValues;
@@ -19,6 +20,7 @@ export function AccommodationFields({
   datesError,
   bounds,
 }: AccommodationFieldsProps) {
+  const { t } = useTranslation();
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const datesErrorId = useId();
 
@@ -27,7 +29,7 @@ export function AccommodationFields({
       <div className="grid grid-cols-2 gap-2">
         <div>
           <Text size="sm" className="mb-1">
-            Arrivée
+            {t("idea.form.arrival")}
           </Text>
 
           <Input
@@ -38,7 +40,7 @@ export function AccommodationFields({
                 : ""
             }
             icon={<Icon name="cal" size={18} />}
-            iconLabel="Choisir les dates"
+            iconLabel={t("idea.form.chooseDates")}
             onIconClick={() => setDatePickerOpen(true)}
             aria-invalid={Boolean(datesError)}
             aria-describedby={datesError ? datesErrorId : undefined}
@@ -47,7 +49,7 @@ export function AccommodationFields({
 
         <div>
           <Text size="sm" className="mb-1">
-            Départ
+            {t("idea.form.departure")}
           </Text>
 
           <Input
@@ -58,7 +60,7 @@ export function AccommodationFields({
                 : ""
             }
             icon={<Icon name="cal" size={18} />}
-            iconLabel="Choisir les dates"
+            iconLabel={t("idea.form.chooseDates")}
             onIconClick={() => setDatePickerOpen(true)}
             aria-invalid={Boolean(datesError)}
             aria-describedby={datesError ? datesErrorId : undefined}
@@ -103,7 +105,7 @@ export function AccommodationFields({
       )}
 
       <Text size="sm" className="mt-3 mb-1">
-        Prix par nuit
+        {t("idea.form.pricePerNight")}
       </Text>
 
       <Input

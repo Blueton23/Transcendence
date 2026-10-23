@@ -42,7 +42,7 @@ export function PlaceIdeaModal({
   return (
     <Modal
       icon="arrow"
-      title="Placer l'idée"
+      title={t("idea.placeIdea")}
       subtitle={idea.title}
       onClose={() => {
         if (!isSubmitting) {
@@ -88,7 +88,7 @@ export function PlaceIdeaModal({
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Enregistrement…" : `${t("actions.save")}`}
+          {isSubmitting ? "Enregistrement" : `${t("actions.save")}`}
         </Button>
       </form>
     </Modal>

@@ -129,13 +129,13 @@ export async function patchIdeaPlacement(
   input: PlaceIdeaInput,
 ): Promise<Idea> {
   if (input.stepId === null) {
-    throw new Error("Choisis une étape pour cette idée");
+    throw new Error(i18n.t("idea.errors.stepRequired"));
   }
 
   const isAccommodation = idea.type === "accommodation";
 
   if (!isAccommodation && !input.date) {
-    throw new Error("Choisis une date pour cette idée");
+    throw new Error(i18n.t("idea.errors.dateRequired"));
   }
 
   const csrfToken = getCookie("csrftoken");

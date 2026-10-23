@@ -17,6 +17,7 @@
     "close": "Cerrar",
     "cancel": "Cancelar",
     "loading": "Cargando…",
+    "language": "Idioma",
     "options": "Opciones",
     "continue": "Continuar",
     "searching": "Buscando…"
@@ -74,6 +75,67 @@
       "loadFailed": "No se pudo cargar tu lista de amigos.",
       "missingRequestId": "Falta el identificador de la solicitud.",
       "noUserSelected": "Ningún usuario seleccionado."
+    }
+  },
+  "idea": {
+    "types": {
+      "restaurant": "Restaurante",
+      "accommodation": "Alojamiento",
+      "activity": "Actividad",
+      "sightseeing": "Para ver"
+    },
+    "filters": {
+      "allTypes": "Todos",
+      "allSteps": "Todas",
+      "noStep": "Sin etapa"
+    },
+    "pool": "Pool general",
+    "unknownProposer": "Desconocido",
+    "pinIdea": "Fijar una idea",
+    "editIdea": "Editar idea",
+    "placeIdea": "Colocar idea",
+    "viewStep": "Ver la etapa",
+    "place": "Colocar",
+    "choose": "Elegir",
+    "chooseLodging": "Elegir este alojamiento",
+    "chosenLodging": "Alojamiento elegido",
+    "options": "Opciones de la idea",
+    "addVote": "Añadir mi voto",
+    "removeVote": "Quitar mi voto",
+    "trashedStep": "Esta idea está vinculada a una etapa en la papelera. Restaura esa etapa o coloca la idea en una etapa activa antes de editarla.",
+    "form": {
+      "step": "Etapa",
+      "chooseStep": "Elegir una etapa",
+      "type": "Tipo",
+      "name": "Nombre",
+      "link": "Enlace",
+      "note": "Nota",
+      "date": "Fecha",
+      "arrival": "Llegada",
+      "departure": "Salida",
+      "arrivalDate": "Fecha de llegada",
+      "departureDate": "Fecha de salida",
+      "pricePerNight": "Precio por noche",
+      "openCalendar": "Abrir el calendario",
+      "chooseDates": "Elegir las fechas"
+    },
+    "errors": {
+      "titleRequired": "El título es obligatorio.",
+      "lodgingDatesRequired": "Las fechas de llegada y salida son obligatorias.",
+      "departureBeforeArrival": "La fecha de salida debe ser posterior a la de llegada.",
+      "dateRequired": "Elige una fecha para esta idea.",
+      "stepRequired": "Elige una etapa para esta idea.",
+      "createFailed": "No se pudo crear la idea.",
+      "editFailed": "No se pudo editar la idea.",
+      "loadFailed": "No se pudieron cargar las ideas.",
+      "invalidTravelId": "ID de viaje no válido.",
+      "notFound": "Idea no encontrada.",
+      "voteNotFound": "Estado del voto no encontrado.",
+      "voteRefreshFailed": "Tu voto se guardó, pero no se pudo actualizar el contador. Recarga la página para sincronizarlo.",
+      "datesOutsideStep": "Las fechas de la idea deben estar dentro de las fechas de la etapa seleccionada.",
+      "lodgingOverlap": "Ya hay un alojamiento elegido en esta etapa para fechas que se solapan.",
+      "lodgingBeforeTravel": "El alojamiento no puede empezar antes del inicio del viaje.",
+      "lodgingAfterTravel": "El alojamiento no puede terminar después del final del viaje."
     }
   },
   "travel": {

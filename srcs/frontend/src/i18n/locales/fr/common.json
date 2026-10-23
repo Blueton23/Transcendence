@@ -19,6 +19,7 @@
     "close": "Fermer",
     "continue": "Continuer",
     "loading": "Chargement...",
+    "language": "Langue",
     "options": "Options",
     "searching": "Recherche…"
   },
@@ -77,6 +78,67 @@
       "noUserSelected": "Aucun utilisateur sélectionné."
     }
   },
+  "idea": {
+    "types": {
+      "restaurant": "Restaurant",
+      "accommodation": "Hébergement",
+      "activity": "Activité",
+      "sightseeing": "À voir"
+    },
+    "filters": {
+      "allTypes": "Tous",
+      "allSteps": "Toutes",
+      "noStep": "Sans étape"
+    },
+    "pool": "Pool général",
+    "unknownProposer": "Inconnu",
+    "pinIdea": "Épingler une idée",
+    "editIdea": "Modifier l'idée",
+    "placeIdea": "Placer l'idée",
+    "viewStep": "Voir l'étape",
+    "place": "Placer",
+    "choose": "Choisir",
+    "chooseLodging": "Choisir cet hébergement",
+    "chosenLodging": "Hébergement choisi",
+    "options": "Options de l'idée",
+    "addVote": "Ajouter mon vote",
+    "removeVote": "Retirer mon vote",
+    "trashedStep": "Cette idée est liée à une étape à la corbeille. Restaure cette étape ou replace l'idée sur une étape active avant de la modifier.",
+    "form": {
+      "step": "Étape",
+      "chooseStep": "Choisir une étape",
+      "type": "Type",
+      "name": "Nom",
+      "link": "Lien",
+      "note": "Note",
+      "date": "Date",
+      "arrival": "Arrivée",
+      "departure": "Départ",
+      "arrivalDate": "Date d'arrivée",
+      "departureDate": "Date de départ",
+      "pricePerNight": "Prix par nuit",
+      "openCalendar": "Ouvrir le calendrier",
+      "chooseDates": "Choisir les dates"
+    },
+    "errors": {
+      "titleRequired": "Le titre est obligatoire.",
+      "lodgingDatesRequired": "Les dates d'arrivée et de départ sont obligatoires.",
+      "departureBeforeArrival": "La date de départ doit être après la date d'arrivée.",
+      "dateRequired": "Choisis une date pour cette idée.",
+      "stepRequired": "Choisis une étape pour cette idée.",
+      "createFailed": "Impossible de créer l'idée.",
+      "editFailed": "Impossible de modifier l'idée.",
+      "loadFailed": "Impossible de charger les idées.",
+      "invalidTravelId": "Identifiant de voyage invalide.",
+      "notFound": "Idée introuvable.",
+      "voteNotFound": "État du vote introuvable.",
+      "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser.",
+      "datesOutsideStep": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée.",
+      "lodgingOverlap": "Un hébergement est déjà choisi sur cette étape pour des dates qui chevauchent celles-ci.",
+      "lodgingBeforeTravel": "L'hébergement ne peut pas commencer avant le début du voyage.",
+      "lodgingAfterTravel": "L'hébergement ne peut pas se terminer après la fin du voyage."
+    }
+  },
   "travel": {
     "addTravel": "Ajouter un voyage",
     "changeDates": "Changer les dates",
@@ -113,5 +175,5 @@
     "travelCreated": "Voyage créé : {{title}}",
     "travelersOnBoard": "{{count}} voyageurs déjà à bord"
   },
-  "errors": { "csrfMissing": "Token CSRF introuvable." }
+  "errors": { "csrfMissing": "errors.csrfMissing" }
 }

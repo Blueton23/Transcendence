@@ -25,7 +25,7 @@ export function IdeaOptionsMenu({
     <div className="relative">
       <IconButton
         icon={<Icon name="dots" size={18} />}
-        label="Options de l'idée"
+        label={t("idea.options")}
         variant="flat"
         size="xs"
         disabled={disabled}
@@ -45,7 +45,7 @@ export function IdeaOptionsMenu({
                 setMenuOpen(false);
               }}
             >
-              Choisir cet hébergement
+              {t("idea.chooseLodging")}
             </MenuItem>
           )}
 

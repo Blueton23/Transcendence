@@ -11,6 +11,7 @@ import IconBadge from "@/shared/ui/IconBadge";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Button from "@/shared/ui/Button";
+import { useTranslation } from "react-i18next";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -43,6 +44,7 @@ export function IdeaCard({
   onDelete,
   onChoose,
 }: IdeaCardProps) {
+  const { t } = useTranslation();
   const isInPool = idea.status === "suggested";
 
   const {
@@ -88,7 +90,7 @@ export function IdeaCard({
                 <StepLabel isInPool={isInPool} stepName={stepName} />
               )}
               {idea.type === "accommodation" && idea.status === "chosen" && (
-                <Text size="sm">Hébergement choisi</Text>
+                <Text size="sm">{t("idea.chosenLodging")}</Text>
               )}
             </div>
           </div>
@@ -143,7 +145,7 @@ export function IdeaCard({
                 onClick={() => submitChoose()}
                 disabled={isActionPending}
               >
-                Choisir
+                {t("idea.choose")}
               </Button>
             ) : (
               (onPlace || onView) && (

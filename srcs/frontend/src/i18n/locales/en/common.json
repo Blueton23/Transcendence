@@ -17,6 +17,7 @@
     "close": "Close",
     "cancel": "Cancel",
     "loading": "Loading",
+    "language": "Language",
     "options": "Options",
     "continue": "Continue",
     "searching": "Searching…"
@@ -74,6 +75,67 @@
       "loadFailed": "Could not load your friends list.",
       "missingRequestId": "Request ID missing.",
       "noUserSelected": "No user selected."
+    }
+  },
+  "idea": {
+    "types": {
+      "restaurant": "Restaurant",
+      "accommodation": "Accommodation",
+      "activity": "Activity",
+      "sightseeing": "Sightseeing"
+    },
+    "filters": {
+      "allTypes": "All",
+      "allSteps": "All",
+      "noStep": "No stop"
+    },
+    "pool": "General pool",
+    "unknownProposer": "Unknown",
+    "pinIdea": "Pin an idea",
+    "editIdea": "Edit idea",
+    "placeIdea": "Place idea",
+    "viewStep": "View stop",
+    "place": "Place",
+    "choose": "Choose",
+    "chooseLodging": "Choose this accommodation",
+    "chosenLodging": "Accommodation chosen",
+    "options": "Idea options",
+    "addVote": "Add my vote",
+    "removeVote": "Remove my vote",
+    "trashedStep": "This idea is linked to a stop in the trash. Restore that stop or move the idea to an active stop before editing it.",
+    "form": {
+      "step": "Stop",
+      "chooseStep": "Choose a stop",
+      "type": "Type",
+      "name": "Name",
+      "link": "Link",
+      "note": "Note",
+      "date": "Date",
+      "arrival": "Check-in",
+      "departure": "Check-out",
+      "arrivalDate": "Check-in date",
+      "departureDate": "Check-out date",
+      "pricePerNight": "Price per night",
+      "openCalendar": "Open calendar",
+      "chooseDates": "Choose dates"
+    },
+    "errors": {
+      "titleRequired": "The title is required.",
+      "lodgingDatesRequired": "Check-in and check-out dates are required.",
+      "departureBeforeArrival": "The check-out date must be after the check-in date.",
+      "dateRequired": "Choose a date for this idea.",
+      "stepRequired": "Choose a stop for this idea.",
+      "createFailed": "Unable to create the idea.",
+      "editFailed": "Unable to edit the idea.",
+      "loadFailed": "Unable to load the ideas.",
+      "invalidTravelId": "Invalid trip ID.",
+      "notFound": "Idea not found.",
+      "voteNotFound": "Vote status not found.",
+      "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
+      "datesOutsideStep": "The idea dates must be within the dates of the selected stop.",
+      "lodgingOverlap": "An accommodation is already chosen on this stop for overlapping dates.",
+      "lodgingBeforeTravel": "The accommodation cannot start before the trip begins.",
+      "lodgingAfterTravel": "The accommodation cannot end after the trip ends."
     }
   },
   "travel": {

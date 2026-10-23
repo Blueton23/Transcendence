@@ -1,5 +1,6 @@
 import Button from "@/shared/ui/Button";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface VoteButtonProps {
   voteCount: number;
@@ -14,6 +15,7 @@ export function VoteButton({
   onVote,
   disabled = false,
 }: VoteButtonProps) {
+  const { t } = useTranslation();
   return (
     <Button
       type="button"
@@ -23,7 +25,7 @@ export function VoteButton({
       onClick={onVote}
       disabled={disabled}
       aria-pressed={voted}
-      aria-label={voted ? "Retirer mon vote" : "Ajouter mon vote"}
+      aria-label={voted ? t("idea.removeVote") : t("idea.addVote")}
     >
       {voteCount}
     </Button>

@@ -65,14 +65,11 @@ export function EditIdeaModal({
     return (
       <Modal
         icon="pinplus"
-        title="Modifier l'idée"
+        title={t("idea.editIdea")}
         subtitle={travelTitle}
         onClose={onClose}
       >
-        <Text className="mb-4">
-          Cette idée est liée à une étape à la corbeille. Restaure cette étape
-          ou replace l’idée sur une étape active avant de la modifier.
-        </Text>
+        <Text className="mb-4">{t("idea.trashedStep")}</Text>
 
         <Button
           type="button"
@@ -89,7 +86,7 @@ export function EditIdeaModal({
   return (
     <Modal
       icon="pinplus"
-      title="Modifier l'idée"
+      title={t("idea.editIdea")}
       subtitle={travelTitle}
       onClose={() => {
         if (!isSubmitting) {
@@ -125,9 +122,7 @@ export function EditIdeaModal({
             onClose();
           } catch (err) {
             setSubmitError(
-              err instanceof Error
-                ? err.message
-                : "Impossible de modifier l’idée.",
+              err instanceof Error ? err.message : t("idea.errors.editFailed"),
             );
           } finally {
             setIsSubmitting(false);
@@ -156,7 +151,7 @@ export function EditIdeaModal({
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Enregistrement…" : `${t("actions.save")}`}
+          {isSubmitting ? `${t("actions.saving")}` : `${t("actions.save")}`}
         </Button>
       </form>
     </Modal>

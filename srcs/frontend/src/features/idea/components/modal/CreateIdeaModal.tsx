@@ -55,7 +55,7 @@ export function CreateIdeaModal({
   return (
     <Modal
       icon="pinplus"
-      title="Épingler une idée"
+      title={t("idea.pinIdea")}
       subtitle={travelTitle}
       onClose={() => {
         if (!isSubmitting) {
@@ -88,7 +88,7 @@ export function CreateIdeaModal({
             setSubmitError(
               err instanceof Error
                 ? err.message
-                : "Impossible de créer l’idée.",
+                : t("idea.errors.createFailed"),
             );
           } finally {
             setIsSubmitting(false);
@@ -118,7 +118,7 @@ export function CreateIdeaModal({
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Enregistrement…" : `${t("actions.save")}`}
+          {isSubmitting ? `${t("actions.saving")}` : `${t("actions.save")}`}
         </Button>
       </form>
     </Modal>

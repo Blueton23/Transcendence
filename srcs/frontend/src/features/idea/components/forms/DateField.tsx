@@ -5,6 +5,7 @@ import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import Input from "@/shared/ui/Input";
 import Card from "@/shared/ui/Card";
+import { useTranslation } from "react-i18next";
 
 interface DateFieldProps {
   dateRange: DateRange | undefined;
@@ -19,13 +20,14 @@ export function DateField({
   datesError,
   bounds,
 }: DateFieldProps) {
+  const { t } = useTranslation();
   const [datePickerOpen, setDatePickerOpen] = useState(false);
   const datesErrorId = useId();
 
   return (
     <div className="mb-4">
       <Text size="sm" className="mb-1">
-        Date
+        {t("idea.form.date")}
       </Text>
 
       <Input
@@ -34,7 +36,7 @@ export function DateField({
           dateRange?.from ? dateRange.from.toLocaleDateString("fr-CH") : ""
         }
         icon={<Icon name="cal" size={18} />}
-        iconLabel="Ouvrir le calendrier"
+        iconLabel={t("idea.form.openCalendar")}
         onIconClick={() => setDatePickerOpen(true)}
         aria-invalid={Boolean(datesError)}
         aria-describedby={datesError ? datesErrorId : undefined}

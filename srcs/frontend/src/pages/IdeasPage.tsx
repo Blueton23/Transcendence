@@ -15,6 +15,7 @@ import { useTravel } from "@/features/travel/hooks/useTravel";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 import { getProposer } from "@/features/idea/utils/getProposer";
+import { useTranslation } from "react-i18next";
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
@@ -46,6 +47,7 @@ export function IdeasPage() {
   } = useTravel(travelId);
 
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
@@ -88,7 +90,7 @@ export function IdeasPage() {
       </div>
 
       <div>
-        <Text className="mb-1">Etape</Text>
+        <Text className="mb-1">{t("idea.form.step")}</Text>
         <IdeaStepFilter
           steps={steps}
           stepActiveFilter={stepActiveFilter}
@@ -113,7 +115,7 @@ export function IdeasPage() {
             <IdeaCard
               key={idea.id}
               idea={idea}
-              proposerName={proposer?.name ?? "Inconnu"}
+              proposerName={proposer?.name ?? t("idea.unknownProposer")}
               proposerInitials={proposer?.initials ?? "?"}
               stepName={step?.localisation}
               onVote={() => handleVote(idea.id)}
