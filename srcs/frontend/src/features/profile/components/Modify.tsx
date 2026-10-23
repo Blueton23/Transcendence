@@ -6,7 +6,7 @@ import Input from "@/shared/ui/Input";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyProfile } from "../api/profile";
-import { useAuth } from "../../auth/context/useAuth";
+import { useAuth } from "@/features/auth/context/useAuth";
 import ModifyPassword from "./ModifyPassword";
 import ProfilePicture from "./ProfilePicture";
 
