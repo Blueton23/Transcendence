@@ -30,7 +30,10 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
-      <Route path="/privacy" element={<PlaceHolder label="privacy a venir" />} />
+      <Route
+        path="/privacy"
+        element={<PlaceHolder label="privacy a venir" />}
+      />
       <Route path="/terms" element={<PlaceHolder label="terms a venir" />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/join/:token" element={<JoinPage />} />
