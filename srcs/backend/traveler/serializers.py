@@ -177,9 +177,9 @@ class TravelerUpdateProfilePictureSerializer(serializers.ModelSerializer):
         ]
 
     def validate_profile_picture(self, value):
-        if value.size > 2 * 1024 * 1024:
+        if value.size > 5 * 1024 * 1024:
             raise serializers.ValidationError(
-                "La photo de profil ne doit pas dépasser 2 Mo."
+                "La photo de profil ne doit pas dépasser 5 Mo."
             )
 
         return value

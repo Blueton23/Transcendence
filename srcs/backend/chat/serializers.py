@@ -2,7 +2,7 @@ from typing import ClassVar
 
 from rest_framework import serializers
 
-from .models import Message
+from .models import MESSAGE_BODY_MAX_LENGTH, Message
 
 
 class MessageSerializer(serializers.ModelSerializer):
@@ -76,9 +76,9 @@ class MessageSerializer(serializers.ModelSerializer):
         if not value:
             raise serializers.ValidationError("Le message ne peut pas être vide.")
 
-        if len(value) > 2000:
+        if len(value) > MESSAGE_BODY_MAX_LENGTH:
             raise serializers.ValidationError(
-                "Le message ne peut pas dépasser 2000 caractères."
+                f"Le message ne peut pas dépasser {MESSAGE_BODY_MAX_LENGTH} caractères."
             )
 
         return value
