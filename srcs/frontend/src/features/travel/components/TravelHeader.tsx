@@ -103,7 +103,7 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
           tone="inverse"
         >{`${travel.nights} nuits`}</Tag>
         <Tag icon={<Icon name="car" size={14} />} tone="inverse">
-          {t("travel.kms", { count: { totalKms } })}
+          {t("travel.kms", { count: totalKms })}
         </Tag>
       </div>
       <TravelOptionsButton travel={travel} />
