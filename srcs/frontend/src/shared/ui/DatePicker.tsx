@@ -1,7 +1,10 @@
 import { DayPicker, type DateRange, type Matcher } from "@daypicker/react";
 import "./DatePicker.css";
-import { fr } from "@daypicker/react/locale";
+import { fr, es, enGB } from "@daypicker/react/locale";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useTranslation } from "react-i18next";
+
+const calendarLocales = { fr, en: enGB, es } as const;
 
 interface DatePickerProps {
   selected: DateRange | undefined;
@@ -27,10 +30,14 @@ export function DatePicker({
   numberOfMonths,
 }: DatePickerProps) {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const { i18n } = useTranslation();
+  const locale =
+    calendarLocales[i18n.resolvedLanguage as keyof typeof calendarLocales] ??
+    fr;
   if (singleDay) {
     return (
       <DayPicker
-        locale={fr}
+        locale={locale}
         mode="single"
         numberOfMonths={numberOfMonths ?? (isDesktop ? 2 : 1)}
         navLayout="around"
@@ -50,7 +57,7 @@ export function DatePicker({
 
   return (
     <DayPicker
-      locale={fr}
+      locale={locale}
       mode="range"
       resetOnSelect
       numberOfMonths={numberOfMonths ?? (isDesktop ? 2 : 1)}

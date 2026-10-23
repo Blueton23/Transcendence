@@ -15,12 +15,14 @@ import ItineraryPage from "../pages/ItineraryPage";
 import { IdeasPage } from "@/pages/IdeasPage";
 import TravelPage from "@/pages/TravelPage";
 import JoinPage from "@/pages/JoinPage";
+import { useTranslation } from "react-i18next";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
 }
 
 function App() {
+  useTranslation();
   return (
     <Routes>
       <Route path="/modal" element={<ModalDemo />} />

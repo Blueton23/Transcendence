@@ -31,11 +31,10 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
             <Text tone="success" font="mono">
               {night.pricePerNight &&
                 `${t("units.pricePerNight", { price: night.pricePerNight })} · `}
-              {lodgingCountNights(night)} · du{" "}
+              {lodgingCountNights(night)} {" · "}
               {night.arrivalDate &&
                 night.departureDate &&
-                `${formatDate(new Date(night.arrivalDate))} au ${" "}
-              ${formatDate(new Date(night.departureDate))}`}
+                `${t("step.fromTo", { start: formatDate(new Date(night.arrivalDate)), end: formatDate(new Date(night.departureDate)) })}`}
             </Text>
           </div>
         </div>

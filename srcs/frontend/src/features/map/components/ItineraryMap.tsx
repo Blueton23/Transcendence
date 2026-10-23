@@ -8,6 +8,7 @@ import { useMapFraming } from "@/features/map/hooks/useMapFraming";
 import { getStepsBounds } from "@/features/map/utils/getBounds";
 import type { Route } from "@/features/map/types";
 import { themeColor } from "@/features/map/utils/themeColor";
+import { useTranslation } from "react-i18next";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -20,6 +21,7 @@ export function ItineraryMap({
   detailStep: Step | null;
   route: Route | null;
 }) {
+  const { i18n } = useTranslation();
   const mapRef = useRef<MapRef>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const bounds = getStepsBounds(steps);
@@ -33,7 +35,8 @@ export function ItineraryMap({
       className="flex-1 overflow-hidden rounded-lg border border-surface md:h-full"
     >
       <Map
-        language="fr"
+        key={i18n.resolvedLanguage}
+        language={i18n.resolvedLanguage}
         ref={mapRef}
         projection={"mercator"}
         initialViewState={

@@ -6,6 +6,7 @@ import Input from "@/shared/ui/Input";
 import Icon from "@/shared/ui/Icon";
 import Card from "@/shared/ui/Card";
 import { useTranslation } from "react-i18next";
+import { getDateLocale } from "@/shared/utils/dateLocale";
 
 interface AccommodationFieldsProps {
   values: IdeaFormValues;
@@ -36,7 +37,7 @@ export function AccommodationFields({
             readOnly
             value={
               values.dateRange?.from
-                ? values.dateRange.from.toLocaleDateString("fr-CH")
+                ? values.dateRange.from.toLocaleDateString(getDateLocale())
                 : ""
             }
             icon={<Icon name="cal" size={18} />}
@@ -56,7 +57,7 @@ export function AccommodationFields({
             readOnly
             value={
               values.dateRange?.to
-                ? values.dateRange.to.toLocaleDateString("fr-CH")
+                ? values.dateRange.to.toLocaleDateString(getDateLocale())
                 : ""
             }
             icon={<Icon name="cal" size={18} />}

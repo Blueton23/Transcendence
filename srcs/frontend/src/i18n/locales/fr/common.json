@@ -144,6 +144,7 @@
   "profile": {
     "alreadyAccount": "Déjà un compte ?",
     "changeAvatar": "Changer l'avatar",
+    "createdAt": "Compte créé le :",
     "editProfile": "Modifier le profil",
     "email": "Email",
     "errors": {
@@ -156,6 +157,7 @@
     "signupSubtitle": "Rejoignez vos futurs road trips",
     "signupTitle": "Créer un compte",
     "title": "Profil",
+    "updatedAt": "Dernière mise à jour :",
     "view": "Voir le profil"
   },
   "step": {
@@ -176,6 +178,7 @@
       "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
       "updateFailed": "Impossible de modifier l'étape."
     },
+    "fromTo": "du {{start}} au {{end}}",
     "list": "Liste",
     "lodgedRatio": "{{lodged}}/{{total}} hébergement",
     "map": "Carte",
@@ -190,7 +193,8 @@
     "proposals_one": "Hébergement à choisir · {{count}} proposition",
     "proposals_other": "Hébergement à choisir · {{count}} propositions",
     "saveChanges": "Enregistrer les modifications",
-    "saving": "Modifications en cours"
+    "saving": "Modifications en cours",
+    "totalRoute": "TOTAL · {{duration}} DE ROUTE · {{distance}} KM"
   },
   "travel": {
     "addTravel": "Ajouter un voyage",
@@ -224,6 +228,12 @@
     "searchFriend": "Rechercher un ami",
     "searchFriendPlaceholder": "Pseudo ou prénom...",
     "skipForNow": "Passer pour l'instant",
+    "status": {
+      "finished": "TERMINÉ",
+      "ongoing": "EN COURS",
+      "startsIn_one": "Dans {{count}} jour",
+      "startsIn_other": "Dans {{count}} jours"
+    },
     "titleLabel": "Titre du voyage",
     "titlePlaceholder": "Titre de mon voyage",
     "travelCreated": "Voyage créé : {{title}}",

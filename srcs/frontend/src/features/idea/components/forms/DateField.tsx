@@ -6,6 +6,7 @@ import Icon from "@/shared/ui/Icon";
 import Input from "@/shared/ui/Input";
 import Card from "@/shared/ui/Card";
 import { useTranslation } from "react-i18next";
+import { getDateLocale } from "@/shared/utils/dateLocale";
 
 interface DateFieldProps {
   dateRange: DateRange | undefined;
@@ -33,7 +34,9 @@ export function DateField({
       <Input
         readOnly
         value={
-          dateRange?.from ? dateRange.from.toLocaleDateString("fr-CH") : ""
+          dateRange?.from
+            ? dateRange.from.toLocaleDateString(getDateLocale())
+            : ""
         }
         icon={<Icon name="cal" size={18} />}
         iconLabel={t("idea.form.openCalendar")}

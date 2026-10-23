@@ -144,6 +144,7 @@
   "profile": {
     "alreadyAccount": "Already have an account?",
     "changeAvatar": "Change avatar",
+    "createdAt": "Account created on:",
     "editProfile": "Edit profile",
     "email": "Email",
     "errors": {
@@ -156,6 +157,7 @@
     "signupSubtitle": "Join your future road trips",
     "signupTitle": "Create an account",
     "title": "Profile",
+    "updatedAt": "Last updated:",
     "view": "View profile"
   },
   "step": {
@@ -176,6 +178,7 @@
       "placeNotFound": "Place not found, choose one from the list.",
       "updateFailed": "Unable to edit the stop."
     },
+    "fromTo": "from {{start}} to {{end}}",
     "list": "List",
     "lodgedRatio": "{{lodged}}/{{total}} accommodation",
     "map": "Map",
@@ -190,7 +193,8 @@
     "proposals_one": "Accommodation to choose · {{count}} proposal",
     "proposals_other": "Accommodation to choose · {{count}} proposals",
     "saveChanges": "Save changes",
-    "saving": "Saving changes"
+    "saving": "Saving changes",
+    "totalRoute": "TOTAL · {{duration}} DRIVING · {{distance}} KM"
   },
   "travel": {
     "addTravel": "Add a trip",
@@ -224,6 +228,12 @@
     "searchFriend": "Search for a friend",
     "searchFriendPlaceholder": "Username or first name...",
     "skipForNow": "Skip for now",
+    "status": {
+      "finished": "FINISHED",
+      "ongoing": "ONGOING",
+      "startsIn_one": "In {{count}} day",
+      "startsIn_other": "In {{count}} days"
+    },
     "titleLabel": "Trip title",
     "titlePlaceholder": "My trip title",
     "travelCreated": "Trip created: {{title}}",
