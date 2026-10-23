@@ -10,7 +10,7 @@ import MenuItem from "@/shared/ui/MenuItem";
 import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { leaveTravel } from "@/features/travel/api/travelApi";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 
 interface TravelHeaderProps {
@@ -82,9 +82,18 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
   const { t } = useTranslation();
   return (
     <div className="relative flex flex-col gap-5 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] px-3.5 py-5 md:gap-3 md:p-6">
-      <Heading level={1} size="lg" className="text-inverse!">
-        {travel.title}
-      </Heading>
+      <div className="flex flex-col gap-2">
+        <Link
+          to="/trip"
+          className="flex items-center gap-2 text-xs text-inverse"
+        >
+          <Icon name="back" size={16} />
+          Mes voyages
+        </Link>
+        <Heading level={1} size="lg" className="text-inverse!">
+          {travel.title}
+        </Heading>
+      </div>
       <div className="flex flex-nowrap gap-2">
         <Tag tone="inverse" className="border-error/80! bg-error/30!">
           {DatesLabel}

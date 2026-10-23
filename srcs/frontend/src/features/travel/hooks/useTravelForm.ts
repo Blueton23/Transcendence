@@ -21,6 +21,11 @@ export function useTravelForm({
     if (!dates?.from || !dates?.to) {
       throw new Error(t("travel.errors.datesRequired"));
     }
+    if (dates?.from === dates?.to) {
+      throw new Error(
+        "Sélectionne une date de fin différente de la date de début",
+      );
+    }
     return createTravel({
       title,
       startDate: toApiDateString(dates.from),

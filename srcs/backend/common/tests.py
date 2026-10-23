@@ -1,16 +1,21 @@
+import datetime
 from io import StringIO
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.cache import cache
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework.authtoken.models import Token
+from rest_framework.test import APITestCase
 
 from chat.models import Message
 from common.seeders.clear import clear_seed_data
-from idea.models import Idea, Reaction
+from idea.models import Idea, IdeaType, Reaction
 from spending.models import Spending
-from travel.models import Participation, Step, Travel
+from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Friendship
 
 Traveler = get_user_model()
@@ -158,3 +163,85 @@ class SeedSpendingsTest(TestCase):
                 self.assertEqual(spending.step.travel_id, spending.travel_id)
             if spending.idea is not None:
                 self.assertEqual(spending.idea.travel_id, spending.travel_id)
+
+
+# Accès aux vues publiques avec la clé API
+class PublicApiKeyTest(APITestCase):
+    def setUp(self):
+        cache.clear()
+        self.traveler = Traveler.objects.create_user(
+            username="dub1", email="dub1@example.com", password="Password123.wq"
+        )
+        self.token = Token.objects.create(user=self.traveler)
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+            latitude=45.764,
+            longitude=4.8357,
+        )
+        self.idea = Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Musée",
+            type=IdeaType.SIGHT,
+        )
+
+    def authorize(self, key):
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {key}")
+
+    def test_token_gives_access_to_all_public_views(self):
+        travel_id = self.travel.id
+        public_urls = [
+            reverse("travel-list"),
+            reverse("travel-detail", kwargs={"pk": travel_id}),
+            reverse("step-list", kwargs={"travel_id": travel_id}),
+            reverse("step-detail", kwargs={"travel_id": travel_id, "pk": self.step.id}),
+            reverse("idea-list", kwargs={"travel_id": travel_id}),
+            reverse("idea-detail", kwargs={"travel_id": travel_id, "pk": self.idea.id}),
+        ]
+        self.authorize(self.token.key)
+
+        for url in public_urls:
+            with self.subTest(url=url):
+                self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_invalid_token_returns_403(self):
+        self.authorize("invalid-key")
+
+        response = self.client.get(reverse("travel-list"))
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data["message"], "Invalid token.")
+
+    def test_token_does_not_open_private_views(self):
+        self.authorize(self.token.key)
+
+        response = self.client.get(reverse("auth-me"))
+
+        self.assertEqual(response.status_code, 403)
+
+    def test_token_does_not_give_access_to_other_travels(self):
+        other_travel = Travel.objects.create(
+            title="Not mine",
+            start_date=datetime.date(2026, 8, 1),
+            end_date=datetime.date(2026, 8, 5),
+        )
+        self.authorize(self.token.key)
+
+        response = self.client.get(
+            reverse("travel-detail", kwargs={"pk": other_travel.pk})
+        )
+
+        self.assertEqual(response.status_code, 404)

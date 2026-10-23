@@ -47,7 +47,7 @@ function Avatar({
   const { currentUser } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const avatarUser = user ?? currentUser;
+  const avatarUser = user ?? (children ? null : currentUser);
   const avatarSize = sizeStyles[size];
   const avatarColor = colorStyles[color];
 

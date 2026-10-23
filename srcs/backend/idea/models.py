@@ -161,21 +161,30 @@ class Idea(TimeStampedModel, ValidatedModel):
             if self.end_date > self.travel.end_date:
                 errors["end_date"] = "The lodging cannot end after the travel."
 
+        if (
+            self.type == IdeaType.LODGING
+            and self.start_date
+            and self.end_date
+            and self.start_date == self.end_date
+        ):
+            errors["end_date"] = "A lodging must span at least one night."
+
         if errors:
             raise ValidationError(errors)
 
         if (
             self.type == IdeaType.LODGING
-            and self.chosen_at is not None
             and self.step_id
+            and self.start_date
+            and self.end_date
         ):
             overlapping = (
                 Idea.objects.filter(
                     step_id=self.step_id,
                     type=IdeaType.LODGING,
                     chosen_at__isnull=False,
-                    start_date__lte=self.end_date,
-                    end_date__gte=self.start_date,
+                    start_date__lt=self.end_date,
+                    end_date__gt=self.start_date,
                 )
                 .exclude(pk=self.pk)
                 .exists()
@@ -183,7 +192,7 @@ class Idea(TimeStampedModel, ValidatedModel):
             if overlapping:
                 raise ValidationError(
                     {
-                        "chosen_at": (
+                        "start_date": (
                             "Another chosen lodging on this step overlaps these dates."
                         )
                     }

@@ -3,6 +3,7 @@ from typing import ClassVar
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -13,9 +14,17 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from common.mixins import PublicApiMixin
+
 from .mixins import ParticipantScopedMixin
 from .models import Participation, ParticipationStatus, Step, Travel
 from .permissions import IsTravelParticipant
+from .schema import (
+    step_detail_schema,
+    steps_list_schema,
+    travel_detail_schema,
+    travels_list_schema,
+)
 from .serializers import StepSerializer, TravelSerializer
 
 
@@ -41,7 +50,9 @@ class TravelJoinView(APIView):
         return Response(TravelSerializer(travel).data)
 
 
-class TravelListView(ParticipantScopedMixin, ListCreateAPIView):
+@extend_schema(tags=["Travels"])
+@travels_list_schema
+class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
@@ -55,12 +66,16 @@ class TravelListView(ParticipantScopedMixin, ListCreateAPIView):
             )
 
 
-class TravelDetailView(ParticipantScopedMixin, RetrieveUpdateAPIView):
+@extend_schema(tags=["Travels"])
+@travel_detail_schema
+class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPIView):
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
 
-class StepListView(ListCreateAPIView):
+@extend_schema(tags=["Steps"])
+@steps_list_schema
+class StepListView(PublicApiMixin, ListCreateAPIView):
     queryset = Step.objects.alive()
     serializer_class = StepSerializer
     permission_classes: ClassVar[list] = [IsAuthenticated, IsTravelParticipant]
@@ -72,7 +87,11 @@ class StepListView(ListCreateAPIView):
         serializer.save(travel_id=self.kwargs["travel_id"])
 
 
-class StepDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
+@extend_schema(tags=["Steps"])
+@step_detail_schema
+class StepDetailView(
+    PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
+):
     queryset = Step.objects.alive()
     serializer_class = StepSerializer
     participation_path = "travel__participations"
