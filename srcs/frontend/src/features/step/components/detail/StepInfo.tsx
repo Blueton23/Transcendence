@@ -2,14 +2,15 @@ import IconBadge from "@/shared/ui/IconBadge";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 import type { Step } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
 interface StepInfoProps {
   step: Step;
   dateLabel: string;
-  hasNights: boolean;
 }
 
-export function StepInfo({ step, dateLabel, hasNights }: StepInfoProps) {
+export function StepInfo({ step, dateLabel }: StepInfoProps) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="flex items-center gap-4">
@@ -19,7 +20,10 @@ export function StepInfo({ step, dateLabel, hasNights }: StepInfoProps) {
             {step.localisation}
           </Heading>
           <Text font="mono" tone="muted" size="sm">
-            {dateLabel} · {hasNights ? `${step.nights} NUITS` : "PAS DE NUIT"}
+            {dateLabel} ·{" "}
+            <span className="uppercase">
+              {t("units.nights", { count: step.nights })}
+            </span>
           </Text>
         </div>
       </div>

@@ -177,12 +177,18 @@
       "updateFailed": "Unable to edit the stop."
     },
     "list": "List",
+    "lodgedRatio": "{{lodged}}/{{total}} accommodation",
     "map": "Map",
     "noLodging": "No accommodation planned yet",
     "noNightHere": "I'm not staying overnight here",
     "noResults": "No results",
+    "pinnedIdeas_one": "{{count}} pinned idea",
+    "pinnedIdeas_other": "{{count}} pinned ideas",
+    "pinnedIdeas_zero": "No pinned ideas",
     "placeAndDates": "Place and dates",
     "placePlaceholder": "Where are you stopping next?",
+    "proposals_one": "Accommodation to choose · {{count}} proposal",
+    "proposals_other": "Accommodation to choose · {{count}} proposals",
     "saveChanges": "Save changes",
     "saving": "Saving changes"
   },
@@ -221,6 +227,13 @@
     "titleLabel": "Trip title",
     "titlePlaceholder": "My trip title",
     "travelCreated": "Trip created: {{title}}",
-    "travelersOnBoard": "{{count}} travellers already on board"
+    "travelersOnBoard_one": "{{count}} traveller already on board",
+    "travelersOnBoard_other": "{{count}} travellers already on board"
+  },
+  "units": {
+    "nights_one": "{{count}} night",
+    "nights_other": "{{count}} nights",
+    "nights_zero": "No nights",
+    "pricePerNight": "{{price}} CHF/night"
   }
 }

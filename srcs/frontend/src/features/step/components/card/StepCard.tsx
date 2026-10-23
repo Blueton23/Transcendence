@@ -9,7 +9,6 @@ import { useState } from "react";
 import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { deleteStep } from "@/features/step/api/stepApi";
-import { formatNights } from "@/shared/utils/formatNights";
 import type { Step } from "@/features/step/types";
 import { useTranslation } from "react-i18next";
 
@@ -90,13 +89,14 @@ function StepDescription({
   step,
   lodging,
 }: Pick<StepCardProps, "step" | "lodging">) {
+  const { t } = useTranslation();
   return (
     <Text tone="muted" size="sm">
-      {formatNights(step.nights)}
+      {t("units.nights", { count: step.nights })}
       {lodging &&
         lodging.total > 0 &&
-        ` · ${lodging.lodged}/${lodging.total} hébergement`}
-      {` · ${step.ideaCount} idées épinglées`}
+        ` · ${t("step.lodgedRatio", { lodged: lodging.lodged, total: lodging.total })}`}
+      {` · ${t("step.pinnedIdeas", { count: step.ideaCount })}`}
     </Text>
   );
 }

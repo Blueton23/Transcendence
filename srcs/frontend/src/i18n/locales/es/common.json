@@ -177,12 +177,18 @@
       "updateFailed": "No se pudo editar la etapa."
     },
     "list": "Lista",
+    "lodgedRatio": "{{lodged}}/{{total}} alojamiento",
     "map": "Mapa",
     "noLodging": "Aún no hay alojamiento previsto",
     "noNightHere": "no pasaré la noche aquí",
     "noResults": "Sin resultados",
+    "pinnedIdeas_one": "{{count}} idea fijada",
+    "pinnedIdeas_other": "{{count}} ideas fijadas",
+    "pinnedIdeas_zero": "Ninguna idea fijada",
     "placeAndDates": "Lugar y fechas",
     "placePlaceholder": "¿Dónde paráis después?",
+    "proposals_one": "Alojamiento por elegir · {{count}} propuesta",
+    "proposals_other": "Alojamiento por elegir · {{count}} propuestas",
     "saveChanges": "Guardar los cambios",
     "saving": "Guardando los cambios"
   },
@@ -221,6 +227,13 @@
     "titleLabel": "Título del viaje",
     "titlePlaceholder": "Título de mi viaje",
     "travelCreated": "Viaje creado: {{title}}",
-    "travelersOnBoard": "{{count}} viajeros ya a bordo"
+    "travelersOnBoard_one": "{{count}} viajero ya a bordo",
+    "travelersOnBoard_other": "{{count}} viajeros ya a bordo"
+  },
+  "units": {
+    "nights_one": "{{count}} noche",
+    "nights_other": "{{count}} noches",
+    "nights_zero": "Sin noches",
+    "pricePerNight": "{{price}} CHF/noche"
   }
 }

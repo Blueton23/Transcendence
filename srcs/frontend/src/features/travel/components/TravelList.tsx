@@ -7,7 +7,6 @@ import Icon from "@/shared/ui/Icon";
 import IconButton from "@/shared/ui/IconButton";
 import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
-import { formatNights } from "@/shared/utils/formatNights";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
@@ -33,7 +32,7 @@ export function TravelList({ travels, onAdd }: TravelListProps) {
                 {getStatus(travel)}
               </Tag>
               <Tag tone="muted" className="self-start text-xs! font-semibold">
-                {formatNights(travel.nights)}
+                {t("units.nights", { count: travel.nights })}
               </Tag>
             </div>
             <Heading size="sm" className="line-clamp-1">

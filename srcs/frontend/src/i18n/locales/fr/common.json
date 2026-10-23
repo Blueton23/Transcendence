@@ -177,12 +177,18 @@
       "updateFailed": "Impossible de modifier l'étape."
     },
     "list": "Liste",
+    "lodgedRatio": "{{lodged}}/{{total}} hébergement",
     "map": "Carte",
     "noLodging": "Aucun hébergement n'est encore prévu",
     "noNightHere": "je ne passe pas de nuit ici",
     "noResults": "Aucun résultat",
+    "pinnedIdeas_one": "{{count}} idée épinglée",
+    "pinnedIdeas_other": "{{count}} idées épinglées",
+    "pinnedIdeas_zero": "Aucune idée épinglée",
     "placeAndDates": "Lieu et dates",
     "placePlaceholder": "Où vous arrêtez-vous ensuite ?",
+    "proposals_one": "Hébergement à choisir · {{count}} proposition",
+    "proposals_other": "Hébergement à choisir · {{count}} propositions",
     "saveChanges": "Enregistrer les modifications",
     "saving": "Modifications en cours"
   },
@@ -210,7 +216,7 @@
     "inviteLink": "Lien d'invitation",
     "inviteTravelers": "Invite tes voyageurs pour planifier ensemble {{title}}",
     "joinTravel": "Rejoindre le voyage",
-    "kms": "{{count}} kms",
+    "kms": "{{count}} km",
     "leave": "Quitter le voyage",
     "manageTravelers": "Gérer les voyageurs",
     "newTravel": "Nouveau voyage",
@@ -221,6 +227,13 @@
     "titleLabel": "Titre du voyage",
     "titlePlaceholder": "Titre de mon voyage",
     "travelCreated": "Voyage créé : {{title}}",
-    "travelersOnBoard": "{{count}} voyageurs déjà à bord"
+    "travelersOnBoard_one": "{{count}} voyageur déjà à bord",
+    "travelersOnBoard_other": "{{count}} voyageurs déjà à bord"
+  },
+  "units": {
+    "nights_one": "{{count}} nuit",
+    "nights_other": "{{count}} nuits",
+    "nights_zero": "Pas de nuit",
+    "pricePerNight": "{{price}} CHF/nuit"
   }
 }

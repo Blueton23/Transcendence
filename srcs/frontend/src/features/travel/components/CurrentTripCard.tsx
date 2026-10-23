@@ -36,10 +36,9 @@ export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
           <Tag icon={<Icon name="cal" size={14} />} tone="inverse">
             {dateLabels}
           </Tag>
-          <Tag
-            icon={<Icon name="car" size={14} />}
-            tone="inverse"
-          >{`${totalKms} kms`}</Tag>
+          <Tag icon={<Icon name="car" size={14} />} tone="inverse">
+            {t("travel.kms", { count: totalKms })}
+          </Tag>
         </div>
         <Button
           variant="outline"

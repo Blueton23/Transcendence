@@ -98,10 +98,9 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
         <Tag tone="inverse" className="border-error/80! bg-error/30!">
           {DatesLabel}
         </Tag>
-        <Tag
-          icon={<Icon name="moon" size={14} />}
-          tone="inverse"
-        >{`${travel.nights} nuits`}</Tag>
+        <Tag icon={<Icon name="moon" size={14} />} tone="inverse">
+          {t("units.nights", { count: travel.nights })}
+        </Tag>
         <Tag icon={<Icon name="car" size={14} />} tone="inverse">
           {t("travel.kms", { count: totalKms })}
         </Tag>

@@ -7,6 +7,7 @@ import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import IconBadge from "@/shared/ui/IconBadge";
 import Text from "@/shared/ui/Text";
+import { useTranslation } from "react-i18next";
 
 interface ChosenNightProps {
   night: Idea;
@@ -14,6 +15,7 @@ interface ChosenNightProps {
 }
 
 export function ChosenNight({ night, actions }: ChosenNightProps) {
+  const { t } = useTranslation();
   return (
     <Card
       variant="success"
@@ -27,7 +29,8 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
           </Heading>
           <div className="flex flex-1">
             <Text tone="success" font="mono">
-              {night.pricePerNight && `${night.pricePerNight} CHF/nuit · `}
+              {night.pricePerNight &&
+                `${t("units.pricePerNight", { price: night.pricePerNight })} · `}
               {lodgingCountNights(night)} · du{" "}
               {night.arrivalDate &&
                 night.departureDate &&
