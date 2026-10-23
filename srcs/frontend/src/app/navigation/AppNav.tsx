@@ -15,7 +15,7 @@ export function AppNavDesktop() {
         <Heading>Peripl</Heading>
       </div>
       <div className="flex flex-col gap-1">
-        <NavPill to="/trip" iconName="home" label={t("nav.trips")}></NavPill>
+        <NavPill to="/travel" iconName="home" label={t("nav.trips")}></NavPill>
         <NavPill
           to="/profile"
           iconName="user"
@@ -32,7 +32,7 @@ export function AppNavDesktop() {
 export function AppNavMobile() {
   return (
     <div className="flex gap-1">
-      <NavPillMobile to="/trip" iconName="home"></NavPillMobile>
+      <NavPillMobile to="/travel" iconName="home"></NavPillMobile>
       <NavPillMobile to="/profile" iconName="user"></NavPillMobile>
     </div>
   );

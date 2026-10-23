@@ -23,29 +23,29 @@ interface TripNavItem {
 function getTripNavItems(tripId: string): TripNavItem[] {
   return [
     {
-      to: `/trip/${tripId}/itinerary`,
+      to: `/travel/${tripId}/itinerary`,
       iconName: "route",
       label: "nav.itinerary",
     },
     {
-      to: `/trip/${tripId}/ideas`,
+      to: `/travel/${tripId}/ideas`,
       iconName: "pinplus",
       label: "nav.ideas",
       badgeCount: 2,
     },
     {
-      to: `/trip/${tripId}/expenses`,
+      to: `/travel/${tripId}/expenses`,
       iconName: "wallet",
       label: "nav.expenses",
     },
     {
-      to: `/trip/${tripId}/chat`,
+      to: `/travel/${tripId}/chat`,
       iconName: "chat",
       label: "nav.chat",
       badgeCount: 3,
     },
     {
-      to: `/trip/${tripId}/assistant`,
+      to: `/travel/${tripId}/assistant`,
       iconName: "spark",
       label: "nav.assistant",
     },

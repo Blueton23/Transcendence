@@ -26,7 +26,7 @@ export function TravelList({ travels, onAdd }: TravelListProps) {
           <Card
             variant="accent"
             className="flex cursor-pointer flex-col gap-2 p-4"
-            onClick={() => navigate(`/trip/${travel.id}/`)}
+            onClick={() => navigate(`/travel/${travel.id}/`)}
           >
             <div className="flex gap-2">
               <Tag tone="muted" className="self-start text-xs! font-semibold">

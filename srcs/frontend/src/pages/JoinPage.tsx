@@ -32,13 +32,13 @@ function JoinPage() {
     );
   if (!travel) return null;
   if (travel.isMember) {
-    return <Navigate to={`/trip/${travel.id}/itinerary`} replace />;
+    return <Navigate to={`/travel/${travel.id}/itinerary`} replace />;
   }
 
   const handleJoin = async () => {
     const result = await submit();
     if (result.success && result.data) {
-      navigate(`/trip/${result.data.id}/itinerary`);
+      navigate(`/travel/${result.data.id}/itinerary`);
     }
   };
 

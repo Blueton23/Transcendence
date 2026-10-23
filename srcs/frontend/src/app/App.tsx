@@ -32,8 +32,8 @@ function App() {
         <Route path="/join/:token" element={<JoinPage />} />
         <Route element={<AppLayout />}>
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/trip" element={<TravelPage />} />
-          <Route path="/trip/:id">
+          <Route path="/travel" element={<TravelPage />} />
+          <Route path="/travel/:id">
             <Route index element={<Navigate to="itinerary" replace />} />
             <Route path="itinerary" element={<ItineraryPage />} />
             <Route path="ideas" element={<IdeasPage />} />

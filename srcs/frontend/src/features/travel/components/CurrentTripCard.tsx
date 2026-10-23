@@ -44,7 +44,7 @@ export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
         <Button
           variant="outline"
           className="self-end"
-          onClick={() => navigate(`/trip/${travel.id}/`)}
+          onClick={() => navigate(`/travel/${travel.id}/`)}
         >
           {t("travel.openTravel")}
           <Icon name="arrow" />

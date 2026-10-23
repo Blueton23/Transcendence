@@ -28,7 +28,7 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
 
   const handleOnSubmit = async () => {
     const result = await submit();
-    if (result.success) navigate("/trip");
+    if (result.success) navigate("/travel");
   };
 
   if (error) return <p>{error}</p>;
@@ -84,7 +84,7 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
     <div className="relative flex flex-col gap-5 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] px-3.5 py-5 md:gap-3 md:p-6">
       <div className="flex flex-col gap-2">
         <Link
-          to="/trip"
+          to="/travel"
           className="flex items-center gap-2 text-xs text-inverse"
         >
           <Icon name="back" size={16} />

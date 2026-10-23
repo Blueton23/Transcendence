@@ -381,7 +381,7 @@ src/features/idea/
 │   ├── modal/         → modals « Épingler », « Modifier », « Placer »
 │   └── forms/         → formulaires et leurs champs (type, dates, hébergement)
 └── utils/             → filtres, validation du formulaire, formats de date, icônes
-src/pages/IdeasPage.tsx → la page /trip/:id/ideas qui assemble le tout
+src/pages/IdeasPage.tsx → la page /travel/:id/ideas qui assemble le tout
 ```
 
 **Pourquoi cette organisation** : en ouvrant un seul dossier, on trouve tout ce qui concerne une fonctionnalité. Les couches sont séparées (appels réseau, état, affichage) : un composant n'appelle jamais `fetch` directement.
@@ -437,7 +437,7 @@ Les boutons d'action utilisent `useSubmitAction` (partagé) : le bouton est **d�
 
 ## Utilisation
 
-1. Connecte-toi, ouvre un voyage, puis l'onglet **Idées** (`/trip/{id}/ideas`).
+1. Connecte-toi, ouvre un voyage, puis l'onglet **Idées** (`/travel/{id}/ideas`).
 2. **Épingler une idée** : choisis un type, un titre, et éventuellement une étape et une date. Pour un hébergement : les dates d'arrivée et de départ, et le prix par nuit.
 3. **Voter** : clique sur le cœur d'une carte. Le compteur augmente ; un deuxième clic retire ton vote.
 4. **Placer** : bouton « Placer » → choisis une étape (et une date pour une idée qui n'est pas un hébergement). La carte affiche alors le nom de l'étape.

@@ -64,7 +64,7 @@ function ItineraryPage() {
   const isLoading = isLoadingTravel || isLoadingSteps;
   const error = errorTravel || errorSteps;
   if (isLoading) return null;
-  if (error) return <Navigate to="/trip" replace />;
+  if (error) return <Navigate to="/travel" replace />;
   if (!travel) return null;
   const selectedStepIndex = detailView
     ? steps.findIndex((step) => step.id === detailView.id)

@@ -119,7 +119,7 @@ export function IdeasPage() {
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}
               onView={() =>
-                navigate(`/trip/${travelId}/itinerary?step=${idea.stepId}`)
+                navigate(`/travel/${travelId}/itinerary?step=${idea.stepId}`)
               }
               onEdit={() => setEditIdeaId(idea.id)}
               onDelete={() => handleDeleteIdea(idea.id)}
