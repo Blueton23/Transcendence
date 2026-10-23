@@ -15,7 +15,7 @@ export function ToggleMobileButton({
         onClick={() => onToggle("list")}
         size="sm"
       >
-        t("step.list")
+        {t("step.list")}
       </Button>
       <Button
         className="px-2! py-1!"

@@ -88,7 +88,7 @@ export function PlaceIdeaModal({
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Enregistrement" : `${t("actions.save")}`}
+          {isSubmitting ? t("actions.saving") : t("actions.save")}
         </Button>
       </form>
     </Modal>
