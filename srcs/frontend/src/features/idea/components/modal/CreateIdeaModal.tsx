@@ -18,6 +18,7 @@ export interface CreateIdeaModalProps {
   steps: Step[];
   initialStepId?: number;
   initialType?: IdeaType;
+  lockStep?: boolean;
   initialDateRange?: DateRange;
   onClose: () => void;
   onCreate: (input: CreateIdeaInput) => Promise<void>;
@@ -28,6 +29,7 @@ export function CreateIdeaModal({
   steps,
   initialStepId,
   initialType,
+  lockStep,
   initialDateRange,
   onClose,
   onCreate,
@@ -94,6 +96,7 @@ export function CreateIdeaModal({
         <CreateIdeaForm
           steps={steps}
           values={values}
+          lockStep={lockStep}
           setValues={setValues}
           titleError={hasSubmitted ? titleError : undefined}
           datesError={hasSubmitted ? datesError : undefined}

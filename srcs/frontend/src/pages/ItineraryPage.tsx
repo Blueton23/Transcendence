@@ -135,6 +135,7 @@ function ItineraryPage() {
           steps={steps}
           initialStepId={detailView?.id}
           initialType={lodgingDate ? "accommodation" : undefined}
+          lockStep={detailView ? true : false}
           initialDateRange={
             lodgingDate
               ? { from: new Date(lodgingDate), to: undefined }
