@@ -695,11 +695,130 @@ docker compose exec redis redis-cli -n 1 FLUSHDB
 - https://drf-spectacular.readthedocs.io/en/latest/customization.html
 - https://swagger.io/docs/specification/v3_0/authentication/api-keys/
 
-## Choix techniques et limites connues
+#
+#
 
-- **Clés stockées en clair, sans expiration** : c'est le fonctionnement de `rest_framework.authtoken`. Une clé se révoque en la supprimant dans l'admin (une nouvelle sera générée au prochain appel). Une amélioration possible serait `django-rest-knox` (clés hachées en SHA-512, expiration), au prix d'un changement de comportement : une nouvelle clé à chaque appel, montrée une seule fois.
-- **`403` plutôt que `401`** pour une requête non authentifiée : on conserve le comportement existant du projet (et de ses tests), parce que `SessionAuthentication` est la première méthode d'authentification. Le message du body (`not_authenticated`, `Invalid token.`) reste explicite.
-- **Compteurs partagés** : le front et l'API d'un même utilisateur partagent le compteur `public_api` ; des clients derrière une même IP (réseau d'école, d'entreprise) partagent le compteur `auth_token`.
-- **`NUM_PROXIES` dépend de l'infrastructure** : à passer à `2` si un autre proxy est ajouté devant Nginx.
-- **Swagger UI est chargé depuis un CDN** : le navigateur a besoin d'Internet pour afficher `/api/docs/` (le schéma `/api/schema/`, lui, est servi par le backend).
-- **HTTP en développement** : le projet tourne actuellement en HTTP sur le port 8080. En HTTP, la clé circule en clair : HTTPS (exigé par le sujet pour toute connexion au backend, y compris depuis un script) doit être en place pour l'évaluation.
+# Module : OAuth 2.0 (Minor, 1 point)
+
+Étape 0 — Google Cloud Console
+
+But : obtenir un Client ID et un Client secret, et dire à Google vers quelle URL il a le droit de renvoyer l’utilisateur.
+
+Les noms des menus changent parfois. Dans la console récente, tout se trouve sous « Google Auth Platform ».
+
+Créer un projet. Va sur console.cloud.google.com, puis Sélecteur de projet → Nouveau projet → nomme-le par exemple Transcendence.
+Configurer l’écran de consentement. Dans Google Auth Platform → Get started (ou Branding), renseigne :
+le nom de l’app, que l’utilisateur verra sur la page Google (par exemple le nom de ton projet) ;
+l’email de support : le tien ;
+l’audience : External, puisque n’importe quel compte Google doit pouvoir se connecter ;
+l’email de contact développeur.
+Ajouter les test users. Dans Audience, ajoute ton email, ceux de l’équipe et plus tard ceux des évaluateurs.
+Tant que l’app est en statut Testing, seuls ces comptes peuvent se connecter. Les autres reçoivent une erreur access_denied.
+Vérifier les scopes. Dans Data access, les scopes openid, email et profile suffisent. Ce sont des scopes « non sensibles », sans procédure de validation lourde.
+Créer le client OAuth. Dans Clients → Create client :
+type : Web application ;
+nom : par exemple transcendence-dev ;
+Authorized redirect URIs : http://localhost:8080/api/auth/google/callback/ ;
+Authorized JavaScript origins : laisse vide. Ce champ sert quand c’est le JavaScript qui parle à Google, ce qui n’est pas ton cas.
+Copier les identifiants. Copie le Client ID et le Client secret tout de suite dans un endroit sûr. Selon la console, le secret peut ne plus être affiché en clair ensuite.
+
+Pourquoi l’URI de redirection est si stricte : c’est la protection principale du flux. Google n’enverra le code qu’à cette adresse exacte. Si un attaquant modifie redirect_uri dans le lien, Google refuse. Le port, le / final et localhost (et non 127.0.0.1) doivent donc correspondre exactement à ce que Django enverra.
+
+Vérification de l’étape 0 : tu as un Client ID (du type xxxx.apps.googleusercontent.com), un secret, et ton email figure dans les test users.
+
+Ces niveaux d'accès permettent :
+- userinfo.email : récupérer l'adresse e-mail de l'utilisateur.
+- userinfo.profile : récupérer les informations de base de son profil (nom, photo, etc.).
+- openid : identifier l'utilisateur avec OpenID Connect.
+
+callback sert à recevoir la réponse de Google après l'authentification de l'utilisateur.
+
+
+
+Étape 1 — Les secrets et l’installation
+
+But : que Django connaisse ton Client ID, ton secret et ton URI de redirection, sans qu’ils soient jamais écrits dans le code ni envoyés sur Git, puis installer Authlib dans l’image du backend.
+
+1.1 — Le .env à la racine
+
+Ajoute à la fin de .env :
+
+bash
+# OAuth 2.0 — Google
+GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=GOCSPX-xxxxxxxx
+GOOGLE_REDIRECT_URI=http://localhost:8080/api/auth/google/callback/
+
+Comment la valeur arrive jusqu’à Django : dans docker-compose.yml, le service backend a env_file: ./.env. Docker injecte donc chaque ligne comme variable d’environnement du conteneur, et Python la lit ensuite avec os.environ. Tu n’as rien à modifier dans docker-compose.yml.
+
+Quelques règles à respecter :
+
+Pas de guillemets ni d’espaces autour du =. C’est le format que tu utilises déjà pour les autres variables.
+Le secret va dans le .env de la racine, jamais dans srcs/frontend/.env. Vite envoie au navigateur toutes les variables qui commencent par VITE_ (c’est pour ça que ton token Mapbox y est). Un secret placé là deviendrait visible par n’importe qui dans les sources de la page.
+L’URI doit être identique au caractère près à celle enregistrée dans la Google Console à l’étape 0.
+1.2 — Le .env.example
+
+Ajoute les mêmes clés, sans les vraies valeurs. C’est ce fichier qui est versionné : il dit à tes coéquipiers quelles variables existent.
+
+bash
+# OAuth 2.0 — Google (Google Cloud Console > Google Auth Platform > Clients)
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=http://localhost:8080/api/auth/google/callback/
+# POUR LA PROD : GOOGLE_REDIRECT_URI en https, et l'ajouter dans la Google Console
+
+L’URI de redirection n’est pas un secret, on peut donc la laisser remplie.
+
+1.3 — config/settings.py
+
+Ajoute ce bloc par exemple juste après SPECTACULAR_SETTINGS :
+
+python
+# OAuth 2.0 — Connexion avec Google (Authlib)
+# Authlib lit automatiquement AUTHLIB_OAUTH_CLIENTS : la clé "google"
+# correspond au nom qu'on donnera au client avec oauth.register("google", ...).
+AUTHLIB_OAUTH_CLIENTS = {
+    "google": {
+        "client_id": os.environ.get("GOOGLE_CLIENT_ID", ""),
+        "client_secret": os.environ.get("GOOGLE_CLIENT_SECRET", ""),
+    },
+}
+
+# Adresse où Google renvoie l'utilisateur après la connexion.
+# Doit être identique à celle enregistrée dans la Google Console.
+GOOGLE_REDIRECT_URI = os.environ.get(
+    "GOOGLE_REDIRECT_URI",
+    "http://localhost:8080/api/auth/google/callback/",
+)
+
+Pourquoi ce découpage :
+
+AUTHLIB_OAUTH_CLIENTS est le réglage officiel d’Authlib. À l’étape 3, oauth.register("google", ...) ira chercher ici le client_id et le client_secret tout seul. La configuration (les secrets) reste dans settings.py, et le code (le protocole) dans l’app oauth.
+GOOGLE_REDIRECT_URI est un réglage à nous. On le passera explicitement à authorize_redirect() à l’étape 4.
+Le "" par défaut au lieu d’un crash : si un coéquipier n’a pas encore configuré Google, le reste du site démarre quand même. Seul le bouton Google échouera. C’est le même principe que ton token Mapbox, qui est facultatif.
+1.4 — requirements.txt
+
+Ajoute ces deux lignes, avec des versions fixées comme pour tes autres dépendances :
+
+text
+Authlib==1.9.1
+requests==2.34.2
+Authlib gère le protocole OAuth / OpenID Connect. Il installe aussi cryptography, qui lui sert à vérifier la signature de l’id_token.
+requests est la librairie HTTP utilisée par Authlib pour parler à Google : échange du code et récupération des clés publiques.
+1.5 — Reconstruire l’image
+
+Ton code est monté en volume (./srcs/backend:/app), mais les paquets Python sont installés dans l’image, au moment du pip install du Dockerfile. Modifier requirements.txt ne suffit donc pas : il faut reconstruire l’image.
+
+bash
+make down
+make up        # = docker compose up --build
+
+Le --build relit requirements.txt. Docker garde en cache les étapes précédentes, donc seule l’installation des paquets est refaite.
+
+1.6 — Vérifications
+#	Commande	Résultat attendu	Ce que ça prouve
+1	make shell puis from authlib.integrations.django_client import OAuth	aucune erreur	Authlib et requests sont installés dans l’image
+2	dans le même shell : from django.conf import settings; bool(settings.AUTHLIB_OAUTH_CLIENTS["google"]["client_secret"])	True	le secret arrive bien du .env jusqu’à Django
+3	dans le même shell : settings.GOOGLE_REDIRECT_URI	ton URI exacte	l’URI de redirection est correcte
+4	make check	System check identified no issues	settings.py reste valide
+5	git status	.env n’apparaît pas	le secret ne partira pas sur Git
