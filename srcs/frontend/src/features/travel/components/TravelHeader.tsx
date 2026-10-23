@@ -88,7 +88,7 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
           className="flex items-center gap-2 text-xs text-inverse"
         >
           <Icon name="back" size={16} />
-          Mes voyages
+          {t("nav.trips")}
         </Link>
         <Heading level={1} size="lg" className="text-inverse!">
           {travel.title}

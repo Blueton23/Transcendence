@@ -1,4 +1,5 @@
 import type { Step, CreateStepData } from "@/features/step/types";
+import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
 import { getApiErrorMessage } from "@/shared/api/errors";
 
@@ -24,7 +25,7 @@ export async function createStep(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/travels/${travelId}/steps/`, {
@@ -54,7 +55,7 @@ export async function updateStep(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(
@@ -86,7 +87,7 @@ export async function deleteStep(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(

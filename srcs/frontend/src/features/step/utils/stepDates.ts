@@ -1,5 +1,6 @@
 import type { DateRange } from "@daypicker/react";
 import type { Step } from "../types";
+import i18n from "@/i18n";
 
 export function formatDayLabel(date: Date): string {
   return new Intl.DateTimeFormat("fr-CH", {
@@ -50,7 +51,7 @@ function formatDayMonth(date: Date): string {
 }
 
 export function formatDateRange(range: DateRange | undefined): string {
-  if (!range?.from) return "Choisir les dates";
+  if (!range?.from) return i18n.t("idea.form.chooseDates");
   if (!range.to || range.from.getTime() === range.to.getTime())
     return formatDayMonth(range.from);
   if (range.from.getMonth() === range.to.getMonth())
