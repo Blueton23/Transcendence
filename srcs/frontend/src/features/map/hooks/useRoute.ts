@@ -1,6 +1,7 @@
 import { getLeg } from "@/features/map/api/routingApi";
 import type { LongLat, Route } from "@/features/map/types";
 import type { Step } from "@/features/step/types";
+import i18n from "@/i18n";
 import { useEffect, useState } from "react";
 
 function coordinates(step: Step): LongLat {
@@ -60,7 +61,10 @@ export function useRoute(steps: Step[]) {
           });
         }
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Erreur");
+        if (!cancelled)
+          setError(
+            err instanceof Error ? err.message : i18n.t("step.errors.generic"),
+          );
       } finally {
         if (!cancelled) setIsLoading(false);
       }

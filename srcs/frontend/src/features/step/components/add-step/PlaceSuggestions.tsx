@@ -40,7 +40,7 @@ export function PlaceSuggestions({
         ))
       ) : (
         <Text tone="muted" size="sm" className="px-3 py-2">
-          Aucun résultat
+          {t("step.noResults")}
         </Text>
       )}
     </div>

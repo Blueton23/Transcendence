@@ -18,10 +18,10 @@ export function StepDetailHeader({
         <IconButton
           variant="flat"
           icon={<Icon name="back" size={16} />}
-          label="Retour à l'itinéraire"
+          label={t("step.backToItinerary")}
           onClick={onBack}
         />
-        <Heading size="md">Détail d'étape</Heading>
+        <Heading size="md">{t("step.detail")}</Heading>
       </div>
       <Button
         onClick={onModify}

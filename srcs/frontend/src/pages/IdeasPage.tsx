@@ -62,7 +62,7 @@ export function IdeasPage() {
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
 
   if (isLoading || isLoadingSteps || isLoadingTravel) {
-    return <Text>Chargement des idées, des étapes et des voyageurs…</Text>;
+    return null;
   }
 
   if (error || errorSteps || errorTravel) {
@@ -70,19 +70,19 @@ export function IdeasPage() {
   }
 
   if (!travel) {
-    return <Text>Voyage introuvable.</Text>;
+    return <Text>{t("travel.errors.notFound")}</Text>;
   }
   return (
     <div className="px-4 pt-8 md:px-8">
       <div className="mb-6 flex items-center justify-between">
         <Heading level={1} size="lg">
-          Idées
+          {t("nav.ideas")}
         </Heading>
         <PinIdeaButton onClick={() => setCreateIdeaModalOpen(true)} />
       </div>
 
       <div>
-        <Text className="mb-1">Type</Text>
+        <Text className="mb-1">{t("idea.form.type")}</Text>
         <IdeaTypeFilter
           typeActiveFilter={typeActiveFilter}
           onChange={setTypeActiveFilter}
@@ -100,9 +100,7 @@ export function IdeasPage() {
       <div className="flex flex-col gap-3">
         {filteredIdeas.length === 0 && (
           <Text tone="muted">
-            {ideas.length === 0
-              ? "Aucune idée pour ce voyage."
-              : "Aucune idée ne correspond aux filtres sélectionnés."}
+            {ideas.length === 0 ? t("idea.page.empty") : t("idea.page.noMatch")}
           </Text>
         )}
 

@@ -90,6 +90,10 @@
       "allSteps": "Toutes",
       "noStep": "Sans étape"
     },
+    "page": {
+      "empty": "Aucune idée pour ce voyage.",
+      "noMatch": "Aucune idée ne correspond aux filtres sélectionnés."
+    },
     "pool": "Pool général",
     "unknownProposer": "Inconnu",
     "pinIdea": "Épingler une idée",
@@ -174,6 +178,35 @@
     "titlePlaceholder": "Titre de mon voyage",
     "travelCreated": "Voyage créé : {{title}}",
     "travelersOnBoard": "{{count}} voyageurs déjà à bord"
+  },
+  "step": {
+    "actions": "Action",
+    "add": "Ajouter une étape",
+    "addExpense": "Ajouter une dépense",
+    "addLodging": "+ Proposer",
+    "addStep": "Ajouter l'étape",
+    "adding": "Ajout...",
+    "backToItinerary": "Retour à l'itinéraire",
+    "delete": "Supprimer l'étape",
+    "detail": "Détail d'étape",
+    "edit": "Modifier l'étape",
+    "list": "Liste",
+    "map": "Carte",
+    "noLodging": "Aucun hébergement n'est encore prévu",
+    "noNightHere": "je ne passe pas de nuit ici",
+    "noResults": "Aucun résultat",
+    "placeAndDates": "Lieu et dates",
+    "placePlaceholder": "Où vous arrêtez-vous ensuite ?",
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Modifications en cours",
+    "errors": {
+      "createFailed": "Impossible de créer l'étape.",
+      "deleteFailed": "Impossible de supprimer l'étape.",
+      "generic": "Erreur",
+      "loadFailed": "Aucune étape enregistrée.",
+      "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
+      "updateFailed": "Impossible de modifier l'étape."
+    }
   },
   "errors": { "csrfMissing": "errors.csrfMissing" }
 }

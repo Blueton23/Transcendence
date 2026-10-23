@@ -46,8 +46,7 @@ export function useStepForm({ step, travel, onSuccess }: UseStepFormProps) {
       throw new Error(t("travel.errors.datesRequired"));
     }
     const chosen = place ?? (await searchPlace(query))[0];
-    if (!chosen)
-      throw new Error("Lieu introuvable, choisis-en un dans la liste.");
+    if (!chosen) throw new Error(t("step.errors.placeNotFound"));
 
     const data = {
       localisation: chosen.localisation,

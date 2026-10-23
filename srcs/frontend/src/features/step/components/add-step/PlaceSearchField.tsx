@@ -2,6 +2,7 @@ import Icon from "@/shared/ui/Icon";
 import Divider from "@/shared/ui/Divider";
 import { type ChangeEventHandler, type FocusEventHandler } from "react";
 import IconButton from "@/shared/ui/IconButton";
+import { useTranslation } from "react-i18next";
 
 interface PlaceSearchFieldProps {
   value: string;
@@ -27,6 +28,7 @@ export function PlaceSearchField({
   onFocus,
   onCalendarClick,
 }: PlaceSearchFieldProps) {
+  const { t } = useTranslation();
   return (
     <div
       className={`flex items-center gap-2 rounded-md px-3 py-2 ${variantStyle[variant]}`}
@@ -38,7 +40,7 @@ export function PlaceSearchField({
         onBlur={onBlur}
         onFocus={onFocus}
         className="flex-1 text-sm text-text outline-none placeholder:text-muted"
-        placeholder="Où vous arrêtez-vous ensuite ?"
+        placeholder={t("step.placePlaceholder")}
       ></input>
       {onCalendarClick && (
         <>

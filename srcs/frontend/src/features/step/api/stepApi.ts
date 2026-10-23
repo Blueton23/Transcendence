@@ -13,7 +13,9 @@ export async function getSteps(travelId: number): Promise<Step[]> {
 
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(getApiErrorMessage(result) || "aucune étape enregistrée");
+    throw new Error(
+      getApiErrorMessage(result) || i18n.t("step.errors.loadFailed"),
+    );
   }
   return result;
 }
@@ -41,7 +43,7 @@ export async function createStep(
   const result = await response.json();
   if (!response.ok) {
     throw new Error(
-      getApiErrorMessage(result) || "impossible de créer l'étape",
+      getApiErrorMessage(result) || i18n.t("step.errors.createFailed"),
     );
   }
   return result;
@@ -74,7 +76,7 @@ export async function updateStep(
   const result = await response.json();
   if (!response.ok) {
     throw new Error(
-      getApiErrorMessage(result) || "impossible de créer l'étape",
+      getApiErrorMessage(result) || i18n.t("step.errors.updateFailed"),
     );
   }
   return result;
@@ -105,7 +107,7 @@ export async function deleteStep(
   if (!response.ok) {
     const result = await response.json();
     throw new Error(
-      getApiErrorMessage(result) || "impossible de supprimer l'étape",
+      getApiErrorMessage(result) || i18n.t("step.errors.deleteFailed"),
     );
   }
 }

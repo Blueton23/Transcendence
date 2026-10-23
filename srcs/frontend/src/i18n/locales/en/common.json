@@ -89,6 +89,10 @@
       "allSteps": "All",
       "noStep": "No stop"
     },
+    "page": {
+      "empty": "No ideas for this trip.",
+      "noMatch": "No ideas match the selected filters."
+    },
     "pool": "General pool",
     "unknownProposer": "Unknown",
     "pinIdea": "Pin an idea",
@@ -173,6 +177,35 @@
     "titlePlaceholder": "My trip title",
     "travelCreated": "Trip created: {{title}}",
     "travelersOnBoard": "{{count}} travellers already on board"
+  },
+  "step": {
+    "actions": "Action",
+    "add": "Add a stop",
+    "addExpense": "Add an expense",
+    "addLodging": "+ Suggest",
+    "addStep": "Add the stop",
+    "adding": "Adding...",
+    "backToItinerary": "Back to itinerary",
+    "delete": "Delete stop",
+    "detail": "Stop details",
+    "edit": "Edit stop",
+    "list": "List",
+    "map": "Map",
+    "noLodging": "No accommodation planned yet",
+    "noNightHere": "I'm not staying overnight here",
+    "noResults": "No results",
+    "placeAndDates": "Place and dates",
+    "placePlaceholder": "Where are you stopping next?",
+    "saveChanges": "Save changes",
+    "saving": "Saving changes",
+    "errors": {
+      "createFailed": "Unable to create the stop.",
+      "deleteFailed": "Unable to delete the stop.",
+      "generic": "Error",
+      "loadFailed": "No stops saved.",
+      "placeNotFound": "Place not found, choose one from the list.",
+      "updateFailed": "Unable to edit the stop."
+    }
   },
   "errors": { "csrfMissing": "CSRF token not found." }
 }

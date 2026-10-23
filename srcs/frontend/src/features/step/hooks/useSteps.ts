@@ -1,6 +1,7 @@
 import type { Step } from "@/features/step/types";
 import { getSteps } from "@/features/step/api/stepApi";
 import { useState, useEffect } from "react";
+import i18n from "@/i18n";
 
 export function useSteps(travelId: number) {
   const [steps, setSteps] = useState<Step[]>([]);
@@ -19,7 +20,9 @@ export function useSteps(travelId: number) {
         const result = await getSteps(travelId);
         setSteps(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Erreur");
+        setError(
+          err instanceof Error ? err.message : i18n.t("step.errors.generic"),
+        );
       } finally {
         setIsLoading(false);
       }

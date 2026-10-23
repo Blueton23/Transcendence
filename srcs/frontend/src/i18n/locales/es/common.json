@@ -89,6 +89,10 @@
       "allSteps": "Todas",
       "noStep": "Sin etapa"
     },
+    "page": {
+      "empty": "No hay ideas para este viaje.",
+      "noMatch": "Ninguna idea coincide con los filtros seleccionados."
+    },
     "pool": "Pool general",
     "unknownProposer": "Desconocido",
     "pinIdea": "Fijar una idea",
@@ -173,6 +177,35 @@
     "titlePlaceholder": "Título de mi viaje",
     "travelCreated": "Viaje creado: {{title}}",
     "travelersOnBoard": "{{count}} viajeros ya a bordo"
+  },
+  "step": {
+    "actions": "Acción",
+    "add": "Añadir una etapa",
+    "addExpense": "Añadir un gasto",
+    "addLodging": "+ Proponer",
+    "addStep": "Añadir la etapa",
+    "adding": "Añadiendo...",
+    "backToItinerary": "Volver al itinerario",
+    "delete": "Eliminar la etapa",
+    "detail": "Detalle de la etapa",
+    "edit": "Editar la etapa",
+    "list": "Lista",
+    "map": "Mapa",
+    "noLodging": "Aún no hay alojamiento previsto",
+    "noNightHere": "no pasaré la noche aquí",
+    "noResults": "Sin resultados",
+    "placeAndDates": "Lugar y fechas",
+    "placePlaceholder": "¿Dónde paráis después?",
+    "saveChanges": "Guardar los cambios",
+    "saving": "Guardando los cambios",
+    "errors": {
+      "createFailed": "No se pudo crear la etapa.",
+      "deleteFailed": "No se pudo eliminar la etapa.",
+      "generic": "Error",
+      "loadFailed": "No hay etapas guardadas.",
+      "placeNotFound": "Lugar no encontrado, elige uno de la lista.",
+      "updateFailed": "No se pudo editar la etapa."
+    }
   },
   "errors": { "csrfMissing": "Token CSRF no encontrado." }
 }

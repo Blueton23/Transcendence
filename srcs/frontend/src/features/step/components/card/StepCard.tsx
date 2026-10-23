@@ -69,7 +69,7 @@ function StepOptionsButton({
           className="top-full right-0 mt-2"
         >
           <MenuItem onClick={onModify} icon="edit">
-            Modifier étape
+            {t("step.edit")}
           </MenuItem>
           <Divider />
           <MenuItem
@@ -78,7 +78,7 @@ function StepOptionsButton({
             onClick={handleOnSubmit}
             disabled={isSubmitting}
           >
-            Supprimer l'étape
+            {t("step.delete")}
           </MenuItem>
         </DropdownMenu>
       )}
