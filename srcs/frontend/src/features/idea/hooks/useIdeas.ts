@@ -16,6 +16,7 @@ import {
   addIdeaReaction,
   removeIdeaReaction,
 } from "@/features/idea/api/api.ideas";
+import i18n from "@/i18n";
 
 export function useIdeas(travelId: number) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
@@ -32,7 +33,7 @@ export function useIdeas(travelId: number) {
 
       try {
         if (!Number.isSafeInteger(travelId) || travelId <= 0) {
-          throw new Error("Identifiant de voyage invalide");
+          throw new Error(i18n.t("idea.errors.invalidTravelId"));
         }
 
         const result = await fetchIdeas(travelId);
@@ -48,9 +49,7 @@ export function useIdeas(travelId: number) {
         }
 
         setError(
-          err instanceof Error
-            ? err.message
-            : "Impossible de charger les idées",
+          err instanceof Error ? err.message : i18n.t("idea.errors.loadFailed"),
         );
       } finally {
         if (!ignore) {
@@ -112,7 +111,7 @@ export function useIdeas(travelId: number) {
     const ideaToPlace = ideas.find((idea) => idea.id === ideaId);
 
     if (!ideaToPlace) {
-      throw new Error("Idée introuvable.");
+      throw new Error(i18n.t("idea.errors.notFound"));
     }
 
     const updatedIdea = await patchIdeaPlacement(travelId, ideaToPlace, input);
@@ -144,7 +143,7 @@ export function useIdeas(travelId: number) {
     const currentIdea = ideas.find((idea) => idea.id === ideaId);
 
     if (!currentIdea) {
-      throw new Error("État du vote introuvable.");
+      throw new Error(i18n.t("idea.errors.voteNotFound"));
     }
 
     const nextVoted = !currentIdea.voted;
@@ -176,9 +175,7 @@ export function useIdeas(travelId: number) {
         ),
       );
     } catch {
-      throw new Error(
-        "La modification de ton vote a été enregistrée, mais le compteur n’a pas pu être actualisé. Recharge la page pour le synchroniser.",
-      );
+      throw new Error(i18n.t("idea.errors.voteRefreshFailed"));
     }
   }
 

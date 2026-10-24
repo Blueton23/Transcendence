@@ -1,4 +1,5 @@
 import type { Leg, LongLat } from "@/features/map/types";
+import i18n from "@/i18n";
 
 interface DirectionsRoutes {
   distance: number;
@@ -39,7 +40,7 @@ export async function getLeg(from: LongLat, to: LongLat): Promise<Leg | null> {
   } else if (data.code === "NoRoute" || data.code === "NoSegment") {
     leg = null;
   } else {
-    throw new Error("Erreur Mapbox");
+    throw new Error(i18n.t("errors.mapbox"));
   }
   cache.set(coordsParam, leg);
   return leg;

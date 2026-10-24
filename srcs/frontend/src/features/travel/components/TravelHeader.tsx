@@ -11,6 +11,7 @@ import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { leaveTravel } from "@/features/travel/api/travelApi";
 import { Link, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 interface TravelHeaderProps {
   travel: Travel;
@@ -19,6 +20,7 @@ interface TravelHeaderProps {
 
 function TravelOptionsButton({ travel }: { travel: Travel }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const { submit, isSubmitting, error } = useSubmitAction(() =>
     leaveTravel(travel.id),
@@ -26,7 +28,7 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
 
   const handleOnSubmit = async () => {
     const result = await submit();
-    if (result.success) navigate("/trip");
+    if (result.success) navigate("/travel");
   };
 
   if (error) return <p>{error}</p>;
@@ -38,7 +40,7 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
     >
       <IconButton
         icon={<Icon name="dots" size={16} />}
-        label="Options"
+        label={t("actions.options")}
         className="border-white/16! bg-white/12! text-inverse!"
         onClick={() => setIsOpen((v) => !v)}
         onMouseDown={(e) => e.stopPropagation()}
@@ -56,10 +58,10 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
               setIsOpen(false);
             }}
           >
-            Copier le lien d'invitation
+            {t("travel.copyInviteLink")}
           </MenuItem>
-          <MenuItem icon="users">Gérer les voyageurs</MenuItem>
-          <MenuItem icon="cal">Changer les dates</MenuItem>
+          <MenuItem icon="users">{t("travel.manageTravelers")}</MenuItem>
+          <MenuItem icon="cal">{t("travel.changeDates")}</MenuItem>
           <Divider />
           <MenuItem
             onClick={handleOnSubmit}
@@ -67,7 +69,7 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
             icon="arrow"
             tone="danger"
           >
-            Quitter le voyage
+            {t("travel.leave")}
           </MenuItem>
         </DropdownMenu>
       )}
@@ -77,15 +79,16 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
 
 export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
   const DatesLabel = computeTravelDates(travel.startDate, travel.endDate);
+  const { t } = useTranslation();
   return (
     <div className="relative flex flex-col gap-5 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] px-3.5 py-5 md:gap-3 md:p-6">
       <div className="flex flex-col gap-2">
         <Link
-          to="/trip"
+          to="/travel"
           className="flex items-center gap-2 text-xs text-inverse"
         >
           <Icon name="back" size={16} />
-          Mes voyages
+          {t("nav.trips")}
         </Link>
         <Heading level={1} size="lg" className="text-inverse!">
           {travel.title}
@@ -95,14 +98,12 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
         <Tag tone="inverse" className="border-error/80! bg-error/30!">
           {DatesLabel}
         </Tag>
-        <Tag
-          icon={<Icon name="moon" size={14} />}
-          tone="inverse"
-        >{`${travel.nights} nuits`}</Tag>
-        <Tag
-          icon={<Icon name="car" size={14} />}
-          tone="inverse"
-        >{`${totalKms} kms`}</Tag>
+        <Tag icon={<Icon name="moon" size={14} />} tone="inverse">
+          {t("units.nights", { count: travel.nights })}
+        </Tag>
+        <Tag icon={<Icon name="car" size={14} />} tone="inverse">
+          {t("travel.kms", { count: totalKms })}
+        </Tag>
       </div>
       <TravelOptionsButton travel={travel} />
     </div>

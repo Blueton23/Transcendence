@@ -17,7 +17,6 @@ interface StepDetailProps {
   onBack: () => void;
 }
 
-//TODO(branchement): recuperer les Ideas + prepare les donnees pour Accomodation et IdeaSection
 export function StepDetail({
   step,
   dateLabel,
@@ -28,14 +27,11 @@ export function StepDetail({
   ideas,
   actions,
 }: StepDetailProps) {
-  const hasNights = step.nights > 0;
-  // const ideas = .... recuperer ici les idee du step
-
   return (
     <div className="flex flex-col gap-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
       <StepDetailHeader onBack={onBack} onModify={onModify} />
 
-      <StepInfo step={step} dateLabel={dateLabel} hasNights={hasNights} />
+      <StepInfo step={step} dateLabel={dateLabel} />
       <Divider />
       <IdeaSection
         step={step}

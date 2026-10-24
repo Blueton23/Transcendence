@@ -7,6 +7,7 @@ import Input from "@/shared/ui/Input";
 
 import { modifyPassword } from "../api/profile";
 import type { ModifyPasswordData } from "../types";
+import { useTranslation } from "react-i18next";
 
 const INITIAL_FORM: ModifyPasswordData = {
   oldPassword: "",
@@ -51,11 +52,13 @@ export function ModifyPassword() {
     }
   }
 
+  const { t } = useTranslation();
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1 text-sm font-semibold text-text-secondary">
-          <span>Mot de passe</span>
+          <span>{t("auth.password")}</span>
           <span>••••••••</span>
         </div>
 
@@ -65,7 +68,7 @@ export function ModifyPassword() {
             onClick={handleEdit}
             className="text-sm font-semibold text-red-500"
           >
-            Changer
+            {t("actions.change")}
           </button>
         )}
       </div>
@@ -74,7 +77,7 @@ export function ModifyPassword() {
         <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-4">
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Ancien mot de passe
+              {t("auth.oldPassword")}
             </span>
 
             <Input
@@ -90,7 +93,7 @@ export function ModifyPassword() {
 
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Nouveau mot de passe
+              {t("auth.newPassword")}
             </span>
 
             <Input
@@ -106,7 +109,7 @@ export function ModifyPassword() {
 
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Confirmer le nouveau mot de passe
+              {t("auth.confirmNewPassword")}
             </span>
 
             <Input
@@ -127,7 +130,9 @@ export function ModifyPassword() {
               className="flex-1 rounded-full py-3"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Enregistrement..." : "Changer le mot de passe"}
+              {isSubmitting
+                ? `${t("actions.saving")}`
+                : `${t("auth.changePassword")}`}
             </Button>
 
             <Button
@@ -137,7 +142,7 @@ export function ModifyPassword() {
               onClick={handleCancel}
               disabled={isSubmitting}
             >
-              Annuler
+              {t("actions.cancel")}
             </Button>
           </div>
 

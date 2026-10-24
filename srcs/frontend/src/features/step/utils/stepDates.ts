@@ -1,8 +1,10 @@
 import type { DateRange } from "@daypicker/react";
 import type { Step } from "../types";
+import i18n from "@/i18n";
+import { getDateLocale } from "@/shared/utils/dateLocale";
 
 export function formatDayLabel(date: Date): string {
-  return new Intl.DateTimeFormat("fr-CH", {
+  return new Intl.DateTimeFormat(getDateLocale(), {
     weekday: "short",
     day: "numeric",
     month: "numeric",
@@ -12,11 +14,16 @@ export function formatDayLabel(date: Date): string {
 }
 
 function formatDay(date: Date): string {
-  return new Intl.DateTimeFormat("fr-CH", { day: "numeric" }).format(date);
+  return new Intl.DateTimeFormat(getDateLocale(), { day: "numeric" }).format(
+    date,
+  );
 }
 
 export function formatDate(date: Date): string {
-  return new Intl.DateTimeFormat("fr-CH", { day: "numeric", month: "2-digit" })
+  return new Intl.DateTimeFormat(getDateLocale(), {
+    day: "numeric",
+    month: "2-digit",
+  })
     .format(date)
     .replace("/", ".");
 }
@@ -38,19 +45,22 @@ export function computeDateLabels(steps: Step[]): string[] {
 }
 
 function formatDayDate(date: Date): string {
-  return new Intl.DateTimeFormat("fr-CH", { day: "numeric" })
+  return new Intl.DateTimeFormat(getDateLocale(), { day: "numeric" })
     .format(date)
     .replace(".", "");
 }
 
 function formatDayMonth(date: Date): string {
-  return new Intl.DateTimeFormat("fr-CH", { day: "numeric", month: "short" })
+  return new Intl.DateTimeFormat(getDateLocale(), {
+    day: "numeric",
+    month: "short",
+  })
     .format(date)
     .replace(".", "");
 }
 
 export function formatDateRange(range: DateRange | undefined): string {
-  if (!range?.from) return "Choisir les dates";
+  if (!range?.from) return i18n.t("idea.form.chooseDates");
   if (!range.to || range.from.getTime() === range.to.getTime())
     return formatDayMonth(range.from);
   if (range.from.getMonth() === range.to.getMonth())

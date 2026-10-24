@@ -1,6 +1,7 @@
 import type { IdeaFilter } from "@/features/idea/types";
 import Chip from "@/shared/ui/Chip";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface IdeaTypeFilterProps {
   typeActiveFilter: IdeaFilter;
@@ -11,10 +12,11 @@ export function IdeaTypeFilter({
   typeActiveFilter,
   onChange,
 }: IdeaTypeFilterProps) {
+  const { t } = useTranslation();
   return (
     <div className="mb-4 flex flex-wrap gap-2">
       <Chip active={typeActiveFilter === "all"} onClick={() => onChange("all")}>
-        Tous
+        {t("idea.filters.allTypes")}
       </Chip>
 
       <Chip
@@ -22,7 +24,7 @@ export function IdeaTypeFilter({
         onClick={() => onChange("restaurant")}
         icon={<Icon name="fork" size={18} />}
       >
-        Restaurant
+        {t("idea.types.restaurant")}
       </Chip>
 
       <Chip
@@ -30,7 +32,7 @@ export function IdeaTypeFilter({
         onClick={() => onChange("accommodation")}
         icon={<Icon name="bed" size={18} />}
       >
-        Hébergement
+        {t("idea.types.accommodation")}
       </Chip>
 
       <Chip
@@ -38,7 +40,7 @@ export function IdeaTypeFilter({
         onClick={() => onChange("activity")}
         icon={<Icon name="mtn" size={18} />}
       >
-        Activité
+        {t("idea.types.activity")}
       </Chip>
 
       <Chip
@@ -46,7 +48,7 @@ export function IdeaTypeFilter({
         onClick={() => onChange("sightseeing")}
         icon={<Icon name="pin" size={18} />}
       >
-        A voir
+        {t("idea.types.sightseeing")}
       </Chip>
     </div>
   );

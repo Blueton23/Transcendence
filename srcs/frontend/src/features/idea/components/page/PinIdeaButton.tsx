@@ -1,19 +1,21 @@
 import Button from "@/shared/ui/Button";
 import Icon from "@/shared/ui/Icon";
 import IconButton from "@/shared/ui/IconButton";
+import { useTranslation } from "react-i18next";
 
 interface PinIdeaButtonProps {
   onClick: () => void;
 }
 
 export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
+  const { t } = useTranslation();
   return (
     <>
       {/* Gère le mobile */}
       <div className="md:hidden">
         <IconButton
           icon={<Icon name="pinplus" size={18} />}
-          label="Épingler une idée"
+          label={t("idea.pinIdea")}
           variant="primary"
           onClick={onClick}
         />
@@ -27,7 +29,7 @@ export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
           onClick={onClick}
           className="w-full"
         >
-          Épingler une idée
+          {t("idea.pinIdea")}
         </Button>
       </div>
     </>

@@ -1,8 +1,8 @@
 export const ideaTypeLabels = {
-  restaurant: "Restaurant",
-  accommodation: "Hébergement",
-  activity: "Activité",
-  sightseeing: "À voir",
+  restaurant: "idea.types.restaurant",
+  accommodation: "idea.types.accommodation",
+  activity: "idea.types.activity",
+  sightseeing: "idea.types.sightseeing",
 } as const;
 
 /*

@@ -8,6 +8,7 @@ import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
 import Card from "@/shared/ui/Card";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface FormScreenProps {
   onCreated: (travel: Travel) => void;
@@ -15,16 +16,17 @@ interface FormScreenProps {
 
 export function FormScreen({ onCreated }: FormScreenProps) {
   const form = useTravelForm({ onCreated });
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2">
         <Text tone="secondary" className="font-semibold">
-          Titre du voyage
+          {t("travel.titleLabel")}
         </Text>
         <Input
           value={form.title}
           onChange={(event) => form.setTitle(event.target.value)}
-          placeholder="Titre de mon voyage"
+          placeholder={t("travel.titlePlaceholder")}
         />
       </div>
       <DateRangeField
@@ -52,7 +54,7 @@ export function FormScreen({ onCreated }: FormScreenProps) {
         variant="primary"
         className="w-full md:text-md"
       >
-        {form.isSubmitting ? "Modifications en cours" : "Créer mon voyage"}
+        {form.isSubmitting ? t("travel.creating") : t("travel.createMyTravel")}
       </Button>
       {form.error && <Text tone="accent">{form.error}</Text>}
     </div>

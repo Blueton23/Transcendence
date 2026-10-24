@@ -3,6 +3,7 @@ import IconBadge from "../../shared/ui/IconBadge";
 import Text from "../../shared/ui/Text";
 import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface TripNavProps {
   tripId: string;
@@ -21,30 +22,39 @@ interface TripNavItem {
 // TODO(backend): brancher ces compteurs sur les vraies données.
 function getTripNavItems(tripId: string): TripNavItem[] {
   return [
-    { to: `/trip/${tripId}/itinerary`, iconName: "route", label: "Itinéraire" },
     {
-      to: `/trip/${tripId}/ideas`,
+      to: `/travel/${tripId}/itinerary`,
+      iconName: "route",
+      label: "nav.itinerary",
+    },
+    {
+      to: `/travel/${tripId}/ideas`,
       iconName: "pinplus",
-      label: "Idées",
+      label: "nav.ideas",
       badgeCount: 2,
     },
-    { to: `/trip/${tripId}/expenses`, iconName: "wallet", label: "Dépenses" },
     {
-      to: `/trip/${tripId}/chat`,
+      to: `/travel/${tripId}/expenses`,
+      iconName: "wallet",
+      label: "nav.expenses",
+    },
+    {
+      to: `/travel/${tripId}/chat`,
       iconName: "chat",
-      label: "Discussion",
+      label: "nav.chat",
       badgeCount: 3,
     },
     {
-      to: `/trip/${tripId}/assistant`,
+      to: `/travel/${tripId}/assistant`,
       iconName: "spark",
-      label: "Assistant IA",
+      label: "nav.assistant",
     },
   ];
 }
 
 export function TripNavDesktop({ tripId }: TripNavProps) {
   const items = getTripNavItems(tripId);
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4">
@@ -57,7 +67,7 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
       <Divider />
       <div className="flex flex-col gap-1">
         {items.map((item) => (
-          <NavPill key={item.to} {...item} />
+          <NavPill key={item.to} {...item} label={t(item.label)} />
         ))}
       </div>
     </div>
