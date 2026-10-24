@@ -27,6 +27,7 @@
     },
     "logginIn": "Connexion…",
     "login": "Se connecter",
+    "logout": "Se déconnecter",
     "loginSubtitle": "Connectez-vous pour retrouver vos voyages",
     "newPassword": "Nouveau mot de passe",
     "noAccount": "Pas encore de compte ?",

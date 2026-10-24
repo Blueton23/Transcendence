@@ -52,14 +52,14 @@ function HomePage() {
           </Button>
 
           <Button variant="outline" onClick={() => navigate("/login")}>
-            Se connecter
+            {t("auth.login")}
           </Button>
 
           <Button variant="outline" onClick={handleLogout}>
-            Se déconnecter
+          {t("auth.logout")}
           </Button>
           <Button variant="outline" onClick={() => navigate("/profile")}>
-            Profil
+          {t("profile.title")}
           </Button>
         </div>
         <div className="pt-10">

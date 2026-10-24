@@ -27,6 +27,7 @@
     },
     "logginIn": "Logging in…",
     "login": "Log in",
+    "logout": "Log out",
     "loginSubtitle": "Log in to find your trips",
     "newPassword": "New Password",
     "noAccount": "No account yet?",
