@@ -700,6 +700,74 @@ docker compose exec redis redis-cli -n 1 FLUSHDB
 
 # Module : OAuth 2.0 (Minor, 1 point)
 
+Comprendre OAuth 2.0 (le flux « Authorization Code »)
+L’utilisateur clique sur « Continuer avec Google » → le navigateur va sur ton backend (/api/auth/google/).
+Le backend le redirige vers Google avec ton client_id, l’URL de retour (redirect_uri), ce que tu demandes (scope : email, nom) et un state aléatoire.
+L’utilisateur se connecte chez Google (ton site ne voit jamais son mot de passe Google) et accepte.
+Google renvoie le navigateur vers ton redirect_uri avec un code temporaire.
+Ton backend échange ce code contre un access_token, directement auprès de Google, en prouvant qui il est avec le client_secret. Le navigateur ne voit jamais ce secret.
+Avec le token, le backend demande à Google « qui est-ce ? » (email, prénom, nom), trouve ou crée le Traveler, appelle login(), puis redirige vers /profile.
+
+
+Le state sert à se protéger d’une attaque CSRF : on le stocke dans la session et on vérifie que Google renvoie bien le même.
+
+
+Étape 1 : déclarer l’application chez Google (console.cloud.google.com)
+
+Comprendre : Google ne parle qu’aux applications qu’il connaît. Tu vas obtenir un Client ID (public, il apparaît dans l’URL) et un Client secret (privé, uniquement dans le .env). Tu déclares aussi l’URL de retour exacte. Google refuse toute autre URL, ce qui empêche quelqu’un de détourner le code vers son propre site.
+
+https://support.google.com/cloud/answer/15549257?hl=en
+
+Implémenter :
+
+Va sur console.cloud.google.com et crée un projet (par exemple « Transcendence »).
+Ouvre Google Auth Platform (le menu « Écran de consentement OAuth » y mène aussi) et clique sur Get started :
+Branding : nom de l’app et ton email de support.
+Audience : choisis External.
+Donne ton email de contact et valide.
+Audience → Test users : ajoute ton Gmail, ceux de tes coéquipiers et, plus tard, ceux des évaluateurs. Tant que l’app est en mode « Testing », seuls ces comptes peuvent se connecter. C’est voulu et suffisant pour le projet.
+Clients → Create client :
+Type : Web application.
+Authorized redirect URIs : http://localhost:8080/api/auth/google/callback/ (exactement ceci, avec le / final).
+Laisse « Authorized JavaScript origins » vide : ce champ ne sert qu’à la connexion faite en JavaScript, pas à notre méthode.
+Copie le Client ID et le Client secret tout de suite, car Google ne réaffiche plus le secret ensuite.
+
+Les trois scopes nécessaires sont :
+- openid : identifier l'utilisateur.
+- email : récupérer son adresse e-mail.
+- profile : récupérer ses informations de profil.
+Pourquoi ?
+Ces scopes sont non sensibles et sont demandés directement lors de l'authentification OAuth, dans ton code Django.
+
+https://developers.google.com/identity/openid-connect/openid-connect?utm_source=chatgpt.com&hl=fr#python
+
+https://developer.auth0.com/resources/guides/web-app/django/basic-authentication?utm_source=chatgpt.com
+
+Ajouter au .env les variable
+les x a remplacer avec les vrai valeur
+
+ajout dans settings le get pour récupérer les valeurs
+
+Tester : le fichier env_file n’est relu que quand le conteneur est recréé
+docker compose exec backend python -c "import os; print(os.environ['GOOGLE_CLIENT_ID'][:15], bool(os.environ['GOOGLE_CLIENT_SECRET']), os.environ['GOOGLE_REDIRECT_URI'])"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Étape 0 — Google Cloud Console
 
 But : obtenir un Client ID et un Client secret, et dire à Google vers quelle URL il a le droit de renvoyer l’utilisateur.
@@ -822,3 +890,7 @@ Le --build relit requirements.txt. Docker garde en cache les étapes précédent
 3	dans le même shell : settings.GOOGLE_REDIRECT_URI	ton URI exacte	l’URI de redirection est correcte
 4	make check	System check identified no issues	settings.py reste valide
 5	git status	.env n’apparaît pas	le secret ne partira pas sur Git
+
+
+
+
