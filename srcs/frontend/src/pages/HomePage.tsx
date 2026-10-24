@@ -56,10 +56,10 @@ function HomePage() {
           </Button>
 
           <Button variant="outline" onClick={handleLogout}>
-          {t("auth.logout")}
+            {t("auth.logout")}
           </Button>
           <Button variant="outline" onClick={() => navigate("/profile")}>
-          {t("profile.title")}
+            {t("profile.title")}
           </Button>
         </div>
         <div className="pt-10">
