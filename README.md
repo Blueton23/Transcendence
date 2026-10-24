@@ -752,6 +752,50 @@ Tester : le fichier env_file n’est relu que quand le conteneur est recréé
 docker compose exec backend python -c "import os; print(os.environ['GOOGLE_CLIENT_ID'][:15], bool(os.environ['GOOGLE_CLIENT_SECRET']), os.environ['GOOGLE_REDIRECT_URI'])"
 
 
+Étape 2 : la vue qui envoie l’utilisateur chez Google
+l’utilisateur arrive sur /api/auth/google/, et le backend le redirige (réponse HTTP 302) vers la page de connexion Google, avec dans l’URL tout ce dont Google a besoin.
+Le navigateur doit afficher la page de Google pour que l’utilisateur s’y connecte
+
+Les paramètres envoyés à Google :
+
+Paramètre	Rôle
+client_id	« C’est l’application Transcendence » (le Client ID de l’étape 1).
+redirect_uri	Où Google doit renvoyer l’utilisateur. Doit être identique à celle déclarée dans la console.
+response_type=code	« Renvoie-moi un code temporaire » : c’est le flux Authorization Code.
+scope=openid email profile	Ce que tu demandes : l’identité, l’email, le prénom et le nom. Rien de plus.
+state	Valeur aléatoire anti-CSRF (détails ci-dessous).
+prompt=select_account	Google affiche toujours le choix du compte. Pratique pour tester avec plusieurs comptes et en soutenance.
+
+
+Le state, concrètement : on génère une chaîne aléatoire, on la stocke dans la session Django de l’utilisateur et on l’envoie à Google. Google la renverra telle quelle au retour. À l’étape 3, on vérifiera que la valeur reçue est la même que celle en session. Sans ça, un attaquant pourrait te faire ouvrir un lien de callback contenant son code Google, et tu serais connecté sur son compte.
+
+Ça fonctionne avec ta config actuelle : SESSION_COOKIE_SAMESITE = "Lax" laisse passer le cookie sessionid quand Google redirige le navigateur vers ton site, car c’est une navigation GET.
+
+Nouveau fichier traveler/oauth.py
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
