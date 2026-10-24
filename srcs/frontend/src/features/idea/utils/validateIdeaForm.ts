@@ -1,5 +1,6 @@
 import type { IdeaFormValues } from "@/features/idea/types";
 import { formatDateToISO } from "@/features/idea/utils/formatDate";
+import i18n from "@/i18n";
 
 interface IdeaFormErrors {
   titleError: string | undefined;
@@ -8,7 +9,9 @@ interface IdeaFormErrors {
 
 export function validateIdeaForm(values: IdeaFormValues): IdeaFormErrors {
   const titleError =
-    values.title.trim() === "" ? "Le titre est obligatoire." : undefined;
+    values.title.trim() === ""
+      ? i18n.t("idea.errors.titleRequired")
+      : undefined;
 
   const isAccommodation = values.type === "accommodation";
   const startDate = values.dateRange?.from;
@@ -18,12 +21,12 @@ export function validateIdeaForm(values: IdeaFormValues): IdeaFormErrors {
 
   if (isAccommodation) {
     if (!startDate || !endDate) {
-      datesError = "Les dates d’arrivée et de départ sont obligatoires.";
+      datesError = i18n.t("idea.errors.lodgingDatesRequired");
     } else if (formatDateToISO(endDate) <= formatDateToISO(startDate)) {
-      datesError = "La date de départ doit être après la date d’arrivée.";
+      datesError = i18n.t("idea.errors.departureBeforeArrival");
     }
   } else if (values.stepId !== null && !startDate) {
-    datesError = "Choisis une date pour cette idée.";
+    datesError = i18n.t("idea.errors.dateRequired");
   }
 
   return { titleError, datesError };

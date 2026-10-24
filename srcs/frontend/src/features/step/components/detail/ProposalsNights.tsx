@@ -5,6 +5,7 @@ import type { IdeaActions } from "@/features/step/types";
 import type { Travel } from "@/features/travel/types";
 import Card from "@/shared/ui/Card";
 import Text from "@/shared/ui/Text";
+import { useTranslation } from "react-i18next";
 
 interface ProposalsNightsProps {
   proposals: Idea[];
@@ -17,9 +18,10 @@ export function ProposalsNights({
   travel,
   actions,
 }: ProposalsNightsProps) {
+  const { t } = useTranslation();
   return (
     <Card variant="dashed-accent" className="flex flex-col gap-2 md:gap-3">
-      <Text>Hébergement à choisir · {proposals.length} propositions</Text>
+      <Text>{t("step.proposals", { count: proposals.length })}</Text>
       {proposals.map((proposal) => {
         const proposer = getProposer(travel, proposal);
         return (

@@ -1,5 +1,6 @@
 import Button from "@/shared/ui/Button";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface StepButtonProps {
   isInPool: boolean;
@@ -14,10 +15,11 @@ export function StepButton({
   onView,
   disabled = false,
 }: StepButtonProps) {
+  const { t } = useTranslation();
   if (isInPool) {
     return (
       <Button variant="outline" size="sm" onClick={onPlace} disabled={disabled}>
-        <span className="text-error">Placer</span>
+        <span className="text-error">{t("idea.place")}</span>
         <Icon name="arrow" size={14} className="text-error" />
       </Button>
     );
@@ -25,7 +27,7 @@ export function StepButton({
 
   return (
     <Button variant="outline" size="sm" onClick={onView}>
-      Voir l'étape
+      {t("idea.viewStep")}
     </Button>
   );
 }

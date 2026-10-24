@@ -1,4 +1,5 @@
 import Tag from "@/shared/ui/Tag";
+import { useTranslation } from "react-i18next";
 
 interface StepLabelProps {
   isInPool: boolean;
@@ -6,10 +7,11 @@ interface StepLabelProps {
 }
 
 export function StepLabel({ isInPool, stepName }: StepLabelProps) {
+  const { t } = useTranslation();
   if (isInPool) {
     return (
       <Tag tone="muted" className="whitespace-nowrap">
-        Pool Général
+        {t("idea.pool")}
       </Tag>
     );
   }

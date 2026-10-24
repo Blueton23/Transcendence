@@ -10,11 +10,13 @@ import Icon from "@/shared/ui/Icon";
 import IconBadge from "@/shared/ui/IconBadge";
 import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
+import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate, useParams } from "react-router";
 
 function JoinPage() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { travel, isLoading, error } = useInvitation(token || "");
   const {
     submit,
@@ -30,13 +32,13 @@ function JoinPage() {
     );
   if (!travel) return null;
   if (travel.isMember) {
-    return <Navigate to={`/trip/${travel.id}/itinerary`} replace />;
+    return <Navigate to={`/travel/${travel.id}/itinerary`} replace />;
   }
 
   const handleJoin = async () => {
     const result = await submit();
     if (result.success && result.data) {
-      navigate(`/trip/${result.data.id}/itinerary`);
+      navigate(`/travel/${result.data.id}/itinerary`);
     }
   };
 
@@ -49,7 +51,7 @@ function JoinPage() {
       <Card className="w-full max-w-100 bg-surface-container p-10">
         <div className="flex flex-col items-center justify-center gap-3">
           <Text font="mono" tone="muted">
-            INVITATION A REJOINDRE
+            {t("travel.invitation")}
           </Text>
           <IconBadge name="compass" color="brand"></IconBadge>
           <Heading>{travel.title}</Heading>
@@ -72,9 +74,11 @@ function JoinPage() {
             icon={<Icon name="check" />}
             onClick={handleJoin}
           >
-            Rejoindre le voyage
+            {t("travel.joinTravel")}
           </Button>
-          <Text>{travel.travelers.length} voyageurs déjà à bord</Text>
+          <Text>
+            {t("travel.travelersOnBoard", { count: travel.travelers.length })}
+          </Text>
         </div>
         {joinError && <Text tone="accent">{joinError}</Text>}
       </Card>

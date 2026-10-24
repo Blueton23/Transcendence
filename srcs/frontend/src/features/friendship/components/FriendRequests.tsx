@@ -12,6 +12,7 @@ import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface FriendRequestsProps {
   onFriendAccepted: () => void;
@@ -21,6 +22,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
   const [requests, setRequests] = useState<FriendshipRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const requestId = useRef<number | null>(null);
+  const { t } = useTranslation();
 
   const {
     submit: submitAccept,
@@ -28,7 +30,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     error: acceptError,
   } = useSubmitAction(async () => {
     if (requestId.current === null) {
-      throw new Error("Identifiant de la demande manquant.");
+      throw new Error(t("friendship.errors.missingRequestId"));
     }
     return acceptFriendRequest(requestId.current);
   });
@@ -39,7 +41,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     error: rejectError,
   } = useSubmitAction(async () => {
     if (requestId.current === null) {
-      throw new Error("Identifiant de la demande manquant.");
+      throw new Error(t("friendship.errors.missingRequestId"));
     }
     return removeFriendRequest(requestId.current);
   });
@@ -77,12 +79,13 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     <div className="flex flex-col gap-5">
       <div className="flex items-center justify-between gap-3">
         <Text tone="muted">
-          DEMANDES RECUES · {requests.length > 0 && requests.length}
+          {t("friendship.receivedRequests")} ·{" "}
+          {requests.length > 0 && requests.length}
         </Text>
       </div>
       {displayedError && <Text tone="accent">{displayedError}</Text>}
       {requests.length === 0 ? (
-        <Text tone="muted">Aucune demande d'amitié en attente.</Text>
+        <Text tone="muted">{t("friendship.noRequests")}</Text>
       ) : (
         <div className="flex flex-col gap-3">
           {requests.map((request) => (
@@ -110,7 +113,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
                   disabled={isSubmitting}
                   onClick={() => void handleAccept(request.id)}
                 >
-                  Accepter
+                  {t("friendship.accept")}
                 </Button>
 
                 <Button
@@ -120,7 +123,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
                   disabled={isSubmitting}
                   onClick={() => void handleReject(request.id)}
                 >
-                  Refuser
+                  {t("friendship.decline")}
                 </Button>
               </div>
             </div>

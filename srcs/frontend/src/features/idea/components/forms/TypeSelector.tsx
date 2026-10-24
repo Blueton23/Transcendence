@@ -1,6 +1,7 @@
 import type { IdeaType } from "@/features/idea/types";
 import Chip from "@/shared/ui/Chip";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface TypeSelectorProps {
   typeActiveFilter: IdeaType;
@@ -11,6 +12,7 @@ export function TypeSelector({
   typeActiveFilter,
   onChange,
 }: TypeSelectorProps) {
+  const { t } = useTranslation();
   return (
     <div className="mb-4 flex flex-wrap gap-2">
       <Chip
@@ -18,7 +20,7 @@ export function TypeSelector({
         onClick={() => onChange("restaurant")}
         icon={<Icon name="fork" size={18} />}
       >
-        Restaurant
+        {t("idea.types.restaurant")}
       </Chip>
 
       <Chip
@@ -26,7 +28,7 @@ export function TypeSelector({
         onClick={() => onChange("accommodation")}
         icon={<Icon name="bed" size={18} />}
       >
-        Hébergement
+        {t("idea.types.accommodation")}
       </Chip>
 
       <Chip
@@ -34,7 +36,7 @@ export function TypeSelector({
         onClick={() => onChange("activity")}
         icon={<Icon name="mtn" size={18} />}
       >
-        Activité
+        {t("idea.types.activity")}
       </Chip>
 
       <Chip
@@ -42,7 +44,7 @@ export function TypeSelector({
         onClick={() => onChange("sightseeing")}
         icon={<Icon name="pin" size={18} />}
       >
-        A voir
+        {t("idea.types.sightseeing")}
       </Chip>
     </div>
   );

@@ -1,6 +1,7 @@
 import type { StepFilter } from "@/features/idea/types";
 import type { Step } from "@/features/step/types";
 import Chip from "@/shared/ui/Chip";
+import { useTranslation } from "react-i18next";
 
 interface IdeaStepFilterProps {
   steps: Step[];
@@ -13,10 +14,11 @@ export function IdeaStepFilter({
   stepActiveFilter,
   onChange,
 }: IdeaStepFilterProps) {
+  const { t } = useTranslation();
   return (
     <div className="mb-5 flex flex-wrap gap-2">
       <Chip active={stepActiveFilter === "all"} onClick={() => onChange("all")}>
-        Toutes
+        {t("idea.filters.allSteps")}
       </Chip>
 
       {steps.map((step) => (
@@ -33,7 +35,7 @@ export function IdeaStepFilter({
         active={stepActiveFilter === "none"}
         onClick={() => onChange("none")}
       >
-        Sans étape
+        {t("idea.filters.noStep")}
       </Chip>
     </div>
   );

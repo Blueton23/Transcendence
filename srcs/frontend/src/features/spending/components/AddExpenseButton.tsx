@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Button from "../../../shared/ui/Button";
 import Icon from "../../../shared/ui/Icon";
 
@@ -6,9 +7,10 @@ interface AddExpenseButtonProps {
 }
 
 function AddExpenseButton({ className = "" }: AddExpenseButtonProps) {
+  const { t } = useTranslation();
   return (
     <Button variant="outline" icon={<Icon name="cash" />} className={className}>
-      Ajouter une dépense
+      {t("step.addExpense")}
     </Button>
   );
 }

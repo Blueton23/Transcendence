@@ -5,6 +5,7 @@ import ProfileInfo from "@/features/profile/components/ProfileInfo";
 import Modal from "@/shared/ui/Modal";
 import type { ReactNode } from "react";
 import type { User } from "@/features/auth/types";
+import { useTranslation } from "react-i18next";
 
 type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 type AvatarColor = "1" | "2" | "3" | "4";
@@ -44,6 +45,7 @@ function Avatar({
   profile = false,
   children,
 }: AvatarProps) {
+  const { t } = useTranslation();
   const { currentUser } = useAuth();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
@@ -59,7 +61,7 @@ function Avatar({
       {avatarUser?.profilePicture ? (
         <img
           src={avatarUser.profilePicture}
-          alt="Photo de profil"
+          alt={t("profile.picture")}
           className="h-full w-full object-cover"
         />
       ) : initials ? (
@@ -78,7 +80,7 @@ function Avatar({
         <button
           type="button"
           onClick={() => setIsProfileOpen(true)}
-          aria-label="Voir le profil"
+          aria-label={t("profile.view")}
           className={`${baseStyle} ${avatarSize} ${avatarColor} ${className} cursor-pointer`}
         >
           {avatarContent}
@@ -93,7 +95,7 @@ function Avatar({
 
       {profile && isProfileOpen && (
         <Modal
-          title="Profil"
+          title={t("profile.title")}
           icon="user"
           onClose={() => setIsProfileOpen(false)}
         >
