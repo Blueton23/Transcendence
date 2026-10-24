@@ -781,6 +781,8 @@ https://developers.google.com/identity/protocols/oauth2/
 ajout de GoogleLoginView dans traveler view
 et url auth-google dans url.py
 
+GoogleLoginView(APIView): redidirge le state en code 302 au nav a google
+
 
 Exemple :
 1. L'utilisateur commence une connexion Google.
@@ -790,7 +792,12 @@ Exemple :
 5. Django vérifie que les deux valeurs sont identiques.
 
 
+return redirect(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")
+sert à rediriger le navigateur de l'utilisateur vers la page de connexion Google, avec tous les paramètres OAuth nécessaires.
 
+verif
+
+curl -i http://localhost:8080/api/auth/google/
 
 
 

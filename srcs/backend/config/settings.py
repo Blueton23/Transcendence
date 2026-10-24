@@ -75,9 +75,9 @@ SESSION_COOKIE_SAMESITE = "Lax"
 # CSRF_COOKIE_SECURE = True
 
 # OAuth 2.0 Google
-GOOGLE_CLIENT_ID = (os.environ.get("GOOGLE_CLIENT_ID", ""),)
-GOOGLE_CLIENT_SECRET = (os.environ.get("GOOGLE_CLIENT_SECRET", ""),)
-GOOGLE_REDIRECT_URI = (os.environ.get("GOOGLE_REDIRECT_URI", ""),)
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+GOOGLE_REDIRECT_URI = os.environ.get("GOOGLE_REDIRECT_URI", "")
 
 ROOT_URLCONF = "config.urls"
 

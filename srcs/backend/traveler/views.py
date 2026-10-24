@@ -553,7 +553,7 @@ class GoogleLoginView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def get(self, request: Request):
-        state = secrets.token.urlsafe(32)
+        state = secrets.token_urlsafe(32)
         request.session["google_oauth2_state"] = state
 
         params = {

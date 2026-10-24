@@ -1,11 +1,12 @@
 from io import BytesIO
+from urllib.parse import parse_qs, urlparse
 
 from django.contrib.auth import SESSION_KEY
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
 from PIL import Image
 from rest_framework.authtoken.models import Token
@@ -1475,6 +1476,11 @@ def test_requests_returns_only_incoming_pending_requests(self):
             friendship.full_clean()
 
 
+# ===================================================================#
+
+# Test : Connexion avec Token (swagger)
+
+
 # Obtention de la clé API : POST /api/auth/token/
 class ApiTokenViewTest(APITestCase):
     def setUp(self):
@@ -1501,3 +1507,43 @@ class ApiTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data["detail"], "Identifiants invalides.")
         self.assertFalse(Token.objects.exists())
+
+
+# ===================================================================#
+
+# Test : Connexion avec Google (OAuth 2.0)
+
+
+@override_settings(
+    GOOGLE_CLIENT_ID="test-client-id",
+    GOOGLE_REDIRECT_URI="http://localhost:8080/api/auth/google/callback/",
+)
+class GoogleLoginViewTest(APITestCase):
+    # Vérifie que Django génère une redirection Google correcte et enregistre le state dans la session
+    def test_redirects_to_google_with_state_in_session(self):
+        response = self.client.get(reverse("auth-google"))
+
+        self.assertEqual(response.status_code, 302)
+
+        url = urlparse(response["Location"])
+        params = parse_qs(url.query)
+
+        self.assertEqual(url.netloc, "accounts.google.com")
+        self.assertEqual(params["client_id"], ["test-client-id"])
+        self.assertEqual(
+            params["redirect_uri"],
+            ["http://localhost:8080/api/auth/google/callback/"],
+        )
+        self.assertEqual(params["response_type"], ["code"])
+        self.assertEqual(params["scope"], ["openid email profile"])
+        self.assertEqual(params["state"], [self.client.session["google_oauth2_state"]])
+
+    # Vérifie qu'une nouvelle tentative de connexion génère un nouveau state
+    def test_state_changes_on_each_attempt(self):
+        self.client.get(reverse("auth-google"))
+        first_state = self.client.session["google_oauth2_state"]
+
+        self.client.get(reverse("auth-google"))
+        second_state = self.client.session["google_oauth2_state"]
+
+        self.assertNotEqual(first_state, second_state)
