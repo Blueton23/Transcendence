@@ -14,6 +14,7 @@ from .views import (
     FriendshipRequestsView,
     FriendshipRequestView,
     FriendshipSearchView,
+    GoogleLoginView,
     LoginView,
     LogoutView,
     MeView,
@@ -31,6 +32,7 @@ urlpatterns = [
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
     path("auth/token/", ApiTokenView.as_view(), name="auth-token"),
+    path("auth/google/", GoogleLoginView.as_view(), name="auth-google"),
     path("travelers/create/", TravelerCreateView.as_view(), name="traveler-create"),
     path("ping/", TravelerPingView.as_view(), name="traveler-ping"),
     path(

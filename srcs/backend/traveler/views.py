@@ -1,7 +1,10 @@
 # views.py
 
+import secrets
 from typing import ClassVar
+from urllib.parse import urlencode
 
+from django.conf import settings
 from django.contrib.auth import (
     authenticate,
     get_user_model,
@@ -12,6 +15,7 @@ from django.contrib.auth import (
 from django.db import IntegrityError
 from django.db.models import Q
 from django.middleware.csrf import get_token
+from django.shortcuts import redirect
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -31,6 +35,8 @@ from .serializers import (
     TravelerUpdateProfilePictureSerializer,
     TravelerUpdateSerializer,
 )
+
+GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 
 Traveler = get_user_model()
 
@@ -195,41 +201,6 @@ class LoginView(APIView):
                     traveler,
                     context={"request": request},
                 ).data,
-            },
-            status=status.HTTP_200_OK,
-        )
-
-
-@extend_schema(tags=["Auth"])
-@api_token_schema
-class ApiTokenView(APIView):
-    authentication_classes: ClassVar[list] = []
-    permission_classes: ClassVar[list] = [AllowAny]
-    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
-    throttle_scope = "auth_token"
-    public_api = True
-
-    def post(self, request: Request) -> Response:
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        traveler = authenticate(
-            request=request,
-            username=serializer.validated_data["username"],
-            password=serializer.validated_data["password"],
-        )
-
-        if traveler is None:
-            return Response(
-                {"detail": "Identifiants invalides."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        token, _ = Token.objects.get_or_create(user=traveler)
-
-        return Response(
-            {
-                "token": token.key,
             },
             status=status.HTTP_200_OK,
         )
@@ -531,3 +502,67 @@ class FriendshipListView(APIView):
             {"friendships": friendship_list},
             status=status.HTTP_200_OK,
         )
+
+
+# ===================================================================#
+
+# Connexion avec Token (swagger)
+
+
+@extend_schema(tags=["Auth"])
+@api_token_schema
+class ApiTokenView(APIView):
+    authentication_classes: ClassVar[list] = []
+    permission_classes: ClassVar[list] = [AllowAny]
+    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
+    throttle_scope = "auth_token"
+    public_api = True
+
+    def post(self, request: Request) -> Response:
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        traveler = authenticate(
+            request=request,
+            username=serializer.validated_data["username"],
+            password=serializer.validated_data["password"],
+        )
+
+        if traveler is None:
+            return Response(
+                {"detail": "Identifiants invalides."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        token, _ = Token.objects.get_or_create(user=traveler)
+
+        return Response(
+            {
+                "token": token.key,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+# ===================================================================#
+
+# Connexion avec Google (OAuth 2.0)
+
+
+class GoogleLoginView(APIView):
+    permission_classes: ClassVar[list] = [AllowAny]
+
+    def get(self, request: Request):
+        state = secrets.token.urlsafe(32)
+        request.session["google_oauth2_state"] = state
+
+        params = {
+            "response_type": "code",
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+            "scope": "openid email profile",
+            "state": state,
+            "prompt": "select_account",
+        }
+
+        return redirect(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")

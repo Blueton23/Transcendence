@@ -773,15 +773,21 @@ Le state, concrètement : on génère une chaîne aléatoire, on la stocke dans 
 
 Nouveau fichier traveler/oauth.py
 
+https://waracle.com/insights/development/adding-google-login-to-your-existing-django-and-django-rest-framework-applications/?ht-comment-id=13848725&utm_source=chatgpt.com
+
+https://developers.google.com/identity/protocols/oauth2/
 
 
+ajout de GoogleLoginView dans traveler view
+et url auth-google dans url.py
 
 
-
-
-
-
-
+Exemple :
+1. L'utilisateur commence une connexion Google.
+2. Django génère state = ABC123.
+3. Django envoie ABC123 à Google.
+4. Google redirige le navigateur vers Django avec state=ABC123.
+5. Django vérifie que les deux valeurs sont identiques.
 
 
 
