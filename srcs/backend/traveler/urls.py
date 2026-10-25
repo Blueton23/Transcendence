@@ -14,7 +14,7 @@ from .views import (
     FriendshipRequestsView,
     FriendshipRequestView,
     FriendshipSearchView,
-    GoogleCallBackView,
+    GoogleCallbackView,
     GoogleLoginView,
     LoginView,
     LogoutView,
@@ -36,7 +36,7 @@ urlpatterns = [
     path("auth/google/", GoogleLoginView.as_view(), name="auth-google"),
     path(
         "auth/google/callback/",
-        GoogleCallBackView.as_view(),
+        GoogleCallbackView.as_view(),
         name="auth-google-callback",
     ),
     path("travelers/create/", TravelerCreateView.as_view(), name="traveler-create"),

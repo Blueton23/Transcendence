@@ -875,6 +875,11 @@ https://docs.python.org/3/howto/logging.html?utm_source=chatgpt.com
 afficher state
 docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; s = Session.objects.order_by('-expire_date').first(); print(s.get_decoded().get('google_oauth2_state'))"
 
-   http://localhost:8080/api/auth/google/callback/?state=COLLE_ICI&code=faux
+http://localhost:8080/api/auth/google/callback/?state=COLLE_ICI&code=faux
 
-   permet de voir le code faux
+permet de voir le code faux
+
+
+Étape 3.3 : demander à Google qui est l’utilisateur
+
+

@@ -573,7 +573,7 @@ class GoogleLoginView(APIView):
 
 
 # Termine la connexion Google
-class GoogleCallBackView(APIView):
+class GoogleCallbackView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def get(self, request: Request):
@@ -587,6 +587,7 @@ class GoogleCallBackView(APIView):
         code = request.query_params.get("code")
 
         if code is None:
+            logger.warning("Google OAuth : aucun code utilisé")
             return redirect("/login?error=google")
 
         try:
@@ -602,7 +603,7 @@ class GoogleCallBackView(APIView):
                 timeout=10,
             )
         except requests.RequestException:
-            logger.warning("Goole OAuth : Google est injoignable")
+            logger.warning("Google OAuth : Google est injoignable")
             return redirect("/login?error=google")
 
         if token_response.status_code != 200:
