@@ -546,9 +546,8 @@ class ApiTokenView(APIView):
 
 # ===================================================================#
 
-# Connexion avec Google (OAuth 2.0)
 
-
+# Démarre la connexion Google (OAuth 2.0)
 class GoogleLoginView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
@@ -566,3 +565,22 @@ class GoogleLoginView(APIView):
         }
 
         return redirect(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")
+
+
+# Termine la connexion Google
+class GoogleCallBackView(APIView):
+    permission_classes: ClassVar[list] = [AllowAny]
+
+    def get(self, request: Request):
+        expected_state = request.session.pop("google_oauth2_state", None)
+        state = request.query_params.get("state")
+
+        if expected_state is None or state != expected_state:
+            return redirect("/login?error=google")
+
+        code = request.query_params.get("code")
+
+        if code is None:
+            return redirect("/login?error=google")
+
+        return Response({"detail": "State valide"})

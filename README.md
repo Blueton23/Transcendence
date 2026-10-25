@@ -710,6 +710,7 @@ Avec le token, le backend demande à Google « qui est-ce ? » (email, prénom, 
 
 
 Le state sert à se protéger d’une attaque CSRF : on le stocke dans la session et on vérifie que Google renvoie bien le même.
+uiliser une seule fois
 
 
 Étape 1 : déclarer l’application chez Google (console.cloud.google.com)
@@ -782,6 +783,23 @@ ajout de GoogleLoginView dans traveler view
 et url auth-google dans url.py
 
 GoogleLoginView(APIView): redidirge le state en code 302 au nav a google
+moment ou on clique pour se connecter
+
+Utilisateur
+    │
+    │ Clique sur "Se connecter avec Google"
+    ▼
+GoogleLoginView
+    │
+    ├── Génère un state
+    ├── Sauvegarde le state
+    ├── Prépare les paramètres OAuth
+    └── Renvoie une redirection HTTP 302
+    │
+    ▼
+Google
+    │
+    └── Affiche la sélection du compte Google
 
 
 Exemple :
@@ -791,6 +809,8 @@ Exemple :
 4. Google redirige le navigateur vers Django avec state=ABC123.
 5. Django vérifie que les deux valeurs sont identiques.
 
+state enregistrer dans django_session
+
 
 return redirect(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")
 sert à rediriger le navigateur de l'utilisateur vers la page de connexion Google, avec tous les paramètres OAuth nécessaires.
@@ -798,6 +818,35 @@ sert à rediriger le navigateur de l'utilisateur vers la page de connexion Googl
 verif
 
 curl -i http://localhost:8080/api/auth/google/
+
+-----
+
+moment ou la fenetre se connecter a "projet"
+peut verifier le state
+
+et view callback
+
+On récupère le state gardé en session, et on le supprime (usage unique) avec pop
+pop permet de supprimer un element d une liste et de l utiliser
+ici le state est unique, une fois utiliser il est supprimer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

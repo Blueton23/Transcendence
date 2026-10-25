@@ -1547,3 +1547,32 @@ class GoogleLoginViewTest(APITestCase):
         second_state = self.client.session["google_oauth2_state"]
 
         self.assertNotEqual(first_state, second_state)
+
+
+class GoogleCallbackViewTest(APITestCase):
+    # Vérifie qu'un state différent de celui de la session est refusé
+    def test_wrong_state_is_refused(self):
+        self.client.get(reverse("auth-google"))
+
+        response = self.client.get(
+            reverse("auth-google-callback"),
+            {"state": "faux-state", "code": "faux-code"},
+        )
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+
+    # Vérifie que l'annulation chez Google (pas de code) est refusée
+    def test_missing_code_is_refused(self):
+        self.client.get(reverse("auth-google"))
+        state = self.client.session["google_oauth2_state"]
+
+        response = self.client.get(
+            reverse("auth-google-callback"),
+            {"state": state, "error": "access_denied"},
+        )
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
