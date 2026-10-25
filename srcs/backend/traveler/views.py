@@ -1,9 +1,11 @@
 # views.py
 
+import logging
 import secrets
 from typing import ClassVar
 from urllib.parse import urlencode
 
+import requests
 from django.conf import settings
 from django.contrib.auth import (
     authenticate,
@@ -37,8 +39,11 @@ from .serializers import (
 )
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
 
 Traveler = get_user_model()
+
+logger = logging.getLogger(__name__)
 
 
 class ApiHealthView(APIView):
@@ -583,4 +588,28 @@ class GoogleCallBackView(APIView):
         if code is None:
             return redirect("/login?error=google")
 
-        return Response({"detail": "State valide"})
+        try:
+            token_response = requests.post(
+                GOOGLE_TOKEN_URL,
+                data={
+                    "code": code,
+                    "client_id": settings.GOOGLE_CLIENT_ID,
+                    "redirect_uri": settings.GOOGLE_REDIRECT_URI,
+                    "client_secret": settings.GOOGLE_CLIENT_SECRET,
+                    "grant_type": "authorization_code",
+                },
+                timeout=10,
+            )
+        except requests.RequestException:
+            logger.warning("Goole OAuth : Google est injoignable")
+            return redirect("/login?error=google")
+
+        if token_response.status_code != 200:
+            logger.warning(
+                "Google OAuth : Le code est refusé : %s", token_response.text
+            )
+            return redirect("/login?error=google")
+
+        token_data = token_response.json()
+
+        return Response({"detail": "Token recu", "champs": list(token_data.keys())})
