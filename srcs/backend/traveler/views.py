@@ -581,6 +581,7 @@ class GoogleCallBackView(APIView):
         state = request.query_params.get("state")
 
         if expected_state is None or state != expected_state:
+            logger.warning("Google OAuth : state invalide ou déjà utilisé")
             return redirect("/login?error=google")
 
         code = request.query_params.get("code")

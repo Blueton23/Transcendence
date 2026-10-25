@@ -1,6 +1,8 @@
 from io import BytesIO
+from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
+import requests
 from django.contrib.auth import SESSION_KEY
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
@@ -1571,6 +1573,46 @@ class GoogleCallbackViewTest(APITestCase):
         response = self.client.get(
             reverse("auth-google-callback"),
             {"state": state, "error": "access_denied"},
+        )
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+
+    # Vérifie que le code est envoyé à Google, et qu'un refus de Google est géré
+    @override_settings(GOOGLE_CLIENT_SECRET="test-client-secret")
+    @patch("traveler.views.requests.post")
+    def test_google_refuses_code(self, mock_post):
+        mock_post.return_value.status_code = 400
+        mock_post.return_value.text = '{"error": "invalid_grant"}'
+
+        self.client.get(reverse("auth-google"))
+        state = self.client.session["google_oauth2_state"]
+
+        response = self.client.get(
+            reverse("auth-google-callback"),
+            {"state": state, "code": "code-expire"},
+        )
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+        sent = mock_post.call_args.kwargs["data"]
+        self.assertEqual(sent["code"], "code-expire")
+        self.assertEqual(sent["client_secret"], "test-client-secret")
+        self.assertEqual(sent["grant_type"], "authorization_code")
+
+    # Vérifie que Google injoignable est géré
+    @patch("traveler.views.requests.post")
+    def test_google_unreachable(self, mock_post):
+        mock_post.side_effect = requests.ConnectionError()
+
+        self.client.get(reverse("auth-google"))
+        state = self.client.session["google_oauth2_state"]
+
+        response = self.client.get(
+            reverse("auth-google-callback"),
+            {"state": state, "code": "un-code"},
         )
 
         self.assertRedirects(

@@ -870,3 +870,11 @@ GOOGLE_TOKEN_URL permet à Google de vérifier le code et de délivrer les token
 
 https://requests.readthedocs.io/en/latest/user/quickstart/?utm_source=chatgpt.com
 https://docs.python.org/3/howto/logging.html?utm_source=chatgpt.com
+
+
+afficher state
+docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; s = Session.objects.order_by('-expire_date').first(); print(s.get_decoded().get('google_oauth2_state'))"
+
+   http://localhost:8080/api/auth/google/callback/?state=COLLE_ICI&code=faux
+
+   permet de voir le code faux
