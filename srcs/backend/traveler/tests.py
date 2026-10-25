@@ -1618,3 +1618,26 @@ class GoogleCallbackViewTest(APITestCase):
         self.assertRedirects(
             response, "/login?error=google", fetch_redirect_response=False
         )
+
+    # Vérifie que le token est envoyé à Google, et qu'un refus des infos est géré
+    @patch("traveler.views.requests.get")
+    @patch("traveler.views.requests.post")
+    def test_google_refuses_userinfo(self, mock_post, mock_get):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"access_token": "faux-token"}
+        mock_get.return_value.status_code = 401
+        mock_get.return_value.text = '{"error": "invalid_token"}'
+
+        self.client.get(reverse("auth-google"))
+        state = self.client.session["google_oauth2_state"]
+
+        response = self.client.get(
+            reverse("auth-google-callback"),
+            {"state": state, "code": "un-code"},
+        )
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+        headers = mock_get.call_args.kwargs["headers"]
+        self.assertEqual(headers["Authorization"], "Bearer faux-token")

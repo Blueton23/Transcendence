@@ -40,6 +40,7 @@ from .serializers import (
 
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
 GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
+GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo"
 
 Traveler = get_user_model()
 
@@ -591,6 +592,7 @@ class GoogleCallbackView(APIView):
             return redirect("/login?error=google")
 
         try:
+            # 1. Echange le code contre un access token
             token_response = requests.post(
                 GOOGLE_TOKEN_URL,
                 data={
@@ -602,16 +604,32 @@ class GoogleCallbackView(APIView):
                 },
                 timeout=10,
             )
+
+            if token_response.status_code != 200:
+                logger.warning(
+                    "Google OAuth : Le code est refusé : %s", token_response.text
+                )
+                return redirect("/login?error=google")
+
+            access_token = token_response.json()["access_token"]
+
+            # 2. Avec le token, on demande à Google qui est l'utilisateur
+            userinfo_response = requests.get(
+                GOOGLE_USERINFO_URL,
+                headers={"Authorization": f"Bearer {access_token}"},
+                timeout=10,
+            )
+
         except requests.RequestException:
             logger.warning("Google OAuth : Google est injoignable")
             return redirect("/login?error=google")
 
-        if token_response.status_code != 200:
+        if userinfo_response.status_code != 200:
             logger.warning(
-                "Google OAuth : Le code est refusé : %s", token_response.text
+                "Google OAuth : infos utilisateur refusées : %s", userinfo_response.text
             )
             return redirect("/login?error=google")
 
-        token_data = token_response.json()
+        userinfo = userinfo_response.json()
 
-        return Response({"detail": "Token recu", "champs": list(token_data.keys())})
+        return Response(userinfo)
