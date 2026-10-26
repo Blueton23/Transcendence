@@ -44,7 +44,7 @@ function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
       to: `/travel/${tripId}/chat`,
       iconName: "chat",
       label: "nav.chat",
-      badgeCount: 3,
+      badgeCount: unreadCount,
     },
     {
       to: `/travel/${tripId}/assistant`,
