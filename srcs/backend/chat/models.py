@@ -17,9 +17,9 @@ class MessageQuerySet(models.QuerySet):
     # Non-lus d'un participant : les messages des autres, arrives depuis son
     # dernier passage (tous si le chat n'a jamais ete ouvert).
     def unread_for(self, participation: Participation) -> "MessageQuerySet":
-        unread = self.filter(travel_id=participation.travel_id).exclude(
-            traveler_id=participation.traveler_id
-        )
+        unread = self.filter(
+            travel_id=participation.travel_id, is_system=False
+        ).exclude(traveler_id=participation.traveler_id)
         if participation.last_read_at is not None:
             unread = unread.filter(created_at__gt=participation.last_read_at)
         return unread

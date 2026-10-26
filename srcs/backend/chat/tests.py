@@ -3,8 +3,12 @@ import datetime
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
+from django.urls import reverse
+from rest_framework import status
+from rest_framework.test import APIClient
 
 from chat.models import MESSAGE_BODY_MAX_LENGTH, Message
+from chat.serializers import MessageSerializer
 from idea.models import Idea, IdeaType
 from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
@@ -267,11 +271,11 @@ class MessageModelTest(TestCase):
     def test_everything_from_others_is_unread_before_first_read(self):
         mine = self._make_message()
         theirs = self._make_message(traveler=self.other)
-        system = self._make_message(traveler=None, is_system=True)
+        self._make_message(traveler=None, is_system=True)
 
         unread = Message.objects.unread_for(self.participation)
 
-        self.assertEqual(list(unread), [theirs, system])
+        self.assertEqual(list(unread), [theirs])
         self.assertNotIn(mine, unread)
 
     def test_mark_read_clears_unread_until_a_new_message(self):
@@ -297,3 +301,222 @@ class MessageModelTest(TestCase):
         )
 
         self.assertFalse(Message.objects.unread_for(self.participation).exists())
+
+
+class ChatViewsAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.traveler = Traveler.objects.create_user(
+            username="alice_api",
+            email="alice_api@example.com",
+            password="password123",
+        )
+        self.other = Traveler.objects.create_user(
+            username="bob_api",
+            email="bob_api@example.com",
+            password="password123",
+        )
+        self.stranger = Traveler.objects.create_user(
+            username="carol_api",
+            email="carol_api@example.com",
+            password="password123",
+        )
+
+        self.travel = Travel.objects.create(
+            title="Road trip API",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+
+        self.participation = Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        Participation.objects.create(
+            traveler=self.other,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        self.messages_url = reverse(
+            "travel-messages",
+            kwargs={"travel_id": self.travel.pk},
+        )
+        self.unread_count_url = reverse(
+            "travel-unread-count",
+            kwargs={"travel_id": self.travel.pk},
+        )
+        self.mark_read_url = reverse(
+            "travel-mark-read",
+            kwargs={"travel_id": self.travel.pk},
+        )
+
+    def test_non_member_get_receives_403(self):
+        self.client.force_authenticate(user=self.stranger)
+
+        response = self.client.get(self.messages_url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_non_member_post_receives_403(self):
+        self.client.force_authenticate(user=self.stranger)
+
+        response = self.client.post(
+            self.messages_url,
+            {"body": "Hello!"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(Message.objects.filter(travel=self.travel).exists())
+
+    def test_left_member_can_read_messages(self):
+        self.participation.status = ParticipationStatus.LEFT
+        self.participation.save()
+
+        Message.objects.create(
+            travel=self.travel,
+            traveler=self.other,
+            body="Message sent before departure",
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.get(self.messages_url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            response.data[0]["body"],
+            "Message sent before departure",
+        )
+
+    def test_left_member_cannot_send_messages(self):
+        self.participation.status = ParticipationStatus.LEFT
+        self.participation.save()
+
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.post(
+            self.messages_url,
+            {"body": "I should not be able to send this"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertFalse(
+            Message.objects.filter(
+                travel=self.travel,
+                body="I should not be able to send this",
+            ).exists()
+        )
+
+    def test_empty_message_is_rejected(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        for body in ("", "   ", "\n\t"):
+            with self.subTest(body=repr(body)):
+                response = self.client.post(
+                    self.messages_url,
+                    {"body": body},
+                    format="json",
+                )
+
+                self.assertEqual(
+                    response.status_code,
+                    status.HTTP_400_BAD_REQUEST,
+                )
+
+    def test_message_over_max_length_is_rejected(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            self.messages_url,
+            {"body": "a" * (MESSAGE_BODY_MAX_LENGTH + 1)},
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    def test_message_at_max_length_is_accepted(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            self.messages_url,
+            {"body": "a" * MESSAGE_BODY_MAX_LENGTH},
+            format="json",
+        )
+
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_201_CREATED,
+        )
+
+    def test_mark_read_resets_unread_count_to_zero(self):
+        Message.objects.create(
+            travel=self.travel,
+            traveler=self.other,
+            body="Unread message",
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+
+        unread_response = self.client.get(self.unread_count_url)
+        self.assertEqual(unread_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(unread_response.data["unread_count"], 1)
+
+        mark_read_response = self.client.post(self.mark_read_url)
+        self.assertEqual(
+            mark_read_response.status_code,
+            status.HTTP_200_OK,
+        )
+        self.assertEqual(mark_read_response.data, {"success": True})
+
+        unread_response = self.client.get(self.unread_count_url)
+        self.assertEqual(unread_response.status_code, status.HTTP_200_OK)
+        self.assertEqual(unread_response.data["unread_count"], 0)
+
+
+class MessageSerializerTest(TestCase):
+    def test_empty_body_is_invalid(self):
+        for body in ("", "   ", "\n\t"):
+            with self.subTest(body=repr(body)):
+                serializer = MessageSerializer(data={"body": body})
+
+                self.assertFalse(serializer.is_valid())
+                self.assertIn("body", serializer.errors)
+
+    def test_body_over_max_length_is_invalid(self):
+        serializer = MessageSerializer(
+            data={
+                "body": "a" * (MESSAGE_BODY_MAX_LENGTH + 1),
+            }
+        )
+
+        self.assertFalse(serializer.is_valid())
+        self.assertIn("body", serializer.errors)
+
+    def test_body_at_max_length_is_valid(self):
+        serializer = MessageSerializer(
+            data={
+                "body": "a" * MESSAGE_BODY_MAX_LENGTH,
+            }
+        )
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(
+            len(serializer.validated_data["body"]),
+            MESSAGE_BODY_MAX_LENGTH,
+        )
+
+    def test_body_is_trimmed(self):
+        serializer = MessageSerializer(data={"body": "  Hello world  "})
+
+        self.assertTrue(serializer.is_valid(), serializer.errors)
+        self.assertEqual(
+            serializer.validated_data["body"],
+            "Hello world",
+        )
