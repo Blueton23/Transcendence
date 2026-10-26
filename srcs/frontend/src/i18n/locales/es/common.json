@@ -49,10 +49,20 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "errors": {
+      "cannot_accept_own_request": "No puedes aceptar tu propia solicitud de amistad.",
+      "cannot_friend_yourself": "No puedes enviarte una solicitud de amistad a ti mismo.",
+      "friendship_not_found": "No se encontró la amistad.",
+      "invalid_user_id": "El ID del usuario no es válido.",
       "loadFailed": "No se pudo cargar tu lista de amigos.",
       "missingRequestId": "Falta el identificador de la solicitud.",
       "noUserSelected": "Ningún usuario seleccionado.",
-      "searchFailed": "No se pudo buscar a los usuarios."
+      "not_friendship_participant": "No formas parte de esta amistad.",
+      "not_request_participant": "No formas parte de esta solicitud de amistad.",
+      "relationship_exists": "Ya existe una amistad o solicitud de amistad con este usuario.",
+      "request_not_found": "No se encontró la solicitud de amistad.",
+      "searchFailed": "No se pudo buscar a los usuarios.",
+      "user_id_required": "Se requiere el ID del usuario.",
+      "user_not_found": "No se encontró al usuario."
     },
     "myFriends": "MIS AMIGOS · {{count}}",
     "noFriends": "Todavía no tienes amigos.",

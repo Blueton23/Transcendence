@@ -49,10 +49,20 @@
     "accept": "Accept",
     "decline": "Decline",
     "errors": {
+      "cannot_accept_own_request": "You cannot accept your own friend request.",
+      "cannot_friend_yourself": "You cannot send a friend request to yourself.",
+      "friendship_not_found": "Friendship not found.",
+      "invalid_user_id": "Invalid user ID.",
       "loadFailed": "Could not load your friends list.",
       "missingRequestId": "Request ID missing.",
       "noUserSelected": "No user selected.",
-      "searchFailed": "Unable to search for users."
+      "not_friendship_participant": "You are not a participant in this friendship.",
+      "not_request_participant": "You are not a participant in this friend request.",
+      "relationship_exists": "A friendship or friend request already exists with this user.",
+      "request_not_found": "Friend request not found.",
+      "searchFailed": "Unable to search for users.",
+      "user_id_required": "User ID is required.",
+      "user_not_found": "User not found."
     },
     "myFriends": "MY FRIENDS · {{count}}",
     "noFriends": "You don't have any friends yet.",

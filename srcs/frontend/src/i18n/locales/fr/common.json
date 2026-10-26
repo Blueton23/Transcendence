@@ -49,10 +49,20 @@
     "accept": "Accepter",
     "decline": "Refuser",
     "errors": {
+      "cannot_accept_own_request": "Vous ne pouvez pas accepter votre propre demande d'amitié.",
+      "cannot_friend_yourself": "Vous ne pouvez pas vous envoyer une demande d'amitié.",
+      "friendship_not_found": "Amitié introuvable.",
+      "invalid_user_id": "Identifiant utilisateur invalide.",
       "loadFailed": "Impossible de charger votre liste d'amis.",
       "missingRequestId": "Identifiant de la demande manquant.",
       "noUserSelected": "Aucun utilisateur sélectionné.",
-      "searchFailed": "Impossible de rechercher les utilisateurs."
+      "not_friendship_participant": "Vous ne faites pas partie de cette amitié.",
+      "not_request_participant": "Vous ne participez pas à cette demande d'amitié.",
+      "relationship_exists": "Une amitié ou une demande d'amitié existe déjà avec cet utilisateur.",
+      "request_not_found": "Demande d'amitié introuvable.",
+      "searchFailed": "Impossible de rechercher les utilisateurs.",
+      "user_id_required": "L'identifiant de l'utilisateur est requis.",
+      "user_not_found": "Utilisateur introuvable."
     },
     "myFriends": "MES AMIS · {{count}}",
     "noFriends": "Vous n'avez pas encore d'amis.",

@@ -15,7 +15,20 @@ export function getApiErrorMessage(result: ApiErrorResponse): string {
       .join("\n");
   }
 
-  return result.detail ?? result.message ?? i18n.t("errors.unexpected");
+  const errorCode = result.code ?? result.detail ?? result.message;
+
+  if (errorCode) {
+    const translationKey = `friendship.errors.${errorCode}`;
+
+    if (i18n.exists(translationKey)) {
+      return i18n.t(translationKey);
+    }
+
+    // Permet aussi de conserver les messages déjà lisibles.
+    return errorCode;
+  }
+
+  return i18n.t("errors.unexpected");
 }
 
 export async function parseResponse<T>(response: Response): Promise<T> {

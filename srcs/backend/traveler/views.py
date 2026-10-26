@@ -1,5 +1,3 @@
-# views.py
-
 from typing import ClassVar
 
 from django.contrib.auth import (
@@ -50,7 +48,8 @@ class TravelerPingView(APIView):
     def get(self, request: Request) -> Response:
         return Response(
             {
-                "message": "[temp]Traveler API is running",
+                "code": "traveler_api_running",
+                "message": "traveler api is running",
                 "status": "ok",
             }
         )
@@ -157,7 +156,8 @@ class TravelerUpdatePasswordView(APIView):
 
         return Response(
             {
-                "detail": "Mot de passe modifié avec succès.",
+                "code": "password_updated",
+                "detail": "password_updated",
             },
             status=status.HTTP_200_OK,
         )
@@ -182,7 +182,8 @@ class LoginView(APIView):
         if traveler is None:
             return Response(
                 {
-                    "detail": "Identifiants invalides.",
+                    "code": "invalid_credentials",
+                    "detail": "invalid_credentials",
                 },
                 status=status.HTTP_401_UNAUTHORIZED,
             )
@@ -221,7 +222,10 @@ class ApiTokenView(APIView):
 
         if traveler is None:
             return Response(
-                {"detail": "Identifiants invalides."},
+                {
+                    "code": "invalid_credentials",
+                    "detail": "invalid_credentials",
+                },
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
@@ -258,7 +262,8 @@ class LogoutView(APIView):
 
         return Response(
             {
-                "message": "Déconnexion réussie.",
+                "code": "logout_success",
+                "message": "logout_success",
             },
             status=status.HTTP_200_OK,
         )
@@ -272,7 +277,8 @@ class CsrfTokenView(APIView):
 
         return Response(
             {
-                "message": "CSRF token initialized.",
+                "code": "csrf_initialized",
+                "message": "csrf_initialized",
             },
             status=status.HTTP_200_OK,
         )
@@ -313,7 +319,10 @@ class FriendshipRequestView(APIView):
 
         if not user_id:
             return Response(
-                {"detail": "L'utilisateur est requis."},
+                {
+                    "code": "user_id_required",
+                    "detail": "user_id_required",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -321,7 +330,10 @@ class FriendshipRequestView(APIView):
             user_id = int(user_id)
         except (ValueError, TypeError):
             return Response(
-                {"error": "user_id doit etre un entier valide"},
+                {
+                    "code": "invalid_user_id",
+                    "detail": "invalid_user_id",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -329,13 +341,19 @@ class FriendshipRequestView(APIView):
             target = Traveler.objects.get(pk=user_id)
         except Traveler.DoesNotExist:
             return Response(
-                {"detail": "Utilisateur introuvable."},
+                {
+                    "code": "user_not_found",
+                    "detail": "user_not_found",
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if target.pk == user.pk:
             return Response(
-                {"detail": "Vous ne pouvez pas vous envoyer une demande d'amitié."},
+                {
+                    "code": "cannot_friend_yourself",
+                    "detail": "cannot_friend_yourself",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -347,7 +365,10 @@ class FriendshipRequestView(APIView):
             user2_id=user2_id,
         ).exists():
             return Response(
-                {"detail": "Une relation existe déjà avec cet utilisateur."},
+                {
+                    "code": "relationship_exists",
+                    "detail": "relationship_exists",
+                },
                 status=status.HTTP_409_CONFLICT,
             )
 
@@ -360,7 +381,10 @@ class FriendshipRequestView(APIView):
             )
         except IntegrityError:
             return Response(
-                {"detail": "Une relation existe déjà avec cet utilisateur."},
+                {
+                    "code": "relationship_exists",
+                    "detail": "relationship_exists",
+                },
                 status=status.HTTP_409_CONFLICT,
             )
 
@@ -425,13 +449,19 @@ class FriendshipAcceptView(APIView):
             )
         except Friendship.DoesNotExist:
             return Response(
-                {"detail": "Demande d'amitié introuvable."},
+                {
+                    "code": "request_not_found",
+                    "detail": "request_not_found",
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
         if request.user.pk == friendship.requested_by_id:
             return Response(
-                {"detail": "Vous ne pouvez pas accepter votre propre demande."},
+                {
+                    "code": "cannot_accept_own_request",
+                    "detail": "cannot_accept_own_request",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -440,7 +470,10 @@ class FriendshipAcceptView(APIView):
             friendship.user2_id,
         }:
             return Response(
-                {"detail": "Vous n'êtes pas concerné par cette demande."},
+                {
+                    "code": "not_request_participant",
+                    "detail": "not_request_participant",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -448,7 +481,10 @@ class FriendshipAcceptView(APIView):
         friendship.save(update_fields=["status", "updated_at"])
 
         return Response(
-            {"detail": "Demande d'amitié acceptée."},
+            {
+                "code": "friendship_request_accepted",
+                "detail": "friendship_request_accepted",
+            },
             status=status.HTTP_200_OK,
         )
 
@@ -463,7 +499,10 @@ class FriendshipRemoveView(APIView):
             )
         except Friendship.DoesNotExist:
             return Response(
-                {"detail": "Amitié introuvable."},
+                {
+                    "code": "friendship_not_found",
+                    "detail": "friendship_not_found",
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -472,14 +511,20 @@ class FriendshipRemoveView(APIView):
             friendship.user2_id,
         }:
             return Response(
-                {"detail": "Vous n'êtes pas concerné par cette relation"},
+                {
+                    "code": "not_friendship_participant",
+                    "detail": "not_friendship_participant",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         friendship.delete()
 
         return Response(
-            {"detail": "Amitié supprimée."},
+            {
+                "code": "friendship_removed",
+                "detail": "friendship_removed",
+            },
             status=status.HTTP_200_OK,
         )
 
