@@ -51,10 +51,12 @@
     "errors": {
       "loadFailed": "Could not load your friends list.",
       "missingRequestId": "Request ID missing.",
-      "noUserSelected": "No user selected."
+      "noUserSelected": "No user selected.",
+      "searchFailed": "Unable to search for users."
     },
     "myFriends": "MY FRIENDS · {{count}}",
     "noFriends": "You don't have any friends yet.",
+    "noUsersFound": "No users found.",
     "noRequests": "No pending friend requests.",
     "receivedRequests": "RECEIVED REQUESTS",
     "remove": "Remove",

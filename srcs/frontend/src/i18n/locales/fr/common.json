@@ -51,11 +51,13 @@
     "errors": {
       "loadFailed": "Impossible de charger votre liste d'amis.",
       "missingRequestId": "Identifiant de la demande manquant.",
-      "noUserSelected": "Aucun utilisateur sélectionné."
+      "noUserSelected": "Aucun utilisateur sélectionné.",
+      "searchFailed": "Impossible de rechercher les utilisateurs."
     },
     "myFriends": "MES AMIS · {{count}}",
     "noFriends": "Vous n'avez pas encore d'amis.",
     "noRequests": "Aucune demande d'amitié en attente.",
+    "noUsersFound": "Aucun utilisateur trouvé.",
     "receivedRequests": "DEMANDES REÇUES",
     "remove": "Retirer",
     "removeTitle": "Retirer {{username}} de vos amis ?",

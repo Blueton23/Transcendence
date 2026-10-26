@@ -51,11 +51,13 @@
     "errors": {
       "loadFailed": "No se pudo cargar tu lista de amigos.",
       "missingRequestId": "Falta el identificador de la solicitud.",
-      "noUserSelected": "Ningún usuario seleccionado."
+      "noUserSelected": "Ningún usuario seleccionado.",
+      "searchFailed": "No se pudo buscar a los usuarios."
     },
     "myFriends": "MIS AMIGOS · {{count}}",
     "noFriends": "Todavía no tienes amigos.",
     "noRequests": "No hay solicitudes de amistad pendientes.",
+    "noUsersFound": "No se encontraron usuarios.",
     "receivedRequests": "SOLICITUDES RECIBIDAS",
     "remove": "Quitar",
     "removeTitle": "¿Quitar a {{username}} de tus amigos?",

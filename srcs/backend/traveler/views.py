@@ -279,38 +279,31 @@ class CsrfTokenView(APIView):
 
 
 class FriendshipSearchView(APIView):
-    permission_classes: ClassVar[list] = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request: Request) -> Response:
         query = request.query_params.get("q", "").strip()
 
-        if not query:
-            return Response(
-                {"detail": "Veuillez saisir un username ou un email."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        if len(query) < 2:
+            return Response({"travelers": []})
 
-        traveler = (
-            Traveler.objects.filter(Q(username__iexact=query) | Q(email__iexact=query))
+        travelers = (
+            Traveler.objects.filter(
+                Q(username__icontains=query)
+                | Q(first_name__icontains=query)
+                | Q(last_name__icontains=query)
+            )
             .exclude(pk=request.user.pk)
-            .first()
+            .order_by("username")[:10]
         )
 
-        if traveler is None:
-            return Response(
-                {"detail": "Aucun utilisateur trouvé."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-
-        return Response(
-            {
-                "traveler": TravelerSerializer(
-                    traveler,
-                    context={"request": request},
-                ).data,
-            },
-            status=status.HTTP_200_OK,
-        )
+        return Response({
+            "travelers": TravelerSerializer(
+                travelers,
+                many=True,
+                context={"request": request},
+            ).data
+        })
 
 
 class FriendshipRequestView(APIView):
