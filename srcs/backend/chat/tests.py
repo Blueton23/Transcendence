@@ -9,6 +9,8 @@ from rest_framework.test import APIClient
 
 from chat.models import MESSAGE_BODY_MAX_LENGTH, Message
 from chat.serializers import MessageSerializer
+from common.realtime import travel_group
+from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaType
 from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
@@ -520,3 +522,95 @@ class MessageSerializerTest(TestCase):
             serializer.validated_data["body"],
             "Hello world",
         )
+
+
+class ChatPermissionEnvelopeTest(TestCase):
+    """403s go through common.exceptions, like every other API error."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.stranger = Traveler.objects.create_user(
+            username="dave", email="dave@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        self.client.force_authenticate(user=self.stranger)
+
+    def test_every_chat_endpoint_uses_the_error_envelope(self):
+        cases = [
+            ("get", "travel-messages"),
+            ("post", "travel-messages"),
+            ("get", "travel-unread-count"),
+            ("post", "travel-mark-read"),
+        ]
+        for method, name in cases:
+            with self.subTest(method=method, name=name):
+                url = reverse(name, kwargs={"travel_id": self.travel.pk})
+                response = getattr(self.client, method)(
+                    url, {"body": "Hello"}, format="json"
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                self.assertEqual(response.data["status"], 403)
+                self.assertEqual(response.data["code"], "permission_denied")
+                self.assertTrue(response.data["message"])
+
+    def test_unknown_travel_is_403(self):
+        url = reverse("travel-messages", kwargs={"travel_id": 999999})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ChatBroadcastTest(BroadcastListenerMixin, TestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.traveler = Traveler.objects.create_user(
+            username="erin", email="erin@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.url = reverse("travel-messages", kwargs={"travel_id": self.travel.pk})
+        self.client.force_authenticate(user=self.traveler)
+        self.listen_to(travel_group(self.travel.id))
+
+    def post(self, data):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = self.client.post(self.url, data, format="json")
+        return response, callbacks
+
+    def test_send_broadcasts_chat_message_in_camel_case(self):
+        response, _ = self.post({"body": "  Salut !  "})
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "chat.message")
+        payload = event["payload"]
+        self.assertEqual(payload["id"], response.data["id"])
+        self.assertEqual(payload["body"], "Salut !")
+        self.assertEqual(payload["travelerName"], str(self.traveler))
+        self.assertEqual(payload["user"]["firstName"], self.traveler.first_name)
+        self.assertIn("createdAt", payload)
+        self.assertIn("isSystem", payload)
+        # Per-reader value: each client works it out.
+        self.assertNotIn("isUnread", payload)
+
+    def test_rejected_message_broadcasts_nothing(self):
+        response, callbacks = self.post({"body": "   "})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(callbacks, [])
