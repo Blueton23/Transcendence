@@ -34,14 +34,15 @@ class TravelMessageListCreateView(APIView):
 
         if participation is None:
             return Response(
-                {"detail": "Vous n'avez pas accès à ce voyage."},
+                {
+                    "code": "travel_chat_access_denied",
+                    "detail": "You do not have access to this trip.",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
         messages = (
-            Message.objects.filter(
-                travel=travel,
-            )
+            Message.objects.filter(travel=travel)
             .select_related("traveler")
             .order_by("created_at", "id")
         )
@@ -64,7 +65,10 @@ class TravelMessageListCreateView(APIView):
 
         if not is_active_member:
             return Response(
-                {"detail": "Vous devez être membre du voyage pour envoyer un message."},
+                {
+                    "code": "travel_chat_membership_required",
+                    "detail": "You must be a member of this trip to send a message.",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -88,7 +92,6 @@ class TravelUnreadCountView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def get(self, request, travel_id):
-
         participation = Participation.objects.filter(
             travel_id=travel_id,
             traveler=request.user,
@@ -100,7 +103,10 @@ class TravelUnreadCountView(APIView):
 
         if participation is None:
             return Response(
-                {"detail": "Vous n'avez pas accès à ce voyage.."},
+                {
+                    "code": "travel_chat_access_denied",
+                    "detail": "You do not have access to this trip.",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -113,7 +119,6 @@ class TravelMarkReadView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def post(self, request, travel_id):
-
         participation = Participation.objects.filter(
             travel_id=travel_id,
             traveler=request.user,
@@ -125,7 +130,10 @@ class TravelMarkReadView(APIView):
 
         if participation is None:
             return Response(
-                {"detail": "Vous n'avez pas accès à ce voyage."},
+                {
+                    "code": "travel_chat_access_denied",
+                    "detail": "You do not have access to this trip.",
+                },
                 status=status.HTTP_403_FORBIDDEN,
             )
 

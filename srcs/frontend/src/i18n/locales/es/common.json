@@ -36,6 +36,12 @@
     "username": "Nombre de usuario",
     "welcomeBack": "Bienvenido de nuevo"
   },
+  "chat": {
+    "errors": {
+      "travelChatAccessDenied": "No tienes acceso a este viaje.",
+      "travelChatMembershipRequired": "Debes ser miembro del viaje para enviar un mensaje."
+    }
+  },
   "errors": {
     "csrfMissing": "Token CSRF no encontrado.",
     "generic": "Error",

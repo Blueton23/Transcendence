@@ -36,6 +36,12 @@
     "username": "Pseudo",
     "welcomeBack": "Bon retour"
   },
+  "chat": {
+    "errors": {
+      "travelChatAccessDenied": "Vous n'avez pas accès à ce voyage.",
+      "travelChatMembershipRequired": "Vous devez être membre du voyage pour envoyer un message."
+    }
+  },
   "errors": {
     "csrfMissing": "errors.csrfMissing",
     "generic": "Error",

@@ -49,7 +49,7 @@ class TravelerPingView(APIView):
         return Response(
             {
                 "code": "traveler_api_running",
-                "message": "traveler api is running",
+                "message": "The traveler API is running.",
                 "status": "ok",
             }
         )
@@ -157,7 +157,7 @@ class TravelerUpdatePasswordView(APIView):
         return Response(
             {
                 "code": "password_updated",
-                "detail": "password_updated",
+                "detail": "Password updated successfully.",
             },
             status=status.HTTP_200_OK,
         )
@@ -183,7 +183,7 @@ class LoginView(APIView):
             return Response(
                 {
                     "code": "invalid_credentials",
-                    "detail": "invalid_credentials",
+                    "detail": "Invalid username or password.",
                 },
                 status=status.HTTP_401_UNAUTHORIZED,
             )
@@ -224,7 +224,7 @@ class ApiTokenView(APIView):
             return Response(
                 {
                     "code": "invalid_credentials",
-                    "detail": "invalid_credentials",
+                    "detail": "Invalid username or password.",
                 },
                 status=status.HTTP_401_UNAUTHORIZED,
             )
@@ -263,7 +263,7 @@ class LogoutView(APIView):
         return Response(
             {
                 "code": "logout_success",
-                "message": "logout_success",
+                "message": "Logged out successfully.",
             },
             status=status.HTTP_200_OK,
         )
@@ -278,7 +278,7 @@ class CsrfTokenView(APIView):
         return Response(
             {
                 "code": "csrf_initialized",
-                "message": "csrf_initialized",
+                "message": "CSRF protection initialized successfully.",
             },
             status=status.HTTP_200_OK,
         )
@@ -321,7 +321,7 @@ class FriendshipRequestView(APIView):
             return Response(
                 {
                     "code": "user_id_required",
-                    "detail": "user_id_required",
+                    "detail": "User ID is required.",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -332,7 +332,7 @@ class FriendshipRequestView(APIView):
             return Response(
                 {
                     "code": "invalid_user_id",
-                    "detail": "invalid_user_id",
+                    "detail": "Invalid user ID.",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -343,7 +343,7 @@ class FriendshipRequestView(APIView):
             return Response(
                 {
                     "code": "user_not_found",
-                    "detail": "user_not_found",
+                    "detail": "User not found.",
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -352,7 +352,7 @@ class FriendshipRequestView(APIView):
             return Response(
                 {
                     "code": "cannot_friend_yourself",
-                    "detail": "cannot_friend_yourself",
+                    "detail": "You cannot send a friend request to yourself.",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -367,7 +367,7 @@ class FriendshipRequestView(APIView):
             return Response(
                 {
                     "code": "relationship_exists",
-                    "detail": "relationship_exists",
+                    "detail": "A friendship or friend request already exists.",
                 },
                 status=status.HTTP_409_CONFLICT,
             )
@@ -383,7 +383,7 @@ class FriendshipRequestView(APIView):
             return Response(
                 {
                     "code": "relationship_exists",
-                    "detail": "relationship_exists",
+                    "detail": "A friendship or friend request already exists.",
                 },
                 status=status.HTTP_409_CONFLICT,
             )
@@ -451,7 +451,7 @@ class FriendshipAcceptView(APIView):
             return Response(
                 {
                     "code": "request_not_found",
-                    "detail": "request_not_found",
+                    "detail": "Friend request not found.",
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -460,7 +460,7 @@ class FriendshipAcceptView(APIView):
             return Response(
                 {
                     "code": "cannot_accept_own_request",
-                    "detail": "cannot_accept_own_request",
+                    "detail": "You cannot accept your own friend request.",
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -472,7 +472,7 @@ class FriendshipAcceptView(APIView):
             return Response(
                 {
                     "code": "not_request_participant",
-                    "detail": "not_request_participant",
+                    "detail": "You are not a participant in this friend request.",
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -483,7 +483,7 @@ class FriendshipAcceptView(APIView):
         return Response(
             {
                 "code": "friendship_request_accepted",
-                "detail": "friendship_request_accepted",
+                "detail": "Friend request accepted successfully.",
             },
             status=status.HTTP_200_OK,
         )
@@ -501,7 +501,7 @@ class FriendshipRemoveView(APIView):
             return Response(
                 {
                     "code": "friendship_not_found",
-                    "detail": "friendship_not_found",
+                    "detail": "Friendship not found.",
                 },
                 status=status.HTTP_404_NOT_FOUND,
             )
@@ -513,7 +513,7 @@ class FriendshipRemoveView(APIView):
             return Response(
                 {
                     "code": "not_friendship_participant",
-                    "detail": "not_friendship_participant",
+                    "detail": "You are not a participant in this friendship.",
                 },
                 status=status.HTTP_403_FORBIDDEN,
             )
@@ -523,7 +523,7 @@ class FriendshipRemoveView(APIView):
         return Response(
             {
                 "code": "friendship_removed",
-                "detail": "friendship_removed",
+                "detail": "Friendship removed successfully.",
             },
             status=status.HTTP_200_OK,
         )
