@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
 import NavPill, { NavPillMobile } from "./NavPill";
 import IconBadge from "../../shared/ui/IconBadge";
 import Text from "../../shared/ui/Text";
 import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
-import { getUnreadCount } from "@/features/chat/api/chatApi";
+import { useUnreadCount } from "@/features/chat/hooks/useUnreadCount";
 import { useTranslation } from "react-i18next";
 
 interface TripNavProps {
@@ -54,31 +53,8 @@ function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
   ];
 }
 
-//SDU : possible de faire un fonction generique par la suite?
-function useUnreadCount(tripId: string): number {
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    async function fetchUnreadCount() {
-      try {
-        const result = await getUnreadCount(Number(tripId));
-        setUnreadCount(result.unreadCount);
-      } catch (error) {
-        console.error(
-          "Impossible de récupérer le nombre de messages non lus :",
-          error,
-        );
-      }
-    }
-
-    fetchUnreadCount();
-  }, [tripId]);
-
-  return unreadCount;
-}
-
 export function TripNavDesktop({ tripId }: TripNavProps) {
-  const unreadCount = useUnreadCount(tripId);
+  const unreadCount = useUnreadCount(Number(tripId));
   const items = getTripNavItems(tripId, unreadCount);
   const { t } = useTranslation();
 
@@ -102,7 +78,7 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
 }
 
 export function TripNavMobile({ tripId }: TripNavProps) {
-  const unreadCount = useUnreadCount(tripId);
+  const unreadCount = useUnreadCount(Number(tripId));
   const items = getTripNavItems(tripId, unreadCount);
 
   return (

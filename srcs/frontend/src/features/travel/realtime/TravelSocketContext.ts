@@ -11,7 +11,7 @@ export type TravelSocketStatus = "connecting" | "open" | "closed" | "forbidden";
 
 export interface TravelSocketContextType {
   status: TravelSocketStatus;
-  subscribre: (type: string, handler: TravelEventHandler) => () => void;
+  subscribe: (type: string, handler: TravelEventHandler) => () => void;
 }
 
 export const TravelSocketContext = createContext<
