@@ -1586,19 +1586,13 @@ class GoogleCallbackViewTest(APITestCase):
         mock_post.return_value.status_code = 400
         mock_post.return_value.text = '{"error": "invalid_grant"}'
 
-        self.client.get(reverse("auth-google"))
-        state = self.client.session["google_oauth2_state"]
-
-        response = self.client.get(
-            reverse("auth-google-callback"),
-            {"state": state, "code": "code-expire"},
-        )
+        response = self.google_login()
 
         self.assertRedirects(
             response, "/login?error=google", fetch_redirect_response=False
         )
         sent = mock_post.call_args.kwargs["data"]
-        self.assertEqual(sent["code"], "code-expire")
+        self.assertEqual(sent["code"], "un-code")
         self.assertEqual(sent["client_secret"], "test-client-secret")
         self.assertEqual(sent["grant_type"], "authorization_code")
 
@@ -1607,13 +1601,7 @@ class GoogleCallbackViewTest(APITestCase):
     def test_google_unreachable(self, mock_post):
         mock_post.side_effect = requests.ConnectionError()
 
-        self.client.get(reverse("auth-google"))
-        state = self.client.session["google_oauth2_state"]
-
-        response = self.client.get(
-            reverse("auth-google-callback"),
-            {"state": state, "code": "un-code"},
-        )
+        response = self.google_login()
 
         self.assertRedirects(
             response, "/login?error=google", fetch_redirect_response=False
@@ -1628,13 +1616,7 @@ class GoogleCallbackViewTest(APITestCase):
         mock_get.return_value.status_code = 401
         mock_get.return_value.text = '{"error": "invalid_token"}'
 
-        self.client.get(reverse("auth-google"))
-        state = self.client.session["google_oauth2_state"]
-
-        response = self.client.get(
-            reverse("auth-google-callback"),
-            {"state": state, "code": "un-code"},
-        )
+        response = self.google_login()
 
         self.assertRedirects(
             response, "/login?error=google", fetch_redirect_response=False
@@ -1706,3 +1688,36 @@ class GoogleCallbackViewTest(APITestCase):
 
         traveler = Traveler.objects.get(email="david.lf@gmail.com")
         self.assertEqual(traveler.username, "david.lf1")
+
+    # Vérifie qu'un email non vérifié par Google est refusé
+    @patch("traveler.views.requests.get")
+    @patch("traveler.views.requests.post")
+    def test_unverified_email_is_refused(self, mock_post, mock_get):
+        self.mock_google_success(mock_post, mock_get)
+        mock_get.return_value.json.return_value["email_verified"] = False
+
+        response = self.google_login()
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+        self.assertFalse(Traveler.objects.exists())
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    # Vérifie qu'un compte classique (avec mot de passe) n'est pas ouvert via Google
+    @patch("traveler.views.requests.get")
+    @patch("traveler.views.requests.post")
+    def test_password_account_is_refused(self, mock_post, mock_get):
+        Traveler.objects.create_user(
+            username="david", email="david.lf@gmail.com", password="pass12345"
+        )
+        self.mock_google_success(mock_post, mock_get)
+
+        response = self.google_login()
+
+        self.assertRedirects(
+            response,
+            "/login?error=google_email_exists",
+            fetch_redirect_response=False,
+        )
+        self.assertNotIn(SESSION_KEY, self.client.session)

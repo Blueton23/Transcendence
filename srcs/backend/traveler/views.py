@@ -588,7 +588,7 @@ class GoogleCallbackView(APIView):
         code = request.query_params.get("code")
 
         if code is None:
-            logger.warning("Google OAuth : aucun code utilisé")
+            logger.warning("Google OAuth : aucun code reçu (connexion annulée ?)")
             return redirect("/login?error=google")
 
         try:
@@ -619,7 +619,6 @@ class GoogleCallbackView(APIView):
                 headers={"Authorization": f"Bearer {access_token}"},
                 timeout=10,
             )
-
         except requests.RequestException:
             logger.warning("Google OAuth : Google est injoignable")
             return redirect("/login?error=google")
@@ -632,6 +631,11 @@ class GoogleCallbackView(APIView):
 
         userinfo = userinfo_response.json()
 
+        # On n'utilise l'email que si Google l'a vérifié
+        if not userinfo.get("email_verified"):
+            logger.warning("Google OAuth : email non vérifié par Google")
+            return redirect("/login?error=google")
+
         # 3. Retrouve le Traveler qui a cet email, ou on le crée
         traveler = Traveler.objects.filter(email__iexact=userinfo["email"]).first()
 
@@ -642,6 +646,9 @@ class GoogleCallbackView(APIView):
                 first_name=userinfo.get("given_name", ""),
                 last_name=userinfo.get("family_name", ""),
             )
+        elif traveler.has_usable_password():
+            logger.warning("Google OAuth : email déjà utilisé par un compte classique")
+            return redirect("/login?error=google_email_exists")
 
         login(request, traveler)
         return redirect("/profile")
