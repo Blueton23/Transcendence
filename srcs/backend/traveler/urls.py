@@ -6,6 +6,7 @@ from django.urls import path
 
 from .views import (
     ApiHealthView,
+    ApiTokenView,
     CsrfTokenView,
     FriendshipAcceptView,
     FriendshipListView,
@@ -29,6 +30,7 @@ urlpatterns = [
     path("auth/login/", LoginView.as_view(), name="auth-login"),
     path("auth/logout/", LogoutView.as_view(), name="auth-logout"),
     path("auth/me/", MeView.as_view(), name="auth-me"),
+    path("auth/token/", ApiTokenView.as_view(), name="auth-token"),
     path("travelers/create/", TravelerCreateView.as_view(), name="traveler-create"),
     path("ping/", TravelerPingView.as_view(), name="traveler-ping"),
     path(

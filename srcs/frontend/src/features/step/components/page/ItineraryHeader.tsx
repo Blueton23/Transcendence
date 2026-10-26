@@ -8,6 +8,7 @@ import Icon from "@/shared/ui/Icon";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import type { Step } from "@/features/step/types";
 import type { Route } from "@/features/map/types";
+import { useTranslation } from "react-i18next";
 
 export interface ItineraryHeaderProps {
   travel: Travel;
@@ -28,6 +29,7 @@ export function ItineraryHeader({
   refetch,
   isDetailView,
 }: ItineraryHeaderProps) {
+  const { t } = useTranslation();
   const [isAddStepOpen, setIsAddStepOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4 pb-4 md:pb-0">
@@ -41,10 +43,10 @@ export function ItineraryHeader({
             <IconButton
               variant="primary"
               icon={<Icon name="pinplus" size={20} />}
-              label="Ajouter une étape"
+              label={t("step.add")}
             />
             <Heading size="sm" level={3}>
-              Ajouter une étape
+              {t("step.add")}
             </Heading>
           </div>
           <ToggleMobileButton mobileView={mobileView} onToggle={onToggle} />

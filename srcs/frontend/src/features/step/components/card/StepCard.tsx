@@ -1,4 +1,3 @@
-import type { Step, StepIdeaPreview } from "@/features/step/types";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
@@ -10,24 +9,17 @@ import { useState } from "react";
 import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { deleteStep } from "@/features/step/api/stepApi";
-import { formatNights } from "@/shared/utils/formatNights";
+import type { Step } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
-//TODO(branchement): ideaPreview viendra d un champ annote cote API par le biais du Serializer de l app traval
-// pas un champ stocke dans Step
 interface StepCardProps {
   step: Step;
   dateLabel: string;
-  ideaPreview?: StepIdeaPreview;
+  lodging?: { lodged: number; total: number };
   onModify: () => void;
   onClick?: () => void;
   refetch: () => void;
 }
-
-const ideaPreviewTones = {
-  proposed: "accent",
-  selected: "accent",
-  reserved: "success",
-} as const;
 
 const StepOptionsStyle =
   "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
@@ -50,6 +42,7 @@ function StepOptionsButton({
   setIsOpen,
 }: StepOptionsButtonProps) {
   // rajouter error une fois que bandeau error en place
+  const { t } = useTranslation();
   const { submit, isSubmitting } = useSubmitAction(() =>
     deleteStep(travelId, stepId),
   );
@@ -65,7 +58,7 @@ function StepOptionsButton({
     <div className={StepOptionsStyle} onClick={(e) => e.stopPropagation()}>
       <IconButton
         icon={<Icon name="dots" size={16} />}
-        label="Options"
+        label={t("actions.options")}
         onClick={() => setIsOpen(!isOpen)}
         onMouseDown={(e) => e.stopPropagation()}
       />
@@ -75,7 +68,7 @@ function StepOptionsButton({
           className="top-full right-0 mt-2"
         >
           <MenuItem onClick={onModify} icon="edit">
-            Modifier étape
+            {t("step.edit")}
           </MenuItem>
           <Divider />
           <MenuItem
@@ -84,7 +77,7 @@ function StepOptionsButton({
             onClick={handleOnSubmit}
             disabled={isSubmitting}
           >
-            Supprimer l'étape
+            {t("step.delete")}
           </MenuItem>
         </DropdownMenu>
       )}
@@ -94,19 +87,16 @@ function StepOptionsButton({
 
 function StepDescription({
   step,
-  ideaPreview,
-}: Pick<StepCardProps, "step" | "ideaPreview">) {
+  lodging,
+}: Pick<StepCardProps, "step" | "lodging">) {
+  const { t } = useTranslation();
   return (
     <Text tone="muted" size="sm">
-      {ideaPreview && (
-        <>
-          <Text as="span" tone={ideaPreviewTones[ideaPreview.status]}>
-            {ideaPreview.label}
-          </Text>
-          {" · "}
-        </>
-      )}
-      {formatNights(step.nights)} · {step.ideaCount} idées épinglées
+      {t("units.nights", { count: step.nights })}
+      {lodging &&
+        lodging.total > 0 &&
+        ` · ${t("step.lodgedRatio", { lodged: lodging.lodged, total: lodging.total })}`}
+      {` · ${t("step.pinnedIdeas", { count: step.ideaCount })}`}
     </Text>
   );
 }
@@ -115,7 +105,7 @@ function StepDescription({
 export function StepCard({
   step,
   dateLabel,
-  ideaPreview,
+  lodging,
   onClick,
   onModify,
   refetch,
@@ -134,7 +124,7 @@ export function StepCard({
         <Heading level={2}>{step.localisation}</Heading>
       </div>
       <div className="flex items-center">
-        <StepDescription step={step} ideaPreview={ideaPreview} />
+        <StepDescription step={step} lodging={lodging} />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
       <StepOptionsButton

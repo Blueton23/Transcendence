@@ -4,6 +4,7 @@ from django.db import transaction
 from django.db.models import Count, Exists, OuterRef
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from rest_framework.generics import (
     GenericAPIView,
@@ -13,17 +14,22 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from common.mixins import PublicApiMixin
 from idea.models import Idea, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
 from travel.mixins import ParticipantScopedMixin
 from travel.models import Step
 from travel.permissions import IsTravelParticipant
 
+from .schema import idea_detail_schema, ideas_list_schema
+
 # ---Idea---#
 
 
 # Liste plusieurs objets (GET, POST)
-class IdeaListView(ListCreateAPIView):
+@extend_schema(tags=["Ideas"])
+@ideas_list_schema
+class IdeaListView(PublicApiMixin, ListCreateAPIView):
     queryset = Idea.objects.all()
     serializer_class = IdeaSerializer
     permission_classes: ClassVar[list] = [
@@ -56,7 +62,11 @@ class IdeaListView(ListCreateAPIView):
 
 
 # Récupérer un seul objet (GET, PATCH, PUT, DELETE)
-class IdeaDetailView(ParticipantScopedMixin, RetrieveUpdateDestroyAPIView):
+@extend_schema(tags=["Ideas"])
+@idea_detail_schema
+class IdeaDetailView(
+    PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
+):
     queryset = Idea.objects.all()
     serializer_class = IdeaSerializer
     participation_path = "travel__participations"

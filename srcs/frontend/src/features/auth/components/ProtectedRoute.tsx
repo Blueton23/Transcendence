@@ -1,12 +1,14 @@
 import { Navigate, Outlet, useLocation } from "react-router";
 import { useAuth } from "@/features/auth/context/useAuth";
+import { useTranslation } from "react-i18next";
 
 function ProtectedRoute() {
   const { currentUser, isLoading } = useAuth();
   const location = useLocation();
+  const { t } = useTranslation();
 
   if (isLoading) {
-    return <div className="p-6">Chargement...</div>;
+    return <div className="p-6">{t("actions.loading")}</div>;
   }
 
   if (!currentUser) {

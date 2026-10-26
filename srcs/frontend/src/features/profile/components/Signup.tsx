@@ -14,6 +14,7 @@ import Input from "@/shared/ui/Input";
 import Icon from "@/shared/ui/Icon";
 import IconBadge from "@/shared/ui/IconBadge";
 import Text from "@/shared/ui/Text";
+import { useTranslation } from "react-i18next";
 
 const INITIAL_FORM: SignupData = {
   firstName: "",
@@ -30,6 +31,7 @@ function Signup() {
   const [form, setForm] = useState<SignupData>(INITIAL_FORM);
 
   const { submit, isSubmitting, error } = useSubmitAction(() => signup(form));
+  const { t } = useTranslation();
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
@@ -63,10 +65,10 @@ function Signup() {
         <IconBadge color="purple" name="mtn" />
 
         <Heading level={1} size="lg">
-          Créer un compte
+          {t("profile.signupTitle")}
         </Heading>
 
-        <Text tone="secondary">Rejoignez vos futurs road trips</Text>
+        <Text tone="secondary">{t("profile.signupSubtitle")}</Text>
       </div>
 
       {/* Formulaire */}
@@ -75,7 +77,7 @@ function Signup() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Prénom
+              {t("profile.firstName")}
             </span>
 
             <Input
@@ -91,7 +93,7 @@ function Signup() {
 
           <label className="flex flex-col gap-2">
             <span className="text-sm font-semibold text-text-secondary">
-              Nom
+              {t("profile.lastName")}
             </span>
 
             <Input
@@ -109,7 +111,7 @@ function Signup() {
         {/* Pseudo */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Pseudo
+            {t("auth.username")}
           </span>
 
           <Input
@@ -127,7 +129,7 @@ function Signup() {
         {/* Email */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Email
+            {t("profile.email")}
           </span>
 
           <Input
@@ -144,7 +146,7 @@ function Signup() {
         {/* Mot de passe */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Mot de passe
+            {t("auth.password")}
           </span>
 
           <Input
@@ -163,7 +165,7 @@ function Signup() {
         {/* Confirmation du mot de passe */}
         <label className="flex flex-col gap-2">
           <span className="text-sm font-semibold text-text-secondary">
-            Confirmer le mot de passe
+            {t("auth.confirmPassword")}
           </span>
 
           <Input
@@ -190,19 +192,19 @@ function Signup() {
             className="w-full rounded-full py-3"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Création..." : "Créer mon compte"}
+            {isSubmitting ? t("auth.creating") : t("auth.createAccount")}
           </Button>
         </div>
         {/* Lien vers la connexion */}
         <div className="flex items-center justify-center gap-1 text-sm">
-          <Text tone="muted">Déjà un compte ?</Text>
+          <Text tone="muted">{t("profile.alreadyAccount")}</Text>
 
           <button
             type="button"
             onClick={() => navigate("/login")}
             className="font-medium text-brand-primary hover:underline"
           >
-            Se connecter
+            {t("auth.login")}
           </button>
         </div>
       </form>

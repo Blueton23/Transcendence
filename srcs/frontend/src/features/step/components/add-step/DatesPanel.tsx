@@ -9,6 +9,7 @@ import { useEscapeKey } from "@/shared/hooks/useEscapeKey";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
 import { canEndOn, canStartOn } from "@/features/step/utils/stepAvailability";
+import { useTranslation } from "react-i18next";
 
 interface DatePanelProps {
   steps: Step[];
@@ -38,6 +39,7 @@ export function DatesPanel({
   error,
 }: DatePanelProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
   useOnClickOutside(cardRef, onClose);
   useEscapeKey(onClose);
 
@@ -89,6 +91,7 @@ export function DatesPanel({
               startMonth={new Date(travel.startDate)}
               endMonth={new Date(travel.endDate)}
               markedDays={noNightDays}
+              numberOfMonths={1}
             />
 
             <label className="flex items-center gap-2 font-sans text-md font-semibold">
@@ -98,13 +101,13 @@ export function DatesPanel({
                 onChange={(event) => onNoOvernightChange(event.target.checked)}
                 className="h-4 w-4 accent-brand-primary"
               />{" "}
-              je ne passe pas de nuit ici
+              {t("step.noNightHere")}
             </label>
           </div>
         </div>
         {onSubmit && (
           <Button onClick={onSubmit} variant="primary" disabled={isSubmitting}>
-            {isSubmitting ? "Ajout..." : "Ajouter l'étape"}
+            {isSubmitting ? t("step.adding") : t("step.addStep")}
           </Button>
         )}
         {error && <Text tone="accent">{error}</Text>}

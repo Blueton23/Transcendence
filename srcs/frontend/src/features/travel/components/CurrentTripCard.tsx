@@ -6,6 +6,7 @@ import Button from "@/shared/ui/Button";
 import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
 import Tag from "@/shared/ui/Tag";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 interface CurrentTripCardProps {
@@ -18,6 +19,7 @@ export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
   const totalKms = route ? route.totalDistanceKm : 0;
   const status = getStatus(travel);
   const navigate = useNavigate();
+  const { t } = useTranslation();
   return (
     <>
       <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-8">
@@ -34,17 +36,16 @@ export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
           <Tag icon={<Icon name="cal" size={14} />} tone="inverse">
             {dateLabels}
           </Tag>
-          <Tag
-            icon={<Icon name="car" size={14} />}
-            tone="inverse"
-          >{`${totalKms} kms`}</Tag>
+          <Tag icon={<Icon name="car" size={14} />} tone="inverse">
+            {t("travel.kms", { count: totalKms })}
+          </Tag>
         </div>
         <Button
           variant="outline"
           className="self-end"
-          onClick={() => navigate(`/trip/${travel.id}/`)}
+          onClick={() => navigate(`/travel/${travel.id}/`)}
         >
-          Ouvrir le voyage
+          {t("travel.openTravel")}
           <Icon name="arrow" />
         </Button>
       </div>

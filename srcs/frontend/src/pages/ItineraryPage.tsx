@@ -5,19 +5,17 @@ import { ItineraryLayout } from "@/features/step/components/page/ItineraryLayout
 import { ItineraryListPanel } from "@/features/step/components/page/ItineraryListPanel";
 import { ItineraryHeader } from "@/features/step/components/page/ItineraryHeader";
 import { StepDetail } from "@/features/step/components/page/StepDetail";
-import type { Step } from "@/features/step/types";
+import type { IdeaActions, Step } from "@/features/step/types";
 import { TripActionsButton } from "@/features/step/components/page/TripActionsButton";
 import { useSteps } from "@/features/step/hooks/useSteps";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import { Navigate } from "react-router";
 import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import { StickyHeader } from "@/shared/ui/StickyHeader";
 import { useRoute } from "@/features/map/hooks/useRoute";
 import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
-
-// TODO(branchement): un fois que PR de david est branchee:
-// - recharger les etapes (refetch) apres la creation pour mettre a jour ideaCount
+import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
 
 function ItineraryPage() {
   const { id } = useParams();
@@ -33,20 +31,40 @@ function ItineraryPage() {
     error: errorSteps,
     refetch,
   } = useSteps(travelId);
-  const { handleCreateIdea } = useIdeas(travelId);
+  const {
+    ideas,
+    handleEditIdea,
+    handleChooseIdea,
+    handleDeleteIdea,
+    handleVote,
+    handleCreateIdea,
+  } = useIdeas(travelId);
   const { route, isLoading: isLoadingRoute } = useRoute(steps);
   const dateLabels = computeDateLabels(steps);
   const [mobileView, setMobileView] = useState<"list" | "map">("list");
-  const [detailStepId, setDetailStepId] = useState<number | null>(null);
+  const [searchParams] = useSearchParams();
+  const [detailStepId, setDetailStepId] = useState<number | null>(
+    Number(searchParams.get("step")) || null,
+  );
   const detailView = steps.find((step) => step.id === detailStepId) ?? null;
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
   const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
+  const [editIdeaId, setEditIdeaId] = useState<number | null>(null);
+  const editIdea = ideas.find((idea) => idea.id === editIdeaId);
+  const [lodgingDate, setLodgingDate] = useState<string | null>(null);
+
+  const ideaActions: IdeaActions = {
+    onVote: handleVote,
+    onDelete: handleDeleteIdea,
+    onChoose: handleChooseIdea,
+    onEdit: (id) => setEditIdeaId(id),
+  };
 
   const isLoading = isLoadingTravel || isLoadingSteps;
   const error = errorTravel || errorSteps;
   if (isLoading) return null;
-  if (error) return <Navigate to="/trip" replace />;
+  if (error) return <Navigate to="/travel" replace />;
   if (!travel) return null;
   const selectedStepIndex = detailView
     ? steps.findIndex((step) => step.id === detailView.id)
@@ -78,11 +96,18 @@ function ItineraryPage() {
             onBack={() => setDetailStepId(null)}
             onModify={() => setStepToModify(detailView)}
             travel={travel}
+            ideas={ideas}
+            actions={ideaActions}
+            onAddLodging={(date) => {
+              setLodgingDate(date);
+              setCreateIdeaModalOpen(true);
+            }}
           />
         ) : (
           <div className="flex flex-col gap-4 md:min-h-0 md:flex-1">
             <ItineraryListPanel
               steps={steps}
+              ideas={ideas}
               route={route}
               isLoadingRoute={isLoadingRoute}
               travel={travel}
@@ -109,9 +134,31 @@ function ItineraryPage() {
           travelTitle={travel.title}
           steps={steps}
           initialStepId={detailView?.id}
-          onClose={() => setCreateIdeaModalOpen(false)}
+          initialType={lodgingDate ? "accommodation" : undefined}
+          lockStep={detailView ? true : false}
+          initialDateRange={
+            lodgingDate
+              ? { from: new Date(lodgingDate), to: undefined }
+              : undefined
+          }
+          onClose={() => {
+            setCreateIdeaModalOpen(false);
+            setLodgingDate(null);
+          }}
           onCreate={async (input) => {
             await handleCreateIdea(input);
+            refetch();
+          }}
+        />
+      )}
+      {editIdea && (
+        <EditIdeaModal
+          travelTitle={travel.title}
+          idea={editIdea}
+          steps={steps}
+          onClose={() => setEditIdeaId(null)}
+          onEdit={async (input) => {
+            await handleEditIdea(editIdea.id, input);
             refetch();
           }}
         />

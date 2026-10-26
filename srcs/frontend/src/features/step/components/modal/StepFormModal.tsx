@@ -9,6 +9,7 @@ import { PlaceSuggestions } from "@/features/step/components/add-step/PlaceSugge
 import { formatDateRange } from "@/features/step/utils/stepDates";
 import { DateRangeField } from "@/shared/ui/DateRangeField";
 import { useStepForm } from "@/features/step/hooks/useStepForm";
+import { useTranslation } from "react-i18next";
 
 export interface StepFormModalProps {
   step?: Step;
@@ -25,6 +26,7 @@ export function StepFormModal({
   onClose,
   refetch,
 }: StepFormModalProps) {
+  const { t } = useTranslation();
   const form = useStepForm({
     step,
     travel,
@@ -36,14 +38,14 @@ export function StepFormModal({
   return (
     <Modal
       icon="pinplus"
-      title={step ? "Modifier l'étape" : "Ajouter une etape"}
+      title={step ? t("step.edit") : "Ajouter une etape"}
       onClose={onClose}
       size="narrow"
     >
       <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <Text tone="secondary" className="font-semibold">
-            Lieu et dates
+            {t("step.placeAndDates")}
           </Text>
           <div className="relative">
             <PlaceSearchField
@@ -95,10 +97,10 @@ export function StepFormModal({
           className="w-full"
         >
           {form.isSubmitting
-            ? "Modifications en cours"
+            ? t("step.saving")
             : step
-              ? "Enregistrer les modifications"
-              : "Ajouter l'étape"}
+              ? t("step.saveChanges")
+              : t("step.addStep")}
         </Button>
         {form.error && <Text tone="accent">{form.error}</Text>}
       </div>

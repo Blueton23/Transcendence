@@ -2,11 +2,10 @@ import { useEffect, useState } from "react";
 import NavPill, { NavPillMobile } from "./NavPill";
 import IconBadge from "../../shared/ui/IconBadge";
 import Text from "../../shared/ui/Text";
-import Icon from "../../shared/ui/Icon";
 import Divider from "../../shared/ui/Divider";
-import { Link } from "react-router";
 import type { IconName } from "../../shared/ui/Icon";
 import { getUnreadCount } from "@/features/chat/api/chatApi";
+import { useTranslation } from "react-i18next";
 
 interface TripNavProps {
   tripId: string;
@@ -25,24 +24,32 @@ interface TripNavItem {
 // TODO(backend): brancher ces compteurs sur les vraies données.
 function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
   return [
-    { to: `/trip/${tripId}/itinerary`, iconName: "route", label: "Itinéraire" },
     {
-      to: `/trip/${tripId}/ideas`,
+      to: `/travel/${tripId}/itinerary`,
+      iconName: "route",
+      label: "nav.itinerary",
+    },
+    {
+      to: `/travel/${tripId}/ideas`,
       iconName: "pinplus",
-      label: "Idées",
+      label: "nav.ideas",
       badgeCount: 2,
     },
-    { to: `/trip/${tripId}/expenses`, iconName: "wallet", label: "Dépenses" },
     {
-      to: `/trip/${tripId}/chat`,
-      iconName: "chat",
-      label: "Discussion",
-      badgeCount: unreadCount,
+      to: `/travel/${tripId}/expenses`,
+      iconName: "wallet",
+      label: "nav.expenses",
     },
     {
-      to: `/trip/${tripId}/assistant`,
+      to: `/travel/${tripId}/chat`,
+      iconName: "chat",
+      label: "nav.chat",
+      badgeCount: 3,
+    },
+    {
+      to: `/travel/${tripId}/assistant`,
       iconName: "spark",
-      label: "Assistant IA",
+      label: "nav.assistant",
     },
   ];
 }
@@ -73,16 +80,10 @@ function useUnreadCount(tripId: string): number {
 export function TripNavDesktop({ tripId }: TripNavProps) {
   const unreadCount = useUnreadCount(tripId);
   const items = getTripNavItems(tripId, unreadCount);
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col gap-8">
-      <Link
-        to="/trip"
-        className="font-md flex items-center gap-2 text-xs text-text-secondary"
-      >
-        <Icon name="back" size={16} />
-        Mes voyages
-      </Link>
       <div className="flex items-center gap-4">
         <IconBadge color="brand" name="mtn" />
         <Text size="md" className="font-bold">
@@ -93,7 +94,7 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
       <Divider />
       <div className="flex flex-col gap-1">
         {items.map((item) => (
-          <NavPill key={item.to} {...item} />
+          <NavPill key={item.to} {...item} label={t(item.label)} />
         ))}
       </div>
     </div>

@@ -13,6 +13,7 @@ import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
 import IconBadge from "@/shared/ui/IconBadge";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 function Login() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ function Login() {
   const { setCurrentUser } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { t } = useTranslation();
 
   const { submit, isSubmitting, error } = useSubmitAction(() =>
     login({ username, password }),
@@ -38,19 +40,17 @@ function Login() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-6">
+    <div className="flex items-center justify-center p-6">
       <div className="w-full max-w-3xl">
         <Card variant="default">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
               <IconBadge color="purple" name="mtn" />
               <Heading level={1} size="lg">
-                Bon retour
+                {t("auth.welcomeBack")}
               </Heading>
 
-              <Text tone="secondary">
-                Connectez-vous pour retrouver vos voyages
-              </Text>
+              <Text tone="secondary">{t("auth.loginSubtitle")}</Text>
             </div>
 
             <div className="flex flex-col gap-4">
@@ -59,7 +59,7 @@ function Login() {
                   htmlFor="username"
                   className="text-sm font-medium text-text-secondary"
                 >
-                  Pseudo
+                  {t("auth.username")}
                 </label>
 
                 <Input
@@ -86,7 +86,7 @@ function Login() {
                   htmlFor="password"
                   className="text-sm font-medium text-text-secondary"
                 >
-                  Mot de passe
+                  {t("auth.password")}
                 </label>
 
                 <Input
@@ -101,7 +101,7 @@ function Login() {
                       className="text-brand-primary"
                     />
                   }
-                  iconLabel="Mot de passe"
+                  iconLabel={t("auth.password")}
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
                   autoComplete="current-password"
@@ -113,24 +113,24 @@ function Login() {
             {error && <Text tone="accent">{error}</Text>}
 
             <Button type="submit" variant="primary" disabled={isSubmitting}>
-              {isSubmitting ? "Connexion..." : "Se connecter"}
+              {isSubmitting ? t("auth.logginIn") : t("auth.login")}
             </Button>
 
             <div className="flex items-center justify-center gap-1 text-sm">
-              <Text tone="muted">Pas encore de compte ?</Text>
+              <Text tone="muted">{t("auth.noAccount")}</Text>
 
               <button
                 type="button"
                 onClick={() => navigate("/signup")}
                 className="font-medium text-brand-primary hover:underline"
               >
-                Créer mon compte
+                {t("auth.createAccount")}
               </button>
             </div>
           </form>
         </Card>
       </div>
-    </main>
+    </div>
   );
 }
 

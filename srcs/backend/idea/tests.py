@@ -397,6 +397,8 @@ class IdeaModelTest(TestCase):
             )
 
     def test_non_overlapping_chosen_lodgings_on_same_step_are_allowed(self):
+        self.step.end_date = datetime.date(2026, 6, 6)
+        self.step.save()
         self._make_idea(
             type=IdeaType.LODGING,
             step=self.step,
@@ -409,10 +411,18 @@ class IdeaModelTest(TestCase):
             type=IdeaType.LODGING,
             step=self.step,
             start_date=datetime.date(2026, 6, 4),
-            end_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 5),
             chosen_at=timezone.now(),
         )
         self.assertEqual(second.status, IdeaStatus.CHOSEN)
+
+    def test_lodging_with_same_start_and_end_is_rejected(self):
+        with self.assertRaises(ValidationError):
+            self._make_idea(
+                type=IdeaType.LODGING,
+                start_date=datetime.date(2026, 6, 3),
+                end_date=datetime.date(2026, 6, 3),
+            )
 
     def test_chosen_lodging_does_not_overlap_with_itself(self):
         idea = self._make_idea(
@@ -3032,7 +3042,7 @@ class IdeaViewTest(APITestCase):
             **COORDS,
         )
 
-        Idea.objects.create(
+        first = Idea.objects.create(
             travel=self.travel,
             traveler=self.traveler,
             title="Hotel déjà choisi",
@@ -3040,8 +3050,6 @@ class IdeaViewTest(APITestCase):
             step=step,
             start_date=datetime.date(2026, 6, 4),
             end_date=datetime.date(2026, 6, 6),
-            chosen_by=self.traveler,
-            chosen_at=timezone.now(),
         )
 
         second = Idea.objects.create(
@@ -3056,6 +3064,10 @@ class IdeaViewTest(APITestCase):
 
         self.client.force_authenticate(user=self.traveler)
 
+        first.chosen_by = self.traveler
+        first.chosen_at = timezone.now()
+        first.save()
+
         response = self.client.post(
             reverse(
                 "idea-choice",
@@ -3067,11 +3079,82 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("chosen_at", response.data["details"])
+        self.assertIn("start_date", response.data["details"])
 
         second.refresh_from_db()
         self.assertIsNone(second.chosen_by)
         self.assertIsNone(second.chosen_at)
+
+    # Test : un hébergement ne peut pas être ajouté sur une période déjà choisie
+    def test_lodging_overlapping_chosen_lodging_is_rejected(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel choisi",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            chosen_by=self.traveler,
+            chosen_at=timezone.now(),
+        )
+
+        with self.assertRaises(ValidationError):
+            Idea.objects.create(
+                travel=self.travel,
+                traveler=self.traveler,
+                title="Autre hôtel",
+                type=IdeaType.LODGING,
+                step=step,
+                start_date=datetime.date(2026, 6, 5),
+                end_date=datetime.date(2026, 6, 7),
+            )
+
+    def test_choosing_adjacent_lodging_via_endpoint_is_allowed(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel déjà choisi",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            chosen_by=self.traveler,
+            chosen_at=timezone.now(),
+        )
+        second = Idea.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            title="Hotel suivant",
+            type=IdeaType.LODGING,
+            step=step,
+            start_date=datetime.date(2026, 6, 6),
+            end_date=datetime.date(2026, 6, 7),
+        )
+
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.post(
+            reverse(
+                "idea-choice",
+                kwargs={"travel_id": self.travel.id, "pk": second.id},
+            )
+        )
+
+        self.assertEqual(response.status_code, 200)
 
 
 # ========================================================================#

@@ -5,6 +5,8 @@ import OnlineStatus from "@/shared/ui/OnlineStatus";
 
 import { useAuth } from "@/features/auth/context/useAuth";
 import type { User } from "@/features/auth/types";
+import { getDateLocale } from "@/shared/utils/dateLocale";
+import { useTranslation } from "react-i18next";
 
 interface ProfileInfoProps {
   user?: User;
@@ -12,6 +14,7 @@ interface ProfileInfoProps {
 }
 
 function ProfileInfo({ user, full = false }: ProfileInfoProps) {
+  const { t } = useTranslation();
   const { currentUser } = useAuth();
   const profileUser = user ?? currentUser;
 
@@ -47,16 +50,16 @@ function ProfileInfo({ user, full = false }: ProfileInfoProps) {
             <OnlineStatus isOnline={profileUser.isOnline} />
           </div>
           <Text size="sm" tone="secondary">
-            Compte créé le :{" "}
+            {t("profile.createdAt")}
             <span className="text-text">
-              {new Date(profileUser.createdAt).toLocaleString("fr-FR")}
+              {new Date(profileUser.createdAt).toLocaleString(getDateLocale())}
             </span>
           </Text>
 
           <Text size="sm" tone="secondary">
-            Dernière mise à jour :{" "}
+            {t("profile.updatedAt")}
             <span className="text-text">
-              {new Date(profileUser.updatedAt).toLocaleString("fr-FR")}
+              {new Date(profileUser.updatedAt).toLocaleString(getDateLocale())}
             </span>
           </Text>
         </div>

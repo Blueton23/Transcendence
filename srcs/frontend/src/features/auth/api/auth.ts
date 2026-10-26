@@ -1,5 +1,6 @@
 import type { AuthResponse, LoginData } from "../types";
 import { getCookie } from "@/shared/api/cookies";
+import i18n from "@/i18n";
 
 const API_BASE_URL = "/api";
 
@@ -10,7 +11,7 @@ export async function getCsrfToken(): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error("Impossible d'initialiser la protection CSRF.");
+    throw new Error(i18n.t("auth.errors.csrfInit"));
   }
 }
 
@@ -20,7 +21,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/auth/login/`, {
@@ -36,7 +37,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.detail || "Identifiants invalides.");
+    throw new Error(result.detail || i18n.t("auth.errors.invalidCredentials"));
   }
 
   return result;
@@ -51,7 +52,7 @@ export async function getMe(): Promise<AuthResponse> {
   const result = await response.json();
 
   if (!response.ok) {
-    throw new Error(result.detail || "Utilisateur non authentifié.");
+    throw new Error(result.detail || i18n.t("auth.errors.notAuthenticated"));
   }
 
   return result;
@@ -61,7 +62,7 @@ export async function logout(): Promise<void> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/auth/logout/`, {
@@ -75,6 +76,6 @@ export async function logout(): Promise<void> {
   if (!response.ok) {
     const result = await response.json();
 
-    throw new Error(result.detail || "Impossible de se déconnecter.");
+    throw new Error(result.detail || i18n.t("auth.errors.logoutFailed"));
   }
 }

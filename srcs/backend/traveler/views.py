@@ -12,13 +12,17 @@ from django.contrib.auth import (
 from django.db import IntegrityError
 from django.db.models import Q
 from django.middleware.csrf import get_token
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .models import Friendship, Status
+from .schema import api_token_schema
 from .serializers import (
     LoginSerializer,
     TravelerCreateSerializer,
@@ -191,6 +195,41 @@ class LoginView(APIView):
                     traveler,
                     context={"request": request},
                 ).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+@extend_schema(tags=["Auth"])
+@api_token_schema
+class ApiTokenView(APIView):
+    authentication_classes: ClassVar[list] = []
+    permission_classes: ClassVar[list] = [AllowAny]
+    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
+    throttle_scope = "auth_token"
+    public_api = True
+
+    def post(self, request: Request) -> Response:
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        traveler = authenticate(
+            request=request,
+            username=serializer.validated_data["username"],
+            password=serializer.validated_data["password"],
+        )
+
+        if traveler is None:
+            return Response(
+                {"detail": "Identifiants invalides."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        token, _ = Token.objects.get_or_create(user=traveler)
+
+        return Response(
+            {
+                "token": token.key,
             },
             status=status.HTTP_200_OK,
         )

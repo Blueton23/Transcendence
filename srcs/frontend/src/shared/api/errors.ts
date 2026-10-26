@@ -1,3 +1,5 @@
+import i18n from "@/i18n";
+
 export interface ApiErrorResponse {
   status?: number;
   code?: string;
@@ -13,7 +15,7 @@ export function getApiErrorMessage(result: ApiErrorResponse): string {
       .join("\n");
   }
 
-  return result.detail ?? result.message ?? "Une erreur est survenue.";
+  return result.detail ?? result.message ?? i18n.t("errors.unexpected");
 }
 
 export async function parseResponse<T>(response: Response): Promise<T> {
@@ -35,14 +37,18 @@ export async function parseResponse<T>(response: Response): Promise<T> {
       try {
         result = JSON.parse(rawBody) as ApiErrorResponse;
       } catch {
-        throw new Error(rawBody || "Erreur serveur.");
+        throw new Error(rawBody || i18n.t("errors.server"));
       }
 
       throw new Error(getApiErrorMessage(result));
     }
 
     throw new Error(
-      rawBody || `Erreur serveur (${response.status} ${response.statusText})`,
+      rawBody ||
+        i18n.t("errors.serverWithStatus", {
+          status: response.status,
+          statusText: response.statusText,
+        }),
     );
   }
 
@@ -50,5 +56,5 @@ export async function parseResponse<T>(response: Response): Promise<T> {
     return response.json() as Promise<T>;
   }
 
-  throw new Error("Réponse serveur invalide.");
+  throw new Error(i18n.t("errors.invalidResponse"));
 }

@@ -7,15 +7,17 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyProfilePicture } from "../api/profile";
 import { useAuth } from "@/features/auth/context/useAuth";
+import { useTranslation } from "react-i18next";
 
 function ProfilePicture() {
   const { currentUser, setCurrentUser } = useAuth();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
 
   const { submit, isSubmitting, error } = useSubmitAction(() => {
     if (!selectedFile) {
-      throw new Error("Aucune image sélectionnée.");
+      throw new Error(t("profile.errors.noImage"));
     }
 
     return modifyProfilePicture(selectedFile);
@@ -70,7 +72,7 @@ function ProfilePicture() {
         onClick={handleSelectPicture}
         disabled={isSubmitting}
       >
-        Changer l'avatar
+        {t("profile.changeAvatar")}
       </Button>
 
       {selectedFile && (
@@ -83,7 +85,9 @@ function ProfilePicture() {
             onClick={handleSubmit}
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Enregistrement..." : "Enregistrer la photo"}
+            {isSubmitting
+              ? `${t("actions.save")}`
+              : `${t("profile.savePhoto")}`}
           </Button>
         </div>
       )}

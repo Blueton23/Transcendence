@@ -7,10 +7,12 @@ import Text from "@/shared/ui/Text";
 import Select from "@/shared/ui/Select";
 import Input from "@/shared/ui/Input";
 import type { Step } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
 interface IdeaFormProps {
   steps: Step[];
   values: IdeaFormValues;
+  lockStep?: boolean;
   setValues: Dispatch<SetStateAction<IdeaFormValues>>;
   titleError?: string;
   datesError?: string;
@@ -19,10 +21,12 @@ interface IdeaFormProps {
 export function CreateIdeaForm({
   steps,
   values,
+  lockStep,
   setValues,
   titleError,
   datesError,
 }: IdeaFormProps) {
+  const { t } = useTranslation();
   const isAccommodation = values.type === "accommodation";
   const titleId = useId();
   const titleErrorId = `${titleId}-error`;
@@ -35,11 +39,12 @@ export function CreateIdeaForm({
   return (
     <>
       <Text size="sm" className="mb-1">
-        Étape
+        {t("idea.form.step")}
       </Text>
 
       <Select
         value={values.stepId ?? ""}
+        disabled={lockStep}
         onChange={(event) =>
           setValues((current) => ({
             ...current,
@@ -49,7 +54,7 @@ export function CreateIdeaForm({
         }
         className="mb-4"
       >
-        <option value="">Pool général</option>
+        <option value="">{t("idea.pool")}</option>
         {steps.map((step) => (
           <option key={step.id} value={step.id}>
             {step.localisation}
@@ -83,7 +88,7 @@ export function CreateIdeaForm({
 
       <label htmlFor={titleId}>
         <Text as="span" size="sm" className="mb-1 block">
-          Nom
+          {t("idea.form.name")}
         </Text>
       </label>
 
@@ -111,7 +116,7 @@ export function CreateIdeaForm({
       )}
 
       <Text size="sm" className="mb-1">
-        Lien
+        {t("idea.form.link")}
       </Text>
 
       <Input
@@ -126,7 +131,7 @@ export function CreateIdeaForm({
       />
 
       <Text size="sm" className="mb-1">
-        Note
+        {t("idea.form.note")}
       </Text>
 
       <Input

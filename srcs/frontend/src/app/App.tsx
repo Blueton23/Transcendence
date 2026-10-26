@@ -16,12 +16,14 @@ import { IdeasPage } from "@/pages/IdeasPage";
 import TravelPage from "@/pages/TravelPage";
 import JoinPage from "@/pages/JoinPage";
 import ChatPage from "@/pages/ChatPage";
+import { useTranslation } from "react-i18next";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
 }
 
 function App() {
+  useTranslation();
   return (
     <Routes>
       <Route path="/modal" element={<ModalDemo />} />
@@ -29,12 +31,17 @@ function App() {
       <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/signup" element={<SignupPage />} />
+      <Route
+        path="/privacy"
+        element={<PlaceHolder label="privacy a venir" />}
+      />
+      <Route path="/terms" element={<PlaceHolder label="terms a venir" />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/join/:token" element={<JoinPage />} />
         <Route element={<AppLayout />}>
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/trip" element={<TravelPage />} />
-          <Route path="/trip/:id">
+          <Route path="/travel" element={<TravelPage />} />
+          <Route path="/travel/:id">
             <Route index element={<Navigate to="itinerary" replace />} />
             <Route path="itinerary" element={<ItineraryPage />} />
             <Route path="ideas" element={<IdeasPage />} />
