@@ -1,8 +1,10 @@
+import { useEffect, useState } from "react";
 import NavPill, { NavPillMobile } from "./NavPill";
 import IconBadge from "../../shared/ui/IconBadge";
 import Text from "../../shared/ui/Text";
 import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
+import { getUnreadCount } from "@/features/chat/api/chatApi";
 import { useTranslation } from "react-i18next";
 
 interface TripNavProps {
@@ -20,7 +22,7 @@ interface TripNavItem {
 // - "ideas" : nombre d'idées à placer (Idea sans step) calculable à partir des idées
 // - "chat"  : messages NON LUS --> nécessite un LastMessageReadAt par participation côté backend.
 // TODO(backend): brancher ces compteurs sur les vraies données.
-function getTripNavItems(tripId: string): TripNavItem[] {
+function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
   return [
     {
       to: `/travel/${tripId}/itinerary`,
@@ -42,7 +44,7 @@ function getTripNavItems(tripId: string): TripNavItem[] {
       to: `/travel/${tripId}/chat`,
       iconName: "chat",
       label: "nav.chat",
-      badgeCount: 3,
+      badgeCount: unreadCount,
     },
     {
       to: `/travel/${tripId}/assistant`,
@@ -52,9 +54,34 @@ function getTripNavItems(tripId: string): TripNavItem[] {
   ];
 }
 
+//SDU : possible de faire un fonction generique par la suite?
+function useUnreadCount(tripId: string): number {
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    async function fetchUnreadCount() {
+      try {
+        const result = await getUnreadCount(Number(tripId));
+        setUnreadCount(result.unreadCount);
+      } catch (error) {
+        console.error(
+          "Impossible de récupérer le nombre de messages non lus :",
+          error,
+        );
+      }
+    }
+
+    fetchUnreadCount();
+  }, [tripId]);
+
+  return unreadCount;
+}
+
 export function TripNavDesktop({ tripId }: TripNavProps) {
-  const items = getTripNavItems(tripId);
+  const unreadCount = useUnreadCount(tripId);
+  const items = getTripNavItems(tripId, unreadCount);
   const { t } = useTranslation();
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex items-center gap-4">
@@ -75,7 +102,9 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
 }
 
 export function TripNavMobile({ tripId }: TripNavProps) {
-  const items = getTripNavItems(tripId);
+  const unreadCount = useUnreadCount(tripId);
+  const items = getTripNavItems(tripId, unreadCount);
+
   return (
     <div className="flex gap-1">
       {items.map((item) => (

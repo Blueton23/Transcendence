@@ -8,7 +8,7 @@ import type {
   ModifyProfilePictureResponse,
 } from "../types";
 
-import { getCsrfToken } from "../../auth/api/auth";
+import { getCsrfToken } from "@/features/auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
 import { parseResponse } from "@/shared/api/errors";
 import i18n from "@/i18n";

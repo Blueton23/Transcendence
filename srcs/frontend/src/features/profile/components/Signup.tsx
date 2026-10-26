@@ -3,8 +3,8 @@ import type { ChangeEvent, FormEvent } from "react";
 import { useNavigate } from "react-router";
 
 import { signup } from "../api/profile";
-import { login } from "../../auth/api/auth";
-import { useAuth } from "../../auth/context/useAuth";
+import { login } from "@/features/auth/api/auth";
+import { useAuth } from "@/features/auth/context/useAuth";
 import type { SignupData } from "../types";
 
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
