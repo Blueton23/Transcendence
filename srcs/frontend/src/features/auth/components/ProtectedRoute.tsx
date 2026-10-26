@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import { useAuth } from "../context/useAuth";
+import { useAuth } from "@/features/auth/context/useAuth";
 import { useTranslation } from "react-i18next";
 
 function ProtectedRoute() {

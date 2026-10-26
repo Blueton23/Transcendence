@@ -6,7 +6,7 @@ import Avatar from "@/shared/ui/Avatar";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
 import { modifyProfilePicture } from "../api/profile";
-import { useAuth } from "../../auth/context/useAuth";
+import { useAuth } from "@/features/auth/context/useAuth";
 import { useTranslation } from "react-i18next";
 
 function ProfilePicture() {

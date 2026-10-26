@@ -16,6 +16,7 @@ import ItineraryPage from "../pages/ItineraryPage";
 import { IdeasPage } from "@/pages/IdeasPage";
 import TravelPage from "@/pages/TravelPage";
 import JoinPage from "@/pages/JoinPage";
+import ChatPage from "@/pages/ChatPage";
 import { useTranslation } from "react-i18next";
 
 function PlaceHolder({ label }: { label: string }) {
@@ -46,7 +47,7 @@ function App() {
             <Route path="itinerary" element={<ItineraryPage />} />
             <Route path="ideas" element={<IdeasPage />} />
             <Route path="expenses" element={<PlaceHolder label="expenses" />} />
-            <Route path="chat" element={<PlaceHolder label="chat" />} />
+            <Route path="chat" element={<ChatPage />} />
             <Route
               path="assistant"
               element={<PlaceHolder label="assistant" />}

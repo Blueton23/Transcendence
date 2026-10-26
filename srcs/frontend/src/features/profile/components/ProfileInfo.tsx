@@ -3,8 +3,8 @@ import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
 
-import { useAuth } from "../../auth/context/useAuth";
-import type { User } from "../../auth/types";
+import { useAuth } from "@/features/auth/context/useAuth";
+import type { User } from "@/features/auth/types";
 import { getDateLocale } from "@/shared/utils/dateLocale";
 import { useTranslation } from "react-i18next";
 
