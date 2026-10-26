@@ -97,7 +97,7 @@ function FriendSearch() {
               variant="dark"
               onClick={() => handleChange("")}
             >
-              {t("actions.change")}
+              {t("actions.cancel")}
             </Button>
           </div>
 

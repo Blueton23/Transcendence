@@ -288,22 +288,20 @@ class FriendshipSearchView(APIView):
             return Response({"travelers": []})
 
         travelers = (
-            Traveler.objects.filter(
-                Q(username__icontains=query)
-                | Q(first_name__icontains=query)
-                | Q(last_name__icontains=query)
-            )
+            Traveler.objects.filter(Q(username__icontains=query))
             .exclude(pk=request.user.pk)
             .order_by("username")[:10]
         )
 
-        return Response({
-            "travelers": TravelerSerializer(
-                travelers,
-                many=True,
-                context={"request": request},
-            ).data
-        })
+        return Response(
+            {
+                "travelers": TravelerSerializer(
+                    travelers,
+                    many=True,
+                    context={"request": request},
+                ).data
+            }
+        )
 
 
 class FriendshipRequestView(APIView):
