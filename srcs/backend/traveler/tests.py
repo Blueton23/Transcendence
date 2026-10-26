@@ -1641,3 +1641,68 @@ class GoogleCallbackViewTest(APITestCase):
         )
         headers = mock_get.call_args.kwargs["headers"]
         self.assertEqual(headers["Authorization"], "Bearer faux-token")
+
+    # Simule les deux réponses de Google : le token, puis les infos utilisateur
+    def mock_google_success(self, mock_post, mock_get):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {"access_token": "faux-token"}
+        mock_get.return_value.status_code = 200
+        mock_get.return_value.json.return_value = {
+            "email": "david.lf@gmail.com",
+            "email_verified": True,
+            "given_name": "David",
+            "family_name": "lf",
+        }
+
+    # Fait un parcours complet : départ (state en session) puis retour de Google
+    def google_login(self):
+        self.client.get(reverse("auth-google"))
+        state = self.client.session["google_oauth2_state"]
+
+        return self.client.get(
+            reverse("auth-google-callback"),
+            {"state": state, "code": "un-code"},
+        )
+
+    # Vérifie qu'un nouvel utilisateur Google est créé et connecté
+    @patch("traveler.views.requests.get")
+    @patch("traveler.views.requests.post")
+    def test_creates_traveler_and_logs_in(self, mock_post, mock_get):
+        self.mock_google_success(mock_post, mock_get)
+
+        response = self.google_login()
+
+        self.assertRedirects(response, "/profile", fetch_redirect_response=False)
+        traveler = Traveler.objects.get(email="david.lf@gmail.com")
+        self.assertEqual(traveler.username, "david.lf")
+        self.assertEqual(traveler.first_name, "David")
+        self.assertEqual(traveler.last_name, "lf")
+        self.assertFalse(traveler.has_usable_password())
+        self.assertEqual(self.client.session[SESSION_KEY], str(traveler.pk))
+
+    # Vérifie qu'à la 2e connexion, on retrouve le même compte (pas de doublon)
+    @patch("traveler.views.requests.get")
+    @patch("traveler.views.requests.post")
+    def test_existing_traveler_is_reused(self, mock_post, mock_get):
+        self.mock_google_success(mock_post, mock_get)
+        self.google_login()
+        self.client.logout()
+
+        self.google_login()
+
+        self.assertEqual(Traveler.objects.count(), 1)
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    # Vérifie qu'un username déjà pris reçoit un numéro
+    @patch("traveler.views.requests.get")
+    @patch("traveler.views.requests.post")
+    def test_username_already_taken(self, mock_post, mock_get):
+        Traveler.objects.create_user(
+            username="david.lf", email="autre@example.com", password="pass12345"
+        )
+        self.mock_google_success(mock_post, mock_get)
+
+        self.google_login()
+
+        traveler = Traveler.objects.get(email="david.lf@gmail.com")
+        self.assertEqual(traveler.username, "david.lf1")

@@ -632,4 +632,28 @@ class GoogleCallbackView(APIView):
 
         userinfo = userinfo_response.json()
 
-        return Response(userinfo)
+        # 3. Retrouve le Traveler qui a cet email, ou on le crée
+        traveler = Traveler.objects.filter(email__iexact=userinfo["email"]).first()
+
+        if traveler is None:
+            traveler = Traveler.objects.create_user(
+                username=generate_username(userinfo["email"]),
+                email=userinfo["email"],
+                first_name=userinfo.get("given_name", ""),
+                last_name=userinfo.get("family_name", ""),
+            )
+
+        login(request, traveler)
+        return redirect("/profile")
+
+
+def generate_username(email: str) -> str:
+    base = email.split("@")[0]
+    username = base
+    number = 1
+
+    while Traveler.objects.filter(username=username).exists():
+        username = f"{base}{number}"
+        number += 1
+
+    return username
