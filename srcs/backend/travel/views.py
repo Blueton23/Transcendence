@@ -77,6 +77,7 @@ class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPI
 def broadcast_step(event_type, step):
     broadcast(travel_group(step.travel_id), event_type, StepSerializer(step).data)
 
+
 @extend_schema(tags=["Steps"])
 @steps_list_schema
 class StepListView(PublicApiMixin, ListCreateAPIView):
