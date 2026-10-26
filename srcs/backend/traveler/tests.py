@@ -1,12 +1,14 @@
 from io import BytesIO
 
 from django.contrib.auth import SESSION_KEY
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import reverse
 from PIL import Image
+from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from traveler.models import Friendship, Status, Traveler
@@ -1471,3 +1473,31 @@ def test_requests_returns_only_incoming_pending_requests(self):
 
         with self.assertRaises(ValidationError):
             friendship.full_clean()
+
+
+# Obtention de la clé API : POST /api/auth/token/
+class ApiTokenViewTest(APITestCase):
+    def setUp(self):
+        cache.clear()
+        self.password = "Password123.wq"
+        self.traveler = Traveler.objects.create_user(
+            username="dub1", email="dub1@example.com", password=self.password
+        )
+        self.url = reverse("auth-token")
+
+    def test_returns_token_with_valid_credentials(self):
+        response = self.client.post(
+            self.url, {"username": "dub1", "password": self.password}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data["token"], Token.objects.get(user=self.traveler).key
+        )
+
+    def test_rejects_wrong_password(self):
+        response = self.client.post(self.url, {"username": "dub1", "password": "wrong"})
+
+        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.data["detail"], "Identifiants invalides.")
+        self.assertFalse(Token.objects.exists())

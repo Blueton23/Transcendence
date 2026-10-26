@@ -8,10 +8,12 @@ import FriendSearch from "../features/friendship/components/FriendSearch";
 
 import Button from "../shared/ui/Button";
 import Modal from "../shared/ui/Modal";
+import { useTranslation } from "react-i18next";
 
 function ProfilePage() {
   const [isModifyOpen, setIsModifyOpen] = useState(false);
   const [friendsRefreshKey, setFriendsRefreshKey] = useState(0);
+  const { t } = useTranslation();
 
   function handleFriendAccepted() {
     setFriendsRefreshKey((current) => current + 1);
@@ -27,7 +29,7 @@ function ProfilePage() {
           variant="dark"
           onClick={() => setIsModifyOpen(true)}
         >
-          Modifier le profil
+          {t("profile.editProfile")}
         </Button>
       </div>
 
@@ -40,7 +42,7 @@ function ProfilePage() {
       {isModifyOpen && (
         <Modal
           icon="edit"
-          title="Modifier le profil"
+          title={t("profile.editProfile")}
           onClose={() => setIsModifyOpen(false)}
         >
           <Modify onSuccess={() => setIsModifyOpen(false)} />

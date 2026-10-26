@@ -9,6 +9,7 @@
 @import "@fontsource/caveat/500.css";
 
 @theme {
+  --breakpoint-md: 1024px;
   /* Typography tokens */
   --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;

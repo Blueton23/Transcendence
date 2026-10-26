@@ -10,6 +10,8 @@ import Text from "@/shared/ui/Text";
 import IconBadge from "@/shared/ui/IconBadge";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
+import Button from "@/shared/ui/Button";
+import { useTranslation } from "react-i18next";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -17,8 +19,9 @@ export interface IdeaCardProps {
   proposerName: string;
   proposerInitials: string;
   stepName?: string;
-  onPlace: () => void;
-  onView: () => void;
+  chooseButton?: boolean;
+  onPlace?: () => void;
+  onView?: () => void;
   onVote: () => Promise<void>;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -33,6 +36,7 @@ export function IdeaCard({
   proposerName,
   proposerInitials,
   stepName,
+  chooseButton,
   onPlace,
   onView,
   onVote,
@@ -40,6 +44,7 @@ export function IdeaCard({
   onDelete,
   onChoose,
 }: IdeaCardProps) {
+  const { t } = useTranslation();
   const isInPool = idea.status === "suggested";
 
   const {
@@ -77,14 +82,15 @@ export function IdeaCard({
 
             <div className="flex min-w-0 flex-col items-start gap-1 md:flex-row md:items-center md:gap-1.5">
               <SecondaryInfo
-                ideaType={idea.type}
                 pricePerNight={idea.pricePerNight}
                 proposerName={proposerName}
                 proposerInitials={proposerInitials}
               />
-              <StepLabel isInPool={isInPool} stepName={stepName} />
+              {(isInPool || stepName) && (
+                <StepLabel isInPool={isInPool} stepName={stepName} />
+              )}
               {idea.type === "accommodation" && idea.status === "chosen" && (
-                <Text size="sm">Hébergement choisi</Text>
+                <Text size="sm">{t("idea.chosenLodging")}</Text>
               )}
             </div>
           </div>
@@ -118,7 +124,7 @@ export function IdeaCard({
                 void submitDelete();
               }}
               onChoose={
-                canChoose
+                canChoose && !chooseButton
                   ? () => {
                       if (isActionPending) {
                         return;
@@ -132,12 +138,25 @@ export function IdeaCard({
           </div>
 
           <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">
-            <StepButton
-              isInPool={isInPool}
-              onPlace={onPlace}
-              onView={onView}
-              disabled={isActionPending}
-            />
+            {chooseButton ? (
+              <Button
+                variant="dark"
+                size="sm"
+                onClick={() => submitChoose()}
+                disabled={isActionPending}
+              >
+                {t("idea.choose")}
+              </Button>
+            ) : (
+              (onPlace || onView) && (
+                <StepButton
+                  isInPool={isInPool}
+                  onPlace={onPlace}
+                  onView={onView}
+                  disabled={isActionPending}
+                />
+              )
+            )}
           </div>
         </div>
       </div>

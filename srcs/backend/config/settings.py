@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "channels",
+    "rest_framework.authtoken",
     "rest_framework",
+    "drf_spectacular",
     "common",
     "traveler",
     "travel",
@@ -112,6 +114,16 @@ CHANNEL_LAYERS = {
     },
 }
 
+# Cache Django : stocke les compteurs du rate limiting (DRF throttling).
+# Redis base no.1, séparée de la no.0 utilisée par Channels.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
+    }
+}
+
+
 REST_FRAMEWORK = {
     # Définit comment DRF identifie l'utilisateur qui fait la requête.
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -132,6 +144,49 @@ REST_FRAMEWORK = {
         "djangorestframework_camel_case.parser.CamelCaseFormParser",
         "djangorestframework_camel_case.parser.CamelCaseMultiPartParser",
     ],
+    # Rate limiting : limites par "scope", appliquées vue par vue
+    "DEFAULT_THROTTLE_RATES": {
+        "public_api": "100/minute",
+        "auth_token": "5/minute",
+    },
+    # 1 proxy (nginx) devant Django : l'IP réelle du client est la dernière (non falsifiable)
+    "NUM_PROXIES": 1,
+    # Documentation : drf-spectacular génère le schéma OpenAPI de chaque vue
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Transcendence - API Publique",
+    # Règles communes à toutes les routes (affichées en haut de la doc)
+    "DESCRIPTION": (
+        "## Gestion des voyages, étapes et idées.\n\n"
+        "### Authentification\n\n"
+        "1. Obtenir une clé avec `POST /api/auth/token/`.\n"
+        "2. Envoyer `Authorization: Token <clé>`.\n\n"
+        "### Accès\n\n"
+        "- **403** : accès refusé.\n"
+        "- **404** : ressource introuvable.\n\n"
+        "### Rate limiting\n\n"
+        "> **Attention :** l'API est limitée à 100 requêtes/minute.\n\n"
+        "### Format\n\n"
+        "- JSON en `camelCase`.\n"
+        "- Dates au format `AAAA-MM-JJ`.\n\n"
+        "### Erreurs\n\n"
+        "- `400` : données invalides.\n"
+        "- `403` : accès refusé.\n"
+        "- `404` : introuvable.\n"
+        "- `429` : trop de requêtes.\n"
+    ),
+    "VERSION": "1.0.0",
+    # Ne documente que les vues marquées public_api = True
+    "PREPROCESSING_HOOKS": ["common.hook.public_endpoints_only"],
+    # Le schéma affiche les champs en camelCase, comme l'API réelle
+    "POSTPROCESSING_HOOKS": [
+        "drf_spectacular.hooks.postprocess_schema_enums",
+        "drf_spectacular.contrib.djangorestframework_camel_case.camelize_serializer_fields",
+    ],
+    # La doc montre exactement les champs à envoyer et ceux qui sont obligatoires.
+    "COMPONENT_SPLIT_REQUEST": True,
 }
 
 # Database

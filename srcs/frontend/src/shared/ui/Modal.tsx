@@ -8,6 +8,7 @@ import Text from "./Text";
 import { useOnClickOutside } from "../hooks/useOnClickOutside";
 import { useRef } from "react";
 import { useEscapeKey } from "../hooks/useEscapeKey";
+import { useTranslation } from "react-i18next";
 
 interface ModalProps {
   children: ReactNode;
@@ -26,6 +27,7 @@ const widthStyles = {
 type ModalHeaderProps = Omit<ModalProps, "children">;
 
 function ModalHeader({ icon, title, subtitle, onClose }: ModalHeaderProps) {
+  const { t } = useTranslation();
   return (
     <div className="flex shrink-0 items-start justify-between p-8">
       <div className="flex items-center gap-4">
@@ -45,7 +47,7 @@ function ModalHeader({ icon, title, subtitle, onClose }: ModalHeaderProps) {
         variant="flat"
         onClick={onClose}
         size="md"
-        label="Fermer"
+        label={t("actions.close")}
         icon={<Icon name="x" size={16} />}
       />
     </div>

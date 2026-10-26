@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { useState } from "react";
 
 export function useSubmitAction<T>(action: () => Promise<T>) {
@@ -11,7 +12,7 @@ export function useSubmitAction<T>(action: () => Promise<T>) {
       const data = await action();
       return { success: true, data };
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Erreur");
+      setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
       return { success: false };
     } finally {
       setIsSubmitting(false);

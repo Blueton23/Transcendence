@@ -9,6 +9,7 @@ import IconButton from "@/shared/ui/IconButton";
 import Input from "@/shared/ui/Input";
 import Text from "@/shared/ui/Text";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
 interface ChoiceScreenProps {
   onCreate: () => void;
@@ -17,6 +18,7 @@ interface ChoiceScreenProps {
 
 export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
   const [link, setLink] = useState("");
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-5">
       <Card
@@ -25,16 +27,16 @@ export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
       >
         <div className="flex items-center gap-5">
           <IconBadge name="compass" />
-          <Heading size="sm"> Créer un voyage</Heading>
+          <Heading size="sm">{t("travel.createTravel")}</Heading>
         </div>
         <IconButton
           variant="ghost"
           icon={<Icon name="arrow" />}
-          label="continue"
+          label={t("actions.continue")}
         />
       </Card>
       <Divider />
-      <Text>J'ai un lien d'invitation</Text>
+      <Text>{t("travel.haveInviteLink")}</Text>
       <div className="flex flex-col gap-4 md:flex-row md:gap-2">
         <Input
           value={link}
@@ -42,7 +44,7 @@ export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
           placeholder="peripl.app/join/…"
         ></Input>
         <Button variant="dark" onClick={() => onJoin(extractToken(link))}>
-          Continuer
+          {t("actions.continue")}
         </Button>
       </div>
     </div>

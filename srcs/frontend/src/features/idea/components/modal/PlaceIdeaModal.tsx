@@ -8,6 +8,7 @@ import Text from "@/shared/ui/Text";
 import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 import type { Step } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
 interface PlaceIdeaModalProps {
   idea: Idea;
@@ -24,6 +25,7 @@ export function PlaceIdeaModal({
 }: PlaceIdeaModalProps) {
   const [stepId, setStepId] = useState<number | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
+  const { t } = useTranslation();
 
   const { submit, isSubmitting, error } = useSubmitAction(async () => {
     const input: PlaceIdeaInput = {
@@ -40,7 +42,7 @@ export function PlaceIdeaModal({
   return (
     <Modal
       icon="arrow"
-      title="Placer l'idée"
+      title={t("idea.placeIdea")}
       subtitle={idea.title}
       onClose={() => {
         if (!isSubmitting) {
@@ -86,7 +88,7 @@ export function PlaceIdeaModal({
           className="w-full"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Enregistrement…" : "Enregistrer"}
+          {isSubmitting ? t("actions.saving") : t("actions.save")}
         </Button>
       </form>
     </Modal>

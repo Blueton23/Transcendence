@@ -1,23 +1,21 @@
+import i18n from "@/i18n";
+
 const translations: Record<string, string> = {
   "The idea dates must be within the step dates.":
-    "Les dates de l’idée doivent être comprises dans les dates de l’étape sélectionnée.",
-
+    "idea.errors.datesOutsideStep",
   "Another chosen lodging on this step overlaps these dates.":
-    "Un hébergement est déjà choisi sur cette étape pour des dates qui chevauchent celles-ci.",
-
+    "idea.errors.lodgingOverlap",
   "The lodging cannot start before the travel.":
-    "L’hébergement ne peut pas commencer avant le début du voyage.",
-
-  "The lodging cannot end after the travel.":
-    "L’hébergement ne peut pas se terminer après la fin du voyage.",
+    "idea.errors.lodgingBeforeTravel",
+  "The lodging cannot end after the travel.": "idea.errors.lodgingAfterTravel",
 };
 
 export function translateIdeaError(error: unknown): never {
   if (error instanceof Error) {
     let message = error.message;
 
-    for (const [english, french] of Object.entries(translations)) {
-      message = message.replaceAll(english, french);
+    for (const [english, key] of Object.entries(translations)) {
+      message = message.replaceAll(english, i18n.t(key));
     }
 
     if (message !== error.message) {

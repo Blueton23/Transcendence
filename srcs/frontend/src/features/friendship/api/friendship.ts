@@ -7,6 +7,7 @@ import type {
 
 import { getCookie } from "@/shared/api/cookies";
 import { parseResponse } from "@/shared/api/errors";
+import i18n from "@/i18n";
 
 const API_BASE_URL = "/api";
 
@@ -29,7 +30,7 @@ export async function sendFriendRequest(
 ): Promise<FriendshipRequestResponse> {
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/friendships/request/`, {
@@ -59,7 +60,7 @@ export async function getFriendRequests(): Promise<FriendshipRequestsResponse> {
 export async function acceptFriendRequest(friendshipId: number): Promise<void> {
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(
@@ -79,7 +80,7 @@ export async function acceptFriendRequest(friendshipId: number): Promise<void> {
 export async function removeFriendRequest(friendshipId: number): Promise<void> {
   const csrfToken = getCookie("csrftoken");
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(

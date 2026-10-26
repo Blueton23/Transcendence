@@ -9,6 +9,7 @@ import Input from "@/shared/ui/Input";
 import Chip from "@/shared/ui/Chip";
 import Icon from "@/shared/ui/Icon";
 import type { Step } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
 interface PlaceIdeaFormProps {
   idea: Idea;
@@ -29,6 +30,7 @@ export function PlaceIdeaForm({
   dateRange,
   setDateRange,
 }: PlaceIdeaFormProps) {
+  const { t } = useTranslation();
   const isAccommodation = idea.type === "accommodation";
 
   const step = steps.find((s) => s.id === stepId);
@@ -39,7 +41,7 @@ export function PlaceIdeaForm({
   return (
     <>
       <Text size="sm" className="mb-1">
-        Étape
+        {t("idea.form.step")}
       </Text>
 
       <Select
@@ -51,7 +53,7 @@ export function PlaceIdeaForm({
         }
         className="mb-4"
       >
-        <option value="">Choisir une étape</option>
+        <option value="">{t("idea.form.chooseStep")}</option>
 
         {steps.map((step) => (
           <option key={step.id} value={step.id}>
@@ -69,7 +71,7 @@ export function PlaceIdeaForm({
       )}
 
       <Text size="sm" className="mb-1">
-        Type
+        {t("idea.form.type")}
       </Text>
 
       <Chip
@@ -77,23 +79,23 @@ export function PlaceIdeaForm({
         className="mb-3"
         icon={<Icon name={ideaIcons[idea.type]} size={14} />}
       >
-        {ideaTypeLabels[idea.type]}
+        {t(ideaTypeLabels[idea.type])}
       </Chip>
 
       <Text size="sm" className="mb-1">
-        Nom
+        {t("idea.form.name")}
       </Text>
 
       <Input value={idea.title} readOnly className="mb-2" />
 
       <Text size="sm" className="mb-1">
-        Lien
+        {t("idea.form.link")}
       </Text>
 
       <Input value={idea.url ?? ""} readOnly className="mb-2" />
 
       <Text size="sm" className="mb-1">
-        Note
+        {t("idea.form.note")}
       </Text>
 
       <Input value={idea.note ?? ""} readOnly className="mb-2" />
@@ -101,19 +103,19 @@ export function PlaceIdeaForm({
       {isAccommodation && (
         <>
           <Text size="sm" className="mb-1">
-            Date d'arrivée
+            {t("idea.form.arrivalDate")}
           </Text>
 
           <Input value={idea.arrivalDate ?? ""} readOnly className="mb-2" />
 
           <Text size="sm" className="mb-1">
-            Date de départ
+            {t("idea.form.departureDate")}
           </Text>
 
           <Input value={idea.departureDate ?? ""} readOnly className="mb-2" />
 
           <Text size="sm" className="mb-1">
-            Prix par nuit
+            {t("idea.form.pricePerNight")}
           </Text>
 
           <Input

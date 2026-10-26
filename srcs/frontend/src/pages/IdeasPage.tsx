@@ -9,11 +9,13 @@ import { PlaceIdeaModal } from "@/features/idea/components/modal/PlaceIdeaModal"
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
 import type { IdeaFilter, StepFilter } from "@/features/idea/types";
 import { filterIdeas } from "@/features/idea/utils/filterIdeas";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useSteps } from "@/features/step/hooks/useSteps";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
+import { getProposer } from "@/features/idea/utils/getProposer";
+import { useTranslation } from "react-i18next";
 
 // Fonction principale pour la page idée
 export function IdeasPage() {
@@ -44,6 +46,9 @@ export function IdeasPage() {
     error: errorTravel,
   } = useTravel(travelId);
 
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const [typeActiveFilter, setTypeActiveFilter] = useState<IdeaFilter>("all");
   const [stepActiveFilter, setStepActiveFilter] = useState<StepFilter>("all");
   const filteredIdeas = filterIdeas(ideas, typeActiveFilter, stepActiveFilter);
@@ -57,7 +62,7 @@ export function IdeasPage() {
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
 
   if (isLoading || isLoadingSteps || isLoadingTravel) {
-    return <Text>Chargement des idées, des étapes et des voyageurs…</Text>;
+    return null;
   }
 
   if (error || errorSteps || errorTravel) {
@@ -65,20 +70,19 @@ export function IdeasPage() {
   }
 
   if (!travel) {
-    return <Text>Voyage introuvable.</Text>;
+    return <Text>{t("travel.errors.notFound")}</Text>;
   }
-
   return (
     <div className="px-4 pt-8 md:px-8">
       <div className="mb-6 flex items-center justify-between">
         <Heading level={1} size="lg">
-          Idées
+          {t("nav.ideas")}
         </Heading>
         <PinIdeaButton onClick={() => setCreateIdeaModalOpen(true)} />
       </div>
 
       <div>
-        <Text className="mb-1">Type</Text>
+        <Text className="mb-1">{t("idea.form.type")}</Text>
         <IdeaTypeFilter
           typeActiveFilter={typeActiveFilter}
           onChange={setTypeActiveFilter}
@@ -86,40 +90,37 @@ export function IdeasPage() {
       </div>
 
       <div>
-        <Text className="mb-1">Etape</Text>
+        <Text className="mb-1">{t("idea.form.step")}</Text>
         <IdeaStepFilter
           steps={steps}
           stepActiveFilter={stepActiveFilter}
           onChange={setStepActiveFilter}
         />
       </div>
-
       <div className="flex flex-col gap-3">
         {filteredIdeas.length === 0 && (
           <Text tone="muted">
-            {ideas.length === 0
-              ? "Aucune idée pour ce voyage."
-              : "Aucune idée ne correspond aux filtres sélectionnés."}
+            {ideas.length === 0 ? t("idea.page.empty") : t("idea.page.noMatch")}
           </Text>
         )}
 
         {filteredIdeas.map((idea) => {
           const step = steps.find((step) => step.id === idea.stepId);
 
-          const proposer = travel.travelers.find(
-            (traveler) => traveler.id === idea.travelerId,
-          );
+          const proposer = getProposer(travel, idea);
 
           return (
             <IdeaCard
               key={idea.id}
               idea={idea}
-              proposerName={proposer?.name ?? "Inconnu"}
+              proposerName={proposer?.name ?? t("idea.unknownProposer")}
               proposerInitials={proposer?.initials ?? "?"}
               stepName={step?.localisation}
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}
-              onView={() => null}
+              onView={() =>
+                navigate(`/travel/${travelId}/itinerary?step=${idea.stepId}`)
+              }
               onEdit={() => setEditIdeaId(idea.id)}
               onDelete={() => handleDeleteIdea(idea.id)}
               onChoose={() => handleChooseIdea(idea.id)}

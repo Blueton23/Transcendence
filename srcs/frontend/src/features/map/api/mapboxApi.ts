@@ -1,4 +1,5 @@
 import type { Place } from "@/features/map/types";
+import i18n from "@/i18n";
 
 interface MapboxFeature {
   geometry: { coordinates: [number, number] };
@@ -21,7 +22,7 @@ export async function searchPlace(query: string): Promise<Place[]> {
   const token = import.meta.env.VITE_MAPBOX_TOKEN;
   const params = new URLSearchParams({
     q: query,
-    language: "fr",
+    language: i18n.resolvedLanguage ?? "fr",
     types: "place,locality,district",
     limit: "5",
     access_token: token,

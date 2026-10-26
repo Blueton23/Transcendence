@@ -5,8 +5,10 @@ import Icon from "@/shared/ui/Icon";
 import DropdownMenu from "@/shared/ui/DropdownMenu";
 import MenuItem from "@/shared/ui/MenuItem";
 import { PinIdeaButton } from "@/features/idea/components/page/PinIdeaButton";
+import { useTranslation } from "react-i18next";
 
 export function TripActionsButton({ onPinIdea }: { onPinIdea: () => void }) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -21,7 +23,7 @@ export function TripActionsButton({ onPinIdea }: { onPinIdea: () => void }) {
       >
         <IconButton
           icon={<Icon name="plus" size={25} />}
-          label="Action"
+          label={t("step.actions")}
           variant="outline"
           size="lg"
           className="border-2 border-brand-primary! bg-surface-control! text-brand-primary!"
@@ -40,10 +42,10 @@ export function TripActionsButton({ onPinIdea }: { onPinIdea: () => void }) {
                 onPinIdea();
               }}
             >
-              Epingler une idee
+              {t("idea.pinIdea")}
             </MenuItem>
             <MenuItem icon="cash" onClick={() => setIsOpen(false)}>
-              Ajouter une depense
+              {t("step.addExpense")}
             </MenuItem>
           </DropdownMenu>
         )}
