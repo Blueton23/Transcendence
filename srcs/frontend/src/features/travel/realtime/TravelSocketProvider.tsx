@@ -108,7 +108,17 @@ export function TravelSocketProvider({
     return () => {
       stopped = true;
       window.clearTimeout(retryTimer);
-      socket?.close(1000);
+      if (!socket) return;
+
+      // Closing mid-handshake makes the browser log "connection interrupted"
+      // (StrictMode does this on every mount in dev): close once open instead.
+      const closing = socket;
+      closing.onmessage = null;
+      if (closing.readyState === WebSocket.CONNECTING) {
+        closing.onopen = () => closing.close(1000);
+      } else {
+        closing.close(1000);
+      }
     };
   }, [travelId, isValid]);
 
