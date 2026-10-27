@@ -5,6 +5,9 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 from django.db.models import ProtectedError
 from django.test import TestCase
+from django.urls import reverse
+from django.utils import timezone
+from rest_framework.test import APITestCase
 
 from idea.models import Idea, IdeaType
 from spending.models import Spending, SpendingCategory, SpendingShare
@@ -704,3 +707,140 @@ class ComputeSettlementsTest(TestCase):
         debtors = {s.debtor for s in compute_settlements(self.travel)}
         self.assertIn(self.dave, debtors)
         self._assert_settles_everyone()
+
+
+class SpendingViewTest(APITestCase):
+    def setUp(self):
+        # Travel principal
+        self.jean = Traveler.objects.create_user(
+            username="Jean",
+            email="jean@exemple.com",
+            password="password123",
+        )
+        self.bob = Traveler.objects.create_user(
+            username="Bob",
+            email="bob@exemple.com",
+            password="password123",
+        )
+        self.alice = Traveler.objects.create_user(
+            username="Alice",
+            email="alice@exemple.com",
+            password="password123",
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        self.other_travel = Travel.objects.create(
+            title="Lets go to Mallorca",
+            start_date=datetime.date(2027, 7, 2),
+            end_date=datetime.date(2027, 7, 20),
+        )
+        for traveler in (self.jean, self.bob):
+            Participation.objects.create(
+                traveler=traveler,
+                travel=self.travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        Participation.objects.create(
+            traveler=self.alice,
+            travel=self.other_travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lyon",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 4),
+            **COORDS,
+        )
+        self.idea = Idea.objects.create(
+            travel=self.travel,
+            traveler=self.jean,
+            title="Bouchon lyonnais",
+            type=IdeaType.RESTAURANT,
+        )
+        self.url = reverse("spending-list", kwargs={"travel_id": self.travel.id})
+        self.client.force_authenticate(self.jean)
+
+    def _payload(self, **overrides):
+        data = {"travelerId": self.bob.id, "category": "m", "amount": "90.00"}
+        data.update(overrides)
+        return data
+
+    def test_create_without_shares_splits_equally_and_keeps_chosen_payer(self):
+        response = self.client.post(self.url, self._payload(), format="json")
+        self.assertEqual(response.json()["travelerId"], self.bob.id)
+        amounts = [Decimal(share["amount"]) for share in response.json()["shares"]]
+        self.assertEqual(amounts, [Decimal("45.00"), Decimal("45.00")])
+
+    def test_create_with_custom_shares(self):
+        shares = [
+            {"travelerId": self.jean.id, "amount": "30.00"},
+            {"travelerId": self.bob.id, "amount": "60.00"},
+        ]
+        response = self.client.post(
+            self.url, self._payload(shares=shares), format="json"
+        )
+        self.assertEqual(response.status_code, 201)
+        got = {
+            share["travelerId"]: Decimal(share["amount"])
+            for share in response.json()["shares"]
+        }
+        self.assertEqual(
+            got, {self.jean.id: Decimal("30.00"), self.bob.id: Decimal("60.00")}
+        )
+
+    def test_create_with_wrong_shares_total_returns_400(self):
+        shares = [{"travelerId": self.jean.id, "amount": "10.00"}]
+        response = self.client.post(
+            self.url, self._payload(shares=shares), format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Spending.objects.count(), 0)
+
+    def test_non_participant_cannot_access_spendings(self):
+        self.client.force_authenticate(self.alice)
+        response = self.client.post(
+            self.url, self._payload(traveler=self.alice.id), format="json"
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(self.client.get(self.url).status_code, 403)
+
+    def test_list_only_returns_spendings_of_this_travel(self):
+        self.client.post(self.url, self._payload(), format="json")
+        Spending.objects.create(
+            travel=self.other_travel,
+            traveler=self.alice,
+            category=SpendingCategory.FUEL,
+            amount="72.00",
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), 1)
+
+    def test_create_attached_to_step_and_idea(self):
+        payload = self._payload(stepId=self.step.id, ideaId=self.idea.id)
+        response = self.client.post(self.url, payload, format="json")
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.json()["stepId"], self.step.id)
+        self.assertEqual(response.json()["ideaId"], self.idea.id)
+
+    def test_create_with_trashed_step_returns_400(self):
+        Step.objects.filter(pk=self.step.pk).update(deleted_at=timezone.now())
+        response = self.client.post(
+            self.url, self._payload(stepId=self.step.id), format="json"
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_patch_amount_resplits_shares(self):
+        created = self.client.post(self.url, self._payload(), format="json").json()
+        detail_url = reverse(
+            "spending-detail",
+            kwargs={"travel_id": self.travel.id, "pk": created["id"]},
+        )
+        response = self.client.patch(detail_url, {"amount": "100.00"}, format="json")
+        self.assertEqual(response.status_code, 200)
+        amounts = [Decimal(share["amount"]) for share in response.json()["shares"]]
+        self.assertEqual(amounts, [Decimal("50.00"), Decimal("50.00")])
