@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from idea.models import Idea
 from spending.models import Spending, SpendingShare
-from spending.services import create_spending
+from spending.services import create_spending, update_spending
 from travel.models import Step
 from traveler.models import Traveler
 
@@ -72,6 +72,12 @@ class SpendingSerializer(serializers.ModelSerializer):
         if shares is not None:
             shares = {s["traveler"]: s["amount"] for s in shares}
         return create_spending(shares=shares, **validated_data)
+
+    def update(self, instance, validated_data):
+        shares = validated_data.pop("shares", None)
+        if shares is not None:
+            shares = {s["traveler"]: s["amount"] for s in shares}
+        return update_spending(instance, shares=shares, **validated_data)
 
     def save(self, **kwargs):
         try:
