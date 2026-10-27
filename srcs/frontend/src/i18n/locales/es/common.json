@@ -165,6 +165,9 @@
     "updatedAt": "Última actualización:",
     "view": "Ver el perfil"
   },
+  "pwa": {
+    "offline": "Sin conexión: algunas funciones no están disponibles"
+  },
   "step": {
     "actions": "Acción",
     "add": "Añadir una etapa",

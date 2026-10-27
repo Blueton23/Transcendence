@@ -165,6 +165,9 @@
     "updatedAt": "Last updated:",
     "view": "View profile"
   },
+  "pwa": {
+    "offline": "You're offline: some features are unavailable"
+  },
   "step": {
     "actions": "Action",
     "add": "Add a stop",

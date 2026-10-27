@@ -165,6 +165,9 @@
     "updatedAt": "Dernière mise à jour :",
     "view": "Voir le profil"
   },
+  "pwa": {
+    "offline": "Hors ligne : certaines fonctions sont indisponibles"
+  },
   "step": {
     "actions": "Action",
     "add": "Ajouter une étape",
