@@ -136,6 +136,10 @@
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation"
   },
+  "map": {
+    "offline": "Carte indisponible hors ligne",
+    "searchOffline": "Recherche indisponible hors ligne"
+  },
   "nav": {
     "assistant": "Assistant IA",
     "chat": "Discussion",
