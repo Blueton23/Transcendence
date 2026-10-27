@@ -70,4 +70,10 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
   },
+  preview: {
+    proxy: {
+      "/api": "http://localhost:8080",
+      "/media": "http://localhost:8080",
+    },
+  },
 });
