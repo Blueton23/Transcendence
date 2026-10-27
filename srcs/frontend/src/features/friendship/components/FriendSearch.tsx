@@ -30,24 +30,27 @@ function FriendSearch() {
     return sendFriendRequest(traveler.id);
   });
 
-  function handleSelect(user: User) {
-    setTraveler(user);
-    setQuery(user.username);
+  function clearMessages() {
     setMessage(null);
     clearRequestError();
   }
 
+  function handleSelect(user: User) {
+    clearMessages();
+    setTraveler(user);
+    setQuery(user.username);
+  }
+
   function handleChange(value: string) {
+    clearMessages();
     setQuery(value);
     setTraveler(null);
-    setMessage(null);
-    clearRequestError();
   }
 
   async function handleSendRequest() {
     if (!traveler) return;
 
-    setMessage(null);
+    clearMessages();
 
     const result = await submitRequest();
 
