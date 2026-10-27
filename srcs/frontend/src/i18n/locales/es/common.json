@@ -22,6 +22,8 @@
     "creating": "Creando…",
     "errors": {
       "csrfInit": "No se pudo inicializar la protección CSRF.",
+      "googleEmailExists": "Ya existe una cuenta con este correo electrónico. Inicia sesión con tu contraseña.",
+      "googleFailed": "No se pudo iniciar sesión con Google. Inténtalo de nuevo.",
       "invalidCredentials": "Credenciales no válidas.",
       "logoutFailed": "No se pudo cerrar la sesión.",
       "notAuthenticated": "Usuario no autenticado."
