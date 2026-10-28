@@ -1,63 +1,55 @@
 from channels.db import database_sync_to_async
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
 
-from common.realtime import travel_group
+from common.consumers import (
+    CLOSE_NOT_AUTHENTICATED,
+    CLOSE_NOT_PARTICIPANT,
+    GroupEventConsumer,
+)
+from common.realtime import send_on_commit, travel_group
 
 from .models import Participation, ParticipationStatus
 
-# Custom close codes, sent after accept() so the browser sees them instead of
-# a generic 1006: the frontend must not reconnect on these.
-CLOSE_NOT_AUTHENTICATED = 4401
-CLOSE_NOT_PARTICIPANT = 4403
+__all__ = [
+    "CLOSE_NOT_AUTHENTICATED",
+    "CLOSE_NOT_PARTICIPANT",
+    "TravelConsumer",
+    "kick_from_travel",
+]
 
 
-class TravelConsumer(AsyncJsonWebsocketConsumer):
+def kick_from_travel(travel_id, traveler_id):
+    """Closes every open socket of `traveler_id` on this travel (after the
+    commit). The permission is only checked at connect, so without this a
+    traveler who left would keep receiving the travel's events."""
+    send_on_commit(
+        travel_group(travel_id),
+        {"type": "travel.kick", "traveler_id": traveler_id},
+    )
+
+
+class TravelConsumer(GroupEventConsumer):
     """Live channel of a travel: joins `travel_<id>` and forwards every event
     broadcast to that group to the client.
 
-    The permission is only checked at connect, with the same rule as
-    IsTravelParticipant (ACCEPTED only, not LEFT).
+    The permission is checked at connect, with the same rule as
+    IsTravelParticipant (ACCEPTED only, not LEFT). A traveler who leaves
+    afterwards is closed by `kick_from_travel`.
     """
 
-    group_name = None
-
-    async def connect(self):
-        user = self.scope["user"]
-        if not user.is_authenticated:
-            await self.reject(CLOSE_NOT_AUTHENTICATED)
-            return
-
+    async def get_group_name(self):
         travel_id = self.scope["url_route"]["kwargs"]["travel_id"]
-        if not await self.is_participant(travel_id, user):
+        if not await self.is_participant(travel_id, self.scope["user"]):
             await self.reject(CLOSE_NOT_PARTICIPANT)
+            return None
+        return travel_group(travel_id)
+
+    async def travel_kick(self, event):
+        # Internal event (no "payload"): never forwarded to the client.
+        if event["traveler_id"] != self.scope["user"].id:
             return
-
-        # Join before accepting: once the client sees the socket open it
-        # reloads over REST, and no event may be lost in between.
-        self.group_name = travel_group(travel_id)
-        await self.channel_layer.group_add(self.group_name, self.channel_name)
-        await self.accept()
-
-    async def reject(self, code):
-        await self.accept()
-        await self.close(code=code)
-
-    async def disconnect(self, close_code):
-        if self.group_name is not None:
-            await self.channel_layer.group_discard(self.group_name, self.channel_name)
-
-    async def receive(self, text_data=None, bytes_data=None):
-        # Writes go through REST; nothing is read from the client for now.
-        pass
-
-    async def dispatch(self, message):
-        # Events sent by common.realtime.broadcast are already the
-        # `{"type", "payload"}` envelope the frontend expects, so they are
-        # forwarded as-is instead of needing one handler per event type.
-        if "payload" in message:
-            await self.send_json(message)
-        else:
-            await super().dispatch(message)
+        # Leave the group first so nothing else is sent to a closing socket.
+        await self.leave_group()
+        await self.close(code=CLOSE_NOT_PARTICIPANT)
 
     @database_sync_to_async
     def is_participant(self, travel_id, user):

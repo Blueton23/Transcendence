@@ -10,6 +10,7 @@ from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
+from chat.models import Message
 from common.realtime import travel_group
 from common.testing import BroadcastListenerMixin, WebsocketCommunicator
 from config.asgi import application
@@ -1000,6 +1001,113 @@ class StepBroadcastTest(BroadcastListenerMixin, APITestCase):
         self.assertEqual(callbacks, [])
 
 
+class ParticipantBroadcastTest(BroadcastListenerMixin, APITestCase):
+    """Joining and leaving a travel: system message, participant event, and
+    the kick that closes the sockets of whoever left."""
+
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Mon voyage",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        self.client.force_authenticate(user=self.traveler)
+        self.listen_to(travel_group(self.travel.id))
+
+    def participate(self, status=ParticipationStatus.ACCEPTED):
+        return Participation.objects.create(
+            traveler=self.traveler, travel=self.travel, status=status
+        )
+
+    def post(self, url):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = self.client.post(url)
+        return response, callbacks
+
+    def join(self):
+        return self.post(
+            reverse("travel-join", kwargs={"token": self.travel.invite_token})
+        )
+
+    def leave(self):
+        return self.post(reverse("travel-leave", kwargs={"travel_id": self.travel.id}))
+
+    def assert_system_message(self, body):
+        event = self.receive_event()
+        self.assertEqual(event["type"], "chat.message")
+        self.assertTrue(event["payload"]["isSystem"])
+        self.assertIsNone(event["payload"]["traveler"])
+        self.assertEqual(event["payload"]["body"], body)
+        self.assertTrue(
+            Message.objects.filter(
+                travel=self.travel, is_system=True, body=body
+            ).exists()
+        )
+
+    def test_leave_announces_then_kicks(self):
+        self.participate()
+
+        response, _ = self.leave()
+
+        self.assertEqual(response.status_code, 204)
+        self.assert_system_message("alice a quitté le voyage.")
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "participant.left",
+                "payload": {"travelerId": self.traveler.id},
+            },
+        )
+        # Internal event: snake_case and no "payload", never sent to clients.
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "travel.kick", "traveler_id": self.traveler.id},
+        )
+
+    def test_leave_without_being_member_announces_nothing(self):
+        self.participate(ParticipationStatus.LEFT)
+
+        response, callbacks = self.leave()
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(callbacks, [])
+        self.assertFalse(Message.objects.filter(travel=self.travel).exists())
+
+    def test_first_join_announces(self):
+        response, _ = self.join()
+
+        self.assertEqual(response.status_code, 200)
+        self.assert_system_message("alice a rejoint le voyage.")
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "participant.joined",
+                "payload": {"travelerId": self.traveler.id},
+            },
+        )
+
+    def test_join_after_leaving_announces(self):
+        self.participate(ParticipationStatus.LEFT)
+
+        response, _ = self.join()
+
+        self.assertEqual(response.status_code, 200)
+        self.assert_system_message("alice a rejoint le voyage.")
+        self.assertEqual(self.receive_event()["type"], "participant.joined")
+
+    def test_join_as_member_announces_nothing(self):
+        self.participate()
+
+        response, callbacks = self.join()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(callbacks, [])
+        self.assertFalse(Message.objects.filter(travel=self.travel).exists())
+
+
 # TransactionTestCase: database_sync_to_async closes the connection that
 # TestCase keeps open for its wrapping transaction.
 class TravelConsumerTest(TransactionTestCase):
@@ -1108,6 +1216,34 @@ class TravelConsumerTest(TransactionTestCase):
 
         group_discard.assert_awaited_once()
         self.assertEqual(group_discard.await_args.args[0], travel_group(self.travel.id))
+
+    async def test_kick_closes_only_that_travelers_socket(self):
+        bob = await sync_to_async(Traveler.objects.create_user)(
+            username="bob", email="bob@example.com", password="password123"
+        )
+        await Participation.objects.acreate(
+            traveler=bob, travel=self.travel, status=ParticipationStatus.ACCEPTED
+        )
+        alice_socket = self.communicator(self.traveler)
+        bob_socket = self.communicator(bob)
+        await alice_socket.connect()
+        await bob_socket.connect()
+
+        await self.group_send({"type": "travel.kick", "traveler_id": self.traveler.id})
+
+        self.assertEqual(
+            await alice_socket.receive_output(timeout=2),
+            {"type": "websocket.close", "code": CLOSE_NOT_PARTICIPANT},
+        )
+        # The kick itself is internal: bob sees nothing, and still gets events.
+        self.assertTrue(await bob_socket.receive_nothing(timeout=0.2))
+        event = {"type": "idea.created", "payload": {"ideaId": 1}}
+        await self.group_send(event)
+        self.assertEqual(await bob_socket.receive_json_from(), event)
+        self.assertTrue(await alice_socket.receive_nothing(timeout=0.2))
+
+        await alice_socket.disconnect()
+        await bob_socket.disconnect()
 
     async def test_client_messages_are_ignored(self):
         communicator = self.communicator(self.traveler)

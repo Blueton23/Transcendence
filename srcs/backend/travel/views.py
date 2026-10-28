@@ -14,9 +14,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.realtime import broadcast, travel_group
+from chat.services import post_system_message
 from common.mixins import PublicApiMixin
+from common.realtime import broadcast, travel_group
 
+from .consumers import kick_from_travel
 from .mixins import ParticipantScopedMixin
 from .models import Participation, ParticipationStatus, Step, Travel
 from .permissions import IsTravelParticipant
@@ -43,12 +45,40 @@ class TravelJoinView(APIView):
 
     def post(self, request, token):
         travel = get_object_or_404(Travel, invite_token=token)
-        Participation.objects.update_or_create(
-            traveler=request.user,
-            travel=travel,
-            defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
-        )
+        with transaction.atomic():
+            participation, created = (
+                Participation.objects.select_for_update().get_or_create(
+                    traveler=request.user,
+                    travel=travel,
+                    defaults={"status": ParticipationStatus.ACCEPTED},
+                )
+            )
+            # Opening the invite link again as a member changes nothing.
+            if created or participation.status != ParticipationStatus.ACCEPTED:
+                participation.status = ParticipationStatus.ACCEPTED
+                participation.left_at = None
+                participation.save()
+                announce_participant(travel.id, request.user, "joined")
         return Response(TravelSerializer(travel).data)
+
+
+PARTICIPANT_MESSAGES = {
+    "joined": "{name} a rejoint le voyage.",
+    "left": "{name} a quitté le voyage.",
+}
+
+
+def announce_participant(travel_id, traveler, action):
+    """Tells the travel that someone joined or left: a system message in the
+    chat, and `participant.<action>` so open pages reload the travelers."""
+    post_system_message(
+        travel_id, PARTICIPANT_MESSAGES[action].format(name=traveler.username)
+    )
+    broadcast(
+        travel_group(travel_id),
+        f"participant.{action}",
+        {"traveler_id": traveler.id},
+    )
 
 
 @extend_schema(tags=["Travels"])
@@ -119,9 +149,11 @@ class StepDetailView(
 class LeaveTravelView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
+    @transaction.atomic
     def post(self, request, travel_id):
+        # Locked so two leave requests at once announce it only once.
         participation = get_object_or_404(
-            Participation,
+            Participation.objects.select_for_update(),
             travel_id=travel_id,
             traveler=request.user,
             status=ParticipationStatus.ACCEPTED,
@@ -129,5 +161,6 @@ class LeaveTravelView(APIView):
         participation.status = ParticipationStatus.LEFT
         participation.left_at = timezone.now()
         participation.save()
-        # TODO: message system a rajouter dans la chat + bouton "restaurer"une fois l-app chat prete
+        announce_participant(travel_id, request.user, "left")
+        kick_from_travel(travel_id, request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)

@@ -6,12 +6,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from common.realtime import broadcast, travel_group
 from travel.models import Participation, ParticipationStatus
 from travel.permissions import IsTravelParticipant
 
 from .models import Message
 from .serializers import MessageSerializer
+from .services import broadcast_message
 
 
 class ChatParticipationMixin:
@@ -28,13 +28,6 @@ class ChatParticipationMixin:
         if participation is None:
             raise PermissionDenied("Vous n'avez pas accès à ce voyage.")
         return participation
-
-
-def broadcast_message(message):
-    payload = MessageSerializer(message).data
-    # "is_unread" depends on who reads it: each client works it out.
-    del payload["is_unread"]
-    broadcast(travel_group(message.travel_id), "chat.message", payload)
 
 
 class TravelMessageListCreateView(ChatParticipationMixin, APIView):
