@@ -9,7 +9,7 @@ from django.contrib.auth import (
     logout,
     update_session_auth_hash,
 )
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.middleware.csrf import get_token
 from drf_spectacular.utils import extend_schema
@@ -20,6 +20,8 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
+
+from common.realtime import broadcast, user_group
 
 from .models import Friendship, Status
 from .schema import api_token_schema
@@ -313,6 +315,18 @@ class FriendshipSearchView(APIView):
         )
 
 
+def notify_friendship(event_type, friendship):
+    """Sends `friendship.<event>` to both users, so the other one sees it and
+    every open tab of the one who acted stays in sync. The payload is only a
+    signal: clients reload their friend lists over REST."""
+    for user_id in (friendship.user1_id, friendship.user2_id):
+        broadcast(
+            user_group(user_id),
+            f"friendship.{event_type}",
+            {"friendship_id": friendship.id},
+        )
+
+
 class FriendshipRequestView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
@@ -372,6 +386,7 @@ class FriendshipRequestView(APIView):
                 {"detail": "Une relation existe déjà avec cet utilisateur."},
                 status=status.HTTP_409_CONFLICT,
             )
+        notify_friendship("requested", friendship)
 
         return Response(
             {
@@ -455,6 +470,7 @@ class FriendshipAcceptView(APIView):
 
         friendship.status = Status.ACCEPTED
         friendship.save(update_fields=["status", "updated_at"])
+        notify_friendship("accepted", friendship)
 
         return Response(
             {"detail": "Demande d'amitié acceptée."},
@@ -485,7 +501,10 @@ class FriendshipRemoveView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        friendship.delete()
+        with transaction.atomic():
+            # Built before delete() clears the id, sent once it is committed.
+            notify_friendship("removed", friendship)
+            friendship.delete()
 
         return Response(
             {"detail": "Amitié supprimée."},
