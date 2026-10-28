@@ -27,6 +27,17 @@ export interface IdeaApiResponse {
   updatedAt: string;
 }
 
+// "idea.created" / "idea.updated" socket events: "voted" depends on the
+// reader, so the server leaves it out.
+export type SocketIdea = Omit<IdeaApiResponse, "voted">;
+
+// "reaction.created" / "reaction.deleted" socket events
+export interface SocketReaction {
+  ideaId: number;
+  travelerId: number;
+  voteCount: number;
+}
+
 // Données envoyées à l’API pour créer une idée
 export interface CreateIdeaApiInput {
   title: string;

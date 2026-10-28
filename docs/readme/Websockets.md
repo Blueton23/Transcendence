@@ -104,6 +104,6 @@ Deux règles qui piègent tout le monde :
 2. ~~Ajouter `TravelConsumer` avec les contrôles d'auth et de participation, l'entrée et la sortie du groupe, et les tests.~~
 3. ~~Ajouter les endpoints REST du chat (liste, envoi, marquer comme lu) avec la diffusion de `chat.message`.~~
 4. ~~Ajouter le hook frontend `useTravelSocket` et l'interface du chat.~~
-5. Diffuser les événements idées, étapes et votes depuis les vues existantes, et les appliquer côté frontend.
+5. ~~Diffuser les événements idées, étapes et votes depuis les vues existantes, et les appliquer côté frontend.~~
 6. Ajouter l'événement d'expulsion au départ d'un voyage, puis le socket de notifications par utilisateur.
 7. Ajouter le catalogue des événements à ce fichier une fois les événements créés.
