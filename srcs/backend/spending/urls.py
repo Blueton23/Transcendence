@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import SpendingDetailView, SpendingListView
+from .views import SpendingDetailView, SpendingListView, SpendingSummaryView
 
 urlpatterns = [
     path(
@@ -10,5 +10,10 @@ urlpatterns = [
         "<int:travel_id>/spendings/<int:pk>/",
         SpendingDetailView.as_view(),
         name="spending-detail",
+    ),
+    path(
+        "<int:travel_id>/spendings/summary/",
+        SpendingSummaryView.as_view(),
+        name="spending-summary",
     ),
 ]
