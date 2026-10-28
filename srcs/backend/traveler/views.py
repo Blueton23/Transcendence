@@ -1,11 +1,10 @@
 # views.py
 
 import logging
-import secrets
 from typing import ClassVar
-from urllib.parse import urlencode
 
 import requests
+from authlib.integrations.django_client import OAuth, OAuthError
 from django.conf import settings
 from django.contrib.auth import (
     authenticate,
@@ -19,6 +18,7 @@ from django.db.models import Q
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
 from drf_spectacular.utils import extend_schema
+from joserfc.errors import JoseError
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -37,10 +37,6 @@ from .serializers import (
     TravelerUpdateProfilePictureSerializer,
     TravelerUpdateSerializer,
 )
-
-GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
-GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
-GOOGLE_USERINFO_URL = "https://openidconnect.googleapis.com/v1/userinfo"
 
 Traveler = get_user_model()
 
@@ -553,24 +549,28 @@ class ApiTokenView(APIView):
 # ===================================================================#
 
 
+# Client OAuth Google : Authlib lit la configuration de Google
+oauth = OAuth()
+oauth.register(
+    "google",
+    client_id=settings.GOOGLE_CLIENT_ID,
+    client_secret=settings.GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
+
+
 # Démarre la connexion Google (OAuth 2.0)
+# Authlib crée le state et le nonce, les garde en session, puis redirige
 class GoogleLoginView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def get(self, request: Request):
-        state = secrets.token_urlsafe(32)
-        request.session["google_oauth2_state"] = state
-
-        params = {
-            "response_type": "code",
-            "client_id": settings.GOOGLE_CLIENT_ID,
-            "redirect_uri": settings.GOOGLE_REDIRECT_URI,
-            "scope": "openid email profile",
-            "state": state,
-            "prompt": "select_account",
-        }
-
-        return redirect(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")
+        return oauth.google.authorize_redirect(
+            request,
+            settings.GOOGLE_REDIRECT_URI,
+            prompt="select_account",
+        )
 
 
 # Termine la connexion Google
@@ -578,65 +578,23 @@ class GoogleCallbackView(APIView):
     permission_classes: ClassVar[list] = [AllowAny]
 
     def get(self, request: Request):
-        expected_state = request.session.pop("google_oauth2_state", None)
-        state = request.query_params.get("state")
-
-        if expected_state is None or state != expected_state:
-            logger.warning("Google OAuth : state invalide ou déjà utilisé")
-            return redirect("/login?error=google")
-
-        code = request.query_params.get("code")
-
-        if code is None:
-            logger.warning("Google OAuth : aucun code reçu (connexion annulée ?)")
-            return redirect("/login?error=google")
-
         try:
-            # 1. Echange le code contre un access token
-            token_response = requests.post(
-                GOOGLE_TOKEN_URL,
-                data={
-                    "code": code,
-                    "client_id": settings.GOOGLE_CLIENT_ID,
-                    "redirect_uri": settings.GOOGLE_REDIRECT_URI,
-                    "client_secret": settings.GOOGLE_CLIENT_SECRET,
-                    "grant_type": "authorization_code",
-                },
-                timeout=10,
-            )
-
-            if token_response.status_code != 200:
-                logger.warning(
-                    "Google OAuth : Le code est refusé : %s", token_response.text
-                )
-                return redirect("/login?error=google")
-
-            access_token = token_response.json()["access_token"]
-
-            # 2. Avec le token, on demande à Google qui est l'utilisateur
-            userinfo_response = requests.get(
-                GOOGLE_USERINFO_URL,
-                headers={"Authorization": f"Bearer {access_token}"},
-                timeout=10,
-            )
-        except requests.RequestException:
-            logger.warning("Google OAuth : Google est injoignable")
+            token = oauth.google.authorize_access_token(request)
+        except (OAuthError, JoseError, requests.RequestException) as error:
+            logger.warning("Google OAuth : connexion échouée : %s", error)
             return redirect("/login?error=google")
 
-        if userinfo_response.status_code != 200:
-            logger.warning(
-                "Google OAuth : infos utilisateur refusées : %s", userinfo_response.text
-            )
-            return redirect("/login?error=google")
+        userinfo = token["userinfo"]
 
-        userinfo = userinfo_response.json()
+        logger.warning(
+            "Google UserInfo : champs=%s",
+            list(userinfo.keys()),
+        )
 
-        # On n'utilise l'email que si Google l'a vérifié
         if not userinfo.get("email_verified"):
             logger.warning("Google OAuth : email non vérifié par Google")
             return redirect("/login?error=google")
 
-        # 3. Retrouve le Traveler qui a cet email, ou on le crée
         traveler = Traveler.objects.filter(email__iexact=userinfo["email"]).first()
 
         if traveler is None:

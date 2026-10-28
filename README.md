@@ -21,16 +21,13 @@ Ce projet a été créé dans le cadre du cursus 42 par <dle-fur[Technical Lead 
 
 | Outil | Pourquoi il est nécessaire | Vérification |
 |---|---|---|
-| **Docker Engine** avec le plugin **Compose v2** | Construit et lance tous les services dans des conteneurs | `docker --version` et `docker compose version` |
-| **GNU Make** | Des commandes courtes pour tout (`make up`, `make test`…) | `make --version` |
-| **Git** | Cloner le dépôt | `git --version` |
+| **Docker** avec le plugin **Compose v2** | Construit et lance tous les services dans des conteneurs | `docker --version` et `docker compose version` |
+| **Make** | Des commandes courtes pour tout (`make up`, `make test`…) | `make --version` |
 
-Rien d'autre n'est nécessaire sur ta machine : Python, Node.js, PostgreSQL, Redis et Nginx tournent tous **dans des conteneurs**.
-Le port **8080** doit être libre sur ta machine.
 
 ## 1. Configurer l'environnement
 
-Tous les secrets et réglages se trouvent dans un fichier **`.env` à la racine du dépôt**. Ce fichier est ignoré par Git ; un modèle est fourni dans `.env.example`.
+Les réglages se trouvent dans un fichier `.env.example`.
 
 ```bash
 cp .env.example .env
@@ -48,13 +45,14 @@ Puis modifie `.env` :
 | `REDIS_HOST`, `REDIS_PORT` | `backend` | Où Django trouve Redis : `redis` (le nom du service) et `6379` |
 | `UID`, `GID` | build du `backend` | Ton identifiant d'utilisateur et de groupe (`id -u`, `id -g`). Les fichiers créés par le conteneur dans `srcs/backend/` t'appartiendront |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` *(facultative)* | `backend` | Origines autorisées à envoyer des formulaires. Par défaut : `http://localhost:8080` |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | `backend` | Identifiants de l'application OAuth créée dans la Google Cloud Console (voir « Module : Authentification OAuth 2.0 avec Google ») |
+| `GOOGLE_REDIRECT_URI` | `backend` | Adresse de retour après la connexion Google : `http://localhost:8080/api/auth/google/callback/`, identique à celle déclarée chez Google |
 
 > Pour générer une clé secrète :
 > `python3 -c "import secrets; print(secrets.token_urlsafe(50))"`
 
-Les changements à faire pour la production sont indiqués en commentaire en haut de `.env.example`.
 
-Les fonctionnalités de carte du frontend ont aussi besoin d'un token Mapbox dans `srcs/frontend/.env` (modèle : `srcs/frontend/.env.example`, variable `VITE_MAPBOX_TOKEN`). Le reste de l'application fonctionne sans.
+Les fonctionnalités de carte du frontend ont aussi besoin d'un token Mapbox dans `srcs/frontend/.env` (modèle : `srcs/frontend/.env.example`, variable `VITE_MAPBOX_TOKEN`).
 
 ## 2. Lancer le projet
 
@@ -91,16 +89,8 @@ Lance ces commandes pendant que le projet tourne. Chacune teste un maillon de la
 | 4 | `make test-db` | `✅ Connexion réussie à la base : <POSTGRES_DB>` | Django atteint **PostgreSQL** |
 | 5 | `make ping` | `PONG` | **Redis** répond |
 | 6 | Ouvrir http://localhost:8080/admin/ | Une page de connexion **mise en forme** (pas du HTML brut) | Les fichiers statiques sont collectés par Django et **servis par Nginx** |
-| 7 | Test WebSocket (ci-dessous) | `{"message": "pong: hello"}` | Les **WebSockets** passent par Nginx jusqu'à Django Channels |
-| 8 | `make test` | `OK` à la fin | La suite de tests du backend passe |
+| 7 | `make test` | `OK` à la fin | La suite de tests du backend passe |
 
-**Test WebSocket** : ouvre http://localhost:8080 dans un navigateur, ouvre la console développeur (F12) et colle :
-
-```js
-const ws = new WebSocket("ws://localhost:8080/ws/ping/");
-ws.onmessage = (e) => console.log(e.data);
-ws.onopen = () => ws.send(JSON.stringify({ message: "hello" }));
-```
 
 ## 4. Commandes utiles
 
@@ -160,7 +150,7 @@ flowchart LR
 ### PostgreSQL 17 : base de données (`db`)
 
 - **Ce que c'est** : une base de données relationnelle (tables, relations, contraintes, transactions).
-- **Pourquoi** : les données du projet sont fortement liées entre elles — voyageurs, voyages, participations, étapes, idées, réactions, amitiés — et doivent rester cohérentes.
+- **Pourquoi** : les données du projet sont fortement liées entre elles, voyageurs, voyages, participations, étapes, idées, réactions, amitiés et doivent rester cohérentes.
 - **Avantages** :
   - Des **contraintes** au niveau de la base, utilisées par nos modèles (`UniqueConstraint`, `CheckConstraint`, par exemple « date de fin ≥ date de début », « une seule réaction par utilisateur et par idée »).
   - Des **transactions** fiables et le **verrouillage de lignes** (`select_for_update`, utilisé lors du choix d'un hébergement), pour que deux utilisateurs ne puissent pas casser les données en même temps.
@@ -173,8 +163,8 @@ flowchart LR
 - **Pourquoi** : deux fonctionnalités ont besoin de données partagées, rapides et temporaires, qui n'ont pas leur place dans PostgreSQL.
 - **Avantages** : très rapide, partagé par tous les processus du backend, expiration automatique des clés.
 - **Dans le projet**, deux bases Redis séparées :
-  - **Base 0 — Django Channels** (channel layer) : transporte les messages temps réel des WebSockets entre les processus du backend.
-  - **Base 1 — cache Django** : stocke les compteurs du **rate limiting** de l'API publique.
+  - **Base 0 - Django Channels** (channel layer) : transporte les messages temps réel des WebSockets entre les processus du backend.
+  - **Base 1 - cache Django** : stocke les compteurs du **rate limiting** de l'API publique.
 
 ### Backend : Django 5.2 + Django REST Framework, servi par Uvicorn (`backend`)
 
@@ -309,7 +299,7 @@ Toutes les routes sont sous `/api/travels/{travel_id}/ideas/` : une idée appart
 
 ### Les vues (`idea/views.py`)
 
-#### `IdeaListView` — lister et créer
+#### `IdeaListView` - lister et créer
 - **Ce que c'est** : une vue générique DRF `ListCreateAPIView` (GET + POST).
 - **Pourquoi** : la vue générique gère déjà la lecture du body, la validation par le serializer et les bons codes HTTP (`200`, `201`). On n'écrit que ce qui est propre au projet.
 - **Avantages** :
@@ -317,19 +307,19 @@ Toutes les routes sont sous `/api/travels/{travel_id}/ideas/` : une idée appart
   - `perform_create` remplit lui-même **le voyage** (depuis l'URL) et **l'auteur** (l'utilisateur connecté) : un client ne peut pas créer une idée au nom de quelqu'un d'autre ni dans un autre voyage.
 - **Dans le projet** : protégée par `IsAuthenticated` + `IsTravelParticipant`. Seul un participant **accepté** du voyage peut lister ou créer, les autres reçoivent `403`. Les idées sont triées de la plus récente à la plus ancienne.
 
-#### `IdeaDetailView` — consulter, modifier, supprimer
+#### `IdeaDetailView` - consulter, modifier, supprimer
 - **Ce que c'est** : une `RetrieveUpdateDestroyAPIView` (GET, PUT, PATCH, DELETE).
 - **Pourquoi** : une seule vue pour toutes les opérations sur **une** idée. Le placement sur une étape est aussi un simple `PATCH` (`stepId` + dates).
 - **Avantages** : avec `ParticipantScopedMixin`, le queryset ne contient **que** les idées des voyages de l'utilisateur. Une idée d'un autre voyage renvoie `404`, sans même révéler qu'elle existe.
 - **Dans le projet** : la suppression est **définitive** et entraîne celle des votes (`on_delete=CASCADE`).
 
-#### `IdeaChoiceView` — choisir un hébergement
+#### `IdeaChoiceView` - choisir un hébergement
 - **Ce que c'est** : une action dédiée, `POST .../choice/`.
 - **Pourquoi** : choisir un hébergement n'est pas une modification libre. C'est une action avec ses propres règles (uniquement un hébergement placé, pas deux hébergements choisis sur des dates qui se chevauchent).
 - **Avantages** : la vue tourne dans une **transaction** (`@transaction.atomic`) avec un **verrou sur les lignes** (`select_for_update`) de l'idée et de l'étape. Si deux participants cliquent en même temps, les requêtes passent l'une après l'autre, et les règles ne peuvent pas être contournées.
 - **Dans le projet** : l'action est **idempotente**. Choisir un hébergement déjà choisi ne change rien et renvoie l'idée telle quelle. L'auteur du choix et la date sont enregistrés (`chosenById`, `chosenAt`).
 
-#### `ReactionView` — les votes
+#### `ReactionView` - les votes
 - **Ce que c'est** : une vue avec trois méthodes sur `.../reaction/` : `GET` (liste des votes), `POST` (voter), `DELETE` (retirer son vote).
 - **Pourquoi** : le vote est une ressource liée à une idée et à l'utilisateur connecté. Le client n'envoie **aucune donnée** : l'idée vient de l'URL, l'utilisateur de la session.
 - **Avantages** : **un seul vote par personne et par idée**, garanti par une contrainte unique en base. Un second `POST` renvoie `400` (« You have already reacted to this idea. »). Le `DELETE` ne supprime **que** le vote de l'utilisateur connecté.
@@ -388,29 +378,29 @@ src/pages/IdeasPage.tsx → la page /travel/:id/ideas qui assemble le tout
 
 ### Les couches, de la plus proche du serveur à la plus proche de l'écran
 
-#### `types.ts` — deux formats de données
+#### `types.ts` - deux formats de données
 - **Ce que c'est** : les types TypeScript d'une idée, **en deux versions** : `IdeaApiResponse` (exactement le JSON reçu) et `Idea` (le format pratique pour les composants).
 - **Pourquoi** : le format de l'API est pensé pour la base (types `r`/`l`/`a`/`s`, décimaux en texte, une seule paire de dates), alors que l'interface a besoin de valeurs lisibles et typées.
 - **Avantage** : TypeScript signale à la compilation toute utilisation d'un champ qui n'existe pas, ou avec le mauvais type.
 
-#### `ideaMapper.ts` — la conversion API ⇄ interface
+#### `ideaMapper.ts` - la conversion API ⇄ interface
 - **Rôle** :
   - `r`/`l`/`a`/`s` ⇄ `restaurant`/`accommodation`/`activity`/`sightseeing` ;
   - les décimaux reçus en texte (`"45.7640000"`, `"120.00"`) deviennent des **nombres** ;
   - `startDate`/`endDate` deviennent `date` (une journée) **ou** `arrivalDate`/`departureDate` (un hébergement), et inversement à l'envoi.
 - **Avantage** : si le format de l'API change, **un seul fichier** est à modifier. Les composants ne sont pas touchés.
 
-#### `api.ideas.ts` — les appels au backend
+#### `api.ideas.ts` - les appels au backend
 - **Rôle** : une fonction par action (`fetchIdeas`, `postIdea`, `patchIdea`, `removeIdea`, `patchIdeaPlacement`, `chooseIdea`, `addIdeaReaction`, `removeIdeaReaction`).
 - **Dans le projet** :
   - `credentials: "include"` envoie le **cookie de session** ;
   - chaque écriture (`POST`, `PATCH`, `DELETE`) ajoute le header **`X-CSRFToken`**, lu dans le cookie `csrftoken` ;
   - les réponses passent par `parseResponse` (partagé, `src/shared/api/errors.ts`), qui lit l'enveloppe d'erreur du backend (`{status, code, message, details}`) et en fait un message lisible.
 
-#### `ideaErrors.ts` — des erreurs en français
+#### `ideaErrors.ts` - des erreurs en français
 - **Rôle** : traduit les messages métier du backend (« The idea dates must be within the step dates. »…) en messages compréhensibles pour l'utilisateur.
 
-#### `useIdeas.ts` — l'état de la page
+#### `useIdeas.ts` - l'état de la page
 - **Ce que c'est** : un hook React qui charge les idées d'un voyage et expose les actions (`handleCreateIdea`, `handleEditIdea`, `handleDeleteIdea`, `handlePlaceIdea`, `handleChooseIdea`, `handleVote`).
 - **Pourquoi** : toute la logique est au même endroit. La page et les composants se contentent d'afficher et d'appeler des fonctions.
 - **Avantages** :
@@ -488,8 +478,8 @@ Le module entier : clé API, accès par vue, rate limiting, documentation et tes
 
 ## Architecture : le parcours d'une requête
 
-```
-ordre des requêtes
+```mermaid
+flowchart LR
     client["Client externe<br/>(script, Postman…)"] -->|"Authorization: Token &lt;clé&gt;"| nginx["Nginx"]
     nginx --> auth["1. Authentification<br/>Session, puis Token"]
     auth --> perm["2. Permissions<br/>participant du voyage ?"]
@@ -695,191 +685,388 @@ docker compose exec redis redis-cli -n 1 FLUSHDB
 - https://drf-spectacular.readthedocs.io/en/latest/customization.html
 - https://swagger.io/docs/specification/v3_0/authentication/api-keys/
 
+## Choix techniques et limites connues
+
+- **Clés stockées en clair, sans expiration** : c'est le fonctionnement de `rest_framework.authtoken`. Une clé se révoque en la supprimant dans l'admin (une nouvelle sera générée au prochain appel). Une amélioration possible serait `django-rest-knox` (clés hachées en SHA-512, expiration), au prix d'un changement de comportement : une nouvelle clé à chaque appel, montrée une seule fois.
+- **`403` plutôt que `401`** pour une requête non authentifiée : on conserve le comportement existant du projet (et de ses tests), parce que `SessionAuthentication` est la première méthode d'authentification. Le message du body (`not_authenticated`, `Invalid token.`) reste explicite.
+- **Compteurs partagés** : le front et l'API d'un même utilisateur partagent le compteur `public_api` ; des clients derrière une même IP (réseau d'école, d'entreprise) partagent le compteur `auth_token`.
+- **`NUM_PROXIES` dépend de l'infrastructure** : à passer à `2` si un autre proxy est ajouté devant Nginx.
+- **Swagger UI est chargé depuis un CDN** : le navigateur a besoin d'Internet pour afficher `/api/docs/` (le schéma `/api/schema/`, lui, est servi par le backend).
+- **HTTP en développement** : le projet tourne actuellement en HTTP sur le port 8080. En HTTP, la clé circule en clair : HTTPS (exigé par le sujet pour toute connexion au backend, y compris depuis un script) doit être en place pour l'évaluation.
+
 #
 #
 
-# Module : OAuth 2.0 (Minor, 1 point)
+# Module : Authentification OAuth 2.0 avec Google (Minor, 1 point)
 
-Comprendre OAuth 2.0 (le flux « Authorization Code »)
-L’utilisateur clique sur « Continuer avec Google » → le navigateur va sur ton backend (/api/auth/google/).
-Le backend le redirige vers Google avec ton client_id, l’URL de retour (redirect_uri), ce que tu demandes (scope : email, nom) et un state aléatoire.
-L’utilisateur se connecte chez Google (ton site ne voit jamais son mot de passe Google) et accepte.
-Google renvoie le navigateur vers ton redirect_uri avec un code temporaire.
-Ton backend échange ce code contre un access_token, directement auprès de Google, en prouvant qui il est avec le client_secret. Le navigateur ne voit jamais ce secret.
-Avec le token, le backend demande à Google « qui est-ce ? » (email, prénom, nom), trouve ou crée le Traveler, appelle login(), puis redirige vers /profile.
+## Présentation
 
+Le sujet demande :
 
-Le state sert à se protéger d’une attaque CSRF : on le stocke dans la session et on vérifie que Google renvoie bien le même.
-uiliser une seule fois
+> *Minor: Implement remote authentication with OAuth 2.0 (Google, GitHub, 42, etc.).*
 
+Ce module permet de **se connecter avec son compte Google**, sans mot de passe sur Transcendence. L'utilisateur clique sur « Continuer avec Google », se connecte **chez Google** (le site ne voit jamais son mot de passe Google), puis revient **connecté** sur son profil.
 
-Étape 1 : déclarer l’application chez Google (console.cloud.google.com)
+| Exigence du sujet | Ce qui est en place |
+|---|---|
+| Authentification distante | L'utilisateur se connecte **chez Google** ; le backend reçoit ensuite son identité, **vérifiée** |
+| OAuth 2.0 | Flux **Authorization Code** côté serveur, avec **OpenID Connect** (`id_token` signé par Google) |
+| Un fournisseur | **Google** |
+| Lié à la gestion des utilisateurs | Un compte `Traveler` est **créé** à la 1re connexion, puis **retrouvé** aux suivantes |
 
-Comprendre : Google ne parle qu’aux applications qu’il connaît. Tu vas obtenir un Client ID (public, il apparaît dans l’URL) et un Client secret (privé, uniquement dans le .env). Tu déclares aussi l’URL de retour exacte. Google refuse toute autre URL, ce qui empêche quelqu’un de détourner le code vers son propre site.
+**Le choix d'implémentation** : la connexion classique du projet utilise les **sessions Django** (cookie `sessionid`). La connexion Google **finit au même endroit** : `login(request, traveler)`, exactement comme `LoginView`. Le frontend, `/api/auth/me/` et les permissions ne voient **aucune différence** entre un utilisateur Google et un utilisateur classique.
 
-https://support.google.com/cloud/answer/15549257?hl=en
+Le travail est partagé en deux :
 
-Implémenter :
+| Partie | Qui s'en occupe | Contenu |
+|---|---|---|
+| **Le protocole OAuth** | la bibliothèque **Authlib** | `state`, `nonce`, échange du code, vérification de l'`id_token` |
+| **Les règles de l'application** | **notre code** | email vérifié, retrouver ou créer le compte, refuser un compte classique, ouvrir la session |
 
-Va sur console.cloud.google.com et crée un projet (par exemple « Transcendence »).
-Ouvre Google Auth Platform (le menu « Écran de consentement OAuth » y mène aussi) et clique sur Get started :
-Branding : nom de l’app et ton email de support.
-Audience : choisis External.
-Donne ton email de contact et valide.
-Audience → Test users : ajoute ton Gmail, ceux de tes coéquipiers et, plus tard, ceux des évaluateurs. Tant que l’app est en mode « Testing », seuls ces comptes peuvent se connecter. C’est voulu et suffisant pour le projet.
-Clients → Create client :
-Type : Web application.
-Authorized redirect URIs : http://localhost:8080/api/auth/google/callback/ (exactement ceci, avec le / final).
-Laisse « Authorized JavaScript origins » vide : ce champ ne sert qu’à la connexion faite en JavaScript, pas à notre méthode.
-Copie le Client ID et le Client secret tout de suite, car Google ne réaffiche plus le secret ensuite.
+## Périmètre de ma contribution
 
-Les trois scopes nécessaires sont :
-- openid : identifier l'utilisateur.
-- email : récupérer son adresse e-mail.
-- profile : récupérer ses informations de profil.
-Pourquoi ?
-Ces scopes sont non sensibles et sont demandés directement lors de l'authentification OAuth, dans ton code Django.
+Le module entier : l'application déclarée chez Google, le client Authlib, les deux vues, les règles de compte, le bouton et les messages d'erreur du frontend (3 langues), et les tests.
+
+## Architecture : le parcours d'une connexion Google
 
-https://developers.google.com/identity/openid-connect/openid-connect?utm_source=chatgpt.com&hl=fr#python
+Une connexion Google, ce sont **2 allers-retours** : le navigateur part chez Google, puis Google le renvoie chez nous avec un **code**, que le backend échange **directement** avec Google.
 
-https://developer.auth0.com/resources/guides/web-app/django/basic-authentication?utm_source=chatgpt.com
+**① Le départ : `GoogleLoginView` (`GET /api/auth/google/`)**
 
-Ajouter au .env les variable
-les x a remplacer avec les vrai valeur
+1. **L'utilisateur clique sur « Continuer avec Google ».** Le frontend fait une vraie navigation vers le backend : `window.location.href = "/api/auth/google/"` (`login.tsx`).
+2. **Authlib prépare la connexion.** Il génère un `state` (protection CSRF) et un `nonce` (protection contre le rejeu de l'`id_token`), puis les garde dans la **session Django**, avec une expiration d'1 heure.
+3. **Le backend redirige vers Google** (`302`) avec `client_id`, `redirect_uri`, `response_type=code`, `scope=openid email profile`, `state` et `nonce`.
 
-ajout dans settings le get pour récupérer les valeurs
+**② Chez Google**
+
+4. **L'utilisateur se connecte sur le site de Google** et accepte de partager son nom et son email. Transcendence ne voit jamais son mot de passe Google.
+5. **Google renvoie le navigateur vers notre adresse de retour**, et uniquement vers celle déclarée dans la console : `/api/auth/google/callback/?state=…&code=…`. Le `code` est temporaire et à usage unique.
 
-Tester : le fichier env_file n’est relu que quand le conteneur est recréé
-docker compose exec backend python -c "import os; print(os.environ['GOOGLE_CLIENT_ID'][:15], bool(os.environ['GOOGLE_CLIENT_SECRET']), os.environ['GOOGLE_REDIRECT_URI'])"
-
-
-Étape 2 : la vue qui envoie l’utilisateur chez Google
-l’utilisateur arrive sur /api/auth/google/, et le backend le redirige (réponse HTTP 302) vers la page de connexion Google, avec dans l’URL tout ce dont Google a besoin.
-Le navigateur doit afficher la page de Google pour que l’utilisateur s’y connecte
-
-Les paramètres envoyés à Google :
-
-Paramètre	Rôle
-client_id	« C’est l’application Transcendence » (le Client ID de l’étape 1).
-redirect_uri	Où Google doit renvoyer l’utilisateur. Doit être identique à celle déclarée dans la console.
-response_type=code	« Renvoie-moi un code temporaire » : c’est le flux Authorization Code.
-scope=openid email profile	Ce que tu demandes : l’identité, l’email, le prénom et le nom. Rien de plus.
-state	Valeur aléatoire anti-CSRF (détails ci-dessous).
-prompt=select_account	Google affiche toujours le choix du compte. Pratique pour tester avec plusieurs comptes et en soutenance.
-
-
-Le state, concrètement : on génère une chaîne aléatoire, on la stocke dans la session Django de l’utilisateur et on l’envoie à Google. Google la renverra telle quelle au retour. À l’étape 3, on vérifiera que la valeur reçue est la même que celle en session. Sans ça, un attaquant pourrait te faire ouvrir un lien de callback contenant son code Google, et tu serais connecté sur son compte.
-
-Ça fonctionne avec ta config actuelle : SESSION_COOKIE_SAMESITE = "Lax" laisse passer le cookie sessionid quand Google redirige le navigateur vers ton site, car c’est une navigation GET.
-
-Nouveau fichier traveler/oauth.py
-
-https://waracle.com/insights/development/adding-google-login-to-your-existing-django-and-django-rest-framework-applications/?ht-comment-id=13848725&utm_source=chatgpt.com
-
-https://developers.google.com/identity/protocols/oauth2/
-
-
-ajout de GoogleLoginView dans traveler view
-et url auth-google dans url.py
-
-GoogleLoginView(APIView): redidirge le state en code 302 au nav a google
-moment ou on clique pour se connecter
-
-Utilisateur
-    │
-    │ Clique sur "Se connecter avec Google"
-    ▼
-GoogleLoginView
-    │
-    ├── Génère un state
-    ├── Sauvegarde le state
-    ├── Prépare les paramètres OAuth
-    └── Renvoie une redirection HTTP 302
-    │
-    ▼
-Google
-    │
-    └── Affiche la sélection du compte Google
-
-
-Exemple :
-1. L'utilisateur commence une connexion Google.
-2. Django génère state = ABC123.
-3. Django envoie ABC123 à Google.
-4. Google redirige le navigateur vers Django avec state=ABC123.
-5. Django vérifie que les deux valeurs sont identiques.
-
-state enregistrer dans django_session
-
-
-return redirect(f"{GOOGLE_AUTH_URL}?{urlencode(params)}")
-sert à rediriger le navigateur de l'utilisateur vers la page de connexion Google, avec tous les paramètres OAuth nécessaires.
-
-verif
-
-curl -i http://localhost:8080/api/auth/google/
-
------
-
-moment ou la fenetre se connecter a "projet"
-peut verifier le state
-
-et view callback
-
-On récupère le state gardé en session, et on le supprime (usage unique) avec pop
-pop permet de supprimer un element d une liste et de l utiliser
-ici le state est unique, une fois utiliser il est supprimer
-
-
-échanger le code contre un token
-
-ta vue reçoit le code. Mais ce code ne dit pas qui est l’utilisateur. C’est juste un ticket temporaire. Il faut l’échanger auprès de Google contre un access token : une clé qui permet ensuite de demander à Google les infos de l’utilisateur
-
-Comment se fait l’échange : ton backend envoie lui-même une requête POST à Google, à l’adresse https://oauth2.googleapis.com/token. Le navigateur ne participe pas. Il y met 5 informations :
-
-Champ	Rôle
-code	Le ticket reçu dans l’URL.
-client_id	« C’est l’application Transcendence. »
-client_secret	La preuve que c’est vraiment ton serveur qui demande.
-redirect_uri	La même adresse qu’à l’étape 2. Google vérifie qu’elles correspondent.
-grant_type=authorization_code	« Je t’échange un code. »
-
-Deux choses peuvent mal tourner, et dans les deux cas on renvoie vers /login?error=google :
-
-Google refuse le code : il répond autre chose que 200 (code expiré ou déjà utilisé, mauvais secret…).
-Google ne répond pas : problème réseau, ou plus de 10 secondes d’attente. C’est timeout=10 qui fixe cette limite : sans lui, la requête pourrait attendre indéfiniment.
-
-Si tout va bien, Google répond 200 avec un JSON comme celui-ci :
-{ "access_token": "ya29.a0Af...", "expires_in": 3599, "scope": "...", "token_type": "Bearer", "id_token": "eyJhbGci..." }
-
-installation de requests dans requirement pour les requete http
-
-ca se verifie dans les logs
-
-Différence essentielle
-Élément	Rôle	Qui effectue le contrôle ?
-state	Vérifier que le callback correspond à une demande initiée par le navigateur	Ton backend Django
-GOOGLE_TOKEN_URL	Échanger le code d'autorisation contre des tokens	Le serveur Google
-id_token	Prouver l'identité Google de l'utilisateur	Django, après vérification cryptographique
-
-Le state permet à Django de vérifier la cohérence de la demande OAuth.
-
-GOOGLE_TOKEN_URL permet à Google de vérifier le code et de délivrer les tokens.
-
-
-
-https://requests.readthedocs.io/en/latest/user/quickstart/?utm_source=chatgpt.com
-https://docs.python.org/3/howto/logging.html?utm_source=chatgpt.com
-
-
-afficher state
-docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; s = Session.objects.order_by('-expire_date').first(); print(s.get_decoded().get('google_oauth2_state'))"
-
-http://localhost:8080/api/auth/google/callback/?state=COLLE_ICI&code=faux
-
-permet de voir le code faux
-
-
-Étape 3.3 : demander à Google qui est l’utilisateur
-
-
+**③ Le retour, partie Authlib : `GoogleCallbackView` (`authorize_access_token`)**
+
+6. **Vérification du `state`** : il doit exister dans la session, puis il est supprimé (usage unique). Sinon : refus.
+7. **Échange du `code`, de serveur à serveur** : le backend envoie à Google le `code`, le `client_id` et le **`client_secret`**. Le navigateur ne participe pas, et le secret ne quitte jamais le backend.
+8. **Google renvoie un `access_token` et un `id_token`**, un JWT signé par Google qui contient l'identité de l'utilisateur.
+9. **Vérification de l'`id_token`** :
+   - sa **signature**, avec les clés publiques de Google ;
+   - `iss` : il vient bien de Google ;
+   - `aud` : il est fait pour **notre** application ;
+   - `exp` : il n'est pas expiré ;
+   - `nonce` : c'est celui de l'étape 2.
+
+   Si une seule vérification échoue : refus.
+
+**④ Le compte et la session, notre code : suite de `GoogleCallbackView`**
+
+10. **Email vérifié ?** `email_verified` doit valoir `true`. Sinon : refus.
+11. **Retrouver ou créer le compte** :
+    - aucun `Traveler` avec cet email → on le crée, **sans mot de passe** ;
+    - un compte créé par Google (sans mot de passe) → on le reprend ;
+    - un compte classique (avec mot de passe) → refus (`google_email_exists`).
+12. **Ouverture de la session** : `login(request, traveler)`, comme pour la connexion classique. Django pose le cookie `sessionid`.
+13. **Redirection vers `/profile`.** React appelle `/api/auth/me/` avec le cookie, et voit l'utilisateur connecté.
+
+À chaque refus (étapes 6, 7, 9, 10 et 11), l'utilisateur est renvoyé vers `/login?error=google` ou `/login?error=google_email_exists`, et la raison est écrite dans les logs du backend.
+
+### Les protections
+
+| Risque | Protection | Assurée par | Vérifiée par |
+|---|---|---|---|
+| Un autre site fait arriver dans notre navigateur un `code` qui n'est pas le nôtre (CSRF de connexion) | `state` aléatoire, gardé en session, comparé au retour | Authlib | `test_oauth_error_is_refused`, vérifications 3 et 6 |
+| Rouvrir une ancienne URL de retour (rejeu) | `state` **supprimé** dès son 1er usage, et expiré après 1 h | Authlib | vérification 6 |
+| Voler le `code` dans l'URL | le `code` ne s'échange qu'avec le `client_secret`, de serveur à serveur | Google + `.env` | |
+| Envoyer le `code` vers un autre site | Google ne redirige que vers l'adresse **déclarée** dans la console | Google | |
+| Un faux `id_token`, ou un token émis pour une autre application | signature vérifiée avec les clés de Google, `iss`, `aud`, `exp` | Authlib | `test_invalid_id_token_is_refused` |
+| Rejouer un `id_token` volé | `nonce` de la session, qui doit se retrouver dans l'`id_token` | Authlib | vérifications 2 et 3 |
+| Un email que Google n'a pas vérifié | `email_verified` obligatoire | notre code | `test_unverified_email_is_refused` |
+| Pré-créer un compte classique avec l'email de la victime (élément 5) | Google n'ouvre **jamais** un compte qui a un mot de passe | notre code | `test_password_account_is_refused`, vérification 7 |
+
+---
+
+## Les éléments du module
+
+### 1. L'application déclarée chez Google
+
+- **Ce que c'est** : un client OAuth de type **« Web application »**, créé dans la **Google Cloud Console** (*Google Auth Platform*). Google fournit un **Client ID** (public, il apparaît dans l'URL) et un **Client secret** (privé).
+- **Pourquoi** : Google ne parle qu'aux applications qu'il connaît, et ne renvoie l'utilisateur **que** vers les adresses de retour déclarées. Un attaquant ne peut donc pas détourner le `code` vers son propre site.
+- **Dans le projet** :
+  - **Authorized redirect URI** : `http://localhost:8080/api/auth/google/callback/` (exactement, **avec le `/` final**). Google n'accepte `http://` que pour `localhost` ;
+  - **Audience → External**, en mode **Testing**. Comme l'application ne demande que les scopes de base (`openid email profile`), Google n'impose pas la liste **Test users** : n'importe quel compte Google (Gmail, autre adresse, Google Workspace) peut se connecter, sans validation de l'application par Google ;
+  - les identifiants sont dans le **`.env`** (jamais commité), lus par `config/settings.py` :
+
+  | Variable | Contenu |
+  |---|---|
+  | `GOOGLE_CLIENT_ID` | le Client ID (`….apps.googleusercontent.com`) |
+  | `GOOGLE_CLIENT_SECRET` | le Client secret |
+  | `GOOGLE_REDIRECT_URI` | `http://localhost:8080/api/auth/google/callback/` |
+
+### 2. Le client OAuth : Authlib
+
+- **Ce que c'est** : **Authlib** implémente OAuth 2.0 et OpenID Connect. Son module `authlib.integrations.django_client` est fait pour Django : il garde ses données dans **`request.session`** et renvoie des réponses Django.
+- **Pourquoi** : c'est une bibliothèque **client**. Elle gère le protocole, puis nous rend l'identité vérifiée : nos comptes, notre session et nos règles restent les nôtres.
+- **Avantages** :
+  - elle fait correctement la partie difficile : **vérifier l'`id_token`** avec les clés publiques de Google ;
+  - pas de table, pas de migration, pas de page imposée ;
+  - **aucune adresse Google écrite en dur** : elles sont lues dans la configuration publiée par Google.
+- **Pourquoi pas django-allauth** : allauth est un **système de comptes complet** (inscription, connexion, vérification d'email, comptes sociaux, avec ses propres tables). Il aurait fait doublon avec `Traveler`, `LoginView` et l'inscription existante, pour un seul fournisseur.
+- **Dans le projet** (`traveler/views.py`) : le client est déclaré **une seule fois**, au chargement du module, et partagé par les deux vues.
+  ```python
+  oauth = OAuth()
+  oauth.register(
+      "google",
+      client_id=settings.GOOGLE_CLIENT_ID,
+      client_secret=settings.GOOGLE_CLIENT_SECRET,
+      server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+      client_kwargs={"scope": "openid email profile"},
+  )
+  ```
+
+  | Paramètre | Rôle |
+  |---|---|
+  | `client_id`, `client_secret` | nos identifiants, lus dans `settings` |
+  | `server_metadata_url` | le document public où Google liste ses adresses : `authorization_endpoint` (page de connexion), `token_endpoint` (échange du code), `jwks_uri` (clés publiques), `issuer`. Authlib le lit au 1er usage |
+  | `scope` | `openid` (identité et `id_token`), `email`, `profile` (prénom, nom). Rien de plus |
+
+  `requests` reste dans `requirements.txt` : Authlib s'en sert pour parler à Google, mais ne l'installe pas lui-même.
+
+### 3. Le départ : `GoogleLoginView`
+
+- **Ce que c'est** : la vue qui envoie le navigateur vers la page de connexion Google.
+  ```python
+  return oauth.google.authorize_redirect(
+      request,
+      settings.GOOGLE_REDIRECT_URI,
+      prompt="select_account",
+  )
+  ```
+- **Ce que fait `authorize_redirect`** :
+
+  | # | Action | Pourquoi |
+  |---|---|---|
+  | 1 | Génère un **`state`** aléatoire | Protection CSRF : au retour, Google doit renvoyer exactement le même |
+  | 2 | Génère un **`nonce`** aléatoire (car le scope contient `openid`) | Google le recopie dans l'`id_token` : un `id_token` volé ne peut pas être rejoué |
+  | 3 | Garde dans la session, sous la clé `_state_google_<state>`, le `nonce`, le `redirect_uri` et une **expiration d'1 heure** | Pour tout vérifier au retour |
+  | 4 | Redirige (`302`) vers Google | L'utilisateur se connecte chez Google |
+
+- **Dans le projet** :
+  - `permission_classes = [AllowAny]` : le réglage par défaut du projet est `IsAuthenticated`, alors que l'utilisateur n'est justement pas encore connecté ;
+  - `prompt="select_account"` : Google affiche toujours le choix du compte ;
+  - avec `SESSION_COOKIE_SAMESITE = "Lax"`, le retour de Google (une navigation `GET`) envoie bien le cookie de session : le `state` est retrouvé.
+
+### 4. Le retour : `GoogleCallbackView`, partie Authlib
+
+- **Ce que c'est** : l'adresse où Google renvoie le navigateur, avec `?state=…&code=…`, ou `?error=access_denied` si l'utilisateur annule.
+  ```python
+  try:
+      token = oauth.google.authorize_access_token(request)
+  except (OAuthError, JoseError, requests.RequestException) as error:
+      logger.warning("Google OAuth : connexion échouée : %s", error)
+      return redirect("/login?error=google")
+
+  userinfo = token["userinfo"]
+  ```
+- **Ce que fait `authorize_access_token`**, dans l'ordre :
+
+  | # | Vérification | Si elle échoue | Message dans les logs |
+  |---|---|---|---|
+  | 1 | L'utilisateur n'a pas annulé | `OAuthError` | `access_denied` |
+  | 2 | Le `state` reçu existe dans la session (puis il est **supprimé** : usage unique) | `OAuthError` | `mismatching_state: CSRF Warning! …` |
+  | 3 | Google accepte le `code` (envoyé avec `client_id` et `client_secret`, dans l'en-tête `Authorization: Basic`) | `OAuthError` | `invalid_grant`, `invalid_client` |
+  | 4 | La **signature** de l'`id_token` est valide (clés de Google, gardées en mémoire après le 1er téléchargement) | `JoseError` | `bad_signature` |
+  | 5 | Son contenu est correct : `iss` = Google, `aud` = **notre** `client_id`, `exp` non dépassé, `nonce` = celui de la session | `JoseError` | `invalid_claim`, `missing_claim` |
+  | | Google injoignable, à n'importe quelle étape | `requests.RequestException` | |
+
+  Si tout passe, `token["userinfo"]` contient le contenu **vérifié** de l'`id_token` : `sub`, `email`, `email_verified`, `given_name`, `family_name`… La liste de ces champs est écrite dans les logs à chaque connexion (`Google UserInfo : champs=[…]`).
+- **Pourquoi l'`id_token` et pas l'endpoint `userinfo` de Google** : l'`id_token` contient déjà l'identité, signée par Google. Une fois vérifié, un appel de plus est inutile.
+- **Un seul message pour l'utilisateur** : dans tous ces cas, il ne peut que réessayer, donc il est renvoyé vers `/login?error=google`. La vraie raison est dans les logs.
+
+### 5. Le compte : retrouver, créer, connecter (notre code)
+
+```mermaid
+flowchart TD
+    A["authorize_access_token()"] -->|"erreur OAuth, id_token invalide,<br/>Google injoignable"| KO1["❌ /login?error=google"]
+    A -->|"identité vérifiée"| B{"email_verified ?"}
+    B -->|"non"| KO1
+    B -->|"oui"| C{"Un Traveler a cet email ?"}
+    C -->|"non"| NEW["create_user()<br/>sans mot de passe"]
+    C -->|"oui, sans mot de passe<br/>(créé par Google)"| LOGIN["login()<br/>cookie sessionid"]
+    C -->|"oui, avec mot de passe<br/>(compte classique)"| KO2["❌ /login?error=google_email_exists"]
+    NEW --> LOGIN
+    LOGIN --> OK["✅ /profile"]
+
+    classDef ok fill:#d9f2e0,stroke:#2e7d32,color:#1b4d20
+    classDef ko fill:#fbe0df,stroke:#c62828,color:#7a1612
+    class OK ok
+    class KO1,KO2 ko
+```
+
+| Règle | Pourquoi |
+|---|---|
+| **`email_verified` obligatoire** | On retrouve le compte par l'email : on n'accepte donc qu'un email que Google a prouvé. Un compte Google peut utiliser une adresse non Gmail, parfois non vérifiée |
+| **Recherche par email** (`email__iexact`, sans tenir compte des majuscules) | C'est ce qui permet de **retrouver** à la 2e connexion le compte créé à la 1re, sans doublon |
+| **Création sans mot de passe** (`create_user()` sans `password`) | Django enregistre un mot de passe inutilisable (`has_usable_password()` vaut `False`) : ce compte ne s'ouvre **qu'avec Google** |
+| **`username` généré** par `generate_username()` | Le modèle exige un username unique : `david.lf@gmail.com` donne `david.lf`, puis `david.lf1`, `david.lf2`… s'il est déjà pris |
+| **Prénom et nom** | `given_name` et `family_name` de Google (vides s'ils ne sont pas fournis) |
+| **Refus d'un compte avec mot de passe** | Voir ci-dessous |
+| **`login(request, traveler)`** | Comme `LoginView` : Django ouvre la session et pose le cookie `sessionid` |
+
+**Pourquoi refuser un compte classique** : l'inscription classique **ne vérifie pas l'email** (le sujet demande seulement email et mot de passe hachés). Si Google se connectait à un compte classique qui a le même email :
+1. un attaquant s'inscrit avec **l'email de la victime** et **son propre** mot de passe ;
+2. la victime clique sur « Continuer avec Google », arrive dans ce compte et y crée ses voyages ;
+3. l'attaquant se connecte avec son mot de passe et voit tout.
+
+Un compte **avec** mot de passe n'est donc jamais ouvert par Google : l'utilisateur est renvoyé vers `/login?error=google_email_exists` et doit utiliser son mot de passe.
+
+Chaque refus écrit une ligne dans les logs : `email non vérifié par Google`, `email déjà utilisé par un compte classique`.
+
+### 6. Le frontend : le bouton et les messages
+
+- **Le bouton** (`src/features/auth/components/login.tsx`), sous « Se connecter » :
+  ```tsx
+  <Button
+    type="button"
+    variant="outline"
+    onClick={() => {
+      window.location.href = "/api/auth/google/";
+    }}
+  >
+    {t("auth.continueWithGoogle")}
+  </Button>
+  ```
+
+  | Choix | Pourquoi |
+  |---|---|
+  | `window.location.href`, pas `fetch()` | Le navigateur doit **quitter le site** pour afficher la page de Google |
+  | Pas `navigate()` de React Router | Il change de page **dans React** : la requête n'atteindrait jamais Django |
+  | `type="button"` | Le bouton est dans le `<form>` de connexion, où un `<button>` soumet le formulaire par défaut |
+  | Pas de CSRF ni de token | C'est une simple navigation `GET`, protégée par le `state` |
+
+- **Les messages d'erreur** : le composant lit `?error=…` dans l'URL avec `useSearchParams()`.
+
+  | URL | Clé de traduction | Message (fr) |
+  |---|---|---|
+  | `/login?error=google` | `auth.errors.googleFailed` | « La connexion avec Google a échoué. Veuillez réessayer. » |
+  | `/login?error=google_email_exists` | `auth.errors.googleEmailExists` | « Un compte existe déjà avec cet email. Connectez-vous avec votre mot de passe. » |
+  | autre code, ou rien | | aucun message |
+
+  - **2 codes seulement** : un message précis n'a de sens que si l'utilisateur peut agir différemment. Pour un compte classique, il doit **changer de méthode** ; dans tous les autres cas, il ne peut que réessayer.
+  - `const errorMessage = error ?? googleError;` : **un seul message à la fois**. Une erreur du formulaire classique remplace le message Google.
+  - Les 3 clés existent en **français, anglais et espagnol** (`src/i18n/locales/*/common.json`).
+
+### 7. Les tests
+
+- **Pourquoi** : vérifier à chaque `make test` que **notre code** réagit correctement à chaque cas.
+- **Comment** : Authlib et Google sont remplacés par des **faux** (`@patch`). Les tests ne dépendent ni d'Internet ni de vrais identifiants, et on vérifie **ce que notre code fait** de la réponse d'Authlib, pas Authlib lui-même (il a ses propres tests).
+- **Dans le projet** (`traveler/tests.py`) :
+
+  | Test | Ce qu'on simule | Ce qu'on vérifie |
+  |---|---|---|
+  | `GoogleLoginViewTest.test_redirects_to_google` | la configuration de Google | `302` vers `accounts.google.com`, avec `redirect_uri`, `response_type=code`, `scope`, `prompt`, un `state` et un `nonce` |
+  | `test_oauth_error_is_refused` | Authlib lève `OAuthError` (`state` invalide, annulation…) | `/login?error=google`, personne n'est connecté |
+  | `test_invalid_id_token_is_refused` | Authlib lève `BadSignatureError` | `/login?error=google`, personne n'est connecté |
+  | `test_google_unreachable` | Authlib lève `ConnectionError` | `/login?error=google` |
+  | `test_creates_traveler_and_logs_in` | une identité Google vérifiée | compte créé (`david.lf`, prénom, nom), **sans mot de passe**, session ouverte, `/profile` |
+  | `test_existing_traveler_is_reused` | 2 connexions avec le même compte Google | **un seul** compte en base |
+  | `test_username_already_taken` | le username `david.lf` est déjà pris | le compte reçoit `david.lf1` |
+  | `test_unverified_email_is_refused` | `email_verified` vaut `False` | `/login?error=google`, **aucun** compte créé |
+  | `test_password_account_is_refused` | un compte classique a déjà cet email | `/login?error=google_email_exists`, personne n'est connecté |
+
+  Sauf le premier, tous ces tests sont dans `GoogleCallbackViewTest`.
+
+---
+
+## Les routes
+
+| Méthode | Route | Résultat | Quand |
+|---|---|---|---|
+| `GET` | `/api/auth/google/` | `302` vers Google | toujours : démarre la connexion |
+| `GET` | `/api/auth/google/callback/` | `302` vers `/profile` | succès : compte retrouvé ou créé, session ouverte |
+| | | `302` vers `/login?error=google` | annulation, `state` invalide, code refusé, `id_token` invalide, Google injoignable, email non vérifié |
+| | | `302` vers `/login?error=google_email_exists` | l'email appartient à un compte classique |
+
+Ce sont des routes de **navigation** (le navigateur les ouvre et suit les redirections), pas des routes d'API qui renvoient du JSON. Elles ne font pas partie de l'API publique et n'apparaissent pas dans `/api/docs/`.
+
+## Les fichiers du module
+
+| Fichier | Ajout |
+|---|---|
+| `.env.example`, `.env` | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` |
+| `requirements.txt` | `requests`, `Authlib` |
+| `config/settings.py` | lecture des 3 variables `GOOGLE_...` |
+| `traveler/views.py` | le client `oauth` (Authlib), `GoogleLoginView`, `GoogleCallbackView`, `generate_username()` |
+| `traveler/urls.py` | les routes `auth/google/` et `auth/google/callback/` |
+| `traveler/tests.py` | `GoogleLoginViewTest`, `GoogleCallbackViewTest` |
+| `src/features/auth/components/login.tsx` | le bouton « Continuer avec Google » et l'affichage des erreurs `?error=…` |
+| `src/i18n/locales/{fr,en,es}/common.json` | `auth.continueWithGoogle`, `auth.errors.googleFailed`, `auth.errors.googleEmailExists` |
+
+---
+
+## Utilisation
+
+1. Remplis les 3 variables `GOOGLE_...` du `.env` (voir l'élément 1), puis lance `make down && make start` : le `.env` n'est relu qu'à la **création** des conteneurs.
+2. Ouvre **http://localhost:8080/login** et clique sur **« Continuer avec Google »**.
+3. Choisis ton compte : tu arrives sur ton **profil**, connecté.
+
+> ⚠️ Pour tester, utilise une **fenêtre de navigation privée**. Si tu es déjà connecté, `GuestRoute` te renvoie hors de `/login`, et un refus de Google te laisse **dans la session déjà ouverte** : tu pourrais croire que la connexion Google a réussi.
+
+## Vérifications rapides
+
+Avant de commencer, ouvre les logs dans un second terminal. Le filtre masque les appels du healthcheck Docker :
+```bash
+docker compose logs -f backend | grep -v '"GET /api/ HTTP'
+```
+
+| # | Commande / action | Résultat attendu | Ce que ça prouve |
+|---|---|---|---|
+| 1 | `make test ARGS="-v 2 traveler.tests.GoogleLoginViewTest traveler.tests.GoogleCallbackViewTest"` | les 9 tests de l'élément 7, chacun suivi de `... ok`, puis `Ran 9 tests … OK` | Toutes les règles du module, testées automatiquement |
+| 2 | `curl -s -o /dev/null -w '%{redirect_url}\n' http://localhost:8080/api/auth/google/` | une URL `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=…&redirect_uri=…&scope=openid+email+profile&state=…&prompt=select_account&nonce=…` | Ce que le backend envoie à Google : on demande un **code**, avec un `state` et un `nonce` |
+| 3 | Fenêtre privée → `http://localhost:8080/api/auth/google/` **sans choisir de compte**, puis la commande **« Voir le state »** ci-dessous | `{'_state_google_…': {'data': {'redirect_uri': '…', 'nonce': '…', 'url': '…'}, 'exp': …}}` | Le `state` (dans le nom de la clé), le `nonce` et l'expiration sont gardés dans la session Django |
+| 4 | Fenêtre privée → `/login` → **« Continuer avec Google »** → choisir son compte | arrivée sur `/profile`, connecté ; dans les logs, **une seule** ligne, par exemple : `Google UserInfo : champs=['iss', 'azp', 'aud', 'sub', 'email', 'email_verified', 'at_hash', 'nonce', 'name', 'picture', 'given_name', 'family_name', 'iat', 'exp']` | Le flux complet fonctionne avec le vrai Google. La ligne montre le contenu de l'`id_token` vérifié : `iss`, `aud` et `nonce` sont bien dedans |
+| 5 | La commande **« Voir le compte »** ci-dessous | par exemple `david.lf david.lf@gmail.com David Lf False` | Le compte a été créé à partir de l'identité Google, **sans mot de passe** (`False`) |
+| 6 | Rouvrir une ancienne URL `…/api/auth/google/callback/?state=…&code=…` (historique du navigateur) | `/login` avec « La connexion avec Google a échoué » ; log `connexion échouée : mismatching_state: CSRF Warning! …` | Le `state` ne sert qu'**une fois** : un retour ne peut pas être rejoué |
+| 7 | Commande **« Simuler un compte classique »**, se reconnecter avec Google, puis commande **« Remettre le compte »** | `/login` avec « Un compte existe déjà avec cet email… » ; log `email déjà utilisé par un compte classique`. Après la 2e commande, la connexion Google refonctionne | Google n'ouvre **jamais** un compte qui a un mot de passe (élément 5) |
+| 8 | Ouvrir `/login?error=google`, puis `/login?error=google_email_exists`, en changeant de langue | les 2 messages de l'élément 6, en français, anglais et espagnol | L'affichage des erreurs côté frontend |
+| 9 | `make check-back`, `make lint` et `make format-check-front` | aucune erreur | Le code respecte le lint et le formatage |
+
+Dans les commandes suivantes, remplace `david.lf@gmail.com` par l'email de ton compte Google.
+
+**Voir le state** (test 3) : le contenu de la dernière session.
+```bash
+docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; s = Session.objects.order_by('-expire_date').first(); print(s.get_decoded())"
+```
+
+**Voir le compte** (test 5) : username, email, prénom, nom, et « a-t-il un mot de passe ? ».
+```bash
+docker compose exec backend python manage.py shell -c "from traveler.models import Traveler; t = Traveler.objects.get(email='david.lf@gmail.com'); print(t.username, t.email, t.first_name, t.last_name, t.has_usable_password())"
+```
+
+**Simuler un compte classique** (test 7) : donner un mot de passe au compte Google. La commande affiche `True`.
+```bash
+docker compose exec backend python manage.py shell -c "from traveler.models import Traveler; t = Traveler.objects.get(email='david.lf@gmail.com'); t.set_password('Test12345!'); t.save(); print(t.has_usable_password())"
+```
+
+**Remettre le compte** (test 7, **à ne pas oublier**) : retirer le mot de passe. La commande affiche `False`.
+```bash
+docker compose exec backend python manage.py shell -c "from traveler.models import Traveler; t = Traveler.objects.get(email='david.lf@gmail.com'); t.set_unusable_password(); t.save(); print(t.has_usable_password())"
+```
+
+---
+
+### Ressources
+- https://developers.google.com/identity/openid-connect/openid-connect
+- https://support.google.com/cloud/answer/15549945
+- https://docs.authlib.org/en/latest/oauth2/client/web/django.html
+- https://datatracker.ietf.org/doc/html/rfc6749#section-4.1
+- https://docs.djangoproject.com/en/5.2/topics/auth/default/#how-to-log-a-user-in
+
+## Choix techniques et limites connues
+
+- **Authlib plutôt qu'une implémentation à la main** : une première version faisait tout avec `requests` (state, échange du code, appel à `userinfo`), sans vérifier l'`id_token`. Authlib ajoute cette vérification (signature, `iss`, `aud`, `exp`, `nonce`), l'expiration du `state`, et lit les adresses de Google dans sa configuration publiée, pour deux vues beaucoup plus courtes.
+- **Authlib plutôt que django-allauth** : allauth aurait pu gérer toute l'authentification si on l'avait choisi dès le départ (inscription, vérification d'email, mot de passe oublié, plusieurs fournisseurs). Ici, les comptes existaient déjà et le module ne demande qu'un fournisseur : on a seulement ajouté la partie OAuth.
+- **Compte retrouvé par l'email, pas par le `sub`** : le `sub` (identifiant Google permanent) demanderait un nouveau champ et une migration. Conséquence : si un utilisateur change l'email de son compte Google, il obtient un nouveau compte chez nous.
+- **Pas de liaison avec un compte classique** : un utilisateur inscrit avec un mot de passe ne peut pas ajouter Google à son compte. C'est le prix de la protection de l'élément 5, tant que l'inscription classique ne vérifie pas l'email.
+- **Pas de mot de passe pour les comptes Google** : « Modifier le mot de passe » demande l'ancien mot de passe, qu'un compte Google n'a pas. Ces utilisateurs se connectent uniquement avec Google.
+- **Toujours redirigé vers `/profile`** : après une connexion Google, la page demandée avant la connexion n'est pas retrouvée (par exemple un lien d'invitation `/join/…`, qu'il faut rouvrir). La connexion classique, elle, y renvoie.
+- **Application Google en mode Testing** : avec les seuls scopes de base, n'importe quel compte Google peut se connecter. Un compte Google Workspace (école, entreprise) peut toutefois être bloqué par les règles de son organisation : utiliser alors un compte personnel, ou l'ajouter dans **Test users**.
+- **Internet nécessaire côté backend** : au 1er usage, le backend télécharge la configuration et les clés publiques de Google, puis les garde en mémoire.
+- **HTTP en développement** : Google accepte `http://` seulement pour `localhost`. Avec HTTPS (exigé par le sujet pour l'évaluation), il faudra déclarer la nouvelle adresse de retour (par exemple `https://localhost:8443/api/auth/google/callback/`) dans la console Google, mettre à jour `GOOGLE_REDIRECT_URI`, et activer `SESSION_COOKIE_SECURE`.
