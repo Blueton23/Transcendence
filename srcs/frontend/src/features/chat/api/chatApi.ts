@@ -1,3 +1,4 @@
+import i18n from "@/i18n/index";
 import { getCookie } from "@/shared/api/cookies";
 import { parseResponse } from "@/shared/api/errors";
 import type {
@@ -33,6 +34,7 @@ export async function sendMessage(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -68,6 +70,7 @@ export async function markMessagesAsRead(travelId: number): Promise<void> {
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );

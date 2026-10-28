@@ -23,7 +23,14 @@
       "csrfInit": "Impossible d'initialiser la protection CSRF.",
       "invalidCredentials": "Identifiants invalides.",
       "logoutFailed": "Impossible de se déconnecter.",
-      "notAuthenticated": "Utilisateur non authentifié."
+      "notAuthenticated": "Utilisateur non authentifié.",
+      "passwordValidationFailed": "Le nouveau mot de passe ne respecte pas les règles de sécurité.",
+      "password_incorrect": "Le mot de passe actuel est incorrect.",
+      "password_mismatch": "Les deux nouveaux mots de passe ne correspondent pas.",
+      "password_too_short": "Le nouveau mot de passe est trop court.",
+      "password_too_common": "Le nouveau mot de passe est trop courant.",
+      "password_entirely_numeric": "Le nouveau mot de passe ne peut pas être uniquement numérique.",
+      "password_too_similar": "Le nouveau mot de passe est trop similaire à vos informations personnelles."
     },
     "logginIn": "Connexion…",
     "login": "Se connecter",

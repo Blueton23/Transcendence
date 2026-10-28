@@ -23,7 +23,14 @@
       "csrfInit": "Could not initialise CSRF protection.",
       "invalidCredentials": "Invalid credentials.",
       "logoutFailed": "Could not log out.",
-      "notAuthenticated": "User not authenticated."
+      "notAuthenticated": "User not authenticated.",
+      "passwordValidationFailed": "The new password does not meet the security requirements.",
+      "password_incorrect": "The current password is incorrect.",
+      "password_mismatch": "The two new passwords do not match.",
+      "password_too_short": "The new password is too short.",
+      "password_too_common": "The new password is too common.",
+      "password_entirely_numeric": "The new password cannot consist entirely of numbers.",
+      "password_too_similar": "The new password is too similar to your personal information."
     },
     "logginIn": "Logging in…",
     "login": "Log in",

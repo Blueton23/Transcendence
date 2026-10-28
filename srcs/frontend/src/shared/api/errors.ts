@@ -9,6 +9,23 @@ export interface ApiErrorResponse {
 }
 
 export function getApiErrorMessage(result: ApiErrorResponse): string {
+  if (result.code === "password_validation_failed") {
+    const codes = result.details?.codes ?? [];
+
+    if (codes.length === 0) {
+      return i18n.t("auth.errors.passwordValidationFailed");
+    }
+
+    return codes
+      .map((code) => {
+        const key = `auth.errors.${code}`;
+
+        return i18n.exists(key)
+          ? i18n.t(key)
+          : i18n.t("auth.errors.passwordValidationFailed");
+      })
+      .join("\n");
+  }
   if (result.details) {
     return Object.entries(result.details)
       .map(([field, messages]) => `${field} : ${messages.join(", ")}`)

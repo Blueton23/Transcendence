@@ -39,6 +39,7 @@ export async function sendFriendRequest(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify({
       user_id: userId,
@@ -70,6 +71,7 @@ export async function acceptFriendRequest(friendshipId: number): Promise<void> {
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
@@ -90,6 +92,7 @@ export async function removeFriendRequest(friendshipId: number): Promise<void> {
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
