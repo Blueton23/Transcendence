@@ -10,7 +10,7 @@ import type {
 
 import { getCsrfToken } from "@/features/auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 import i18n from "@/i18n";
 
 const API_BASE_URL = "/api";

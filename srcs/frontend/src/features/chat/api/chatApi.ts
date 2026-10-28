@@ -1,6 +1,6 @@
 import i18n from "@/i18n/index";
 import { getCookie } from "@/shared/api/cookies";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 import type {
   ApiChatMessage,
   CreateMessageData,
