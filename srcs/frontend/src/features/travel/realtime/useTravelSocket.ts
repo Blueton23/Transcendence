@@ -1,9 +1,12 @@
-import { useContext, useEffect, useEffectEvent } from "react";
+import { useContext } from "react";
 
 import {
-  TravelSocketContext,
-  type TravelEventHandler,
-} from "./TravelSocketContext";
+  useSocketEvent,
+  useSocketOpen,
+  type SocketEventHandler,
+} from "@/shared/realtime/eventSocket";
+
+import { TravelSocketContext } from "./TravelSocketContext";
 
 export function useTravelSocket() {
   const context = useContext(TravelSocketContext);
@@ -16,26 +19,17 @@ export function useTravelSocket() {
   return context;
 }
 
-// The event hooks below do nothing outside a trip (no TravelSocketProvider),
-// so shared hooks like useSteps also work on pages such as /travel.
+// Both do nothing outside a trip (no TravelSocketProvider), so shared hooks
+// like useSteps also work on pages such as /travel.
 
 export function useTravelEvent<T = unknown>(
   type: string,
-  handler: TravelEventHandler<T>,
+  handler: SocketEventHandler<T>,
 ) {
-  const subscribe = useContext(TravelSocketContext)?.subscribe;
-  const onEvent = useEffectEvent((payload: unknown) => handler(payload as T));
-
-  useEffect(() => subscribe?.(type, onEvent), [subscribe, type]);
+  useSocketEvent(TravelSocketContext, type, handler);
 }
 
-// Runs on every (re)connection. The socket does not replay what was missed
-// while it was closed, so this is where a hook reloads its data over REST.
+// Runs on every (re)connection: reload over REST what may have been missed.
 export function useTravelSocketOpen(handler: () => void) {
-  const status = useContext(TravelSocketContext)?.status;
-  const onOpen = useEffectEvent(handler);
-
-  useEffect(() => {
-    if (status === "open") onOpen();
-  }, [status]);
+  useSocketOpen(TravelSocketContext, handler);
 }
