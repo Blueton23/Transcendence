@@ -161,7 +161,12 @@ class TravelerUpdatePasswordSerializer(serializers.Serializer):
         )
 
         if not form.is_valid():
-            raise serializers.ValidationError(form.errors)
+            errors = [
+                message
+                for field_errors in form.errors.values()
+                for message in field_errors
+            ]
+            raise serializers.ValidationError({"password": errors})
 
         attrs["_password_change_form"] = form
 

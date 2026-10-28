@@ -28,6 +28,7 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -49,6 +50,7 @@ export async function modifyProfile(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -70,6 +72,7 @@ export async function modifyPassword(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -97,6 +100,7 @@ export async function modifyProfilePicture(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: formData,
     },
