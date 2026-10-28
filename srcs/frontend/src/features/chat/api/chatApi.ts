@@ -25,7 +25,7 @@ export async function sendMessage(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/${travelId}/messages/`, {
@@ -60,7 +60,7 @@ export async function markMessagesAsRead(travelId: number): Promise<void> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(

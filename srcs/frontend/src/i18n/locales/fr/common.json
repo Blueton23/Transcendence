@@ -50,7 +50,7 @@
     }
   },
   "errors": {
-    "csrfMissing": "errors.csrfMissing",
+    "csrfMissing": "Jeton CSRF introuvable.",
     "generic": "Error",
     "invalidResponse": "Réponse serveur invalide.",
     "mapbox": "Erreur Mapbox",
