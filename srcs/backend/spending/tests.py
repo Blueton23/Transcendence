@@ -844,3 +844,56 @@ class SpendingViewTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         amounts = [Decimal(share["amount"]) for share in response.json()["shares"]]
         self.assertEqual(amounts, [Decimal("50.00"), Decimal("50.00")])
+
+    def _summary_url(self, travel=None):
+        travel = travel or self.travel
+        return reverse("spending-summary", kwargs={"travel_id": travel.id})
+
+    def test_summary_returns_totals_balances_and_settlements(self):
+        create_spending(
+            travel=self.travel,
+            traveler=self.jean,
+            category=SpendingCategory.MEALS,
+            amount="90.00",
+        )
+        create_spending(
+            travel=self.travel,
+            traveler=self.bob,
+            category=SpendingCategory.FUEL,
+            amount="30.00",
+        )
+
+        response = self.client.get(self._summary_url())
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(Decimal(str(data["total"])), Decimal("120.00"))
+        totals = {row["category"]: Decimal(row["total"]) for row in data["byCategory"]}
+        self.assertEqual(totals, {"m": Decimal("90.00"), "f": Decimal("30.00")})
+        self.assertEqual(len(data["settlements"]), 1)
+        settlement = data["settlements"][0]
+        self.assertEqual(settlement["debtorId"], self.bob.id)
+        self.assertEqual(settlement["creditorId"], self.jean.id)
+        self.assertEqual(Decimal(str(settlement["amount"])), Decimal("30.00"))
+
+    def test_summary_without_spendings_is_empty(self):
+        response = self.client.get(self._summary_url())
+        data = response.json()
+        self.assertEqual(data["total"], 0)
+        self.assertEqual(data["byCategory"], [])
+        self.assertEqual(data["settlements"], [])
+
+    def test_summary_ignores_other_travel(self):
+        create_spending(
+            travel=self.other_travel,
+            traveler=self.alice,
+            category=SpendingCategory.MEALS,
+            amount="90.00",
+        )
+        response = self.client.get(self._summary_url())
+        data = response.json()
+        self.assertEqual(data["total"], 0)
+
+    def test_summary_forbidden_for_non_participant(self):
+        self.client.force_authenticate(self.alice)
+        response = self.client.get(self._summary_url())
+        self.assertEqual(response.status_code, 403)
