@@ -4,7 +4,7 @@ Ce qu'il faut savoir avant de construire les fonctionnalités temps réel (chat,
 
 ## Ce qui est déjà en place
 
-La tuyauterie est faite ; il ne manque que la couche applicative.
+La tuyauterie et les événements sont en place ; le catalogue complet est plus bas.
 
 | Élément | Où |
 |---|---|
@@ -14,12 +14,15 @@ La tuyauterie est faite ; il ne manque que la couche applicative.
 | Channel layer Redis | `CHANNEL_LAYERS` dans `srcs/backend/config/settings.py` |
 | Proxy nginx pour `/ws/` | `srcs/nginx/nginx.conf` |
 | Consumer d'exemple (`PingConsumer`) | `srcs/backend/config/consumers.py` |
+| Base commune des consumers (`GroupEventConsumer`, codes de fermeture) | `srcs/backend/common/consumers.py` |
 | Socket d'un voyage (`TravelConsumer`, `ws/travels/<travel_id>/`) | `srcs/backend/travel/consumers.py` |
+| Socket personnel (`NotificationConsumer`, `ws/notifications/`) | `srcs/backend/traveler/consumers.py` |
+| Messages système du chat (`post_system_message`) | `srcs/backend/chat/services.py` |
 | Tests et smoke test | `srcs/backend/config/tests.py`, `scripts/smoke.sh` |
 | `WebsocketCommunicator` pour les tests | `srcs/backend/common/testing.py` |
-| Helpers de diffusion (`broadcast`, `travel_group`) | `srcs/backend/common/realtime.py` |
-
-Reste à construire : quels événements existent, et comment React les consomme.
+| Helpers de diffusion (`broadcast`, `send_on_commit`, `travel_group`, `user_group`) | `srcs/backend/common/realtime.py` |
+| Hook frontend générique (`useEventSocket`, reconnexion, abonnements) | `srcs/frontend/src/shared/realtime/eventSocket.ts` |
+| Providers et hooks frontend | `features/travel/realtime/`, `features/notifications/realtime/` |
 
 ## Le modèle mental
 
@@ -55,15 +58,15 @@ Deux règles qui piègent tout le monde :
 - **Le CSRF ne s'applique pas aux WebSockets.** La protection équivalente est `AllowedHostsOriginValidator`, déjà présent dans `config/asgi.py`. À conserver.
 - **Contrôle à la connexion.** `TravelConsumer` vérifie `is_authenticated` et que l'utilisateur a une participation `ACCEPTED` au voyage. `PingConsumer`, lui, accepte tout le monde.
 - **Utiliser la même règle que `IsTravelParticipant`, pas `is_travel_member`.** Ce dernier autorise aussi `LEFT`, ce qui est correct pour les anciens messages mais pas pour l'accès en direct.
-- **La permission n'est vérifiée qu'à la connexion.** Si quelqu'un quitte un voyage ou en est retiré, son socket ouvert reste dans le groupe tant qu'il n'est pas expulsé par un événement de groupe qui fait fermer ce consumer.
-- **Codes de fermeture** : fermer avant `accept()` ne montre au navigateur qu'un échec générique 1006. Pour dire au frontend « ne réessaie pas, tu n'as pas le droit », il faut accepter puis fermer avec un code personnalisé, 4401 (non connecté) ou 4403 (pas participant, voyage inexistant compris), définis dans `travel/consumers.py`.
+- **La permission n'est vérifiée qu'à la connexion.** Quand quelqu'un quitte un voyage, `LeaveTravelView` appelle `kick_from_travel` : l'événement interne `travel.kick` (sans `payload`, donc jamais transmis au navigateur) fait sortir du groupe et fermer en 4403 chaque socket de ce voyageur. Côté frontend, `TravelAccessGuard` renvoie alors vers `/travel`. Une future action « retirer un participant » devra faire pareil.
+- **Codes de fermeture** : fermer avant `accept()` ne montre au navigateur qu'un échec générique 1006. Pour dire au frontend « ne réessaie pas, tu n'as pas le droit », il faut accepter puis fermer avec un code personnalisé, 4401 (non connecté) ou 4403 (pas participant, voyage inexistant compris), définis dans `common/consumers.py`.
 - **Rejoindre le groupe avant `accept()`.** Dès que le socket est ouvert, le frontend recharge via REST ; si le consumer rejoignait le groupe après, un événement envoyé entre les deux serait perdu.
 
 ## Choix de conception
 
 1. **Écrire via REST, diffuser via WebSocket.** Les idées, étapes, votes et messages du chat continuent de passer par les vues DRF, qui gèrent déjà la validation, les permissions et l'enveloppe d'erreur. Après l'enregistrement, la vue diffuse dans un `transaction.on_commit`. Le socket sert surtout du serveur vers le client ; les indicateurs de saisie sont le genre de chose qui irait du client vers le serveur.
 
-2. **Un socket par voyage, avec des événements typés.** `ws/travels/<travel_id>/` rejoint `travel_<id>` et transporte `chat.message`, `idea.created`, `step.updated`, etc. Un groupe par utilisateur (`user_<id>`) viendra plus tard, quand les notifications et les amis devront atteindre quelqu'un en dehors d'une page de voyage.
+2. **Un socket par voyage, avec des événements typés.** `ws/travels/<travel_id>/` rejoint `travel_<id>` et transporte `chat.message`, `idea.created`, `step.updated`, etc. Le socket personnel `ws/notifications/` rejoint `user_<id>` pour ce qui doit atteindre quelqu'un en dehors d'une page de voyage (les demandes d'amis pour l'instant). Il est ouvert sur toutes les pages connectées, et tous les onglets d'un même utilisateur partagent le groupe.
 
 3. **Une seule enveloppe d'événement, en camelCase.** Par exemple `{ "type": "idea.created", "payload": {...} }`. Les consumers ne passent pas par le renderer DRF, donc rien n'est converti en camelCase automatiquement. Construire les payloads avec les serializers existants et les passer à `broadcast` de `common.realtime`, qui les camelize (sinon le frontend recevrait du snake_case sur le socket et du camelCase sur REST) et n'envoie qu'après le commit :
 
@@ -95,15 +98,33 @@ Deux règles qui piègent tout le monde :
 | | Gérer proprement connexion et déconnexion | Reconnexion avec backoff, rechargement à la reconnexion, retrait du groupe |
 | | Diffusion efficace des messages | Groupes via Redis, pas de boucle sur les utilisateurs |
 | Collaborative features (mineur) | Espace partagé, édition en direct | Événements idées, étapes et votes sur le socket du voyage |
-| Notification system (mineur) | Actions de création, modification et suppression | Groupe par utilisateur, plus tard |
+| Notification system (mineur) | Actions de création, modification et suppression | Socket personnel `user_<id>` (amitiés), messages système du chat |
 | Multi-utilisateur (obligatoire) | Pas de race conditions | Écritures REST avec contraintes en base, diffusion après commit |
 
-## Découpage en commits proposé
+## Catalogue des événements
 
-1. ~~Déplacer le communicator de test dans `common` et ajouter un helper de diffusion qui camelize l'enveloppe.~~
-2. ~~Ajouter `TravelConsumer` avec les contrôles d'auth et de participation, l'entrée et la sortie du groupe, et les tests.~~
-3. ~~Ajouter les endpoints REST du chat (liste, envoi, marquer comme lu) avec la diffusion de `chat.message`.~~
-4. ~~Ajouter le hook frontend `useTravelSocket` et l'interface du chat.~~
-5. ~~Diffuser les événements idées, étapes et votes depuis les vues existantes, et les appliquer côté frontend.~~
-6. Ajouter l'événement d'expulsion au départ d'un voyage, puis le socket de notifications par utilisateur.
-7. Ajouter le catalogue des événements à ce fichier une fois les événements créés.
+Enveloppe : `{ "type": "...", "payload": {...} }`, en camelCase. Tous sont envoyés après le commit. Pour ajouter un événement : `broadcast(...)` dans la vue, puis `useTravelEvent` ou `useNotificationEvent` dans le hook concerné, et une ligne ici.
+
+### Socket du voyage (`ws/travels/<travel_id>/`, groupe `travel_<id>`)
+
+| Type | Envoyé par | Payload | Côté frontend |
+|---|---|---|---|
+| `chat.message` | `chat/views.py` (envoi), `chat/services.py` (message système) | `MessageSerializer` sans `isUnread` | `useChat` ajoute le message, `useUnreadCount` incrémente le badge (sauf messages système et les siens) |
+| `idea.created` | `IdeaListView` | `IdeaSerializer` sans `voted` | `useIdeas` ajoute l'idée ; `useSteps` recharge (`ideaCount`) |
+| `idea.updated` | `IdeaDetailView` (modification, placement), `IdeaChoiceView` | `IdeaSerializer` sans `voted` | `useIdeas` remplace l'idée en gardant `voted` ; `useSteps` recharge |
+| `idea.deleted` | `IdeaDetailView` | `{ id }` | `useIdeas` retire l'idée ; `useSteps` recharge |
+| `reaction.created` / `reaction.deleted` | `ReactionView` | `{ ideaId, travelerId, voteCount }` | `useIdeas` met à jour `voteCount`, et `voted` si `travelerId` est l'utilisateur |
+| `step.created` / `step.updated` | `StepListView`, `StepDetailView` | `StepSerializer` | `useSteps` insère ou remplace, trié par dates |
+| `step.deleted` | `StepDetailView` | `{ id }` | `useSteps` retire l'étape ; `useIdeas` recharge (les idées reviennent dans le pool) |
+| `participant.joined` / `participant.left` | `TravelJoinView`, `LeaveTravelView` (avec un message système dans le chat) | `{ travelerId }` | `useTravel` recharge la liste des voyageurs |
+| `travel.kick` (interne) | `kick_from_travel` | `{ traveler_id }`, hors enveloppe | Jamais reçu : le consumer ferme le socket concerné en 4403 |
+
+### Socket personnel (`ws/notifications/`, groupe `user_<id>`)
+
+Envoyés aux deux personnes concernées, pour que les autres onglets de celle qui agit restent à jour aussi. Le payload n'est qu'un signal : le frontend recharge les listes en REST.
+
+| Type | Envoyé par | Payload | Côté frontend |
+|---|---|---|---|
+| `friendship.requested` | `FriendshipRequestView` | `{ friendshipId }` | `ProfilePage` recharge demandes et amis |
+| `friendship.accepted` | `FriendshipAcceptView` | `{ friendshipId }` | idem |
+| `friendship.removed` | `FriendshipRemoveView` (refus, annulation ou suppression) | `{ friendshipId }` | idem |

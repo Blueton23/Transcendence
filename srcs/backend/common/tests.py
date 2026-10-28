@@ -2,19 +2,16 @@ import datetime
 from io import StringIO
 from unittest.mock import patch
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.management import call_command
 from django.core.management.base import CommandError
-from django.test import TestCase, SimpleTestCase
+from django.test import TestCase
 from django.urls import reverse
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
 from chat.models import Message
-from common.realtime import broadcast, travel_group
 from common.seeders.clear import clear_seed_data
 from idea.models import Idea, IdeaType, Reaction
 from spending.models import Spending
