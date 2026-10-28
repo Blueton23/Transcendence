@@ -19,8 +19,14 @@ from travel.mixins import ParticipantScopedMixin
 from travel.models import Travel
 from travel.permissions import IsTravelParticipant
 
+from .schema import (
+    spending_detail_schema,
+    spendings_list_schema,
+)
+
 
 @extend_schema(tags=["Spendings"])
+@spendings_list_schema
 class SpendingListView(PublicApiMixin, ListCreateAPIView):
     queryset = Spending.objects.all()
     serializer_class = SpendingSerializer
@@ -44,6 +50,7 @@ class SpendingListView(PublicApiMixin, ListCreateAPIView):
 
 
 @extend_schema(tags=["Spendings"])
+@spending_detail_schema
 class SpendingDetailView(
     PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateDestroyAPIView
 ):
@@ -58,7 +65,7 @@ class SpendingDetailView(
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
 
-class SpendingSummaryView(APIView, PublicApiMixin):
+class SpendingSummaryView(APIView):
     permission_classes: ClassVar[list] = [
         IsAuthenticated,
         IsTravelParticipant,
