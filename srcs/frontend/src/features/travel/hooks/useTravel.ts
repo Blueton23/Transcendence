@@ -1,6 +1,10 @@
 import type { Travel } from "@/features/travel/types";
 import { getTravel, getTravels } from "@/features/travel/api/travelApi";
-import { useState, useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
+import {
+  useTravelEvent,
+  useTravelSocketOpen,
+} from "@/features/travel/realtime/useTravelSocket";
 import i18n from "@/i18n";
 
 export function useTravel(travelId: number) {
@@ -23,6 +27,20 @@ export function useTravel(travelId: number) {
     }
     loadTravel();
   }, [travelId]);
+
+  // Reloads in place (no loading state, so the page does not blank out).
+  const reloadTravel = useCallback(async () => {
+    try {
+      setTravel(await getTravel(travelId));
+    } catch (err) {
+      console.error("Impossible de recharger le voyage :", err);
+    }
+  }, [travelId]);
+
+  // The travelers list changes when someone joins or leaves.
+  useTravelSocketOpen(() => void reloadTravel());
+  useTravelEvent("participant.joined", () => void reloadTravel());
+  useTravelEvent("participant.left", () => void reloadTravel());
 
   return { travel, isLoading, error };
 }

@@ -32,6 +32,8 @@ def _seed(**kwargs):
         "reactions": 5,
         "messages_per_travel": 3,
         "spendings_per_travel": 3,
+        # The default (99) hashes 99 passwords on every call: keep tests fast.
+        "dub_travelers": 0,
     }
     defaults.update(kwargs)
     call_command("seed", stdout=StringIO(), **defaults)
@@ -128,7 +130,7 @@ class SeedFreshFlagTest(TestCase):
         _seed(travelers=5, travels=2, fresh=True)
 
         self.assertEqual(Travel.objects.count(), 2)
-        self.assertEqual(Traveler.objects.count(), 104)
+        self.assertEqual(Traveler.objects.count(), 5)
 
     def test_fresh_keeps_superuser(self):
         Traveler.objects.create_superuser(
@@ -137,7 +139,16 @@ class SeedFreshFlagTest(TestCase):
         _seed(travelers=4, fresh=True)
 
         self.assertTrue(Traveler.objects.filter(username="admin").exists())
-        self.assertEqual(Traveler.objects.count(), 104)
+        self.assertEqual(Traveler.objects.count(), 5)
+
+
+class SeedDubTravelersTest(TestCase):
+    def test_creates_the_requested_dub_accounts_and_their_friendships(self):
+        _seed(dub_travelers=20)
+
+        dubs = Traveler.objects.filter(username__startswith="dub")
+        self.assertEqual(dubs.count(), 20)
+        self.assertTrue(Friendship.objects.filter(user1__in=dubs).exists())
 
 
 class SeedSpendingsTest(TestCase):

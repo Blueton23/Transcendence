@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef } from "react";
+import { Fragment } from "react";
 import type { ChatMessage } from "../types";
 
 import { useAuth } from "@/features/auth/context/useAuth";
@@ -26,15 +26,7 @@ export default function ChatTimeline({
   isLoading,
   error,
 }: ChatTimelineProps) {
-  const bottomRef = useRef<HTMLDivElement>(null);
   const { currentUser } = useAuth();
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({
-      behavior: "auto",
-      block: "end",
-    });
-  }, [messages, isLoading]);
 
   if (isLoading) {
     return (
@@ -86,8 +78,6 @@ export default function ChatTimeline({
           </Fragment>
         );
       })}
-
-      <div ref={bottomRef} />
     </div>
   );
 }

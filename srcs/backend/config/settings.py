@@ -102,7 +102,13 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
-                f"redis://{REDIS_HOST}:{REDIS_PORT}/0",
+                {
+                    "address": f"redis://{REDIS_HOST}:{REDIS_PORT}/0",
+                    # redis-py 8 defaults socket_timeout to 5s, the same as the
+                    # 5s blocking pop channels_redis waits on: idle sockets
+                    # would crash. Must stay above brpop_timeout.
+                    "socket_timeout": 10,
+                },
             ],
         },
     },

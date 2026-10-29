@@ -1,16 +1,25 @@
 from io import BytesIO
 
+from asgiref.sync import sync_to_async
+from channels.layers import get_channel_layer
+from django.conf import settings
 from django.contrib.auth import SESSION_KEY
+from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from PIL import Image
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
+from common.consumers import CLOSE_NOT_AUTHENTICATED
+from common.realtime import user_group
+from common.testing import BroadcastListenerMixin, WebsocketCommunicator
+from config.asgi import application
+from traveler.consumers import NotificationConsumer
 from traveler.models import Friendship, Status, Traveler
 from traveler.serializers import (
     TravelerCreateSerializer,
@@ -1501,3 +1510,156 @@ class ApiTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data["detail"], "Identifiants invalides.")
         self.assertFalse(Token.objects.exists())
+
+
+class FriendshipBroadcastTest(BroadcastListenerMixin, APITestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.alice = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="Password123!"
+        )
+        self.bob = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="Password123!"
+        )
+        self.client.force_authenticate(user=self.alice)
+
+    def create_friendship(self, requester, target, status=Status.PENDING):
+        user1, user2 = sorted([requester, target], key=lambda user: user.pk)
+        return Friendship.objects.create(
+            user1=user1, user2=user2, requested_by=requester, status=status
+        )
+
+    def request(self, method, url, data=None):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = getattr(self.client, method)(url, data)
+        return response, callbacks
+
+    def test_request_notifies_the_target(self):
+        self.listen_to(user_group(self.bob.id))
+
+        response, _ = self.request(
+            "post", reverse("friendship-request"), {"user_id": self.bob.pk}
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "friendship.requested",
+                "payload": {"friendshipId": response.data["friendship"]},
+            },
+        )
+
+    def test_request_also_notifies_the_requesters_other_tabs(self):
+        self.listen_to(user_group(self.alice.id))
+
+        self.request("post", reverse("friendship-request"), {"user_id": self.bob.pk})
+
+        self.assertEqual(self.receive_event()["type"], "friendship.requested")
+
+    def test_accept_notifies_the_requester(self):
+        friendship = self.create_friendship(self.bob, self.alice)
+        self.listen_to(user_group(self.bob.id))
+
+        response, _ = self.request(
+            "post",
+            reverse("friendship-accept", kwargs={"friendship_id": friendship.id}),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "friendship.accepted",
+                "payload": {"friendshipId": friendship.id},
+            },
+        )
+
+    def test_remove_notifies_the_other_friend(self):
+        friendship = self.create_friendship(self.bob, self.alice, Status.ACCEPTED)
+        friendship_id = friendship.id
+        self.listen_to(user_group(self.bob.id))
+
+        response, _ = self.request(
+            "delete",
+            reverse("friendship-remove", kwargs={"friendship_id": friendship_id}),
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Friendship.objects.filter(pk=friendship_id).exists())
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "friendship.removed",
+                "payload": {"friendshipId": friendship_id},
+            },
+        )
+
+    def test_rejected_request_notifies_nobody(self):
+        response, callbacks = self.request(
+            "post", reverse("friendship-request"), {"user_id": self.alice.pk}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(callbacks, [])
+
+
+# TransactionTestCase: database_sync_to_async closes the connection that
+# TestCase keeps open for its wrapping transaction.
+class NotificationConsumerTest(TransactionTestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.alice = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="Password123!"
+        )
+
+    def communicator(self, user):
+        return WebsocketCommunicator(
+            NotificationConsumer.as_asgi(), "/ws/notifications/", scope={"user": user}
+        )
+
+    async def test_user_receives_own_events_only(self):
+        communicator = self.communicator(self.alice)
+        connected, _ = await communicator.connect()
+        self.assertTrue(connected)
+
+        layer = get_channel_layer()
+        event = {"type": "friendship.requested", "payload": {"friendshipId": 1}}
+        await layer.group_send(user_group(self.alice.id + 1), event)
+        self.assertTrue(await communicator.receive_nothing(timeout=0.2))
+
+        await layer.group_send(user_group(self.alice.id), event)
+        self.assertEqual(await communicator.receive_json_from(), event)
+        await communicator.disconnect()
+
+    async def test_anonymous_is_closed_with_4401(self):
+        communicator = self.communicator(AnonymousUser())
+
+        connected, _ = await communicator.connect()
+        message = await communicator.receive_output(timeout=2)
+
+        self.assertTrue(connected)
+        self.assertEqual(
+            message, {"type": "websocket.close", "code": CLOSE_NOT_AUTHENTICATED}
+        )
+        await communicator.disconnect()
+
+    async def test_logged_in_user_connects_through_routing(self):
+        await sync_to_async(self.client.force_login)(self.alice)
+        session_id = self.client.cookies[settings.SESSION_COOKIE_NAME].value
+        communicator = WebsocketCommunicator(
+            application,
+            "/ws/notifications/",
+            headers=[
+                (b"origin", b"http://localhost"),
+                (b"cookie", f"{settings.SESSION_COOKIE_NAME}={session_id}".encode()),
+            ],
+        )
+
+        connected, _ = await communicator.connect()
+
+        self.assertTrue(connected)
+        self.assertTrue(await communicator.receive_nothing(timeout=0.2))
+        await communicator.disconnect()
