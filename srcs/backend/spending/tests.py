@@ -772,6 +772,7 @@ class SpendingViewTest(APITestCase):
     def test_create_without_shares_splits_equally_and_keeps_chosen_payer(self):
         response = self.client.post(self.url, self._payload(), format="json")
         self.assertEqual(response.json()["travelerId"], self.bob.id)
+        self.assertEqual(response.status_code, 201)
         amounts = [Decimal(share["amount"]) for share in response.json()["shares"]]
         self.assertEqual(amounts, [Decimal("45.00"), Decimal("45.00")])
 
@@ -878,7 +879,7 @@ class SpendingViewTest(APITestCase):
     def test_summary_without_spendings_is_empty(self):
         response = self.client.get(self._summary_url())
         data = response.json()
-        self.assertEqual(data["total"], 0)
+        self.assertEqual(data["total"], "0.00")
         self.assertEqual(data["byCategory"], [])
         self.assertEqual(data["settlements"], [])
 
@@ -891,7 +892,7 @@ class SpendingViewTest(APITestCase):
         )
         response = self.client.get(self._summary_url())
         data = response.json()
-        self.assertEqual(data["total"], 0)
+        self.assertEqual(data["total"], "0.00")
 
     def test_summary_forbidden_for_non_participant(self):
         self.client.force_authenticate(self.alice)

@@ -25,6 +25,10 @@ from .schema import (
 )
 
 
+def _money(value) -> str:
+    return f"{value:.2f}"
+
+
 @extend_schema(tags=["Spendings"])
 @spendings_list_schema
 class SpendingListView(PublicApiMixin, ListCreateAPIView):
@@ -81,14 +85,17 @@ class SpendingSummaryView(APIView):
         balances = compute_balances(travel)
         settlements = compute_settlements(travel)
         data = {
-            "total": sum(row["total"] for row in by_category),
-            "by_category": by_category,
+            "total": _money(sum(row["total"] for row in by_category)),
+            "by_category": [
+                {"category": row["category"], "total": _money(row["total"])}
+                for row in by_category
+            ],
             "balances": [
                 {
                     "traveler_id": b.traveler.pk,
-                    "paid": b.paid,
-                    "owed": b.owed,
-                    "balance": b.balance,
+                    "paid": _money(b.paid),
+                    "owed": _money(b.owed),
+                    "balance": _money(b.balance),
                 }
                 for b in balances
             ],
@@ -96,7 +103,7 @@ class SpendingSummaryView(APIView):
                 {
                     "debtor_id": s.debtor.pk,
                     "creditor_id": s.creditor.pk,
-                    "amount": s.amount,
+                    "amount": _money(s.amount),
                 }
                 for s in settlements
             ],
