@@ -130,7 +130,7 @@ function Login() {
 
             <Button
               type="button"
-              variant="outline"
+              variant="primary"
               onClick={() => {
                 window.location.href = "/api/auth/google/";
               }}
