@@ -586,11 +586,6 @@ class GoogleCallbackView(APIView):
 
         userinfo = token["userinfo"]
 
-        logger.warning(
-            "Google UserInfo : champs=%s",
-            list(userinfo.keys()),
-        )
-
         if not userinfo.get("email_verified"):
             logger.warning("Google OAuth : email non vérifié par Google")
             return redirect("/login?error=google")
