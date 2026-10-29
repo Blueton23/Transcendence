@@ -14,7 +14,7 @@ import {
   mapIdeaFromApi,
   mapCreateIdeaToApi,
 } from "@/features/idea/api/ideaMapper";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 
 // Récupérer les idées du voyage
 export async function fetchIdeas(travelId: number): Promise<Idea[]> {

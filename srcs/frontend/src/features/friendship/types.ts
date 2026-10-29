@@ -1,7 +1,7 @@
-import type { User } from "../auth/types";
+import type { User } from "@/features/auth/types";
 
 export interface FriendshipSearchResponse {
-  traveler: User;
+  travelers: User[];
 }
 
 export interface FriendshipRequestResponse {

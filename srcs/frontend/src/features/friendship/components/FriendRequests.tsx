@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 import type { FriendshipRequest } from "../types";
 import {
@@ -8,11 +9,10 @@ import {
 } from "../api/friendship";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 
-import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
 import Icon from "@/shared/ui/Icon";
-import { useTranslation } from "react-i18next";
+import IconButton from "@/shared/ui/IconButton";
 
 interface FriendRequestsProps {
   onFriendAccepted: () => void;
@@ -32,6 +32,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     if (requestId.current === null) {
       throw new Error(t("friendship.errors.missingRequestId"));
     }
+
     return acceptFriendRequest(requestId.current);
   });
 
@@ -43,6 +44,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
     if (requestId.current === null) {
       throw new Error(t("friendship.errors.missingRequestId"));
     }
+
     return removeFriendRequest(requestId.current);
   });
 
@@ -55,12 +57,15 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
       setRequests(response.requests);
       setError(null);
     }
+
     void loadRequests();
   }, []);
 
   async function handleAccept(id: number) {
     requestId.current = id;
+
     const result = await submitAccept();
+
     if (result.success) {
       setRequests((current) => current.filter((request) => request.id !== id));
       onFriendAccepted();
@@ -69,7 +74,9 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
 
   async function handleReject(id: number) {
     requestId.current = id;
+
     const result = await submitReject();
+
     if (result.success) {
       setRequests((current) => current.filter((request) => request.id !== id));
     }
@@ -83,7 +90,9 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
           {requests.length > 0 && requests.length}
         </Text>
       </div>
+
       {displayedError && <Text tone="accent">{displayedError}</Text>}
+
       {requests.length === 0 ? (
         <Text tone="muted">{t("friendship.noRequests")}</Text>
       ) : (
@@ -93,7 +102,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
               key={request.id}
               className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-4"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <Avatar user={request.traveler} profile />
 
                 <div className="flex min-w-0 flex-col">
@@ -105,26 +114,22 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
                 </div>
               </div>
 
-              <div className="flex gap-2">
-                <Button
-                  type="button"
+              <div className="flex shrink-0 items-center gap-2">
+                <IconButton
                   icon={<Icon name="check" size={16} />}
+                  label={t("friendship.accept")}
                   variant="success"
                   disabled={isSubmitting}
                   onClick={() => void handleAccept(request.id)}
-                >
-                  {t("friendship.accept")}
-                </Button>
+                />
 
-                <Button
-                  type="button"
+                <IconButton
                   icon={<Icon name="x" size={16} />}
+                  label={t("friendship.decline")}
                   variant="danger"
                   disabled={isSubmitting}
                   onClick={() => void handleReject(request.id)}
-                >
-                  {t("friendship.decline")}
-                </Button>
+                />
               </div>
             </div>
           ))}

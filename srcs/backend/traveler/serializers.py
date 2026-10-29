@@ -161,7 +161,21 @@ class TravelerUpdatePasswordSerializer(serializers.Serializer):
         )
 
         if not form.is_valid():
-            raise serializers.ValidationError(form.errors)
+            error_codes = [
+                error.code or "invalid"
+                for field_errors in form.errors.as_data().values()
+                for error in field_errors
+            ]
+
+            # Supprime les doublons tout en conservant l'ordre.
+            error_codes = list(dict.fromkeys(error_codes))
+
+            raise serializers.ValidationError(
+                {
+                    "code": "password_validation_failed",
+                    "errors": error_codes,
+                }
+            )
 
         attrs["_password_change_form"] = form
 

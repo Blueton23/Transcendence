@@ -23,7 +23,14 @@
       "csrfInit": "No se pudo inicializar la protección CSRF.",
       "invalidCredentials": "Credenciales no válidas.",
       "logoutFailed": "No se pudo cerrar la sesión.",
-      "notAuthenticated": "Usuario no autenticado."
+      "notAuthenticated": "Usuario no autenticado.",
+      "passwordValidationFailed": "La nueva contraseña no cumple los requisitos de seguridad.",
+      "password_incorrect": "La contraseña actual es incorrecta.",
+      "password_mismatch": "Las dos contraseñas nuevas no coinciden.",
+      "password_too_short": "La nueva contraseña es demasiado corta.",
+      "password_too_common": "La nueva contraseña es demasiado común.",
+      "password_entirely_numeric": "La nueva contraseña no puede estar compuesta únicamente por números.",
+      "password_too_similar": "La nueva contraseña es demasiado similar a tu información personal."
     },
     "logginIn": "Iniciando sesión…",
     "login": "Iniciar sesión",
@@ -35,6 +42,12 @@
     "password": "Contraseña",
     "username": "Nombre de usuario",
     "welcomeBack": "Bienvenido de nuevo"
+  },
+  "chat": {
+    "errors": {
+      "travelChatAccessDenied": "No tienes acceso a este viaje.",
+      "travelChatMembershipRequired": "Debes ser miembro del viaje para enviar un mensaje."
+    }
   },
   "errors": {
     "csrfMissing": "Token CSRF no encontrado.",
@@ -49,20 +62,32 @@
     "accept": "Aceptar",
     "decline": "Rechazar",
     "errors": {
+      "cannot_accept_own_request": "No puedes aceptar tu propia solicitud de amistad.",
+      "cannot_friend_yourself": "No puedes enviarte una solicitud de amistad a ti mismo.",
+      "friendship_not_found": "No se encontró la amistad.",
+      "invalid_user_id": "El ID del usuario no es válido.",
       "loadFailed": "No se pudo cargar tu lista de amigos.",
       "missingRequestId": "Falta el identificador de la solicitud.",
-      "noUserSelected": "Ningún usuario seleccionado."
+      "noUserSelected": "Ningún usuario seleccionado.",
+      "not_friendship_participant": "No formas parte de esta amistad.",
+      "not_request_participant": "No formas parte de esta solicitud de amistad.",
+      "relationship_exists": "Ya existe una amistad o solicitud de amistad con este usuario.",
+      "request_not_found": "No se encontró la solicitud de amistad.",
+      "searchFailed": "No se pudo buscar a los usuarios.",
+      "user_id_required": "Se requiere el ID del usuario.",
+      "user_not_found": "No se encontró al usuario."
     },
     "myFriends": "MIS AMIGOS · {{count}}",
     "noFriends": "Todavía no tienes amigos.",
     "noRequests": "No hay solicitudes de amistad pendientes.",
+    "noUsersFound": "No se encontraron usuarios.",
     "receivedRequests": "SOLICITUDES RECIBIDAS",
     "remove": "Quitar",
     "removeTitle": "¿Quitar a {{username}} de tus amigos?",
     "removing": "Eliminando…",
     "requestSent": "Solicitud de amistad enviada.",
     "search": "Buscar",
-    "searchPlaceholder": "Añadir un amigo · usuario o correo",
+    "searchPlaceholder": "Añadir un amigo · usuario",
     "sending": "Enviando…",
     "sendRequest": "Enviar solicitud",
     "title": "Amigos"

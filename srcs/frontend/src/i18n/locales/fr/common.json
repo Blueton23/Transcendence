@@ -23,7 +23,14 @@
       "csrfInit": "Impossible d'initialiser la protection CSRF.",
       "invalidCredentials": "Identifiants invalides.",
       "logoutFailed": "Impossible de se déconnecter.",
-      "notAuthenticated": "Utilisateur non authentifié."
+      "notAuthenticated": "Utilisateur non authentifié.",
+      "passwordValidationFailed": "Le nouveau mot de passe ne respecte pas les règles de sécurité.",
+      "password_incorrect": "Le mot de passe actuel est incorrect.",
+      "password_mismatch": "Les deux nouveaux mots de passe ne correspondent pas.",
+      "password_too_short": "Le nouveau mot de passe est trop court.",
+      "password_too_common": "Le nouveau mot de passe est trop courant.",
+      "password_entirely_numeric": "Le nouveau mot de passe ne peut pas être uniquement numérique.",
+      "password_too_similar": "Le nouveau mot de passe est trop similaire à vos informations personnelles."
     },
     "logginIn": "Connexion…",
     "login": "Se connecter",
@@ -31,13 +38,19 @@
     "loginSubtitle": "Connectez-vous pour retrouver vos voyages",
     "newPassword": "Nouveau mot de passe",
     "noAccount": "Pas encore de compte ?",
-    "oldPassword": "Ancien mot de passe",
+    "oldPassword": "Mot de passe actuel",
     "password": "Mot de passe",
     "username": "Pseudo",
     "welcomeBack": "Bon retour"
   },
+  "chat": {
+    "errors": {
+      "travelChatAccessDenied": "Vous n'avez pas accès à ce voyage.",
+      "travelChatMembershipRequired": "Vous devez être membre du voyage pour envoyer un message."
+    }
+  },
   "errors": {
-    "csrfMissing": "errors.csrfMissing",
+    "csrfMissing": "Jeton CSRF introuvable.",
     "generic": "Error",
     "invalidResponse": "Réponse serveur invalide.",
     "mapbox": "Erreur Mapbox",
@@ -49,20 +62,32 @@
     "accept": "Accepter",
     "decline": "Refuser",
     "errors": {
+      "cannot_accept_own_request": "Vous ne pouvez pas accepter votre propre demande d'amitié.",
+      "cannot_friend_yourself": "Vous ne pouvez pas vous envoyer une demande d'amitié.",
+      "friendship_not_found": "Amitié introuvable.",
+      "invalid_user_id": "Identifiant utilisateur invalide.",
       "loadFailed": "Impossible de charger votre liste d'amis.",
       "missingRequestId": "Identifiant de la demande manquant.",
-      "noUserSelected": "Aucun utilisateur sélectionné."
+      "noUserSelected": "Aucun utilisateur sélectionné.",
+      "not_friendship_participant": "Vous ne faites pas partie de cette amitié.",
+      "not_request_participant": "Vous ne participez pas à cette demande d'amitié.",
+      "relationship_exists": "Une amitié ou une demande d'amitié existe déjà avec cet utilisateur.",
+      "request_not_found": "Demande d'amitié introuvable.",
+      "searchFailed": "Impossible de rechercher les utilisateurs.",
+      "user_id_required": "L'identifiant de l'utilisateur est requis.",
+      "user_not_found": "Utilisateur introuvable."
     },
     "myFriends": "MES AMIS · {{count}}",
     "noFriends": "Vous n'avez pas encore d'amis.",
     "noRequests": "Aucune demande d'amitié en attente.",
+    "noUsersFound": "Aucun utilisateur trouvé.",
     "receivedRequests": "DEMANDES REÇUES",
     "remove": "Retirer",
     "removeTitle": "Retirer {{username}} de vos amis ?",
     "removing": "Suppression…",
     "requestSent": "Demande d'amitié envoyée.",
     "search": "Rechercher",
-    "searchPlaceholder": "Ajouter un ami · pseudo ou email",
+    "searchPlaceholder": "Ajouter un ami · pseudo",
     "sending": "Envoi…",
     "sendRequest": "Envoyer une demande",
     "title": "Amis"

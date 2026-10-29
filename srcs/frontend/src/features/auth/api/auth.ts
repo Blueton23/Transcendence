@@ -30,6 +30,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -70,6 +71,7 @@ export async function logout(): Promise<void> {
     credentials: "include",
     headers: {
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 

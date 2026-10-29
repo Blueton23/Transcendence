@@ -56,7 +56,11 @@ function Modify({ onSuccess }: ModifyProps) {
 
   return (
     <div className="w-full">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4"
+        id="modify-profile-form"
+      >
         {/* Photo de profil */}
         <div className="flex items-center justify-start gap-3">
           <ProfilePicture />
@@ -140,17 +144,11 @@ function Modify({ onSuccess }: ModifyProps) {
       {/* Bouton principal */}
       <div className="mt-4">
         <Button
-          type="button"
+          type="submit"
+          form="modify-profile-form"
           variant="primary"
           className="w-full rounded-full py-3"
           disabled={isSubmitting}
-          onClick={() => {
-            const formElement = document.querySelector(
-              "form",
-            ) as HTMLFormElement | null;
-
-            formElement?.requestSubmit();
-          }}
         >
           {isSubmitting ? `${t("actions.saving")}` : `${t("actions.save")}`}
         </Button>

@@ -1,5 +1,6 @@
+import i18n from "@/i18n/index";
 import { getCookie } from "@/shared/api/cookies";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 import type {
   ApiChatMessage,
   CreateMessageData,
@@ -24,7 +25,7 @@ export async function sendMessage(
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(`${API_BASE_URL}/${travelId}/messages/`, {
@@ -33,6 +34,7 @@ export async function sendMessage(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -58,7 +60,7 @@ export async function markMessagesAsRead(travelId: number): Promise<void> {
   const csrfToken = getCookie("csrftoken");
 
   if (!csrfToken) {
-    throw new Error("Token CSRF introuvable.");
+    throw new Error(i18n.t("errors.csrfMissing"));
   }
 
   const response = await fetch(
@@ -68,6 +70,7 @@ export async function markMessagesAsRead(travelId: number): Promise<void> {
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );

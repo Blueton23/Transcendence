@@ -8,53 +8,51 @@ export interface ApiErrorResponse {
   details?: Record<string, string[]> | null;
 }
 
-export function getApiErrorMessage(result: ApiErrorResponse): string {
-  if (result.details) {
-    return Object.entries(result.details)
-      .map(([field, messages]) => `${field} : ${messages.join(", ")}`)
-      .join("\n");
-  }
+function getPasswordValidationMessage(result: ApiErrorResponse): string {
+  const fallback = i18n.t("auth.errors.passwordValidationFailed");
+  const codes = result.details?.codes ?? [];
 
-  return result.detail ?? result.message ?? i18n.t("errors.unexpected");
+  if (codes.length === 0) {
+    return fallback;
+  }
+  return codes
+    .map((code) => {
+      const key = `auth.errors.${code}`;
+      return i18n.exists(key) ? i18n.t(key) : fallback;
+    })
+    .join("\n");
 }
 
-export async function parseResponse<T>(response: Response): Promise<T> {
-  const contentType = response.headers.get("content-type");
+function getDetailsMessage(
+  details: Record<string, string[]> | null | undefined,
+): string | null {
+  if (!details) {
+    return null;
+  }
+  return Object.entries(details)
+    .map(([field, messages]) => `${field} : ${messages.join(", ")}`)
+    .join("\n");
+}
 
-  if (!response.ok) {
-    const rawBody = await response.text();
+function getTranslatedErrorMessage(errorCode: string): string {
+  const key = `friendship.errors.${errorCode}`;
+  return i18n.exists(key) ? i18n.t(key) : errorCode;
+}
 
-    console.error("API ERROR", {
-      status: response.status,
-      statusText: response.statusText,
-      contentType,
-      body: rawBody,
-    });
-
-    if (contentType?.includes("application/json")) {
-      let result: ApiErrorResponse;
-
-      try {
-        result = JSON.parse(rawBody) as ApiErrorResponse;
-      } catch {
-        throw new Error(rawBody || i18n.t("errors.server"));
-      }
-
-      throw new Error(getApiErrorMessage(result));
-    }
-
-    throw new Error(
-      rawBody ||
-        i18n.t("errors.serverWithStatus", {
-          status: response.status,
-          statusText: response.statusText,
-        }),
-    );
+export function getApiErrorMessage(result: ApiErrorResponse): string {
+  if (result.code === "password_validation_failed") {
+    return getPasswordValidationMessage(result);
   }
 
-  if (contentType?.includes("application/json")) {
-    return response.json() as Promise<T>;
+  const detailsMessage = getDetailsMessage(result.details);
+  if (detailsMessage !== null) {
+    return detailsMessage;
   }
 
-  throw new Error(i18n.t("errors.invalidResponse"));
+  const errorCode = result.code ?? result.detail ?? result.message;
+  if (errorCode) {
+    return getTranslatedErrorMessage(errorCode);
+  }
+
+  return i18n.t("errors.unexpected");
 }

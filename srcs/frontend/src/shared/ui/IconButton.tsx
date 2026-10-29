@@ -1,6 +1,8 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
-type IconButtonVariant = "primary" | "flat" | "outline" | "ghost";
+type IconButtonVariant =
+  "primary" | "flat" | "outline" | "ghost" | "success" | "danger";
+
 type IconButtonSize = "xs" | "sm" | "md" | "lg";
 
 interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -15,6 +17,8 @@ const variantStyles = {
   flat: "bg-surface-container text-muted border-transparent",
   outline: "bg-surface border-border text-text-secondary",
   ghost: "bg-transparent border-transparent text-muted",
+  success: "bg-success/15 text-success border-transparent hover:bg-success/25",
+  danger: "bg-error/15 text-error border-transparent hover:bg-error/25",
 };
 
 const sizeStyles = {
@@ -25,7 +29,7 @@ const sizeStyles = {
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center shrink-0 rounded-full border cursor-pointer";
+  "inline-flex items-center justify-center shrink-0 rounded-full border cursor-pointer disabled:cursor-not-allowed disabled:opacity-50";
 
 function IconButton({
   icon,
@@ -49,4 +53,5 @@ function IconButton({
     </button>
   );
 }
+
 export default IconButton;
