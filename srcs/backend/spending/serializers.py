@@ -1,8 +1,8 @@
 from typing import ClassVar
 
-from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
+from common.mixins import ModelValidationMixin
 from idea.models import Idea
 from spending.models import Spending, SpendingShare
 from spending.services import create_spending, update_spending
@@ -17,13 +17,6 @@ class SpendingSharesSerializer(serializers.ModelSerializer):
         allow_null=False,
         required=True,
     )
-
-    def save(self, **kwargs):
-        try:
-            return super().save(**kwargs)
-        except DjangoValidationError as exc:
-            detail = getattr(exc, "message_dict", exc.messages)
-            raise serializers.ValidationError(detail) from exc
 
     class Meta:
         model = SpendingShare
@@ -41,7 +34,7 @@ class SpendingSharesSerializer(serializers.ModelSerializer):
         ]
 
 
-class SpendingSerializer(serializers.ModelSerializer):
+class SpendingSerializer(ModelValidationMixin, serializers.ModelSerializer):
     travel_id = serializers.IntegerField(read_only=True)
 
     traveler_id = serializers.PrimaryKeyRelatedField(
@@ -67,24 +60,20 @@ class SpendingSerializer(serializers.ModelSerializer):
 
     shares = SpendingSharesSerializer(many=True, required=False)
 
-    def create(self, validated_data):
+    @staticmethod
+    def pop_shares(validated_data):
         shares = validated_data.pop("shares", None)
         if shares is not None:
             shares = {s["traveler"]: s["amount"] for s in shares}
+        return shares
+
+    def create(self, validated_data):
+        shares = self.pop_shares(validated_data)
         return create_spending(shares=shares, **validated_data)
 
     def update(self, instance, validated_data):
-        shares = validated_data.pop("shares", None)
-        if shares is not None:
-            shares = {s["traveler"]: s["amount"] for s in shares}
+        shares = self.pop_shares(validated_data)
         return update_spending(instance, shares=shares, **validated_data)
-
-    def save(self, **kwargs):
-        try:
-            return super().save(**kwargs)
-        except DjangoValidationError as exc:
-            detail = getattr(exc, "message_dict", exc.messages)
-            raise serializers.ValidationError(detail) from exc
 
     class Meta:
         model = Spending
