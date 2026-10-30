@@ -1564,6 +1564,13 @@ class GoogleLoginViewTest(APITestCase):
 @patch("traveler.views.oauth.google.authorize_access_token")
 class GoogleCallbackViewTest(APITestCase):
     # Simule le retour de Google sur le callback
+    def setUp(self):
+        super().setUp()
+
+        logger_patcher = patch("traveler.views.logger.warning")
+        logger_patcher.start()
+        self.addCleanup(logger_patcher.stop)
+
     def google_callback(self):
         return self.client.get(
             reverse("auth-google-callback"),
