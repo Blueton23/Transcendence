@@ -898,3 +898,41 @@ class SpendingViewTest(APITestCase):
         self.client.force_authenticate(self.alice)
         response = self.client.get(self._summary_url())
         self.assertEqual(response.status_code, 403)
+
+    def _make_spending(self):
+        return Spending.objects.create(
+            travel=self.travel,
+            traveler=self.jean,
+            category=SpendingCategory.MEALS,
+            amount="30.00",
+        )
+
+    def _detail_url(self, spending):
+        return reverse(
+            "spending-detail", kwargs={"travel_id": self.travel.id, "pk": spending.id}
+        )
+
+    def test_delete_spending_and_shares(self):
+        spending = self._make_spending()
+        response = self.client.delete(self._detail_url(spending))
+        self.assertEqual(response.status_code, 204)
+        self.assertFalse(Spending.objects.filter(pk=spending.pk).exists())
+        self.assertFalse(SpendingShare.objects.filter(spending_id=spending.pk).exists())
+
+    def test_non_particpant_gets_404_on_detail(self):
+        spending = self._make_spending()
+        self.client.force_authenticate(self.alice)
+        url = self._detail_url(spending)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        response = self.client.patch(
+            url, {"label": "Great petite place"}, format="json"
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_non_participant_cannot_delete_spending(self):
+        self.client.force_authenticate(self.alice)
+        spending = self._make_spending()
+        response = self.client.delete(self._detail_url(spending))
+        self.assertEqual(response.status_code, 404)
+        self.assertTrue(Spending.objects.filter(pk=spending.pk).exists())
