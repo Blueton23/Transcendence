@@ -1,4 +1,5 @@
 import type { Place } from "@/features/map/types";
+import { useOnlineNetworkStatus } from "@/shared/hooks/useOnlineNetworkStatus";
 import Icon from "@/shared/ui/Icon";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
@@ -14,13 +15,16 @@ export function PlaceSuggestions({
   isLoading,
   onSelect,
 }: PlaceSuggestionsProps) {
-  console.log(isLoading);
   const { t } = useTranslation();
+  const isOnline = useOnlineNetworkStatus();
   return (
     <div className="absolute z-10 mt-2 flex w-full flex-col rounded-md bg-surface py-2">
-      {isLoading ? (
+      {!isOnline ? (
         <Text tone="muted" size="sm" className="px-3 py-2">
-          {" "}
+          {t("map.searchOffline")}
+        </Text>
+      ) : isLoading ? (
+        <Text tone="muted" size="sm" className="px-3 py-2">
           {t("actions.searching")}
         </Text>
       ) : items.length > 0 ? (
