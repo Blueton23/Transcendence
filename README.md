@@ -703,3 +703,21 @@ docker compose exec redis redis-cli -n 1 FLUSHDB
 - **`NUM_PROXIES` dépend de l'infrastructure** : à passer à `2` si un autre proxy est ajouté devant Nginx.
 - **Swagger UI est chargé depuis un CDN** : le navigateur a besoin d'Internet pour afficher `/api/docs/` (le schéma `/api/schema/`, lui, est servi par le backend).
 - **HTTP en développement** : le projet tourne actuellement en HTTP sur le port 8080. En HTTP, la clé circule en clair : HTTPS (exigé par le sujet pour toute connexion au backend, y compris depuis un script) doit être en place pour l'évaluation.
+
+### PWA — installable and offline-capable (Minor, 1 point)
+
+**Done by:** Charlotte.
+
+**What it delivers.** Peripl can be installed as an app (Chrome, Edge, Safari) and stays usable offline in read-only mode: the user remains logged in, finds the trips already visited, and sees a clear message when a feature needs the network.
+
+**How it is implemented.**
+
+- `vite-plugin-pwa` (Workbox) in `vite.config.ts` generates the web manifest and the service worker. The app files are precached in the production build; `GET /api/travels…` uses a `NetworkFirst` strategy, so the last known trips are shown without network.
+- `AuthProvider` tells apart a network failure (`TypeError`: keep the user saved in `localStorage`) from a server error (401: log out). On logout, the saved user and the trips cache are deleted, so nothing leaks on a shared device.
+- A `useOnlineNetworkStatus` hook drives an "Offline" banner, a placeholder in place of the Mapbox map, and a message in the place search. Texts are translated (fr/en/es).
+
+**Limits.** Offline use is read-only (no queue for changes). Mapbox tiles cannot be cached (terms of service), so the map is unavailable offline. Production needs HTTPS. Firefox desktop cannot install PWAs.
+
+**How to test.** `cd srcs/frontend && npx vite build && npx vite preview` (http://localhost:4173), log in, tick "Offline" in the browser developer tools and reload. Add `http://localhost:4173` to `DJANGO_CSRF_TRUSTED_ORIGINS` in `.env` to be able to log out from this port.
+
+

@@ -136,6 +136,10 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
   },
+  "map": {
+    "offline": "Map unavailable offline",
+    "searchOffline": "Search unavailable offline"
+  },
   "nav": {
     "assistant": "AI assistant",
     "chat": "Chat",
@@ -164,6 +168,9 @@
     "title": "Profile",
     "updatedAt": "Last updated:",
     "view": "View profile"
+  },
+  "pwa": {
+    "offline": "You're offline: some features are unavailable"
   },
   "step": {
     "actions": "Action",
