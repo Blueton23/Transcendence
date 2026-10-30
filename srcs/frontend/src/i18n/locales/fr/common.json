@@ -139,6 +139,10 @@
     "privacy": "Politique de confidentialité",
     "terms": "Conditions d'utilisation"
   },
+  "map": {
+    "offline": "Carte indisponible hors ligne",
+    "searchOffline": "Recherche indisponible hors ligne"
+  },
   "nav": {
     "assistant": "Assistant IA",
     "chat": "Discussion",
@@ -167,6 +171,9 @@
     "title": "Profil",
     "updatedAt": "Dernière mise à jour :",
     "view": "Voir le profil"
+  },
+  "pwa": {
+    "offline": "Hors ligne : certaines fonctions sont indisponibles"
   },
   "step": {
     "actions": "Action",

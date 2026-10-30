@@ -139,6 +139,10 @@
     "privacy": "Política de privacidad",
     "terms": "Condiciones de uso"
   },
+  "map": {
+    "offline": "Mapa no disponible sin conexión",
+    "searchOffline": "Búsqueda no disponible sin conexión"
+  },
   "nav": {
     "assistant": "Asistente AI",
     "chat": "Chat",
@@ -167,6 +171,9 @@
     "title": "Perfil",
     "updatedAt": "Última actualización:",
     "view": "Ver el perfil"
+  },
+  "pwa": {
+    "offline": "Sin conexión: algunas funciones no están disponibles"
   },
   "step": {
     "actions": "Acción",
