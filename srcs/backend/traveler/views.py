@@ -1,7 +1,11 @@
 # views.py
 
+import logging
 from typing import ClassVar
 
+import requests
+from authlib.integrations.django_client import OAuth, OAuthError
+from django.conf import settings
 from django.contrib.auth import (
     authenticate,
     get_user_model,
@@ -12,7 +16,9 @@ from django.contrib.auth import (
 from django.db import IntegrityError
 from django.db.models import Q
 from django.middleware.csrf import get_token
+from django.shortcuts import redirect
 from drf_spectacular.utils import extend_schema
+from joserfc.errors import JoseError
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -33,6 +39,8 @@ from .serializers import (
 )
 
 Traveler = get_user_model()
+
+logger = logging.getLogger(__name__)
 
 
 class ApiHealthView(APIView):
@@ -195,41 +203,6 @@ class LoginView(APIView):
                     traveler,
                     context={"request": request},
                 ).data,
-            },
-            status=status.HTTP_200_OK,
-        )
-
-
-@extend_schema(tags=["Auth"])
-@api_token_schema
-class ApiTokenView(APIView):
-    authentication_classes: ClassVar[list] = []
-    permission_classes: ClassVar[list] = [AllowAny]
-    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
-    throttle_scope = "auth_token"
-    public_api = True
-
-    def post(self, request: Request) -> Response:
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        traveler = authenticate(
-            request=request,
-            username=serializer.validated_data["username"],
-            password=serializer.validated_data["password"],
-        )
-
-        if traveler is None:
-            return Response(
-                {"detail": "Identifiants invalides."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        token, _ = Token.objects.get_or_create(user=traveler)
-
-        return Response(
-            {
-                "token": token.key,
             },
             status=status.HTTP_200_OK,
         )
@@ -531,3 +504,116 @@ class FriendshipListView(APIView):
             {"friendships": friendship_list},
             status=status.HTTP_200_OK,
         )
+
+
+# ===================================================================#
+
+# Connexion avec Token (swagger)
+
+
+@extend_schema(tags=["Auth"])
+@api_token_schema
+class ApiTokenView(APIView):
+    authentication_classes: ClassVar[list] = []
+    permission_classes: ClassVar[list] = [AllowAny]
+    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
+    throttle_scope = "auth_token"
+    public_api = True
+
+    def post(self, request: Request) -> Response:
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        traveler = authenticate(
+            request=request,
+            username=serializer.validated_data["username"],
+            password=serializer.validated_data["password"],
+        )
+
+        if traveler is None:
+            return Response(
+                {"detail": "Identifiants invalides."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        token, _ = Token.objects.get_or_create(user=traveler)
+
+        return Response(
+            {
+                "token": token.key,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+# ===================================================================#
+
+
+# Client OAuth Google : Authlib lit la configuration de Google
+oauth = OAuth()
+oauth.register(
+    "google",
+    client_id=settings.GOOGLE_CLIENT_ID,
+    client_secret=settings.GOOGLE_CLIENT_SECRET,
+    server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",
+    client_kwargs={"scope": "openid email profile"},
+)
+
+
+# Démarre la connexion Google (OAuth 2.0)
+# Authlib crée le state et le nonce, les garde en session, puis redirige
+class GoogleLoginView(APIView):
+    permission_classes: ClassVar[list] = [AllowAny]
+
+    def get(self, request: Request):
+        return oauth.google.authorize_redirect(
+            request,
+            settings.GOOGLE_REDIRECT_URI,
+            prompt="select_account",
+        )
+
+
+# Termine la connexion Google
+class GoogleCallbackView(APIView):
+    permission_classes: ClassVar[list] = [AllowAny]
+
+    def get(self, request: Request):
+        try:
+            token = oauth.google.authorize_access_token(request)
+        except (OAuthError, JoseError, requests.RequestException) as error:
+            logger.warning("Google OAuth : connexion échouée : %s", error)
+            return redirect("/login?error=google")
+
+        userinfo = token["userinfo"]
+
+        if not userinfo.get("email_verified"):
+            logger.warning("Google OAuth : email non vérifié par Google")
+            return redirect("/login?error=google")
+
+        traveler = Traveler.objects.filter(email__iexact=userinfo["email"]).first()
+
+        if traveler is None:
+            traveler = Traveler.objects.create_user(
+                username=generate_username(userinfo["email"]),
+                email=userinfo["email"],
+                first_name=userinfo.get("given_name", ""),
+                last_name=userinfo.get("family_name", ""),
+            )
+        elif traveler.has_usable_password():
+            logger.warning("Google OAuth : email déjà utilisé par un compte classique")
+            return redirect("/login?error=google_email_exists")
+
+        login(request, traveler)
+        return redirect("/profile")
+
+
+def generate_username(email: str) -> str:
+    base = email.split("@")[0]
+    username = base
+    number = 1
+
+    while Traveler.objects.filter(username=username).exists():
+        username = f"{base}{number}"
+        number += 1
+
+    return username

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 
 import { login } from "../api/auth";
 import { useAuth } from "@/features/auth/context/useAuth";
@@ -23,10 +23,22 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { t } = useTranslation();
+  const [searchParams] = useSearchParams();
 
   const { submit, isSubmitting, error } = useSubmitAction(() =>
     login({ username, password }),
   );
+
+  const errorCode = searchParams.get("error");
+  let googleError = null;
+
+  if (errorCode === "google_email_exists") {
+    googleError = t("auth.errors.googleEmailExists");
+  } else if (errorCode === "google") {
+    googleError = t("auth.errors.googleFailed");
+  }
+
+  const errorMessage = error ?? googleError;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -110,10 +122,20 @@ function Login() {
               </div>
             </div>
 
-            {error && <Text tone="accent">{error}</Text>}
+            {errorMessage && <Text tone="accent">{errorMessage}</Text>}
 
             <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? t("auth.logginIn") : t("auth.login")}
+            </Button>
+
+            <Button
+              type="button"
+              variant="primary"
+              onClick={() => {
+                window.location.href = "/api/auth/google/";
+              }}
+            >
+              {t("auth.continueWithGoogle")}
             </Button>
 
             <div className="flex items-center justify-center gap-1 text-sm">
