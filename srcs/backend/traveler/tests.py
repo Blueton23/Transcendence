@@ -1,12 +1,17 @@
 from io import BytesIO
+from unittest.mock import patch
+from urllib.parse import parse_qs, urlparse
 
+import requests
+from authlib.integrations.django_client import OAuthError
 from django.contrib.auth import SESSION_KEY
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.urls import reverse
+from joserfc.errors import BadSignatureError
 from PIL import Image
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -1475,6 +1480,11 @@ def test_requests_returns_only_incoming_pending_requests(self):
             friendship.full_clean()
 
 
+# ===================================================================#
+
+# Test : Connexion avec Token (swagger)
+
+
 # Obtention de la clé API : POST /api/auth/token/
 class ApiTokenViewTest(APITestCase):
     def setUp(self):
@@ -1501,3 +1511,167 @@ class ApiTokenViewTest(APITestCase):
         self.assertEqual(response.status_code, 401)
         self.assertEqual(response.data["detail"], "Identifiants invalides.")
         self.assertFalse(Token.objects.exists())
+
+
+# ===================================================================#
+
+# Test : Connexion avec Google (OAuth 2.0)
+
+
+# Ce qu'Authlib lirait dans le document "openid-configuration" de Google
+GOOGLE_METADATA = {
+    "authorization_endpoint": "https://accounts.google.com/o/oauth2/v2/auth"
+}
+
+# Les infos de l'utilisateur, telles qu'Authlib les tire de l'id_token vérifié
+GOOGLE_USERINFO = {
+    "email": "david.lf@gmail.com",
+    "email_verified": True,
+    "given_name": "David",
+    "family_name": "lf",
+}
+
+
+@override_settings(
+    GOOGLE_REDIRECT_URI="http://localhost:8080/api/auth/google/callback/",
+)
+@patch(
+    "traveler.views.oauth.google.load_server_metadata",
+    return_value=GOOGLE_METADATA,
+)
+class GoogleLoginViewTest(APITestCase):
+    # Vérifie que l'utilisateur est redirigé vers Google avec les bons paramètres
+    def test_redirects_to_google(self, mock_metadata):
+        response = self.client.get(reverse("auth-google"))
+
+        self.assertEqual(response.status_code, 302)
+
+        url = urlparse(response["Location"])
+        params = parse_qs(url.query)
+
+        self.assertEqual(url.netloc, "accounts.google.com")
+        self.assertEqual(
+            params["redirect_uri"],
+            ["http://localhost:8080/api/auth/google/callback/"],
+        )
+        self.assertEqual(params["response_type"], ["code"])
+        self.assertEqual(params["scope"], ["openid email profile"])
+        self.assertEqual(params["prompt"], ["select_account"])
+        self.assertIn("state", params)
+        self.assertIn("nonce", params)
+
+
+@patch("traveler.views.oauth.google.authorize_access_token")
+class GoogleCallbackViewTest(APITestCase):
+    # Simule le retour de Google sur le callback
+    def setUp(self):
+        super().setUp()
+
+        logger_patcher = patch("traveler.views.logger.warning")
+        logger_patcher.start()
+        self.addCleanup(logger_patcher.stop)
+
+    def google_callback(self):
+        return self.client.get(
+            reverse("auth-google-callback"),
+            {"state": "un-state", "code": "un-code"},
+        )
+
+    # Vérifie qu'une erreur OAuth (state, annulation, code refusé) est gérée
+    def test_oauth_error_is_refused(self, mock_authorize):
+        mock_authorize.side_effect = OAuthError(error="mismatching_state")
+
+        response = self.google_callback()
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    # Vérifie qu'un id_token invalide (mauvaise signature...) est refusé
+    def test_invalid_id_token_is_refused(self, mock_authorize):
+        mock_authorize.side_effect = BadSignatureError()
+
+        response = self.google_callback()
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    # Vérifie que Google injoignable est géré
+    def test_google_unreachable(self, mock_authorize):
+        mock_authorize.side_effect = requests.ConnectionError()
+
+        response = self.google_callback()
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+
+    # Vérifie qu'un nouvel utilisateur Google est créé et connecté
+    def test_creates_traveler_and_logs_in(self, mock_authorize):
+        mock_authorize.return_value = {"userinfo": GOOGLE_USERINFO}
+
+        response = self.google_callback()
+
+        self.assertRedirects(response, "/profile", fetch_redirect_response=False)
+        traveler = Traveler.objects.get(email="david.lf@gmail.com")
+        self.assertEqual(traveler.username, "david.lf")
+        self.assertEqual(traveler.first_name, "David")
+        self.assertEqual(traveler.last_name, "lf")
+        self.assertFalse(traveler.has_usable_password())
+        self.assertEqual(self.client.session[SESSION_KEY], str(traveler.pk))
+
+    # Vérifie qu'à la 2e connexion, on retrouve le même compte (pas de doublon)
+    def test_existing_traveler_is_reused(self, mock_authorize):
+        mock_authorize.return_value = {"userinfo": GOOGLE_USERINFO}
+        self.google_callback()
+        self.client.logout()
+
+        self.google_callback()
+
+        self.assertEqual(Traveler.objects.count(), 1)
+        self.assertIn(SESSION_KEY, self.client.session)
+
+    # Vérifie qu'un username déjà pris reçoit un numéro
+    def test_username_already_taken(self, mock_authorize):
+        Traveler.objects.create_user(
+            username="david.lf", email="autre@example.com", password="pass12345"
+        )
+        mock_authorize.return_value = {"userinfo": GOOGLE_USERINFO}
+
+        self.google_callback()
+
+        traveler = Traveler.objects.get(email="david.lf@gmail.com")
+        self.assertEqual(traveler.username, "david.lf1")
+
+    # Vérifie qu'un email non vérifié par Google est refusé
+    def test_unverified_email_is_refused(self, mock_authorize):
+        mock_authorize.return_value = {
+            "userinfo": {**GOOGLE_USERINFO, "email_verified": False}
+        }
+
+        response = self.google_callback()
+
+        self.assertRedirects(
+            response, "/login?error=google", fetch_redirect_response=False
+        )
+        self.assertFalse(Traveler.objects.exists())
+        self.assertNotIn(SESSION_KEY, self.client.session)
+
+    # Vérifie qu'un compte classique (avec mot de passe) n'est pas ouvert via Google
+    def test_password_account_is_refused(self, mock_authorize):
+        Traveler.objects.create_user(
+            username="david", email="david.lf@gmail.com", password="pass12345"
+        )
+        mock_authorize.return_value = {"userinfo": GOOGLE_USERINFO}
+
+        response = self.google_callback()
+
+        self.assertRedirects(
+            response,
+            "/login?error=google_email_exists",
+            fetch_redirect_response=False,
+        )
+        self.assertNotIn(SESSION_KEY, self.client.session)

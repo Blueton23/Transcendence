@@ -109,6 +109,9 @@ test:
 ping:
 	$(COMPOSE) exec redis redis-cli ping
 
+logs-backend:
+	$(COMPOSE) logs -f backend
+
 format-back:
 	$(COMPOSE) exec backend ruff format .
 
