@@ -139,7 +139,193 @@
   },
   "legal": {
     "privacy": "Politique de confidentialité",
-    "terms": "Conditions d'utilisation"
+    "terms": "Conditions d'utilisation",
+    "lastUpdated": "Dernière mise à jour : 31 octobre 2026",
+    "privacyPage": {
+      "intro": "Cette politique explique quelles données Peripl (https://peripl.app) traite, pourquoi, qui peut les voir et quels sont vos droits.",
+      "sections": [
+        {
+          "title": "1. Qui sommes-nous",
+          "paragraphs": [
+            "Peripl est un projet étudiant réalisé dans le cadre du cursus de l'école 42. Le service est gratuit et non commercial.",
+            "Pour toute question concernant vos données :"
+          ],
+          "items": ["lefur.david@bluewin.ch", "charlotte.pasquier@bluewin.ch"]
+        },
+        {
+          "title": "2. Données que vous nous fournissez",
+          "items": [
+            "Compte : nom d'utilisateur, prénom, nom, adresse email et mot de passe. Le mot de passe est stocké sous forme hachée, jamais en clair.",
+            "Connexion avec Google (si vous la choisissez) : Google nous transmet votre adresse email vérifiée, votre prénom et votre nom. Nous n'avons jamais accès à votre mot de passe Google.",
+            "Photo de profil : facultative, 5 Mo maximum.",
+            "Voyages et étapes : titre, dates, lieux et leurs coordonnées géographiques.",
+            "Idées : titre, type (restaurant, hébergement, activité, visite), lieu, note, lien, prix par nuit et dates, ainsi que vos coups de cœur et les hébergements choisis.",
+            "Discussion : les messages que vous envoyez dans le chat d'un voyage (2000 caractères maximum).",
+            "Dépenses : montant, catégorie, libellé, date de paiement, payeur et répartition des parts entre participants. Un participant peut enregistrer une dépense payée par un autre participant.",
+            "Amis : vos demandes d'ami et votre liste d'amis.",
+            "Clé d'API : uniquement si vous en générez une pour utiliser l'API publique."
+          ]
+        },
+        {
+          "title": "3. Données collectées automatiquement",
+          "items": [
+            "Votre statut en ligne, affiché aux autres utilisateurs.",
+            "Les dates de création et de modification de vos contenus, et la date de votre dernière visite dans le chat d'un voyage (pour afficher les messages non lus).",
+            "Votre adresse IP : utilisée temporairement pour limiter le nombre de requêtes et protéger le service contre les abus. Elle peut aussi apparaître dans les journaux techniques du serveur."
+          ]
+        },
+        {
+          "title": "4. Pourquoi nous utilisons ces données",
+          "paragraphs": [
+            "Uniquement pour faire fonctionner Peripl : créer et sécuriser votre compte, organiser vos voyages avec les autres participants, afficher la carte et les trajets, calculer les soldes des dépenses et protéger le service.",
+            "Nous ne vendons pas vos données, nous n'affichons aucune publicité et nous n'utilisons aucun outil de mesure d'audience."
+          ]
+        },
+        {
+          "title": "5. Qui peut voir vos données",
+          "items": [
+            "Les participants d'un voyage voient tout son contenu : étapes, idées, coups de cœur, messages, dépenses et soldes.",
+            "Vos amis, les participants de vos voyages et toute personne qui vous recherche avec votre nom d'utilisateur ou votre adresse email exacte voient votre nom d'utilisateur, votre prénom, votre nom, votre adresse email, votre photo de profil et votre statut en ligne.",
+            "Toute personne disposant d'un compte et du lien d'invitation d'un voyage peut le rejoindre et accéder à son contenu.",
+            "Votre arrivée dans un voyage et votre départ sont annoncés automatiquement dans la discussion."
+          ]
+        },
+        {
+          "title": "6. Services tiers",
+          "paragraphs": [
+            "Peripl fait appel à deux services tiers, et à aucun autre :"
+          ],
+          "items": [
+            "Mapbox : affichage de la carte, recherche de lieux et calcul des trajets. Le texte saisi dans la recherche de lieux et les coordonnées des étapes sont envoyés à Mapbox directement depuis votre navigateur, qui reçoit donc aussi votre adresse IP. Politique de Mapbox : https://www.mapbox.com/legal/privacy",
+            "Google : uniquement si vous choisissez « Continuer avec Google ». Politique de Google : https://policies.google.com/privacy"
+          ]
+        },
+        {
+          "title": "7. Cookies et stockage local",
+          "paragraphs": [
+            "Peripl utilise uniquement des éléments strictement nécessaires à son fonctionnement. C'est pourquoi aucun bandeau de consentement n'est affiché."
+          ],
+          "items": [
+            "sessionid : cookie qui vous garde connecté, inaccessible au JavaScript.",
+            "csrftoken : cookie de sécurité qui protège contre les requêtes frauduleuses.",
+            "lang : votre langue préférée, enregistrée dans le stockage local du navigateur.",
+            "peripl-user : une copie de votre profil dans le stockage local pour un affichage rapide, effacée à la déconnexion."
+          ]
+        },
+        {
+          "title": "8. Sécurité",
+          "paragraphs": [
+            "Les échanges sont chiffrés (HTTPS). Les mots de passe sont hachés, le cookie de session est inaccessible aux scripts, les requêtes sensibles sont protégées contre la falsification (CSRF) et le nombre de requêtes est limité pour freiner les abus."
+          ]
+        },
+        {
+          "title": "9. Durée de conservation",
+          "items": [
+            "Vos données sont conservées tant que votre compte existe.",
+            "Si vous quittez un voyage, ce que vous y avez ajouté (idées, messages, dépenses) reste visible des autres participants.",
+            "Les dépenses dont vous êtes payeur ou débiteur restent nécessaires au calcul des soldes des autres participants et sont conservées tant que le voyage existe.",
+            "Si votre compte est supprimé, vos messages restent dans la discussion, sans nom d'auteur."
+          ]
+        },
+        {
+          "title": "10. Vos droits",
+          "paragraphs": [
+            "Conformément à la loi fédérale suisse sur la protection des données (nLPD) et, le cas échéant, au RGPD, vous pouvez accéder à vos données, les rectifier, les supprimer, en obtenir une copie ou vous opposer à leur traitement.",
+            "Vous pouvez modifier vous-même votre nom d'utilisateur, votre prénom, votre nom, votre adresse email, votre photo et votre mot de passe depuis votre profil.",
+            "La suppression du compte n'est pas encore disponible dans l'application : écrivez à lefur.david@bluewin.ch depuis l'adresse email de votre compte. Nous traitons chaque demande dans un délai d'un mois.",
+            "Si vous estimez que vos droits ne sont pas respectés, vous pouvez vous adresser au Préposé fédéral à la protection des données et à la transparence (PFPDT) ou à l'autorité de protection des données de votre pays."
+          ]
+        },
+        {
+          "title": "11. Modifications",
+          "paragraphs": [
+            "Cette politique peut évoluer avec l'application. La date de la dernière mise à jour figure en haut de cette page."
+          ]
+        }
+      ]
+    },
+    "termsPage": {
+      "intro": "En créant un compte ou en utilisant Peripl (https://peripl.app), vous acceptez les présentes conditions.",
+      "sections": [
+        {
+          "title": "1. Le service",
+          "paragraphs": [
+            "Peripl est une application gratuite de planification de voyages en groupe, réalisée comme projet étudiant de l'école 42. Elle permet de créer un voyage, d'y inviter des participants, de placer des étapes sur une carte, de proposer des idées (restaurants, hébergements, activités, visites), d'y réagir, de choisir les hébergements, de discuter et de partager les dépenses.",
+            "Le service est fourni tel quel, sans garantie de disponibilité. Il peut être modifié, interrompu ou arrêté à tout moment."
+          ]
+        },
+        {
+          "title": "2. Votre compte",
+          "items": [
+            "Vous pouvez vous inscrire avec une adresse email et un mot de passe, ou avec votre compte Google.",
+            "Vous fournissez des informations exactes et gardez votre mot de passe confidentiel.",
+            "Vous êtes responsable de l'activité réalisée depuis votre compte et avec votre clé d'API."
+          ]
+        },
+        {
+          "title": "3. Voyages et invitations",
+          "items": [
+            "Toute personne ayant un compte et le lien d'invitation d'un voyage peut le rejoindre : partagez ce lien uniquement avec les personnes concernées.",
+            "Tous les participants voient le contenu du voyage et peuvent y contribuer.",
+            "Si vous quittez un voyage, vos contributions restent visibles des autres participants."
+          ]
+        },
+        {
+          "title": "4. Dépenses",
+          "items": [
+            "Les dépenses servent à suivre qui a payé quoi et à calculer les soldes et les remboursements entre participants.",
+            "Un participant peut enregistrer une dépense au nom d'un autre : vérifiez les montants et les parts.",
+            "Après avoir quitté un voyage, vous ne pouvez plus en modifier les dépenses, mais vos parts restent comptées dans les soldes.",
+            "Peripl n'effectue aucun paiement : les soldes sont indicatifs et les remboursements se règlent entre vous."
+          ]
+        },
+        {
+          "title": "5. Votre contenu",
+          "paragraphs": [
+            "Vous restez propriétaire de ce que vous publiez (idées, messages, photo, etc.) et vous en êtes responsable. Vous nous autorisez uniquement à l'héberger et à l'afficher aux personnes concernées pour faire fonctionner le service.",
+            "Il est interdit de publier un contenu illégal, haineux, violent, à caractère sexuel, diffamatoire ou portant atteinte aux droits d'autrui, ainsi que du spam. Nous pouvons retirer un tel contenu."
+          ]
+        },
+        {
+          "title": "6. Utilisation acceptable et API",
+          "items": [
+            "N'essayez pas d'accéder aux comptes ou aux voyages d'autres personnes, ni de contourner les mesures de sécurité.",
+            "Ne surchargez pas le service et n'en extrayez pas les données de manière automatisée en dehors de l'API publique.",
+            "L'API publique (voyages, étapes, idées, dépenses) s'utilise avec une clé personnelle et est limitée à 100 requêtes par minute. Sa documentation est disponible sur https://peripl.app/api/docs/."
+          ]
+        },
+        {
+          "title": "7. Informations indicatives",
+          "paragraphs": [
+            "Les distances et durées de trajet sont calculées par Mapbox et restent indicatives. Les prix, liens et informations des idées sont saisis par les utilisateurs. Peripl ne réserve rien : vérifiez toujours les informations avant votre départ."
+          ]
+        },
+        {
+          "title": "8. Suspension et fin d'utilisation",
+          "paragraphs": [
+            "Nous pouvons suspendre ou supprimer un compte qui ne respecte pas ces conditions. Vous pouvez arrêter d'utiliser Peripl à tout moment et demander la suppression de votre compte à lefur.david@bluewin.ch."
+          ]
+        },
+        {
+          "title": "9. Responsabilité",
+          "paragraphs": [
+            "Dans les limites permises par la loi, Peripl, projet étudiant non commercial, ne peut être tenu responsable des pertes de données, des interruptions du service, ni des décisions prises sur la base des informations affichées."
+          ]
+        },
+        {
+          "title": "10. Données personnelles",
+          "paragraphs": [
+            "Le traitement de vos données est décrit dans la Politique de confidentialité."
+          ]
+        },
+        {
+          "title": "11. Modifications, droit applicable et contact",
+          "paragraphs": [
+            "Ces conditions peuvent évoluer ; la date de la dernière mise à jour figure en haut de cette page. Elles sont soumises au droit suisse."
+          ]
+        }
+      ]
+    }
   },
   "map": {
     "offline": "Carte indisponible hors ligne",
