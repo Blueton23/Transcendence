@@ -17,6 +17,7 @@ import { IdeasPage } from "@/pages/IdeasPage";
 import TravelPage from "@/pages/TravelPage";
 import JoinPage from "@/pages/JoinPage";
 import ChatPage from "@/pages/ChatPage";
+import LegalPage from "@/pages/LegalPage";
 import { useTranslation } from "react-i18next";
 
 function PlaceHolder({ label }: { label: string }) {
@@ -34,11 +35,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
       </Route>
-      <Route
-        path="/privacy"
-        element={<PlaceHolder label="privacy a venir" />}
-      />
-      <Route path="/terms" element={<PlaceHolder label="terms a venir" />} />
+      <Route path="/privacy" element={<LegalPage doc="privacy" />} />
+      <Route path="/terms" element={<LegalPage doc="terms" />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/join/:token" element={<JoinPage />} />
         <Route element={<AppLayout />}>

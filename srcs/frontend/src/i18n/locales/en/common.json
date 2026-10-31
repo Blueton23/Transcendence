@@ -139,7 +139,194 @@
   },
   "legal": {
     "privacy": "Privacy Policy",
-    "terms": "Terms of Service"
+    "terms": "Terms of Service",
+    "back": "Back",
+    "lastUpdated": "Last updated: October 31, 2026",
+    "privacyPage": {
+      "intro": "This policy explains what data Peripl (https://peripl.app) processes, why, who can see it and what your rights are.",
+      "sections": [
+        {
+          "title": "1. Who we are",
+          "paragraphs": [
+            "Peripl is a student project built as part of the 42 school curriculum. The service is free and non-commercial.",
+            "For any question about your data :"
+          ],
+          "items": ["lefur.david@bluewin.ch", "charlotte.pasquier@bluewin.ch"]
+        },
+        {
+          "title": "2. Data you provide",
+          "items": [
+            "Account: username, first name, last name, email address and password. The password is stored hashed, never in plain text.",
+            "Sign in with Google (if you choose it): Google sends us your verified email address, first name and last name. We never have access to your Google password.",
+            "Profile picture: optional, 5 MB maximum.",
+            "Trips and stops: title, dates, places and their geographic coordinates.",
+            "Ideas: title, type (restaurant, lodging, activity, sight), place, note, link, price per night and dates, as well as your likes and the chosen lodgings.",
+            "Chat: the messages you send in a trip's chat (2000 characters maximum).",
+            "Expenses: amount, category, label, payment date, payer and how the shares are split between participants. A participant can record an expense paid by another participant.",
+            "Friends: your friend requests and your friend list.",
+            "API key: only if you generate one to use the public API."
+          ]
+        },
+        {
+          "title": "3. Data collected automatically",
+          "items": [
+            "Your online status, shown to other users.",
+            "The creation and modification dates of your content, and the date of your last visit to a trip's chat (to show unread messages).",
+            "Your IP address: used temporarily to limit the number of requests and protect the service against abuse. It may also appear in the server's technical logs."
+          ]
+        },
+        {
+          "title": "4. Why we use this data",
+          "paragraphs": [
+            "Only to run Peripl: create and secure your account, organize your trips with the other participants, display the map and routes, calculate expense balances and protect the service.",
+            "We do not sell your data, we show no advertising and we use no audience measurement tools."
+          ]
+        },
+        {
+          "title": "5. Who can see your data",
+          "items": [
+            "A trip's participants see all of its content: stops, ideas, likes, messages, expenses and balances.",
+            "Your friends, the participants of your trips and anyone who searches for your exact username or email address can see your username, first name, last name, email address, profile picture and online status.",
+            "Anyone with an account and a trip's invitation link can join it and access its content.",
+            "When you join or leave a trip, it is automatically announced in the chat."
+          ]
+        },
+        {
+          "title": "6. Third-party services",
+          "paragraphs": [
+            "Peripl relies on two third-party services, and no others:"
+          ],
+          "items": [
+            "Mapbox: map display, place search and route calculation. The text you type in the place search and the coordinates of the stops are sent to Mapbox directly from your browser, so Mapbox also receives your IP address. Mapbox policy: https://www.mapbox.com/legal/privacy",
+            "Google: only if you choose “Continue with Google”. Google policy: https://policies.google.com/privacy"
+          ]
+        },
+        {
+          "title": "7. Cookies and local storage",
+          "paragraphs": [
+            "Peripl only uses what is strictly necessary for it to work. That is why no consent banner is shown."
+          ],
+          "items": [
+            "sessionid: cookie that keeps you signed in, not accessible to JavaScript.",
+            "csrftoken: security cookie that protects against forged requests.",
+            "lang: your preferred language, saved in the browser's local storage.",
+            "peripl-user: a copy of your profile in local storage for faster display, cleared when you sign out."
+          ]
+        },
+        {
+          "title": "8. Security",
+          "paragraphs": [
+            "Connections are encrypted (HTTPS). Passwords are hashed, the session cookie is not accessible to scripts, sensitive requests are protected against forgery (CSRF) and the number of requests is limited to curb abuse."
+          ]
+        },
+        {
+          "title": "9. Retention",
+          "items": [
+            "Your data is kept as long as your account exists.",
+            "If you leave a trip, what you added to it (ideas, messages, expenses) remains visible to the other participants.",
+            "Expenses you paid or owe a share of are needed to calculate the other participants' balances and are kept as long as the trip exists.",
+            "If your account is deleted, your messages remain in the chat without an author name."
+          ]
+        },
+        {
+          "title": "10. Your rights",
+          "paragraphs": [
+            "Under the Swiss Federal Act on Data Protection (FADP) and, where applicable, the GDPR, you can access, correct and delete your data, obtain a copy of it or object to its processing.",
+            "You can change your username, first name, last name, email address, picture and password yourself from your profile.",
+            "Account deletion is not yet available in the app: write to lefur.david@bluewin.ch from your account's email address. We handle every request within one month.",
+            "If you believe your rights are not respected, you can contact the Swiss Federal Data Protection and Information Commissioner (FDPIC) or the data protection authority of your country."
+          ]
+        },
+        {
+          "title": "11. Changes",
+          "paragraphs": [
+            "This policy may change as the app evolves. The date of the last update is shown at the top of this page."
+          ]
+        }
+      ]
+    },
+    "termsPage": {
+      "intro": "By creating an account or using Peripl (https://peripl.app), you accept these terms.",
+      "sections": [
+        {
+          "title": "1. The service",
+          "paragraphs": [
+            "Peripl is a free group trip planning app, built as a 42 school student project. It lets you create a trip, invite participants, place stops on a map, suggest ideas (restaurants, lodgings, activities, sights), react to them, choose lodgings, chat and share expenses.",
+            "The service is provided as is, with no guarantee of availability. It may be changed, interrupted or shut down at any time."
+          ]
+        },
+        {
+          "title": "2. Your account",
+          "items": [
+            "You can sign up with an email address and a password, or with your Google account.",
+            "You provide accurate information and keep your password confidential.",
+            "You are responsible for activity carried out from your account and with your API key."
+          ]
+        },
+        {
+          "title": "3. Trips and invitations",
+          "items": [
+            "Anyone with an account and a trip's invitation link can join it: only share this link with the people concerned.",
+            "All participants see the trip's content and can contribute to it.",
+            "If you leave a trip, your contributions remain visible to the other participants."
+          ]
+        },
+        {
+          "title": "4. Expenses",
+          "items": [
+            "Expenses are used to track who paid what and to calculate balances and repayments between participants.",
+            "A participant can record an expense on behalf of another: check the amounts and shares.",
+            "After leaving a trip, you can no longer edit its expenses, but your shares still count in the balances.",
+            "Peripl makes no payments: balances are indicative and repayments are settled between you."
+          ]
+        },
+        {
+          "title": "5. Your content",
+          "paragraphs": [
+            "You remain the owner of what you publish (ideas, messages, picture, etc.) and you are responsible for it. You only allow us to host it and display it to the people concerned in order to run the service.",
+            "Publishing content that is illegal, hateful, violent, sexual, defamatory or infringes the rights of others, as well as spam, is prohibited. We may remove such content."
+          ]
+        },
+        {
+          "title": "6. Acceptable use and API",
+          "items": [
+            "Do not try to access other people's accounts or trips, or to bypass security measures.",
+            "Do not overload the service or extract its data automatically outside of the public API.",
+            "The public API (trips, stops, ideas, expenses) is used with a personal key and is limited to 100 requests per minute. Its documentation is available at https://peripl.app/api/docs/."
+          ]
+        },
+        {
+          "title": "7. Indicative information",
+          "paragraphs": [
+            "Travel distances and durations are calculated by Mapbox and are indicative. Prices, links and idea details are entered by users. Peripl books nothing: always check the information before you leave."
+          ]
+        },
+        {
+          "title": "8. Suspension and termination",
+          "paragraphs": [
+            "We may suspend or delete an account that does not comply with these terms. You can stop using Peripl at any time and request the deletion of your account at lefur.david@bluewin.ch."
+          ]
+        },
+        {
+          "title": "9. Liability",
+          "paragraphs": [
+            "To the extent permitted by law, Peripl, a non-commercial student project, cannot be held liable for data loss, service interruptions or decisions made based on the information displayed."
+          ]
+        },
+        {
+          "title": "10. Personal data",
+          "paragraphs": [
+            "How your data is processed is described in the Privacy Policy."
+          ]
+        },
+        {
+          "title": "11. Changes, governing law and contact",
+          "paragraphs": [
+            "These terms may change; the date of the last update is shown at the top of this page. They are governed by Swiss law."
+          ]
+        }
+      ]
+    }
   },
   "map": {
     "offline": "Map unavailable offline",
