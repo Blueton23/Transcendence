@@ -1156,3 +1156,10 @@ ssl_protocols TLSv1.2 TLSv1.3; : seules ces deux versions de TLS sont acceptées
 etape 2
 modifer dockerfile nginx et mettre 443
 
+
+etepe 3 modifier compose et enlver les chose plus utile comme les node et olume front car c est serve qui compile
+
+
+etape 4 : dockerfile frontend a modifier poiur tourner sur serve
+1. Vite compile ton frontend
+2. serve distribue le frontend compilé

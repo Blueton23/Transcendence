@@ -1,7 +1,3 @@
-# POUR LA PROD
-# "./srcs/backend:/app" est a retirer pour la prod
-# "port 8080:80" de nginx a changer pour la prod en "443:443"
-
 services:
   db:
     image: postgres:17-alpine
@@ -34,7 +30,6 @@ services:
     env_file:
       - ./.env
     volumes:
-      - ./srcs/backend:/app
       - static_data:/app/staticfiles
       - media_data:/app/mediafiles
     depends_on:
@@ -51,12 +46,12 @@ services:
     restart: unless-stopped
 
   frontend:
-    build: ./srcs/frontend
-    volumes:
-      - ./srcs/frontend:/app
-      - frontend_node_modules:/app/node_modules
+    build:
+      context: ./srcs/frontend
+      args:
+        VITE_MAPBOX_TOKEN: ${VITE_MAPBOX_TOKEN}
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:5173"]
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:3000"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -66,19 +61,19 @@ services:
   nginx:
     build: ./srcs/nginx
     ports:
-      - "8080:80"
+      - "443:443"
     volumes:
+      - ./certs:/etc/nginx/certs:ro
       - static_data:/static:ro
       - media_data:/media:ro
     depends_on:
       backend:
         condition: service_healthy
       frontend:
-        condition: service_started
+        condition: service_healthy
     restart: unless-stopped
 
 volumes:
   postgres_data:
-  frontend_node_modules:
   static_data:
   media_data:

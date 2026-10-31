@@ -64,3 +64,6 @@ Thumbs.db
 
 # Fichiers
 srcs/frontend/public/mockup.html
+
+# Nginx
+certs/
