@@ -1089,3 +1089,70 @@ docker compose exec backend python manage.py shell -c "from traveler.models impo
 **Limits.** Offline use is read-only (no queue for changes). Mapbox tiles cannot be cached (terms of service), so the map is unavailable offline. Production needs HTTPS. Firefox desktop cannot install PWAs.
 
 **How to test.** `cd srcs/frontend && npx vite build && npx vite preview` (http://localhost:4173), log in, tick "Offline" in the browser developer tools and reload. Add `http://localhost:4173` to `DJANGO_CSRF_TRUSTED_ORIGINS` in `.env` to be able to log out from this port.
+
+
+=========================
+
+Avant de toucher au premier fichier, il faut trancher un point qui conditionne tout le reste : le certificat TLS.
+
+Le problème : .app est un domaine HSTS préchargé dans Chrome. Avec un certificat auto-signé sur peripl.app, Chrome affiche l’erreur sans bouton « Continuer quand même » : le correcteur est bloqué. De plus, votre PWA enregistre un service worker. Avec un certificat non reconnu, ce service worker échoue et produit une erreur dans la console, ce que le sujet interdit.
+
+La solution que je recommande :
+
+un enregistrement DNS peripl.app → 127.0.0.1 ;
+un vrai certificat Let’s Encrypt obtenu par challenge DNS, donc sans hébergement.
+
+Résultat : sur n’importe quelle machine qui lance make, https://peripl.app ouvre le projet local avec un cadenas vert. Il n’y a rien à installer et /etc/hosts ne change pas. Le certificat est valable 90 jours, donc il faudra le générer peu avant la soutenance.
+
+Plan global (on le fera une étape à la fois) :
+
+DNS + certificat
+nginx : TLS sur 443, redirection 80 → 443, server_name peripl.app
+docker-compose : port 443, montage des certificats, retrait des volumes de dev
+frontend : build de prod (vos notes : serve sur le port 3000)
+backend : uvicorn avec workers, migrate automatique, réglages de sécurité Django (cookies secure, proxy SSL, hosts, CSRF), .env.example
+Google OAuth : redirect URI en https://peripl.app/...
+Vérification finale : une seule commande, console Chrome propre
+Étape 1 : DNS
+
+Chez votre registrar (là où vous avez acheté peripl.app), dans la zone DNS, créez :
+
+Type	Nom	Valeur
+A	@ (peripl.app)	127.0.0.1
+
+Puis vérifiez depuis un terminal :
+
+bash
+dig +short peripl.app
+
+La commande doit répondre 127.0.0.1. La propagation peut prendre quelques minutes.
+
+
+
+
+==========================================
+
+etape 1 : modifier nginx.conf
+
+frontend : 3000
+le conteneur frontend, port 3000, où serve distribuera le build React
+
+Vite en développement : exécute un serveur de développement avec rechargement automatique.
+Vite en production : compile ton application React.
+serve en production : distribue le résultat de cette compilation.
+
+
+ajout 443 et ssl
+nom de domain
+http2 pour la gere plusieurs requete rapidement
+
+
+ssl_certificate : le certificat public. fullchain.pem contient votre certificat suivi de celui de l’autorité Let’s Encrypt, ce qui permet à Chrome de remonter la chaîne de confiance.
+ssl_certificate_key : la clé privée qui va avec. Elle ne doit jamais aller sur Git.
+Les deux chemins correspondent à la structure que certbot génère. On montera ce dossier dans le conteneur à l’étape 2.
+ssl_protocols TLSv1.2 TLSv1.3; : seules ces deux versions de TLS sont acceptées. Les anciennes (TLS 1.0 et 1.1) sont considérées comme non sûres.
+
+
+etape 2
+modifer dockerfile nginx et mettre 443
+
