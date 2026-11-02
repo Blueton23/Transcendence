@@ -140,7 +140,6 @@
   "legal": {
     "privacy": "Política de privacidad",
     "terms": "Condiciones de uso",
-    "back": "Volver",
     "lastUpdated": "Última actualización: 31 de octubre de 2026",
     "privacyPage": {
       "intro": "Esta política explica qué datos trata Peripl (https://peripl.app), por qué, quién puede verlos y cuáles son tus derechos.",
@@ -210,7 +209,8 @@
             "sessionid: cookie que mantiene tu sesión iniciada, inaccesible para JavaScript.",
             "csrftoken: cookie de seguridad que protege contra solicitudes fraudulentas.",
             "lang: tu idioma preferido, guardado en el almacenamiento local del navegador.",
-            "peripl-user: una copia de tu perfil en el almacenamiento local para mostrarlo más rápido, que se borra al cerrar sesión."
+            "peripl-user: una copia de tu perfil en el almacenamiento local para mostrarlo más rápido, que se borra al cerrar sesión.",
+            "Caché sin conexión: una copia de los viajes que has consultado (etapas, ideas y otros datos del viaje), guardada en el navegador para que sigan siendo legibles sin conexión, que se borra al cerrar sesión."
           ]
         },
         {

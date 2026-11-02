@@ -209,7 +209,8 @@
             "sessionid : cookie qui vous garde connecté, inaccessible au JavaScript.",
             "csrftoken : cookie de sécurité qui protège contre les requêtes frauduleuses.",
             "lang : votre langue préférée, enregistrée dans le stockage local du navigateur.",
-            "peripl-user : une copie de votre profil dans le stockage local pour un affichage rapide, effacée à la déconnexion."
+            "peripl-user : une copie de votre profil dans le stockage local pour un affichage rapide, effacée à la déconnexion.",
+            "Cache hors ligne : une copie des voyages que vous avez consultés (étapes, idées et autres données du voyage), conservée dans le navigateur pour rester lisible sans connexion, effacée à la déconnexion."
           ]
         },
         {

@@ -140,7 +140,6 @@
   "legal": {
     "privacy": "Privacy Policy",
     "terms": "Terms of Service",
-    "back": "Back",
     "lastUpdated": "Last updated: October 31, 2026",
     "privacyPage": {
       "intro": "This policy explains what data Peripl (https://peripl.app) processes, why, who can see it and what your rights are.",
@@ -210,7 +209,8 @@
             "sessionid: cookie that keeps you signed in, not accessible to JavaScript.",
             "csrftoken: security cookie that protects against forged requests.",
             "lang: your preferred language, saved in the browser's local storage.",
-            "peripl-user: a copy of your profile in local storage for faster display, cleared when you sign out."
+            "peripl-user: a copy of your profile in local storage for faster display, cleared when you sign out.",
+            "Offline cache: a copy of the trips you have viewed (stops, ideas and other trip data), kept in the browser so they stay readable without a connection, cleared when you sign out."
           ]
         },
         {
