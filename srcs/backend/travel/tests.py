@@ -10,7 +10,7 @@ from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from rest_framework.test import APITestCase
 
-from chat.models import Message
+from chat.models import Message, SystemMessageKey
 from common.realtime import travel_group
 from common.testing import BroadcastListenerMixin, WebsocketCommunicator
 from config.asgi import application
@@ -1035,15 +1035,20 @@ class ParticipantBroadcastTest(BroadcastListenerMixin, APITestCase):
     def leave(self):
         return self.post(reverse("travel-leave", kwargs={"travel_id": self.travel.id}))
 
-    def assert_system_message(self, body):
+    def assert_system_message(self, key):
         event = self.receive_event()
         self.assertEqual(event["type"], "chat.message")
         self.assertTrue(event["payload"]["isSystem"])
         self.assertIsNone(event["payload"]["traveler"])
-        self.assertEqual(event["payload"]["body"], body)
+        self.assertEqual(event["payload"]["body"], "")
+        self.assertEqual(event["payload"]["systemKey"], key)
+        self.assertEqual(event["payload"]["systemParams"], {"name": "alice"})
         self.assertTrue(
             Message.objects.filter(
-                travel=self.travel, is_system=True, body=body
+                travel=self.travel,
+                is_system=True,
+                system_key=key,
+                system_params={"name": "alice"},
             ).exists()
         )
 
@@ -1053,7 +1058,7 @@ class ParticipantBroadcastTest(BroadcastListenerMixin, APITestCase):
         response, _ = self.leave()
 
         self.assertEqual(response.status_code, 204)
-        self.assert_system_message("alice a quitté le voyage.")
+        self.assert_system_message(SystemMessageKey.PARTICIPANT_LEFT)
         self.assertEqual(
             self.receive_event(),
             {
@@ -1080,7 +1085,7 @@ class ParticipantBroadcastTest(BroadcastListenerMixin, APITestCase):
         response, _ = self.join()
 
         self.assertEqual(response.status_code, 200)
-        self.assert_system_message("alice a rejoint le voyage.")
+        self.assert_system_message(SystemMessageKey.PARTICIPANT_JOINED)
         self.assertEqual(
             self.receive_event(),
             {
@@ -1095,7 +1100,7 @@ class ParticipantBroadcastTest(BroadcastListenerMixin, APITestCase):
         response, _ = self.join()
 
         self.assertEqual(response.status_code, 200)
-        self.assert_system_message("alice a rejoint le voyage.")
+        self.assert_system_message(SystemMessageKey.PARTICIPANT_JOINED)
         self.assertEqual(self.receive_event()["type"], "participant.joined")
 
     def test_join_as_member_announces_nothing(self):

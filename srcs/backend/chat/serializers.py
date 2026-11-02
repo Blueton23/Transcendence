@@ -20,6 +20,8 @@ class MessageSerializer(serializers.ModelSerializer):
             "body",
             "created_at",
             "is_system",
+            "system_key",
+            "system_params",
             "is_unread",
         ]
         read_only_fields: ClassVar[list[str]] = [
@@ -29,6 +31,8 @@ class MessageSerializer(serializers.ModelSerializer):
             "user",
             "created_at",
             "is_system",
+            "system_key",
+            "system_params",
             "is_unread",
         ]
 

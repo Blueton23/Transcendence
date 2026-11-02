@@ -68,7 +68,7 @@ export default function ChatTimeline({
             {showDate && <ChatDateSeparator date={message.createdAt} />}
 
             {message.type === "system" ? (
-              <ChatSystemMessage body={message.body} />
+              <ChatSystemMessage message={message} />
             ) : (
               <ChatUserMessage
                 message={message}

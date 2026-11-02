@@ -14,6 +14,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from chat.models import SystemMessageKey
 from chat.services import post_system_message
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
@@ -63,8 +64,8 @@ class TravelJoinView(APIView):
 
 
 PARTICIPANT_MESSAGES = {
-    "joined": "{name} a rejoint le voyage.",
-    "left": "{name} a quitté le voyage.",
+    "joined": SystemMessageKey.PARTICIPANT_JOINED,
+    "left": SystemMessageKey.PARTICIPANT_LEFT,
 }
 
 
@@ -72,7 +73,7 @@ def announce_participant(travel_id, traveler, action):
     """Tells the travel that someone joined or left: a system message in the
     chat, and `participant.<action>` so open pages reload the travelers."""
     post_system_message(
-        travel_id, PARTICIPANT_MESSAGES[action].format(name=traveler.username)
+        travel_id, PARTICIPANT_MESSAGES[action], {"name": traveler.username}
     )
     broadcast(
         travel_group(travel_id),

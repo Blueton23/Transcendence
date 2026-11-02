@@ -7,7 +7,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from chat.models import MESSAGE_BODY_MAX_LENGTH, Message
+from chat.models import MESSAGE_BODY_MAX_LENGTH, Message, SystemMessageKey
 from chat.serializers import MessageSerializer
 from common.realtime import travel_group
 from common.testing import BroadcastListenerMixin
@@ -64,6 +64,17 @@ class MessageModelTest(TestCase):
             end_date=datetime.date(2026, 7, 10),
         )
 
+    def _make_system_message(self, **overrides):
+        data = {
+            "traveler": None,
+            "is_system": True,
+            "body": "",
+            "system_key": SystemMessageKey.PARTICIPANT_JOINED,
+            "system_params": {"name": "bob"},
+        }
+        data.update(overrides)
+        return self._make_message(**data)
+
     def _make_message(self, **overrides):
         data = {
             "travel": self.travel,
@@ -103,8 +114,8 @@ class MessageModelTest(TestCase):
         message = self._make_message(body="Hello")
         self.assertEqual(str(message), "alice @ Road trip: Hello")
 
-        system = self._make_message(traveler=None, is_system=True, body="Bob joined")
-        self.assertEqual(str(system), "system @ Road trip: Bob joined")
+        system = self._make_system_message()
+        self.assertEqual(str(system), "system @ Road trip: participant_joined")
 
     # --- Suppressions en cascade ---
 
@@ -162,14 +173,30 @@ class MessageModelTest(TestCase):
     # --- Auteur et messages systeme ---
 
     def test_system_message_has_no_author(self):
-        message = self._make_message(traveler=None, is_system=True)
+        message = self._make_system_message()
         self.assertTrue(message.is_system)
         self.assertIsNone(message.traveler_id)
+        self.assertEqual(message.body, "")
 
     def test_system_message_with_author_is_rejected(self):
         with self.assertRaises(ValidationError) as ctx:
-            self._make_message(is_system=True)
+            self._make_system_message(traveler=self.traveler)
         self.assertIn("traveler", ctx.exception.message_dict)
+
+    def test_system_message_without_key_is_rejected(self):
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_system_message(system_key="")
+        self.assertIn("system_key", ctx.exception.message_dict)
+
+    def test_user_message_with_system_key_is_rejected(self):
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_message(system_key=SystemMessageKey.PARTICIPANT_LEFT)
+        self.assertIn("system_key", ctx.exception.message_dict)
+
+    def test_user_message_without_body_is_rejected(self):
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_message(body="")
+        self.assertIn("body", ctx.exception.message_dict)
 
     def test_database_rejects_system_message_with_author(self):
         message = self._make_message()
@@ -273,7 +300,7 @@ class MessageModelTest(TestCase):
     def test_everything_from_others_is_unread_before_first_read(self):
         mine = self._make_message()
         theirs = self._make_message(traveler=self.other)
-        self._make_message(traveler=None, is_system=True)
+        self._make_system_message()
 
         unread = Message.objects.unread_for(self.participation)
 

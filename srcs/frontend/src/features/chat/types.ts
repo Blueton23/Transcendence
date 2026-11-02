@@ -8,6 +8,8 @@ export interface ApiChatMessage {
   body: string;
   createdAt: string;
   isSystem: boolean;
+  systemKey: string;
+  systemParams: Record<string, string>;
   isUnread: boolean;
 }
 
