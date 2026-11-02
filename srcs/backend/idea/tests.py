@@ -732,7 +732,7 @@ class IdeaSerializerTest(TestCase):
                 travel=self.travel,
             )
 
-        self.assertIn("step", context.exception.detail)
+        self.assertIn("step_id", context.exception.detail)
 
     # ========================================================================#
     # Bloc 3 : Vérification des champs read-only
@@ -1497,7 +1497,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step", response.data["details"])
+        self.assertIn("step_id", response.data["details"])
 
     # Test : une étape dans la corbeille ne peut pas recevoir une nouvelle idée
     def test_rejects_trashed_step(self):
@@ -2302,7 +2302,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step", response.data["details"])
+        self.assertIn("step_id", response.data["details"])
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -2375,7 +2375,7 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step", response.data["details"])
+        self.assertIn("step_id", response.data["details"])
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)

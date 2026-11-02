@@ -1,14 +1,14 @@
 from typing import ClassVar
 
-from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import IntegrityError, transaction
 from rest_framework import serializers
 
+from common.mixins import ModelValidationMixin
 from idea.models import Idea, Reaction
 from travel.models import Step
 
 
-class IdeaSerializer(serializers.ModelSerializer):
+class IdeaSerializer(ModelValidationMixin, serializers.ModelSerializer):
     travel_id = serializers.IntegerField(read_only=True)
     traveler_id = serializers.IntegerField(read_only=True)
 
@@ -49,13 +49,6 @@ class IdeaSerializer(serializers.ModelSerializer):
             return False
 
         return obj.reactions.filter(traveler=request.user).exists()
-
-    def save(self, **kwargs):
-        try:
-            return super().save(**kwargs)
-        except DjangoValidationError as exc:
-            detail = getattr(exc, "message_dict", exc.messages)
-            raise serializers.ValidationError(detail) from exc
 
     class Meta:
         model = Idea
