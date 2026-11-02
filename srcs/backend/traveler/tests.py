@@ -17,7 +17,6 @@ from traveler.serializers import (
     TravelerSerializer,
     TravelerUpdatePasswordSerializer,
     TravelerUpdateProfilePictureSerializer,
-    TravelerUpdateSerializer,
 )
 
 
@@ -345,7 +344,7 @@ class TravelerUpdateSerializerTest(TestCase):
         )
 
     def test_can_update_first_name_and_last_name(self):
-        serializer = TravelerUpdateSerializer(
+        serializer = TravelerSerializer(
             self.traveler,
             data={
                 "first_name": "Alicia",
@@ -363,7 +362,7 @@ class TravelerUpdateSerializerTest(TestCase):
         self.assertEqual(self.traveler.last_name, "Martin")
 
     def test_can_update_email(self):
-        serializer = TravelerUpdateSerializer(
+        serializer = TravelerSerializer(
             self.traveler,
             data={
                 "email": "new@example.com",
@@ -379,7 +378,7 @@ class TravelerUpdateSerializerTest(TestCase):
         self.assertEqual(self.traveler.email, "new@example.com")
 
     def test_profile_picture_is_read_only(self):
-        serializer = TravelerUpdateSerializer(
+        serializer = TravelerSerializer(
             self.traveler,
             data={
                 "profile_picture": "fake-picture.jpg",

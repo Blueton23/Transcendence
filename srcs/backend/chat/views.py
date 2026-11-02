@@ -34,10 +34,7 @@ class TravelMessageListCreateView(APIView):
 
         if participation is None:
             return Response(
-                {
-                    "code": "travel_chat_access_denied",
-                    "detail": "You do not have access to this trip.",
-                },
+                {"detail": "You do not have access to this trip."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -65,10 +62,7 @@ class TravelMessageListCreateView(APIView):
 
         if not is_active_member:
             return Response(
-                {
-                    "code": "travel_chat_membership_required",
-                    "detail": "You must be a member of this trip to send a message.",
-                },
+                {"detail": "You must be a member of this trip to send a message."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -103,10 +97,7 @@ class TravelUnreadCountView(APIView):
 
         if participation is None:
             return Response(
-                {
-                    "code": "travel_chat_access_denied",
-                    "detail": "You do not have access to this trip.",
-                },
+                {"detail": "You do not have access to this trip."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 
@@ -130,10 +121,7 @@ class TravelMarkReadView(APIView):
 
         if participation is None:
             return Response(
-                {
-                    "code": "travel_chat_access_denied",
-                    "detail": "You do not have access to this trip.",
-                },
+                {"detail": "You do not have access to this trip."},
                 status=status.HTTP_403_FORBIDDEN,
             )
 

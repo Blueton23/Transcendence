@@ -1,6 +1,7 @@
 import type { AuthResponse, LoginData } from "../types";
 import { getCookie } from "@/shared/api/cookies";
 import i18n from "@/i18n";
+import { parseResponse } from "@/shared/api/parseResponse";
 
 const API_BASE_URL = "/api";
 
@@ -35,13 +36,10 @@ export async function login(data: LoginData): Promise<AuthResponse> {
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.detail || i18n.t("auth.errors.invalidCredentials"));
-  }
-
-  return result;
+  return parseResponse<AuthResponse>(
+    response,
+    "auth.errors.invalidCredentials",
+  );
 }
 
 export async function getMe(): Promise<AuthResponse> {
@@ -50,13 +48,7 @@ export async function getMe(): Promise<AuthResponse> {
     credentials: "include",
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.detail || i18n.t("auth.errors.notAuthenticated"));
-  }
-
-  return result;
+  return parseResponse<AuthResponse>(response, "auth.errors.notAuthenticated");
 }
 
 export async function logout(): Promise<void> {

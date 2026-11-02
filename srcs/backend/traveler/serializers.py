@@ -1,17 +1,29 @@
-# serializers.py
-
 from typing import ClassVar
 
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
 from .models import Friendship, Traveler
 
 
-class TravelerSerializer(serializers.ModelSerializer):
-    profile_picture = serializers.SerializerMethodField()
+def django_error_detail(
+    error: DjangoValidationError,
+) -> serializers.ErrorDetail:
+    return serializers.ErrorDetail(
+        error.message % error.params if error.params else error.message,
+        code=error.code or "invalid",
+    )
 
+
+def password_error_details(
+    exc: DjangoValidationError,
+) -> list[serializers.ErrorDetail]:
+    return [django_error_detail(error) for error in exc.error_list]
+
+
+class TravelerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Traveler
 
@@ -34,17 +46,6 @@ class TravelerSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-
-    def get_profile_picture(self, obj: Traveler) -> str | None:
-        if not obj.profile_picture:
-            return None
-
-        request = self.context.get("request")
-
-        if request:
-            return request.build_absolute_uri(obj.profile_picture.url)
-
-        return obj.profile_picture.url
 
 
 class TravelerCreateSerializer(serializers.ModelSerializer):
@@ -72,7 +73,10 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
         if attrs["password"] != attrs["password_confirmation"]:
             raise serializers.ValidationError(
                 {
-                    "password_confirmation": "Les mots de passe ne correspondent pas.",
+                    "password_confirmation": serializers.ErrorDetail(
+                        "Passwords do not match.",
+                        code="password_mismatch",
+                    )
                 }
             )
 
@@ -80,52 +84,14 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
             password_validation.validate_password(
                 attrs["password"],
             )
-        except password_validation.ValidationError as exc:
+        except DjangoValidationError as exc:
             raise serializers.ValidationError(
                 {
-                    "password": exc.messages,
+                    "password": password_error_details(exc),
                 }
             ) from exc
 
         return attrs
-
-
-class TravelerUpdateSerializer(serializers.ModelSerializer):
-    profile_picture = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Traveler
-
-        fields: ClassVar[list[str]] = [
-            "id",
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "profile_picture",
-            "is_online",
-            "created_at",
-            "updated_at",
-        ]
-
-        read_only_fields: ClassVar[list[str]] = [
-            "id",
-            "profile_picture",
-            "is_online",
-            "created_at",
-            "updated_at",
-        ]
-
-    def get_profile_picture(self, obj: Traveler) -> str | None:
-        if not obj.profile_picture:
-            return None
-
-        request = self.context.get("request")
-
-        if request:
-            return request.build_absolute_uri(obj.profile_picture.url)
-
-        return obj.profile_picture.url
 
 
 class LoginSerializer(serializers.Serializer):
@@ -136,17 +102,9 @@ class LoginSerializer(serializers.Serializer):
 
 
 class TravelerUpdatePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(
-        write_only=True,
-    )
-
-    new_password_1 = serializers.CharField(
-        write_only=True,
-    )
-
-    new_password_2 = serializers.CharField(
-        write_only=True,
-    )
+    old_password = serializers.CharField(write_only=True)
+    new_password_1 = serializers.CharField(write_only=True)
+    new_password_2 = serializers.CharField(write_only=True)
 
     def validate(self, attrs: dict[str, str]) -> dict[str, str]:
         request = self.context["request"]
@@ -161,21 +119,22 @@ class TravelerUpdatePasswordSerializer(serializers.Serializer):
         )
 
         if not form.is_valid():
-            error_codes = [
-                error.code or "invalid"
-                for field_errors in form.errors.as_data().values()
-                for error in field_errors
-            ]
+            field_mapping = {
+                "old_password": "old_password",
+                "new_password1": "new_password_1",
+                "new_password2": "new_password_2",
+            }
 
-            # Supprime les doublons tout en conservant l'ordre.
-            error_codes = list(dict.fromkeys(error_codes))
+            errors = {}
 
-            raise serializers.ValidationError(
-                {
-                    "code": "password_validation_failed",
-                    "errors": error_codes,
-                }
-            )
+            for field, field_errors in form.errors.as_data().items():
+                api_field = field_mapping.get(field, field)
+
+                errors[api_field] = [
+                    django_error_detail(error) for error in field_errors
+                ]
+
+            raise serializers.ValidationError(errors)
 
         attrs["_password_change_form"] = form
 
@@ -193,7 +152,8 @@ class TravelerUpdateProfilePictureSerializer(serializers.ModelSerializer):
     def validate_profile_picture(self, value):
         if value.size > 5 * 1024 * 1024:
             raise serializers.ValidationError(
-                "La photo de profil ne doit pas dépasser 5 Mo."
+                "The profile picture must not exceed 5 MB.",
+                code="max_size",
             )
 
         return value
@@ -219,26 +179,5 @@ class TravelerUpdateProfilePictureSerializer(serializers.ModelSerializer):
         return instance
 
 
-class FriendshipSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Friendship
-
-        fields: ClassVar[list[str]] = [
-            "id",
-            "user1",
-            "user2",
-            "requested_by",
-            "status",
-            "created_at",
-            "updated_at",
-        ]
-
-        read_only_fields: ClassVar[list[str]] = [
-            "id",
-            "user1",
-            "user2",
-            "requested_by",
-            "status",
-            "created_at",
-            "updated_at",
-        ]
+class FriendshipCreateSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
