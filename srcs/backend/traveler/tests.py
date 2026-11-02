@@ -1673,6 +1673,8 @@ class NotificationConsumerTest(TransactionTestCase):
         self.assertTrue(connected)
         self.assertTrue(await communicator.receive_nothing(timeout=0.2))
         await communicator.disconnect()
+
+
 # ===================================================================#
 
 # Test : Connexion avec Google (OAuth 2.0)
