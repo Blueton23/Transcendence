@@ -2,18 +2,18 @@ from io import BytesIO
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
+import requests
 from asgiref.sync import sync_to_async
+from authlib.integrations.django_client import OAuthError
 from channels.layers import get_channel_layer
 from django.conf import settings
-import requests
-from authlib.integrations.django_client import OAuthError
 from django.contrib.auth import SESSION_KEY
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import IntegrityError, transaction
-from django.test import TestCase, override_settings, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, override_settings
 from django.urls import reverse
 from joserfc.errors import BadSignatureError
 from PIL import Image
