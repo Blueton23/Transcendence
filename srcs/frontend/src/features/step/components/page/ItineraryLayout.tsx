@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import { ItineraryMap } from "@/features/map/components/ItineraryMap";
 import type { Step } from "@/features/step/types";
 import type { Route } from "@/features/map/types";
+import { useOnlineNetworkStatus } from "@/shared/hooks/useOnlineNetworkStatus";
+import { MapOffline } from "@/features/map/components/MapOffline";
 
 interface ItineraryLayoutProps {
   mobileView: "list" | "map";
@@ -18,6 +20,7 @@ export function ItineraryLayout({
   route,
   detailStep,
 }: ItineraryLayoutProps) {
+  const isOnline = useOnlineNetworkStatus();
   return (
     <div className="flex flex-1 flex-col md:grid md:min-h-0 md:flex-1 md:grid-cols-2 md:gap-2">
       <div
@@ -28,7 +31,11 @@ export function ItineraryLayout({
       <div
         className={`md:block ${mobileView === "map" ? "flex flex-1 flex-col" : "hidden"}`}
       >
-        <ItineraryMap steps={steps} detailStep={detailStep} route={route} />
+        {isOnline ? (
+          <ItineraryMap steps={steps} detailStep={detailStep} route={route} />
+        ) : (
+          <MapOffline />
+        )}
       </div>
     </div>
   );

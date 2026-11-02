@@ -17,10 +17,15 @@
     "changePassword": "Change password",
     "confirmNewPassword": "Confirm new password",
     "confirmPassword": "Confirm password",
+    "continueWithGoogle": "Continue with Google",
     "createAccount": "Create my account",
     "creating": "Creating…",
     "errors": {
       "csrfInit": "Could not initialise CSRF protection.",
+      "emailExists": "An account already exists with this email address.",
+      "googleAccountExists": "A Google account is already linked to this email address.",
+      "googleEmailExists": "An account already exists with this email. Please log in with your password.",
+      "googleFailed": "Google sign-in failed. Please try again.",
       "invalidCredentials": "Invalid credentials.",
       "logoutFailed": "Could not log out.",
       "notAuthenticated": "User not authenticated."
@@ -136,6 +141,10 @@
     "privacy": "Privacy Policy",
     "terms": "Terms of Service"
   },
+  "map": {
+    "offline": "Map unavailable offline",
+    "searchOffline": "Search unavailable offline"
+  },
   "nav": {
     "assistant": "AI assistant",
     "chat": "Chat",
@@ -164,6 +173,9 @@
     "title": "Profile",
     "updatedAt": "Last updated:",
     "view": "View profile"
+  },
+  "pwa": {
+    "offline": "You're offline: some features are unavailable"
   },
   "step": {
     "actions": "Action",

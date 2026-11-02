@@ -67,6 +67,22 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
             "password",
             "password_confirmation",
         ]
+        extra_kwargs: ClassVar[dict] = {"email": {"validators": []}}
+
+    def validate_email(self, value: str) -> str:
+        traveler = Traveler.objects.filter(email__iexact=value).first()
+
+        if traveler is None:
+            return value
+
+        if not traveler.has_usable_password():
+            raise serializers.ValidationError(
+                "Un compte Google est déjà associé à cette adresse email."
+            )
+
+        raise serializers.ValidationError(
+            "Un compte existe déjà avec cette adresse email."
+        )
 
     def validate(self, attrs: dict[str, str]) -> dict[str, str]:
         if attrs["password"] != attrs["password_confirmation"]:
