@@ -19,6 +19,7 @@ media/
 
 # Node / React / Vite
 node_modules/
+dev-dist/
 dist/
 dist-ssr/
 .vite/

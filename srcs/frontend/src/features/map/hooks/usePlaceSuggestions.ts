@@ -12,7 +12,12 @@ export function usePlaceSuggestions(query: string) {
     if (query.trim() === "") return;
     let cancelled = false;
     const timer = setTimeout(async () => {
-      const places = await searchPlace(query);
+      let places: Place[] = [];
+      try {
+        places = await searchPlace(query);
+      } catch {
+        //network off or Mapbox not available: list is empty
+      }
       if (!cancelled) setResults({ query, places });
     }, 300);
     return () => {
