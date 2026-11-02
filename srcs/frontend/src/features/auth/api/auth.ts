@@ -36,10 +36,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
     body: JSON.stringify(data),
   });
 
-  return parseResponse<AuthResponse>(
-    response,
-    "auth.errors.invalidCredentials",
-  );
+  return parseResponse<AuthResponse>(response);
 }
 
 export async function getMe(): Promise<AuthResponse> {
@@ -48,7 +45,7 @@ export async function getMe(): Promise<AuthResponse> {
     credentials: "include",
   });
 
-  return parseResponse<AuthResponse>(response, "auth.errors.notAuthenticated");
+  return parseResponse<AuthResponse>(response);
 }
 
 export async function logout(): Promise<void> {

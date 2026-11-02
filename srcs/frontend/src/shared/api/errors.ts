@@ -1,58 +1,67 @@
 import i18n from "@/i18n";
 
-export interface ApiErrorResponse {
-  status?: number;
+export interface ApiError {
   code?: string;
-  message?: string;
   detail?: string;
-  details?: Record<string, string[]> | null;
+  attr?: string | null;
 }
 
-function getPasswordValidationMessage(result: ApiErrorResponse): string {
-  const fallback = i18n.t("auth.errors.passwordValidationFailed");
-  const codes = result.details?.codes ?? [];
-
-  if (codes.length === 0) {
-    return fallback;
-  }
-  return codes
-    .map((code) => {
-      const key = `auth.errors.${code}`;
-      return i18n.exists(key) ? i18n.t(key) : fallback;
-    })
-    .join("\n");
+export interface ApiErrorResponse {
+  type?: string;
+  errors?: ApiError[];
 }
 
-function getDetailsMessage(
-  details: Record<string, string[]> | null | undefined,
-): string | null {
-  if (!details) {
-    return null;
-  }
-  return Object.entries(details)
-    .map(([field, messages]) => `${field} : ${messages.join(", ")}`)
-    .join("\n");
+const ERROR_SCOPES = [
+  "auth.errors",
+  "friendship.errors",
+  "chat.errors",
+  "idea.errors",
+  "profile.errors",
+  "step.errors",
+  "travel.errors",
+  "errors",
+];
+
+function toCamelCase(value: string): string {
+  return value.replace(/_([a-z])/g, (_, letter: string) =>
+    letter.toUpperCase(),
+  );
 }
 
-function getTranslatedErrorMessage(errorCode: string): string {
-  const key = `friendship.errors.${errorCode}`;
-  return i18n.exists(key) ? i18n.t(key) : errorCode;
+function translateCode(code: string): string {
+  const variants = [code, toCamelCase(code)];
+
+  for (const scope of ERROR_SCOPES) {
+    for (const variant of variants) {
+      const key = `${scope}.${variant}`;
+
+      if (i18n.exists(key)) {
+        return i18n.t(key);
+      }
+    }
+  }
+
+  return code;
 }
 
-export function getApiErrorMessage(result: ApiErrorResponse): string {
-  if (result.code === "password_validation_failed") {
-    return getPasswordValidationMessage(result);
+function getErrorMessage(error: ApiError): string {
+  if (error.code) {
+    return translateCode(error.code);
   }
 
-  const detailsMessage = getDetailsMessage(result.details);
-  if (detailsMessage !== null) {
-    return detailsMessage;
-  }
-
-  const errorCode = result.code ?? result.detail ?? result.message;
-  if (errorCode) {
-    return getTranslatedErrorMessage(errorCode);
+  if (error.detail) {
+    return error.detail;
   }
 
   return i18n.t("errors.unexpected");
+}
+
+export function getApiErrorMessage(response: ApiErrorResponse): string {
+  if (!response.errors?.length) {
+    return i18n.t("errors.unexpected");
+  }
+
+  const messages = response.errors.map(getErrorMessage);
+
+  return [...new Set(messages)].join("\n");
 }
