@@ -28,12 +28,23 @@ function toCamelCase(value: string): string {
   );
 }
 
-function translateCode(code: string): string {
-  const variants = [code, toCamelCase(code)];
+function translateCode(code: string, attr?: string | null): string {
+  const codeVariants = [code, toCamelCase(code)];
+  const attrVariants = attr ? [attr, toCamelCase(attr)] : [];
 
   for (const scope of ERROR_SCOPES) {
-    for (const variant of variants) {
-      const key = `${scope}.${variant}`;
+    for (const attrVariant of attrVariants) {
+      for (const codeVariant of codeVariants) {
+        const key = `${scope}.${attrVariant}.${codeVariant}`;
+
+        if (i18n.exists(key)) {
+          return i18n.t(key);
+        }
+      }
+    }
+
+    for (const codeVariant of codeVariants) {
+      const key = `${scope}.${codeVariant}`;
 
       if (i18n.exists(key)) {
         return i18n.t(key);
@@ -46,7 +57,7 @@ function translateCode(code: string): string {
 
 function getErrorMessage(error: ApiError): string {
   if (error.code) {
-    return translateCode(error.code);
+    return translateCode(error.code, error.attr);
   }
 
   if (error.detail) {

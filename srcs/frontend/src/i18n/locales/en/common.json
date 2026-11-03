@@ -187,7 +187,13 @@
     "editProfile": "Edit profile",
     "email": "Email",
     "errors": {
-      "noImage": "No image selected."
+      "email": {
+        "unique": "This email address is already in use."
+      },
+      "noImage": "No image selected.",
+      "username": {
+        "unique": "This username is already in use."
+      }
     },
     "firstName": "First name",
     "lastName": "Last name",
