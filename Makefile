@@ -1,4 +1,4 @@
-include .env
+-include .env
 export
 
 #######################################
@@ -8,6 +8,19 @@ COMPOSE = docker compose
 #######################################
 
 # Commandes compose
+env:
+	@if [ -f .env ]; then \
+		echo ".env existe déjà, rien n'a été modifié."; \
+	else \
+		cp .env.example .env; \
+		sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$$(openssl rand -hex 32)|" .env; \
+		sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$$(openssl rand -hex 16)|" .env; \
+		sed -i "s|^UID=.*|UID=$$(id -u)|" .env; \
+		sed -i "s|^GID=.*|GID=$$(id -g)|" .env; \
+		echo ".env créé."; \
+		echo "À remplir à la main : GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, VITE_MAPBOX_TOKEN"; \
+	fi
+
 up:
 	$(COMPOSE) up --build
 
@@ -142,7 +155,7 @@ lint:
 
 #######################################
 
-.PHONY: up down start stop restart build ps images volumes logs clean fclean re smoke \
+.PHONY: env up down start stop restart build ps images volumes logs clean fclean re smoke \
 	psql test-db \
 	makemigrations check-migrations migrate startapp createsuperuser seed unseed shell check test format-back format-check-back \
 	lint-back lint-fix-back check-back fix-back format-front format-check-front front-install
