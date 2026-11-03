@@ -33,7 +33,7 @@ class MessageSerializer(serializers.ModelSerializer):
         ]
 
     def get_traveler_name(self, obj):
-        return str(obj.traveler) if obj.traveler else "Ancien participant"
+        return str(obj.traveler) if obj.traveler else "Former participant"
 
     def get_user(self, obj):
         traveler = obj.traveler
@@ -74,11 +74,11 @@ class MessageSerializer(serializers.ModelSerializer):
         value = value.strip()
 
         if not value:
-            raise serializers.ValidationError("Le message ne peut pas être vide.")
+            raise serializers.ValidationError("The message cannot be empty.")
 
         if len(value) > MESSAGE_BODY_MAX_LENGTH:
             raise serializers.ValidationError(
-                f"Le message ne peut pas dépasser {MESSAGE_BODY_MAX_LENGTH} caractères."
+                f"The message cannot exceed {MESSAGE_BODY_MAX_LENGTH} characters."
             )
 
         return value

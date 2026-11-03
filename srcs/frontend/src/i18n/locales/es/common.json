@@ -51,7 +51,8 @@
   "chat": {
     "errors": {
       "travelChatAccessDenied": "No tienes acceso a este viaje.",
-      "travelChatMembershipRequired": "Debes ser miembro del viaje para enviar un mensaje."
+      "travelChatMembershipRequired": "Debes ser miembro del viaje para enviar un mensaje.",
+      "max_length": "El mensaje es demasiado largo."
     }
   },
   "errors": {
