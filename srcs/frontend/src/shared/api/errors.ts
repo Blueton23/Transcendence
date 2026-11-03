@@ -22,33 +22,20 @@ const ERROR_SCOPES = [
   "errors",
 ];
 
-function toCamelCase(value: string): string {
-  return value.replace(/_([a-z])/g, (_, letter: string) =>
-    letter.toUpperCase(),
-  );
-}
-
 function translateCode(code: string, attr?: string | null): string {
-  const codeVariants = [code, toCamelCase(code)];
-  const attrVariants = attr ? [attr, toCamelCase(attr)] : [];
-
   for (const scope of ERROR_SCOPES) {
-    for (const attrVariant of attrVariants) {
-      for (const codeVariant of codeVariants) {
-        const key = `${scope}.${attrVariant}.${codeVariant}`;
+    if (attr) {
+      const attrKey = `${scope}.${attr}.${code}`;
 
-        if (i18n.exists(key)) {
-          return i18n.t(key);
-        }
+      if (i18n.exists(attrKey)) {
+        return i18n.t(attrKey);
       }
     }
 
-    for (const codeVariant of codeVariants) {
-      const key = `${scope}.${codeVariant}`;
+    const key = `${scope}.${code}`;
 
-      if (i18n.exists(key)) {
-        return i18n.t(key);
-      }
+    if (i18n.exists(key)) {
+      return i18n.t(key);
     }
   }
 
