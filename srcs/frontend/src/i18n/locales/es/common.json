@@ -178,6 +178,7 @@
     "offline": "Sin conexión: algunas funciones no están disponibles"
   },
   "spending": {
+    "add": "Añadir un gasto",
     "categories": {
       "lodging": "Alojamiento",
       "fuel": "Combustible",
@@ -186,6 +187,7 @@
       "tolls": "Peajes",
       "other": "Otros"
     },
+    "edit": "Editar el gasto",
     "errors": {
       "createFailed": "No se pudo crear el gasto.",
       "deleteFailed": "No se pudo eliminar el gasto.",
@@ -196,6 +198,18 @@
       "allCategories": "Todas"
     },
     "form": {
+      "amount": "Importe",
+      "attachedTo": "Vinculado a",
+      "category": "Categoría",
+      "ideaLinked": "Vinculado a una idea",
+      "label": "Concepto del gasto",
+      "labelPlaceholder": "Ej.: gasolina, o elige una idea abajo",
+      "noIdea": "Ninguna idea vinculada",
+      "optional": "opcional",
+      "paidBy": "Pagado por",
+      "perPerson_one": "{{count}} persona · {{amount}} CHF",
+      "perPerson_other": "{{count}} personas · {{amount}} CHF cada una",
+      "sharedWith": "Repartido entre",
       "step": "Etapa",
       "type": "Categoría"
     },
@@ -204,6 +218,9 @@
       "empty": "No hay gastos para este viaje.",
       "noMatch": "Ningún gasto coincide con los filtros seleccionados."
     },
+    "saveChanges": "Guardar los cambios",
+    "saving": "Guardando…",
+    "submitAdd": "Añadir el gasto",
     "wholeTravel": "Viaje completo"
   },
   "step": {

@@ -17,6 +17,7 @@ import { useParams } from "react-router";
 import type { SpendingFilter } from "@/features/spending/types";
 import { SpendingCategoryFilter } from "@/features/spending/components/SpendingCategoryFilter";
 import { filterSpendings } from "@/features/spending/utils/filterSpendings";
+import { useIdeas } from "@/features/idea/hooks/useIdeas";
 
 // Fonction principale pour la page idée
 export function SpendingPage() {
@@ -38,6 +39,12 @@ export function SpendingPage() {
     error: errorTravel,
   } = useTravel(travelId);
 
+  const {
+    ideas,
+    isLoading: isLoadingIdeas,
+    error: errorIdeas,
+  } = useIdeas(travelId);
+
   const { t } = useTranslation();
 
   const [typeActiveFilter, setTypeActiveFilter] =
@@ -56,11 +63,11 @@ export function SpendingPage() {
     (spending) => spending.id === spendingToModify,
   );
 
-  if (isLoading || isLoadingSteps || isLoadingTravel) {
+  if (isLoading || isLoadingSteps || isLoadingTravel || isLoadingIdeas) {
     return null;
   }
 
-  if (error || errorSteps || errorTravel) {
+  if (error || errorSteps || errorTravel || errorIdeas) {
     return <Text>{error || errorSteps || errorTravel}</Text>;
   }
 
@@ -71,19 +78,21 @@ export function SpendingPage() {
     <div className="px-4 pt-8 md:px-8">
       <div className="mb-6 flex items-center justify-between">
         <Heading level={1} size="lg">
-          {t("nav.spendings")}
+          {t("nav.expenses")}
         </Heading>
         <AddExpenseButton onClick={() => setIsCreateOpen(true)} />
       </div>
 
-      <div>
-        <Text className="mb-1">{t("spending.form.type")}</Text>
-        <SpendingCategoryFilter
-          typeActiveFilter={typeActiveFilter}
-          onChange={setTypeActiveFilter}
-        />
+      <div className="flex flex-col gap-5">
+        <SpendingSummary />
+        <div>
+          <Text className="mb-1">{t("spending.form.type")}</Text>
+          <SpendingCategoryFilter
+            typeActiveFilter={typeActiveFilter}
+            onChange={setTypeActiveFilter}
+          />
+        </div>
       </div>
-
       <div>
         <Text className="mb-1">{t("spending.form.step")}</Text>
         <IdeaStepFilter
@@ -100,7 +109,6 @@ export function SpendingPage() {
               : t("spending.page.noMatch")}
           </Text>
         )}
-        <SpendingSummary />
         {filteredSpendings.map((spending) => {
           const payer = getPayer(summary, spending.travelerId);
           const step = steps.find((s) => s.id === spending.stepId);
@@ -124,10 +132,14 @@ export function SpendingPage() {
       {(isCreateOpen || spendingToModify) && (
         <SpendingModal
           spending={editSpending ?? undefined}
+          travel={travel}
+          steps={steps}
+          ideas={ideas}
           onClose={() => {
             setIsCreateOpen(false);
             setSpendingToModify(null);
           }}
+          refetch={refetch}
         />
       )}
     </div>

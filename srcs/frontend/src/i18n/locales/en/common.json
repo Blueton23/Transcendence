@@ -178,6 +178,7 @@
     "offline": "You're offline: some features are unavailable"
   },
   "spending": {
+    "add": "Add an expense",
     "categories": {
       "lodging": "Lodging",
       "fuel": "Fuel",
@@ -186,6 +187,7 @@
       "tolls": "Tolls",
       "other": "Other"
     },
+    "edit": "Edit the expense",
     "errors": {
       "createFailed": "Unable to create the expense.",
       "deleteFailed": "Unable to delete the expense.",
@@ -196,6 +198,18 @@
       "allCategories": "All"
     },
     "form": {
+      "amount": "Amount",
+      "attachedTo": "Attached to",
+      "category": "Category",
+      "ideaLinked": "Linked to an idea",
+      "label": "Expense label",
+      "labelPlaceholder": "E.g. fuel refill, or pick an idea below",
+      "noIdea": "No linked idea",
+      "optional": "optional",
+      "paidBy": "Paid by",
+      "perPerson_one": "{{count}} person · {{amount}} CHF",
+      "perPerson_other": "{{count}} people · {{amount}} CHF each",
+      "sharedWith": "Split between",
       "step": "Stop",
       "type": "Category"
     },
@@ -204,6 +218,9 @@
       "empty": "No expenses for this trip.",
       "noMatch": "No expenses match the selected filters."
     },
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "submitAdd": "Add the expense",
     "wholeTravel": "Whole trip"
   },
   "step": {

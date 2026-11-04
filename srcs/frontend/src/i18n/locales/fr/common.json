@@ -178,6 +178,7 @@
     "offline": "Hors ligne : certaines fonctions sont indisponibles"
   },
   "spending": {
+    "add": "Ajouter une dépense",
     "categories": {
       "lodging": "Hébergement",
       "fuel": "Carburant",
@@ -186,6 +187,7 @@
       "tolls": "Péages",
       "other": "Autre"
     },
+    "edit": "Modifier la dépense",
     "errors": {
       "createFailed": "Impossible de créer la dépense.",
       "deleteFailed": "Impossible de supprimer la dépense.",
@@ -196,6 +198,18 @@
       "allCategories": "Toutes"
     },
     "form": {
+      "amount": "Montant",
+      "attachedTo": "Rattachement",
+      "category": "Catégorie",
+      "ideaLinked": "Liée à une idée",
+      "label": "Libellé de la dépense",
+      "labelPlaceholder": "Ex. : plein d'essence, ou choisis une idée ci-dessous",
+      "noIdea": "Aucune idée liée",
+      "optional": "optionnel",
+      "paidBy": "Payé par",
+      "perPerson_one": "{{count}} personne concernée · {{amount}} CHF",
+      "perPerson_other": "{{count}} personnes concernées · {{amount}} CHF chacune",
+      "sharedWith": "Réparti entre",
       "step": "Étape",
       "type": "Catégorie"
     },
@@ -204,6 +218,9 @@
       "empty": "Aucune dépense pour ce voyage.",
       "noMatch": "Aucune dépense ne correspond aux filtres sélectionnés."
     },
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Enregistrement…",
+    "submitAdd": "Ajouter la dépense",
     "wholeTravel": "Voyage entier"
   },
   "step": {

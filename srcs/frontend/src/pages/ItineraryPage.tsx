@@ -178,9 +178,13 @@ function ItineraryPage() {
       {createExpenseModalOpen && (
         <SpendingModal
           spending={undefined}
+          travel={travel}
+          steps={steps}
+          ideas={ideas}
           onClose={() => {
             setCreateExpenseModalOpen(false);
           }}
+          refetch={refetch}
         />
       )}
     </div>

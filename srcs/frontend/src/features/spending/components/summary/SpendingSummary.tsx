@@ -3,7 +3,7 @@ import { ByCategory } from "@/features/spending/components/summary/ByCategory";
 
 export function SpendingSummary() {
   return (
-    <div>
+    <div className="flex flex-col gap-5">
       <ByCategory />
       <BalanceAndSettlements />
     </div>
