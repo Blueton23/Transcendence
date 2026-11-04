@@ -1,5 +1,7 @@
 export type SpendingCategory = "l" | "f" | "a" | "m" | "t" | "o";
 
+export const categories: SpendingCategory[] = ["l", "f", "a", "m", "t", "o"];
+
 export type SpendingFilter = "all" | SpendingCategory;
 
 export interface Spending {
@@ -25,7 +27,7 @@ export interface SpendingInput {
   paidDate: string | null;
   stepId: number | null;
   ideaId: number | null;
-  shares?: { travelerId: number; amount: string }[];
+  sharedWith: number[];
 }
 
 export interface SpendingSummary {

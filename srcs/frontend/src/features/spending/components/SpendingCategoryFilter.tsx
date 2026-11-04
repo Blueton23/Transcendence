@@ -1,7 +1,4 @@
-import type {
-  SpendingCategory,
-  SpendingFilter,
-} from "@/features/spending/types";
+import { categories, type SpendingFilter } from "@/features/spending/types";
 import { spendingCategoryIcons } from "@/features/spending/utils/spendingCategoryIcons";
 import { spendingCategoryLabels } from "@/features/spending/utils/spendingCategoryLabels";
 import Chip from "@/shared/ui/Chip";
@@ -18,7 +15,6 @@ export function SpendingCategoryFilter({
   onChange,
 }: SpendingCategoryFilterProps) {
   const { t } = useTranslation();
-  const categories: SpendingCategory[] = ["l", "f", "a", "m", "t", "o"];
   return (
     <div className="mb-4 flex flex-wrap gap-2">
       <Chip active={typeActiveFilter === "all"} onClick={() => onChange("all")}>

@@ -9,6 +9,7 @@ import type { Spending } from "@/features/spending/types";
 import Tag from "@/shared/ui/Tag";
 import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import { spendingCategoryIcons } from "@/features/spending/utils/spendingCategoryIcons";
+import { spendingCategoryLabels } from "@/features/spending/utils/spendingCategoryLabels";
 
 export interface SpendingCardProps {
   spending: Spending;
@@ -44,7 +45,7 @@ export function SpendingCard({
 
           <div className="flex min-w-0 flex-1 flex-col">
             <Heading level={3} size="xs" className="truncate">
-              {spending.label}
+              {spending.label || t(spendingCategoryLabels[spending.category])}
             </Heading>
 
             <div className="flex min-w-0 flex-col items-start gap-1 md:flex-row md:items-center md:gap-1.5">
