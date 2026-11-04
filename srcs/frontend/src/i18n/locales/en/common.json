@@ -185,6 +185,12 @@
       "meals": "Meals",
       "tolls": "Tolls",
       "other": "Other"
+    },
+    "errors": {
+      "createFailed": "Unable to create the expense.",
+      "deleteFailed": "Unable to delete the expense.",
+      "loadFailed": "Unable to load the expenses.",
+      "updateFailed": "Unable to edit the expense."
     }
   },
   "step": {

@@ -185,6 +185,12 @@
       "meals": "Repas",
       "tolls": "Péages",
       "other": "Autre"
+    },
+    "errors": {
+      "createFailed": "Impossible de créer la dépense.",
+      "deleteFailed": "Impossible de supprimer la dépense.",
+      "loadFailed": "Impossible de charger les dépenses.",
+      "updateFailed": "Impossible de modifier la dépense."
     }
   },
   "step": {

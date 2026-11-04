@@ -185,6 +185,12 @@
       "meals": "Comidas",
       "tolls": "Peajes",
       "other": "Otros"
+    },
+    "errors": {
+      "createFailed": "No se pudo crear el gasto.",
+      "deleteFailed": "No se pudo eliminar el gasto.",
+      "loadFailed": "No se pudieron cargar los gastos.",
+      "updateFailed": "No se pudo editar el gasto."
     }
   },
   "step": {
