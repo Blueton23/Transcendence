@@ -13,7 +13,7 @@ export interface ItineraryTimelineProps {
   dateLabels: string[];
   onDetailView: (step: Step) => void;
   onModifyStep: (step: Step) => void;
-  refetch: () => void;
+  onDeleteStep: (step: Step) => Promise<void>;
 }
 
 export function ItineraryTimeline({
@@ -23,7 +23,7 @@ export function ItineraryTimeline({
   dateLabels,
   onDetailView,
   onModifyStep,
-  refetch,
+  onDeleteStep,
 }: ItineraryTimelineProps) {
   return (
     <div className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-2">
@@ -49,7 +49,7 @@ export function ItineraryTimeline({
               dateLabel={dateLabels[index]}
               onClick={() => onDetailView(step)}
               onModify={() => onModifyStep(step)}
-              refetch={refetch}
+              onDelete={() => onDeleteStep(step)}
             />
           </Fragment>
         );

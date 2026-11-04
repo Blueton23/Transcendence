@@ -3,7 +3,6 @@ import { VoteButton } from "@/features/idea/components/card/VoteButton";
 import { StepButton } from "@/features/idea/components/card/StepButton";
 import { SecondaryInfo } from "@/features/idea/components/card/SecondaryInfo";
 import { StepLabel } from "@/features/idea/components/card/StepLabel";
-import { IdeaOptionsMenu } from "@/features/idea/components/card/IdeaOptionsMenu";
 import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import Text from "@/shared/ui/Text";
@@ -12,6 +11,7 @@ import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Button from "@/shared/ui/Button";
 import { useTranslation } from "react-i18next";
+import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -113,26 +113,20 @@ export function IdeaCard({
           </div>
 
           <div className="order-2 md:order-3">
-            <IdeaOptionsMenu
+            <OptionsMenu
               disabled={isActionPending}
               onEdit={onEdit}
-              onDelete={() => {
-                if (isActionPending) {
-                  return;
-                }
-
-                void submitDelete();
-              }}
-              onChoose={
+              onDelete={() => void submitDelete()}
+              extraActions={
                 canChoose && !chooseButton
-                  ? () => {
-                      if (isActionPending) {
-                        return;
-                      }
-
-                      void submitChoose();
-                    }
-                  : undefined
+                  ? [
+                      {
+                        icon: "check",
+                        label: t("idea.chooseLodging"),
+                        onClick: () => void submitChoose(),
+                      },
+                    ]
+                  : []
               }
             />
           </div>
