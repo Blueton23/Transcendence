@@ -13,13 +13,14 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
 from idea.models import Idea, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
 from travel.mixins import ParticipantScopedMixin
-from travel.models import Step
+from travel.models import Participation, ParticipationStatus, Step
 from travel.permissions import IsTravelParticipant
 
 from .schema import idea_detail_schema, ideas_list_schema
@@ -140,6 +141,30 @@ class IdeaChoiceView(ParticipantScopedMixin, GenericAPIView):
             self.get_serializer(idea).data,
             status=status.HTTP_200_OK,
         )
+
+
+# Nouvelles idées depuis le dernier passage sur la page (badge du menu)
+class IdeaSeenMixin:
+    permission_classes: ClassVar[list] = [IsAuthenticated, IsTravelParticipant]
+
+    def get_participation(self):
+        return Participation.objects.get(
+            travel_id=self.kwargs["travel_id"],
+            traveler=self.request.user,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+
+class IdeaUnseenCountView(IdeaSeenMixin, APIView):
+    def get(self, request, travel_id):
+        count = Idea.objects.unseen_for(self.get_participation()).count()
+        return Response({"unseen_count": count})
+
+
+class IdeaMarkSeenView(IdeaSeenMixin, APIView):
+    def post(self, request, travel_id):
+        self.get_participation().mark_ideas_seen()
+        return Response({"success": True})
 
 
 # ========================================================================#

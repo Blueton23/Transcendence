@@ -3988,3 +3988,129 @@ class IdeaBroadcastTest(BroadcastListenerMixin, APITestCase):
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(callbacks, [])
+
+
+class IdeaUnseenTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice_unseen",
+            email="alice_unseen@example.com",
+            password="password123",
+        )
+        self.other = Traveler.objects.create_user(
+            username="bob_unseen",
+            email="bob_unseen@example.com",
+            password="password123",
+        )
+        self.stranger = Traveler.objects.create_user(
+            username="carol_unseen",
+            email="carol_unseen@example.com",
+            password="password123",
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        self.other_travel = Travel.objects.create(
+            title="Autre voyage",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 15),
+        )
+        self.participation = Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        for travel in (self.travel, self.other_travel):
+            Participation.objects.create(
+                traveler=self.other,
+                travel=travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        self.unseen_url = reverse(
+            "idea-unseen-count", kwargs={"travel_id": self.travel.pk}
+        )
+        self.mark_seen_url = reverse(
+            "idea-mark-seen", kwargs={"travel_id": self.travel.pk}
+        )
+
+    def _make_idea(self, traveler=None, travel=None):
+        return Idea.objects.create(
+            travel=travel or self.travel,
+            traveler=traveler or self.other,
+            title="Fondue",
+            type=IdeaType.RESTAURANT,
+        )
+
+    # --- Modele ---
+
+    def test_ideas_from_others_are_unseen_before_first_visit(self):
+        self._make_idea(traveler=self.traveler)
+        theirs = self._make_idea()
+
+        unseen = Idea.objects.unseen_for(self.participation)
+
+        self.assertEqual(list(unseen), [theirs])
+
+    def test_mark_seen_clears_unseen_until_a_new_idea(self):
+        self._make_idea()
+
+        self.participation.mark_ideas_seen()
+
+        self.assertFalse(Idea.objects.unseen_for(self.participation).exists())
+
+        new = self._make_idea()
+
+        self.assertEqual(list(Idea.objects.unseen_for(self.participation)), [new])
+
+    def test_unseen_ignores_deleted_ideas_and_other_travels(self):
+        self._make_idea().delete()
+        self._make_idea(travel=self.other_travel)
+
+        self.assertFalse(Idea.objects.unseen_for(self.participation).exists())
+
+    # --- Vues ---
+
+    def test_mark_seen_resets_unseen_count_to_zero(self):
+        self._make_idea()
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(self.unseen_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["unseen_count"], 1)
+
+        response = self.client.post(self.mark_seen_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(self.unseen_url)
+        self.assertEqual(response.data["unseen_count"], 0)
+
+    def test_mark_seen_only_touches_my_participation(self):
+        self._make_idea(traveler=self.traveler)
+        self.client.force_authenticate(user=self.traveler)
+
+        self.client.post(self.mark_seen_url)
+
+        other_participation = Participation.objects.get(
+            traveler=self.other, travel=self.travel
+        )
+        self.assertIsNone(other_participation.ideas_seen_at)
+        self.assertEqual(Idea.objects.unseen_for(other_participation).count(), 1)
+
+    def test_non_member_receives_403(self):
+        self.client.force_authenticate(user=self.stranger)
+
+        self.assertEqual(self.client.get(self.unseen_url).status_code, 403)
+        self.assertEqual(self.client.post(self.mark_seen_url).status_code, 403)
+
+    def test_left_member_receives_403(self):
+        self.participation.status = ParticipationStatus.LEFT
+        self.participation.save()
+        self.client.force_authenticate(user=self.traveler)
+
+        self.assertEqual(self.client.get(self.unseen_url).status_code, 403)
+        self.assertEqual(self.client.post(self.mark_seen_url).status_code, 403)
+
+    def test_anonymous_receives_403(self):
+        self.assertIn(self.client.get(self.unseen_url).status_code, (401, 403))
