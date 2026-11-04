@@ -1,7 +1,3 @@
-# POUR LA PROD DANS ENTRYPOINT.SH
-# Ajouter si besoin pour la migration auto - "python manage.py migrate --noinput"
-# Remplacer "--reload" par "--workers 4"
-
 FROM    python:3.13-slim-bookworm
 
 ARG     UID=1000
