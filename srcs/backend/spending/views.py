@@ -16,7 +16,7 @@ from spending.models import Spending
 from spending.serializers import SpendingSerializer
 from spending.services import compute_balances, compute_settlements
 from travel.mixins import ParticipantScopedMixin
-from travel.models import Travel
+from travel.models import ParticipationStatus, Travel
 from travel.permissions import IsTravelParticipant
 
 from .schema import (
@@ -84,6 +84,11 @@ class SpendingSummaryView(APIView):
         )
         balances = compute_balances(travel)
         settlements = compute_settlements(travel)
+        accepted_ids = set(
+            travel.participations.filter(
+                status=ParticipationStatus.ACCEPTED
+            ).values_list("traveler_id", flat=True)
+        )
         data = {
             "total": _money(sum(row["total"] for row in by_category)),
             "by_category": [
@@ -93,6 +98,8 @@ class SpendingSummaryView(APIView):
             "balances": [
                 {
                     "traveler_id": b.traveler.pk,
+                    "name": b.traveler.username,
+                    "has_left": b.traveler.pk not in accepted_ids,
                     "paid": _money(b.paid),
                     "owed": _money(b.owed),
                     "balance": _money(b.balance),

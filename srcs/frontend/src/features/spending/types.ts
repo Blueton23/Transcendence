@@ -31,6 +31,8 @@ export interface SpendingSummary {
   byCategory: { category: SpendingCategory; total: string }[];
   balances: {
     travelerId: number;
+    name: string;
+    hasLeft: boolean;
     paid: string;
     owed: string;
     balance: string;

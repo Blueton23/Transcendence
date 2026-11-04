@@ -936,3 +936,17 @@ class SpendingViewTest(APITestCase):
         response = self.client.delete(self._detail_url(spending))
         self.assertEqual(response.status_code, 404)
         self.assertTrue(Spending.objects.filter(pk=spending.pk).exists())
+
+    def test_participant_leave_travel_but_keep_name_share(self):
+        self._make_spending()
+        Participation.objects.filter(traveler=self.jean, travel=self.travel).update(
+            status=ParticipationStatus.LEFT
+        )
+        self.client.force_authenticate(self.bob)
+        response = self.client.get(self._summary_url())
+        self.assertEqual(response.status_code, 200)
+        jean = next(
+            b for b in response.json()["balances"] if b["travelerId"] == self.jean.id
+        )
+        self.assertEqual(jean["name"], self.jean.username)
+        self.assertTrue(jean["hasLeft"])
