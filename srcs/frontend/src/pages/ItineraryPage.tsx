@@ -16,6 +16,8 @@ import { useRoute } from "@/features/map/hooks/useRoute";
 import { CreateIdeaModal } from "@/features/idea/components/modal/CreateIdeaModal";
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
 import { EditIdeaModal } from "@/features/idea/components/modal/EditIdeaModal";
+import { deleteStep } from "@/features/step/api/stepApi";
+import { SpendingModal } from "@/features/spending/components/SpendingModal";
 
 function ItineraryPage() {
   const { id } = useParams();
@@ -50,6 +52,7 @@ function ItineraryPage() {
 
   const [stepToModify, setStepToModify] = useState<Step | null>(null);
   const [createIdeaModalOpen, setCreateIdeaModalOpen] = useState(false);
+  const [createExpenseModalOpen, setCreateExpenseModalOpen] = useState(false);
   const [editIdeaId, setEditIdeaId] = useState<number | null>(null);
   const editIdea = ideas.find((idea) => idea.id === editIdeaId);
   const [lodgingDate, setLodgingDate] = useState<string | null>(null);
@@ -59,6 +62,11 @@ function ItineraryPage() {
     onDelete: handleDeleteIdea,
     onChoose: handleChooseIdea,
     onEdit: (id) => setEditIdeaId(id),
+  };
+
+  const handleDeleteStep = async (step: Step) => {
+    await deleteStep(travelId, step.id);
+    refetch();
   };
 
   const isLoading = isLoadingTravel || isLoadingSteps;
@@ -113,12 +121,16 @@ function ItineraryPage() {
               travel={travel}
               dateLabels={dateLabels}
               onDetailView={(step) => setDetailStepId(step.id)}
-              refetch={refetch}
               onModifyStep={setStepToModify}
+              onDeleteStep={handleDeleteStep}
+              refetch={refetch}
             />
           </div>
         )}
-        <TripActionsButton onPinIdea={() => setCreateIdeaModalOpen(true)} />
+        <TripActionsButton
+          onPinIdea={() => setCreateIdeaModalOpen(true)}
+          onPinExpense={() => setCreateExpenseModalOpen(true)}
+        />
       </ItineraryLayout>
       {stepToModify && (
         <StepFormModal
@@ -160,6 +172,14 @@ function ItineraryPage() {
           onEdit={async (input) => {
             await handleEditIdea(editIdea.id, input);
             refetch();
+          }}
+        />
+      )}
+      {createExpenseModalOpen && (
+        <SpendingModal
+          spending={undefined}
+          onClose={() => {
+            setCreateExpenseModalOpen(false);
           }}
         />
       )}

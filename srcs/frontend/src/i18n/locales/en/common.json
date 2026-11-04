@@ -191,7 +191,20 @@
       "deleteFailed": "Unable to delete the expense.",
       "loadFailed": "Unable to load the expenses.",
       "updateFailed": "Unable to edit the expense."
-    }
+    },
+    "filters": {
+      "allCategories": "All"
+    },
+    "form": {
+      "step": "Stop",
+      "type": "Category"
+    },
+    "left": "left",
+    "page": {
+      "empty": "No expenses for this trip.",
+      "noMatch": "No expenses match the selected filters."
+    },
+    "wholeTravel": "Whole trip"
   },
   "step": {
     "actions": "Action",

@@ -191,7 +191,20 @@
       "deleteFailed": "Impossible de supprimer la dépense.",
       "loadFailed": "Impossible de charger les dépenses.",
       "updateFailed": "Impossible de modifier la dépense."
-    }
+    },
+    "filters": {
+      "allCategories": "Toutes"
+    },
+    "form": {
+      "step": "Étape",
+      "type": "Catégorie"
+    },
+    "left": "parti",
+    "page": {
+      "empty": "Aucune dépense pour ce voyage.",
+      "noMatch": "Aucune dépense ne correspond aux filtres sélectionnés."
+    },
+    "wholeTravel": "Voyage entier"
   },
   "step": {
     "actions": "Action",

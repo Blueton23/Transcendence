@@ -3,7 +3,7 @@ import Avatar from "@/shared/ui/Avatar";
 import { useTranslation } from "react-i18next";
 
 interface SecondaryInfoProps {
-  pricePerNight: number | null;
+  pricePerNight?: number | null;
   proposerName: string;
   proposerInitials: string;
 }

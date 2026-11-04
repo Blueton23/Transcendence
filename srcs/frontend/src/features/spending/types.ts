@@ -1,5 +1,7 @@
 export type SpendingCategory = "l" | "f" | "a" | "m" | "t" | "o";
 
+export type SpendingFilter = "all" | SpendingCategory;
+
 export interface Spending {
   id: number;
   travelId: number;

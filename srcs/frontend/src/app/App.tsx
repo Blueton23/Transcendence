@@ -18,6 +18,7 @@ import TravelPage from "@/pages/TravelPage";
 import JoinPage from "@/pages/JoinPage";
 import ChatPage from "@/pages/ChatPage";
 import { useTranslation } from "react-i18next";
+import { SpendingPage } from "@/pages/SpendingPage";
 
 function PlaceHolder({ label }: { label: string }) {
   return <Text className="p-4">{label} à venir</Text>;
@@ -48,7 +49,7 @@ function App() {
             <Route index element={<Navigate to="itinerary" replace />} />
             <Route path="itinerary" element={<ItineraryPage />} />
             <Route path="ideas" element={<IdeasPage />} />
-            <Route path="expenses" element={<PlaceHolder label="expenses" />} />
+            <Route path="expenses" element={<SpendingPage />} />
             <Route path="chat" element={<ChatPage />} />
             <Route
               path="assistant"

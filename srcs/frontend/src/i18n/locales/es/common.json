@@ -191,7 +191,20 @@
       "deleteFailed": "No se pudo eliminar el gasto.",
       "loadFailed": "No se pudieron cargar los gastos.",
       "updateFailed": "No se pudo editar el gasto."
-    }
+    },
+    "filters": {
+      "allCategories": "Todas"
+    },
+    "form": {
+      "step": "Etapa",
+      "type": "Categoría"
+    },
+    "left": "se fue",
+    "page": {
+      "empty": "No hay gastos para este viaje.",
+      "noMatch": "Ningún gasto coincide con los filtros seleccionados."
+    },
+    "wholeTravel": "Viaje completo"
   },
   "step": {
     "actions": "Acción",
