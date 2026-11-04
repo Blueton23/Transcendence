@@ -10,8 +10,8 @@ import {
 } from "react";
 
 // Shared by the server-to-client sockets (trip, notifications): every
-// message is a `{ type, payload }` event, and the server only signals; the
-// data itself is always reloaded over REST.
+// message is a `{ type, payload }` event. The hooks use it as a signal and
+// reload the data itself over REST.
 
 export interface SocketEvent<T = unknown> {
   type: string;

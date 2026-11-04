@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   Idea,
   CreateIdeaInput,
   PlaceIdeaInput,
   EditIdeaInput,
-  SocketIdea,
-  SocketReaction,
 } from "@/features/idea/types";
 import {
   fetchIdeas,
@@ -18,8 +16,6 @@ import {
   addIdeaReaction,
   removeIdeaReaction,
 } from "@/features/idea/api/api.ideas";
-import { mapIdeaFromApi } from "@/features/idea/api/ideaMapper";
-import { useAuth } from "@/features/auth/context/useAuth";
 import {
   useTravelEvent,
   useTravelSocketOpen,
@@ -27,8 +23,8 @@ import {
 import i18n from "@/i18n";
 
 // Replaces the idea if it is already listed, otherwise adds it on top (the
-// list is newest first). The REST response and the socket echo of the same
-// change can arrive in any order, so both go through here.
+// list is newest first). A reload triggered by the socket can bring the new
+// idea before the POST response does.
 function upsertIdea(current: Idea[], idea: Idea) {
   if (!current.some((existing) => existing.id === idea.id)) {
     return [idea, ...current];
@@ -36,17 +32,10 @@ function upsertIdea(current: Idea[], idea: Idea) {
   return current.map((existing) => (existing.id === idea.id ? idea : existing));
 }
 
-// Socket ideas have no "voted": keep the value this user already had.
-function fromSocket(current: Idea[], event: SocketIdea): Idea {
-  const existing = current.find((idea) => idea.id === event.id);
-  return mapIdeaFromApi({ ...event, voted: existing?.voted ?? false });
-}
-
 export function useIdeas(travelId: number) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { currentUser } = useAuth();
 
   useEffect(() => {
     let ignore = false;
@@ -90,52 +79,29 @@ export function useIdeas(travelId: number) {
     };
   }, [travelId]);
 
-  /* Recharge sans vider la liste (reconnexion du socket) */
-  const reloadIdeas = useCallback(async () => {
+  /* Recharge sans vider la liste (événements du socket) */
+  // Live events can trigger several reloads in a row: keep the last one.
+  const lastReload = useRef(0);
+  async function reloadIdeas() {
+    const reload = ++lastReload.current;
     try {
-      setIdeas(await fetchIdeas(travelId));
+      const result = await fetchIdeas(travelId);
+      if (reload === lastReload.current) setIdeas(result);
     } catch (err) {
       console.error("Impossible de recharger les idées :", err);
     }
-  }, [travelId]);
+  }
 
-  // Live updates from the other travelers.
   // Catches up on anything changed while the socket was closed.
   useTravelSocketOpen(() => void reloadIdeas());
 
-  useTravelEvent<SocketIdea>("idea.created", (event) =>
-    setIdeas((current) => upsertIdea(current, fromSocket(current, event))),
-  );
-  useTravelEvent<SocketIdea>("idea.updated", (event) =>
-    setIdeas((current) => upsertIdea(current, fromSocket(current, event))),
-  );
-  useTravelEvent<{ id: number }>("idea.deleted", ({ id }) =>
-    setIdeas((current) => current.filter((idea) => idea.id !== id)),
-  );
+  useTravelEvent("idea.created", () => void reloadIdeas());
+  useTravelEvent("idea.updated", () => void reloadIdeas());
+  useTravelEvent("idea.deleted", () => void reloadIdeas());
+  useTravelEvent("reaction.created", () => void reloadIdeas());
+  useTravelEvent("reaction.deleted", () => void reloadIdeas());
   // Ideas placed on a deleted step go back to the pool on the server.
   useTravelEvent("step.deleted", () => void reloadIdeas());
-
-  function applyReaction(event: SocketReaction, voted: boolean) {
-    setIdeas((current) =>
-      current.map((idea) => {
-        if (idea.id !== event.ideaId) return idea;
-        // Our own vote from another tab also updates "voted" here.
-        const isMine = event.travelerId === currentUser?.id;
-        return {
-          ...idea,
-          voteCount: event.voteCount,
-          voted: isMine ? voted : idea.voted,
-        };
-      }),
-    );
-  }
-
-  useTravelEvent<SocketReaction>("reaction.created", (event) =>
-    applyReaction(event, true),
-  );
-  useTravelEvent<SocketReaction>("reaction.deleted", (event) =>
-    applyReaction(event, false),
-  );
 
   {
     /* Gère la création d'idée */
@@ -143,7 +109,7 @@ export function useIdeas(travelId: number) {
   async function handleCreateIdea(input: CreateIdeaInput): Promise<void> {
     const newIdea = await postIdea(travelId, input);
 
-    // The socket may have added it already: upsert instead of prepending.
+    // A socket reload may have added it already: upsert instead of prepending.
     setIdeas((currentIdeas) => upsertIdea(currentIdeas, newIdea));
   }
 

@@ -7,20 +7,6 @@ import {
   useTravelSocketOpen,
 } from "@/features/travel/realtime/useTravelSocket";
 
-// Same order as the backend (Step.Meta.ordering): ISO dates sort as strings.
-function byDates(a: Step, b: Step) {
-  return (
-    a.startDate.localeCompare(b.startDate) ||
-    a.endDate.localeCompare(b.endDate) ||
-    a.createdAt.localeCompare(b.createdAt)
-  );
-}
-
-function upsertStep(current: Step[], step: Step) {
-  const others = current.filter((existing) => existing.id !== step.id);
-  return [...others, step].sort(byDates);
-}
-
 export function useSteps(travelId: number) {
   const [steps, setSteps] = useState<Step[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,18 +49,11 @@ export function useSteps(travelId: number) {
   // Catches up on anything changed while the socket was closed.
   useTravelSocketOpen(refetch);
 
-  useTravelEvent<Step>("step.created", (step) =>
-    setSteps((current) => upsertStep(current, step)),
-  );
-  useTravelEvent<Step>("step.updated", (step) =>
-    setSteps((current) => upsertStep(current, step)),
-  );
-  useTravelEvent<{ id: number }>("step.deleted", ({ id }) =>
-    setSteps((current) => current.filter((step) => step.id !== id)),
-  );
-
   // Each step shows how many ideas are pinned on it (ideaCount): reload the
-  // steps when ideas move. Votes do not change it.
+  // steps when ideas move too. Votes do not change it.
+  useTravelEvent("step.created", refetch);
+  useTravelEvent("step.updated", refetch);
+  useTravelEvent("step.deleted", refetch);
   useTravelEvent("idea.created", refetch);
   useTravelEvent("idea.updated", refetch);
   useTravelEvent("idea.deleted", refetch);
