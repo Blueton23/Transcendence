@@ -49,10 +49,14 @@
     "welcomeBack": "Bon retour"
   },
   "chat": {
+    "system": {
+      "participant_joined": "{{name}} a rejoint le voyage.",
+      "participant_left": "{{name}} a quitté le voyage."
+    },
     "errors": {
+      "max_length": "Le message est trop long.",
       "travelChatAccessDenied": "Vous n'avez pas accès à ce voyage.",
-      "travelChatMembershipRequired": "Vous devez être membre du voyage pour envoyer un message.",
-      "max_length": "Le message est trop long."
+      "travelChatMembershipRequired": "Vous devez être membre du voyage pour envoyer un message."
     }
   },
   "errors": {

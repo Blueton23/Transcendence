@@ -31,6 +31,8 @@ from rest_framework.response import Response
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
+from common.realtime import broadcast, user_group
+
 from .models import Friendship, Status
 from .schema import api_token_schema
 from .serializers import (
@@ -300,8 +302,33 @@ class FriendshipSearchView(APIView):
                     travelers,
                     many=True,
                     context={"request": request},
-                ).data
-            }
+                ).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+def notify_friendship(event_type, friendship):
+    """Sends `friendship.<event>` to both users, so the other one sees it and
+    every open tab of the one who acted stays in sync. The payload is only a
+    signal: clients reload their friend lists over REST."""
+    for user_id in (friendship.user1_id, friendship.user2_id):
+        broadcast(
+            user_group(user_id),
+            f"friendship.{event_type}",
+            {"friendship_id": friendship.id},
+        )
+
+
+def notify_friendship(event_type, friendship):
+    """Sends `friendship.<event>` to both users, so the other one sees it and
+    every open tab of the one who acted stays in sync. The payload is only a
+    signal: clients reload their friend lists over REST."""
+    for user_id in (friendship.user1_id, friendship.user2_id):
+        broadcast(
+            user_group(user_id),
+            f"friendship.{event_type}",
+            {"friendship_id": friendship.id},
         )
 
 
@@ -347,6 +374,7 @@ class FriendshipRequestView(APIView):
                 "A friendship or friend request already exists.",
                 code="relationship_exists",
             ) from exc
+        notify_friendship("requested", friendship)
 
         return Response(
             {
@@ -430,6 +458,7 @@ class FriendshipAcceptView(APIView):
 
         friendship.status = Status.ACCEPTED
         friendship.save(update_fields=["status", "updated_at"])
+        notify_friendship("accepted", friendship)
 
         return Response(
             {"detail": "Friend request accepted successfully."},
@@ -460,7 +489,10 @@ class FriendshipRemoveView(APIView):
                 code="not_friendship_participant",
             )
 
-        friendship.delete()
+        with transaction.atomic():
+            # Built before delete() clears the id, sent once it is committed.
+            notify_friendship("removed", friendship)
+            friendship.delete()
 
         return Response(
             {"detail": "Friendship removed successfully."},

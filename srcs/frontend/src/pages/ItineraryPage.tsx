@@ -147,7 +147,6 @@ function ItineraryPage() {
           }}
           onCreate={async (input) => {
             await handleCreateIdea(input);
-            refetch();
           }}
         />
       )}
@@ -159,7 +158,6 @@ function ItineraryPage() {
           onClose={() => setEditIdeaId(null)}
           onEdit={async (input) => {
             await handleEditIdea(editIdea.id, input);
-            refetch();
           }}
         />
       )}
