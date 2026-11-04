@@ -15,10 +15,11 @@ import Icon from "@/shared/ui/Icon";
 import { useTranslation } from "react-i18next";
 
 interface FriendRequestsProps {
+  refreshKey: number;
   onFriendAccepted: () => void;
 }
 
-function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
+function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
   const [requests, setRequests] = useState<FriendshipRequest[]>([]);
   const [error, setError] = useState<string | null>(null);
   const requestId = useRef<number | null>(null);
@@ -56,7 +57,7 @@ function FriendRequests({ onFriendAccepted }: FriendRequestsProps) {
       setError(null);
     }
     void loadRequests();
-  }, []);
+  }, [refreshKey]);
 
   async function handleAccept(id: number) {
     requestId.current = id;

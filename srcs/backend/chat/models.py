@@ -13,6 +13,11 @@ from travel.models import Participation, Step, Travel, is_travel_member
 MESSAGE_BODY_MAX_LENGTH = 2000
 
 
+class SystemMessageKey(models.TextChoices):
+    PARTICIPANT_JOINED = "participant_joined", "Participant joined"
+    PARTICIPANT_LEFT = "participant_left", "Participant left"
+
+
 class MessageQuerySet(models.QuerySet):
     # Non-lus d'un participant : les messages des autres, arrives depuis son
     # dernier passage (tous si le chat n'a jamais ete ouvert).
@@ -58,7 +63,14 @@ class Message(TimeStampedModel, ValidatedModel):
         blank=True,
     )
     is_system = models.BooleanField(default=False)
-    body = models.TextField(validators=[MaxLengthValidator(MESSAGE_BODY_MAX_LENGTH)])
+    # Empty for a system message: its text is built by the front from system_key and system_params.
+    body = models.TextField(
+        blank=True, validators=[MaxLengthValidator(MESSAGE_BODY_MAX_LENGTH)]
+    )
+    system_key = models.CharField(
+        max_length=50, choices=SystemMessageKey.choices, blank=True
+    )
+    system_params = models.JSONField(default=dict, blank=True)
 
     objects = MessageQuerySet.as_manager()
 
@@ -81,8 +93,9 @@ class Message(TimeStampedModel, ValidatedModel):
         ]
 
     def __str__(self) -> str:
-        author = "system" if self.is_system else self.traveler
-        return f"{author} @ {self.travel}: {self.body[:30]}"
+        if self.is_system:
+            return f"system @ {self.travel}: {self.system_key}"
+        return f"{self.traveler} @ {self.travel}: {self.body[:30]}"
 
     def clean(self) -> None:
         super().clean()
@@ -99,6 +112,13 @@ class Message(TimeStampedModel, ValidatedModel):
                 self.travel_id, self.traveler_id
             ):
                 errors["traveler"] = "The author must be a participant of the travel."
+
+        if self.is_system and not self.system_key:
+            errors["system_key"] = "A system message must have a system key."
+        elif not self.is_system and self.system_key:
+            errors["system_key"] = "Only a system message can have a system key."
+        elif not self.is_system and not self.body:
+            errors["body"] = "A message must have a body."
 
         if self.step_id and self.idea_id:
             errors["idea"] = "A message is attached to a step or an idea, not both."
