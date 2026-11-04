@@ -41,6 +41,12 @@
     "username": "Nombre de usuario",
     "welcomeBack": "Bienvenido de nuevo"
   },
+  "chat": {
+    "system": {
+      "participant_joined": "{{name}} se ha unido al viaje.",
+      "participant_left": "{{name}} ha dejado el viaje."
+    }
+  },
   "errors": {
     "csrfMissing": "Token CSRF no encontrado.",
     "generic": "Error",
