@@ -9,7 +9,7 @@ interface FriendSearchResultProps {
 }
 
 function FriendSearchResult({ user, onSelect }: FriendSearchResultProps) {
-  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ");
+  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
 
   return (
     <button
@@ -27,7 +27,7 @@ function FriendSearchResult({ user, onSelect }: FriendSearchResultProps) {
         )}
       </div>
 
-      <Icon name="chevron-right" size={18} className="text-muted" />
+      <Icon name="chevr-right" size={18} className="text-muted" />
     </button>
   );
 }

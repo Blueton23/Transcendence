@@ -86,9 +86,9 @@ function FriendSearch() {
             <div className="flex min-w-0 flex-1 flex-col">
               <Text>{traveler.username}</Text>
 
-              {(traveler.first_name || traveler.last_name) && (
+              {(traveler.firstName || traveler.lastName) && (
                 <Text size="sm" tone="secondary">
-                  {[traveler.first_name, traveler.last_name]
+                  {[traveler.firstName, traveler.lastName]
                     .filter(Boolean)
                     .join(" ")}
                 </Text>

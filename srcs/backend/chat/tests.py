@@ -573,17 +573,35 @@ class ChatPermissionEnvelopeTest(TestCase):
             ("get", "travel-unread-count"),
             ("post", "travel-mark-read"),
         ]
+
         for method, name in cases:
             with self.subTest(method=method, name=name):
                 url = reverse(name, kwargs={"travel_id": self.travel.pk})
+
                 response = getattr(self.client, method)(
-                    url, {"body": "Hello"}, format="json"
+                    url,
+                    {"body": "Hello"},
+                    format="json",
                 )
 
-                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-                self.assertEqual(response.data["status"], 403)
-                self.assertEqual(response.data["code"], "permission_denied")
-                self.assertTrue(response.data["message"])
+                self.assertEqual(
+                    response.status_code,
+                    status.HTTP_403_FORBIDDEN,
+                )
+                self.assertEqual(
+                    response.data["type"],
+                    "client_error",
+                )
+                self.assertEqual(
+                    response.data["errors"][0]["code"],
+                    "permission_denied",
+                )
+                self.assertTrue(
+                    response.data["errors"][0]["detail"],
+                )
+                self.assertIsNone(
+                    response.data["errors"][0]["attr"],
+                )
 
     def test_unknown_travel_is_403(self):
         url = reverse("travel-messages", kwargs={"travel_id": 999999})
