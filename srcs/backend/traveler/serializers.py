@@ -5,7 +5,7 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 
-from .models import Friendship, Traveler
+from .models import Traveler
 
 
 def django_error_detail(

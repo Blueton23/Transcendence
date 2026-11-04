@@ -11,7 +11,7 @@ from django.contrib.auth import (
     logout,
     update_session_auth_hash,
 )
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
@@ -335,12 +335,13 @@ class FriendshipRequestView(APIView):
         user2_id = max(user.pk, target.pk)
 
         try:
-            friendship = Friendship.objects.create(
-                user1_id=user1_id,
-                user2_id=user2_id,
-                requested_by=user,
-                status=Status.PENDING,
-            )
+            with transaction.atomic():
+                friendship = Friendship.objects.create(
+                    user1_id=user1_id,
+                    user2_id=user2_id,
+                    requested_by=user,
+                    status=Status.PENDING,
+                )
         except IntegrityError as exc:
             raise ValidationError(
                 "A friendship or friend request already exists.",
@@ -503,46 +504,6 @@ class FriendshipListView(APIView):
 
         return Response(
             {"friendships": friendship_list},
-            status=status.HTTP_200_OK,
-        )
-
-
-# ===================================================================#
-
-# Connexion avec Token (swagger)
-
-
-@extend_schema(tags=["Auth"])
-@api_token_schema
-class ApiTokenView(APIView):
-    authentication_classes: ClassVar[list] = []
-    permission_classes: ClassVar[list] = [AllowAny]
-    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
-    throttle_scope = "auth_token"
-    public_api = True
-
-    def post(self, request: Request) -> Response:
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        traveler = authenticate(
-            request=request,
-            username=serializer.validated_data["username"],
-            password=serializer.validated_data["password"],
-        )
-
-        if traveler is None:
-            return Response(
-                {"detail": "Identifiants invalides."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        token, _ = Token.objects.get_or_create(user=traveler)
-
-        return Response(
-            {
-                "token": token.key,
-            },
             status=status.HTTP_200_OK,
         )
 

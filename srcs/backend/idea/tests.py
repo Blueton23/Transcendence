@@ -1497,7 +1497,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step_id", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "step_id",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
     # Test : une étape dans la corbeille ne peut pas recevoir une nouvelle idée
     def test_rejects_trashed_step(self):
@@ -1525,7 +1529,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step_id", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "step_id",
+            [error["attr"] for error in response.data["errors"]],
+        )
         self.assertFalse(Idea.objects.filter(title="Idée sur étape supprimée").exists())
 
     # ========================================================================#
@@ -1982,7 +1990,11 @@ class IdeaViewTest(APITestCase):
             )
 
             self.assertEqual(response.status_code, 400)
-            self.assertIn("start_date", response.data["details"])
+            self.assertEqual(response.data["type"], "validation_error")
+            self.assertIn(
+                "start_date",
+                [error["attr"] for error in response.data["errors"]],
+            )
 
             self.idea.refresh_from_db()
             self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
@@ -2000,7 +2012,11 @@ class IdeaViewTest(APITestCase):
             )
 
             self.assertEqual(response.status_code, 400)
-            self.assertIn("start_date", response.data["details"])
+            self.assertEqual(response.data["type"], "validation_error")
+            self.assertIn(
+                "start_date",
+                [error["attr"] for error in response.data["errors"]],
+            )
 
             self.idea.refresh_from_db()
             self.assertEqual(self.idea.type, IdeaType.RESTAURANT)
@@ -2302,7 +2318,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step_id", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "step_id",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -2339,7 +2359,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step_id", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "step_id",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -2375,7 +2399,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("step_id", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "step_id",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.step)
@@ -2415,7 +2443,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("start_date", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "start_date",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.step, step)
@@ -2459,7 +2491,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("start_date", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "start_date",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.step, step)
@@ -2504,7 +2540,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("chosen_at", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "chosen_at",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertEqual(self.idea.step, step)
@@ -2946,7 +2986,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("chosen_at", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "chosen_at",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.chosen_by)
@@ -2978,7 +3022,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("chosen_at", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "chosen_at",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.chosen_by)
@@ -3020,7 +3068,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("chosen_at", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "chosen_at",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.idea.refresh_from_db()
         self.assertIsNone(self.idea.chosen_by)
@@ -3079,7 +3131,11 @@ class IdeaViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("start_date", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "start_date",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         second.refresh_from_db()
         self.assertIsNone(second.chosen_by)
@@ -3460,7 +3516,11 @@ class ReactionViewTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("reaction", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "reaction",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
         self.assertEqual(
             Reaction.objects.filter(

@@ -223,7 +223,17 @@ class PublicApiKeyTest(APITestCase):
         response = self.client.get(reverse("travel-list"))
 
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.data["message"], "Invalid token.")
+        self.assertEqual(response.data["type"], "client_error")
+        self.assertEqual(
+            response.data["errors"],
+            [
+                {
+                    "code": "authentication_failed",
+                    "detail": "Invalid token.",
+                    "attr": None,
+                }
+            ],
+        )
 
     def test_token_does_not_open_private_views(self):
         self.authorize(self.token.key)
