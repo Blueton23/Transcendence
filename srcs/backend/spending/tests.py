@@ -765,7 +765,12 @@ class SpendingViewTest(APITestCase):
         self.client.force_authenticate(self.jean)
 
     def _payload(self, **overrides):
-        data = {"travelerId": self.bob.id, "category": "m", "amount": "90.00"}
+        data = {
+            "travelerId": self.bob.id,
+            "category": "m",
+            "amount": "90.00",
+            "label": "Sunshine Restaurant",
+        }
         data.update(overrides)
         return data
 
@@ -950,3 +955,51 @@ class SpendingViewTest(APITestCase):
         )
         self.assertEqual(jean["name"], self.jean.username)
         self.assertTrue(jean["hasLeft"])
+
+    def test_create_with_shared_with_splits_only_between_selected(self):
+        simon = Traveler.objects.create_user(
+            username="Simon", email="simon@exemple.com", password="password123"
+        )
+        Participation.objects.create(
+            traveler=simon, travel=self.travel, status=ParticipationStatus.ACCEPTED
+        )
+        response = self.client.post(
+            self.url,
+            self._payload(amount="10.01", sharedWith=[self.jean.id, simon.id]),
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        shares = {
+            s["travelerId"]: Decimal(s["amount"]) for s in response.json()["shares"]
+        }
+        self.assertEqual(
+            shares, {self.jean.id: Decimal("5.01"), simon.id: Decimal("5.00")}
+        )
+
+    def test_create_with_shared_with_non_member_returns_400(self):
+        response = self.client.post(
+            self.url,
+            self._payload(sharedWith=[self.jean.id, self.alice.id]),
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_without_label_returns_400(self):
+        response = self.client.post(self.url, self._payload(label=""), format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_patch_shared_with_keeps_amount(self):
+        spending = create_spending(
+            travel=self.travel,
+            traveler=self.jean,
+            category=SpendingCategory.MEALS,
+            label="Raclette",
+            amount="90.00",
+        )
+        url = f"{self.url}{spending.id}/"
+        response = self.client.patch(url, {"sharedWith": [self.bob.id]}, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [(s["travelerId"], s["amount"]) for s in response.json()["shares"]],
+            [(self.bob.id, "90.00")],
+        )

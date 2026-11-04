@@ -5,7 +5,7 @@ from rest_framework import serializers
 from common.mixins import ModelValidationMixin
 from idea.models import Idea
 from spending.models import Spending, SpendingShare
-from spending.services import create_spending, update_spending
+from spending.services import create_spending, split_equally, update_spending
 from travel.models import Step
 from traveler.models import Traveler
 
@@ -60,19 +60,30 @@ class SpendingSerializer(ModelValidationMixin, serializers.ModelSerializer):
 
     shares = SpendingSharesSerializer(many=True, required=False)
 
+    shared_with = serializers.PrimaryKeyRelatedField(
+        queryset=Traveler.objects.all(),
+        many=True,
+        write_only=True,
+        required=False,
+    )
+
     @staticmethod
-    def pop_shares(validated_data):
+    def resolve_shares(validated_data, instance=None):
         shares = validated_data.pop("shares", None)
+        shared_with = validated_data.pop("shared_with", None)
+        if shared_with is not None:
+            amount = validated_data.get("amount") or instance.amount
+            return split_equally(amount, shared_with)
         if shares is not None:
-            shares = {s["traveler"]: s["amount"] for s in shares}
-        return shares
+            return {s["traveler"]: s["amount"] for s in shares}
+        return None
 
     def create(self, validated_data):
-        shares = self.pop_shares(validated_data)
+        shares = self.resolve_shares(validated_data)
         return create_spending(shares=shares, **validated_data)
 
     def update(self, instance, validated_data):
-        shares = self.pop_shares(validated_data)
+        shares = self.resolve_shares(validated_data, instance)
         return update_spending(instance, shares=shares, **validated_data)
 
     class Meta:
@@ -90,9 +101,14 @@ class SpendingSerializer(ModelValidationMixin, serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "shares",
+            "shared_with",
         ]
         read_only_fields: ClassVar[list[str]] = [
             "travel_id",
             "created_at",
             "updated_at",
         ]
+
+        extra_kwargs: ClassVar[dict] = {
+            "label": {"required": True, "allow_blank": False}
+        }
