@@ -1,49 +1,57 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { User } from "@/features/auth/types";
 import { searchFriend } from "../api/friendship";
 
+type SearchResult = {
+  query: string;
+  travelers: User[];
+  error: string | null;
+};
+
 export function useFriendSuggestions(query: string, enabled: boolean) {
-  const [travelers, setTravelers] = useState<User[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const requestId = useRef(0);
+  const [result, setResult] = useState<SearchResult | null>(null);
+
+  const value = query.trim();
+  const canSearch = enabled && value.length >= 2;
+  const hasResult = canSearch && result?.query === value;
 
   useEffect(() => {
-    const value = query.trim();
-    const currentRequest = ++requestId.current;
+    if (!canSearch) return;
 
-    if (!enabled || value.length < 2) {
-      setTravelers([]);
-      setIsSearching(false);
-      setError(null);
-      return;
-    }
-
-    setIsSearching(true);
-    setError(null);
+    let cancelled = false;
 
     const timeoutId = window.setTimeout(async () => {
       try {
-        const result = await searchFriend(value);
+        const response = await searchFriend(value);
 
-        if (currentRequest !== requestId.current) return;
+        if (cancelled) return;
 
-        setTravelers(result.travelers);
+        setResult({
+          query: value,
+          travelers: response.travelers,
+          error: null,
+        });
       } catch {
-        if (currentRequest !== requestId.current) return;
+        if (cancelled) return;
 
-        setTravelers([]);
-        setError("Impossible de rechercher les utilisateurs.");
-      } finally {
-        if (currentRequest === requestId.current) {
-          setIsSearching(false);
-        }
+        setResult({
+          query: value,
+          travelers: [],
+          error: "Failed to search for users.",
+        });
       }
     }, 300);
 
-    return () => window.clearTimeout(timeoutId);
-  }, [query, enabled]);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [value, canSearch]);
 
-  return { travelers, isSearching, error };
+  return {
+    travelers: hasResult ? result.travelers : [],
+    isSearching: canSearch && !hasResult,
+    error: hasResult ? result.error : null,
+  };
 }
