@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
+import { useMarkIdeasSeen } from "@/features/idea/hooks/useMarkIdeasSeen";
 import { IdeaCard } from "@/features/idea/components/card/IdeaCard";
 import { PinIdeaButton } from "@/features/idea/components/page/PinIdeaButton";
 import { IdeaTypeFilter } from "@/features/idea/components/page/IdeaTypeFilter";
@@ -33,6 +34,8 @@ export function IdeasPage() {
     handleChooseIdea,
     handleVote,
   } = useIdeas(travelId);
+
+  useMarkIdeasSeen(travelId);
 
   const {
     steps,

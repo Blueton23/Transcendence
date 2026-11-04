@@ -242,3 +242,33 @@ export async function removeIdeaReaction(
     await parseResponse<unknown>(response);
   }
 }
+
+// Nombre de nouvelles idées (des autres) depuis le dernier passage sur la page
+export async function fetchUnseenIdeasCount(travelId: number): Promise<number> {
+  const response = await fetch(`/api/travels/${travelId}/ideas/unseen-count/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const data = await parseResponse<{ unseenCount: number }>(response);
+  return data.unseenCount;
+}
+
+// Marquer les idées du voyage comme vues
+export async function markIdeasAsSeen(travelId: number): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error(i18n.t("errors.csrfMissing"));
+  }
+
+  const response = await fetch(`/api/travels/${travelId}/ideas/mark-seen/`, {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "X-CSRFToken": csrfToken,
+    },
+  });
+
+  await parseResponse<{ success: boolean }>(response);
+}
