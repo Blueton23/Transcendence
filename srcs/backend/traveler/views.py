@@ -320,18 +320,6 @@ def notify_friendship(event_type, friendship):
         )
 
 
-def notify_friendship(event_type, friendship):
-    """Sends `friendship.<event>` to both users, so the other one sees it and
-    every open tab of the one who acted stays in sync. The payload is only a
-    signal: clients reload their friend lists over REST."""
-    for user_id in (friendship.user1_id, friendship.user2_id):
-        broadcast(
-            user_group(user_id),
-            f"friendship.{event_type}",
-            {"friendship_id": friendship.id},
-        )
-
-
 class FriendshipRequestView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
