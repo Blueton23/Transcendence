@@ -8,6 +8,8 @@ export interface ApiChatMessage {
   body: string;
   createdAt: string;
   isSystem: boolean;
+  systemKey: string;
+  systemParams: Record<string, string>;
   isUnread: boolean;
 }
 
@@ -23,3 +25,7 @@ export interface CreateMessageData {
 export interface UnreadCountResponse {
   unreadCount: number;
 }
+
+// "chat.message" socket event: isUnread depends on the reader, so the server
+// leaves it out.
+export type SocketChatMessage = Omit<ApiChatMessage, "isUnread">;

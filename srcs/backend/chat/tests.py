@@ -7,8 +7,10 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from chat.models import MESSAGE_BODY_MAX_LENGTH, Message
+from chat.models import MESSAGE_BODY_MAX_LENGTH, Message, SystemMessageKey
 from chat.serializers import MessageSerializer
+from common.realtime import travel_group
+from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaType
 from travel.models import Participation, ParticipationStatus, Step, Travel
 from traveler.models import Traveler
@@ -62,6 +64,17 @@ class MessageModelTest(TestCase):
             end_date=datetime.date(2026, 7, 10),
         )
 
+    def _make_system_message(self, **overrides):
+        data = {
+            "traveler": None,
+            "is_system": True,
+            "body": "",
+            "system_key": SystemMessageKey.PARTICIPANT_JOINED,
+            "system_params": {"name": "bob"},
+        }
+        data.update(overrides)
+        return self._make_message(**data)
+
     def _make_message(self, **overrides):
         data = {
             "travel": self.travel,
@@ -101,8 +114,8 @@ class MessageModelTest(TestCase):
         message = self._make_message(body="Hello")
         self.assertEqual(str(message), "alice @ Road trip: Hello")
 
-        system = self._make_message(traveler=None, is_system=True, body="Bob joined")
-        self.assertEqual(str(system), "system @ Road trip: Bob joined")
+        system = self._make_system_message()
+        self.assertEqual(str(system), "system @ Road trip: participant_joined")
 
     # --- Suppressions en cascade ---
 
@@ -160,14 +173,30 @@ class MessageModelTest(TestCase):
     # --- Auteur et messages systeme ---
 
     def test_system_message_has_no_author(self):
-        message = self._make_message(traveler=None, is_system=True)
+        message = self._make_system_message()
         self.assertTrue(message.is_system)
         self.assertIsNone(message.traveler_id)
+        self.assertEqual(message.body, "")
 
     def test_system_message_with_author_is_rejected(self):
         with self.assertRaises(ValidationError) as ctx:
-            self._make_message(is_system=True)
+            self._make_system_message(traveler=self.traveler)
         self.assertIn("traveler", ctx.exception.message_dict)
+
+    def test_system_message_without_key_is_rejected(self):
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_system_message(system_key="")
+        self.assertIn("system_key", ctx.exception.message_dict)
+
+    def test_user_message_with_system_key_is_rejected(self):
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_message(system_key=SystemMessageKey.PARTICIPANT_LEFT)
+        self.assertIn("system_key", ctx.exception.message_dict)
+
+    def test_user_message_without_body_is_rejected(self):
+        with self.assertRaises(ValidationError) as ctx:
+            self._make_message(body="")
+        self.assertIn("body", ctx.exception.message_dict)
 
     def test_database_rejects_system_message_with_author(self):
         message = self._make_message()
@@ -271,7 +300,7 @@ class MessageModelTest(TestCase):
     def test_everything_from_others_is_unread_before_first_read(self):
         mine = self._make_message()
         theirs = self._make_message(traveler=self.other)
-        self._make_message(traveler=None, is_system=True)
+        self._make_system_message()
 
         unread = Message.objects.unread_for(self.participation)
 
@@ -520,3 +549,95 @@ class MessageSerializerTest(TestCase):
             serializer.validated_data["body"],
             "Hello world",
         )
+
+
+class ChatPermissionEnvelopeTest(TestCase):
+    """403s go through common.exceptions, like every other API error."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.stranger = Traveler.objects.create_user(
+            username="dave", email="dave@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        self.client.force_authenticate(user=self.stranger)
+
+    def test_every_chat_endpoint_uses_the_error_envelope(self):
+        cases = [
+            ("get", "travel-messages"),
+            ("post", "travel-messages"),
+            ("get", "travel-unread-count"),
+            ("post", "travel-mark-read"),
+        ]
+        for method, name in cases:
+            with self.subTest(method=method, name=name):
+                url = reverse(name, kwargs={"travel_id": self.travel.pk})
+                response = getattr(self.client, method)(
+                    url, {"body": "Hello"}, format="json"
+                )
+
+                self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+                self.assertEqual(response.data["status"], 403)
+                self.assertEqual(response.data["code"], "permission_denied")
+                self.assertTrue(response.data["message"])
+
+    def test_unknown_travel_is_403(self):
+        url = reverse("travel-messages", kwargs={"travel_id": 999999})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class ChatBroadcastTest(BroadcastListenerMixin, TestCase):
+    """Hits the real Redis channel layer configured in settings."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.traveler = Traveler.objects.create_user(
+            username="erin", email="erin@example.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.url = reverse("travel-messages", kwargs={"travel_id": self.travel.pk})
+        self.client.force_authenticate(user=self.traveler)
+        self.listen_to(travel_group(self.travel.id))
+
+    def post(self, data):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = self.client.post(self.url, data, format="json")
+        return response, callbacks
+
+    def test_send_broadcasts_chat_message_in_camel_case(self):
+        response, _ = self.post({"body": "  Salut !  "})
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "chat.message")
+        payload = event["payload"]
+        self.assertEqual(payload["id"], response.data["id"])
+        self.assertEqual(payload["body"], "Salut !")
+        self.assertEqual(payload["travelerName"], str(self.traveler))
+        self.assertEqual(payload["user"]["firstName"], self.traveler.first_name)
+        self.assertIn("createdAt", payload)
+        self.assertIn("isSystem", payload)
+        # Per-reader value: each client works it out.
+        self.assertNotIn("isUnread", payload)
+
+    def test_rejected_message_broadcasts_nothing(self):
+        response, callbacks = self.post({"body": "   "})
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(callbacks, [])

@@ -45,10 +45,10 @@ def seed_friendships(fake: Faker, travelers: list, count: int) -> list:
     return friendships
 
 
-def seed_dub_travelers() -> list:
+def seed_dub_travelers(count: int = 99) -> list:
     travelers = []
 
-    for i in range(1, 100):
+    for i in range(1, count + 1):
         traveler = Traveler.objects.create_user(
             username=f"dub{i}",
             email=f"dub{i}@example.com",
@@ -65,7 +65,8 @@ def seed_dub_travelers() -> list:
 def seed_dub_friendships(dub_travelers: list) -> list:
     friendships = []
 
-    for i in range(1, 10):
+    # With fewer travelers, the slices below just come back shorter.
+    for i in range(1, min(10, len(dub_travelers) + 1)):
         user = dub_travelers[i - 1]
 
         accepted_friends = dub_travelers[i * 10 - 1 : i * 10 + 2]
