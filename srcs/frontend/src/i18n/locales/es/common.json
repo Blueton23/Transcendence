@@ -177,6 +177,16 @@
   "pwa": {
     "offline": "Sin conexión: algunas funciones no están disponibles"
   },
+  "spending": {
+    "categories": {
+      "lodging": "Alojamiento",
+      "fuel": "Combustible",
+      "activities": "Actividades",
+      "meals": "Comidas",
+      "tolls": "Peajes",
+      "other": "Otros"
+    }
+  },
   "step": {
     "actions": "Acción",
     "add": "Añadir una etapa",

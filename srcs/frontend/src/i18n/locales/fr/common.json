@@ -177,6 +177,16 @@
   "pwa": {
     "offline": "Hors ligne : certaines fonctions sont indisponibles"
   },
+  "spending": {
+    "categories": {
+      "lodging": "Hébergement",
+      "fuel": "Carburant",
+      "activities": "Activités",
+      "meals": "Repas",
+      "tolls": "Péages",
+      "other": "Autre"
+    }
+  },
   "step": {
     "actions": "Action",
     "add": "Ajouter une étape",

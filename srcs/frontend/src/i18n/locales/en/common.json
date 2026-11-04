@@ -177,6 +177,16 @@
   "pwa": {
     "offline": "You're offline: some features are unavailable"
   },
+  "spending": {
+    "categories": {
+      "lodging": "Lodging",
+      "fuel": "Fuel",
+      "activities": "Activities",
+      "meals": "Meals",
+      "tolls": "Tolls",
+      "other": "Other"
+    }
+  },
   "step": {
     "actions": "Action",
     "add": "Add a stop",
