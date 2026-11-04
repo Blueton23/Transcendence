@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
@@ -100,6 +101,10 @@ class StepDetailView(
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
     def perform_destroy(self, instance):
+        if instance.spendings.exists():
+            raise ValidationError(
+                {"detail": "This stop has expenses: move or delte them first"}
+            )
         instance.soft_delete()
         # TODO: message system a rajouter dans la chat + bouton "restaurer"une fois l-app chat prete
 

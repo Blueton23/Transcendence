@@ -9,6 +9,10 @@ from idea.models import (
     Idea,
     IdeaType,
 )
+from spending.models import (
+    Spending,
+    SpendingCategory,
+)
 from travel.models import (
     Participation,
     ParticipationStatus,
@@ -900,3 +904,22 @@ class StepViewTest(APITestCase):
         self.assertEqual(response.status_code, 404)
         self.mon_step.refresh_from_db()
         self.assertEqual(self.autre_step.localisation, "Paris")
+
+    def test_cannot_delete_step_with_spendings(self):
+        Spending.objects.create(
+            travel=self.mon_voyage,
+            traveler=self.traveler,
+            step=self.mon_step,
+            category=SpendingCategory.MEALS,
+            amount="30.00",
+        )
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.delete(
+            reverse(
+                "step-detail",
+                kwargs={"travel_id": self.mon_voyage.id, "pk": self.mon_step.id},
+            )
+        )
+        self.assertEqual(response.status_code, 400)
+        self.mon_step.refresh_from_db()
+        self.assertIsNone(self.mon_step.deleted_at)
