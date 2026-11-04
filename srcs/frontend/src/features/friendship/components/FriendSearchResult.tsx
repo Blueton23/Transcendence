@@ -27,7 +27,7 @@ function FriendSearchResult({ user, onSelect }: FriendSearchResultProps) {
         )}
       </div>
 
-      <Icon name="chevr-right" size={18} className="text-muted" />
+      <Icon name="chev-right" size={18} className="text-muted" />
     </button>
   );
 }
