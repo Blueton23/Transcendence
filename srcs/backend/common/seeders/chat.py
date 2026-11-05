@@ -1,6 +1,6 @@
 from faker import Faker
 
-from chat.models import Message
+from chat.models import Message, SystemMessageKey
 from travel.models import ParticipationStatus
 
 
@@ -30,14 +30,23 @@ def seed_messages(fake: Faker, travels: list, per_travel: int) -> list:
                 elif ideas:
                     idea = fake.random_element(elements=ideas)
 
+            if is_system:
+                content = {
+                    "system_key": fake.random_element(SystemMessageKey.values),
+                    "system_params": {"name": fake.user_name()},
+                }
+            else:
+                content = {
+                    "traveler": fake.random_element(authors),
+                    "body": fake.sentence(),
+                }
             messages.append(
                 Message.objects.create(
                     travel=travel,
-                    traveler=None if is_system else fake.random_element(authors),
                     step=step,
                     idea=idea,
                     is_system=is_system,
-                    body=fake.sentence(),
+                    **content,
                 )
             )
     return messages

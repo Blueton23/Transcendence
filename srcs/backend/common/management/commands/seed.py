@@ -29,6 +29,8 @@ class Command(BaseCommand):
         parser.add_argument("--reactions", type=int, default=40)
         parser.add_argument("--messages-per-travel", type=int, default=8)
         parser.add_argument("--spendings-per-travel", type=int, default=5)
+        # Fixed accounts dub1..dubN for manual testing (see seed_dub_travelers).
+        parser.add_argument("--dub-travelers", type=int, default=99)
         parser.add_argument(
             "--fresh",
             action="store_true",
@@ -74,7 +76,7 @@ class Command(BaseCommand):
         self.stdout.write(f"Created {len(spendings)} spendings.")
 
         # Travelers DUB
-        dub_travelers = seed_dub_travelers()
+        dub_travelers = seed_dub_travelers(options["dub_travelers"])
         self.stdout.write(f"Created {len(dub_travelers)} DUB travelers.")
 
         # Friendships spécifiques des DUB

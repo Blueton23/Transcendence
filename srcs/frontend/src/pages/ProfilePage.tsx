@@ -9,15 +9,26 @@ import FriendSearch from "../features/friendship/components/FriendSearch";
 import Button from "../shared/ui/Button";
 import Modal from "../shared/ui/Modal";
 import { useTranslation } from "react-i18next";
+import {
+  useNotificationEvent,
+  useNotificationSocketOpen,
+} from "../features/notifications/realtime/useNotificationSocket";
 
 function ProfilePage() {
   const [isModifyOpen, setIsModifyOpen] = useState(false);
   const [friendsRefreshKey, setFriendsRefreshKey] = useState(0);
   const { t } = useTranslation();
 
-  function handleFriendAccepted() {
+  function refreshFriends() {
     setFriendsRefreshKey((current) => current + 1);
   }
+
+  // Someone else sent, accepted, declined or removed a friendship (or this
+  // user did, in another tab): reload both lists.
+  useNotificationSocketOpen(refreshFriends);
+  useNotificationEvent("friendship.requested", refreshFriends);
+  useNotificationEvent("friendship.accepted", refreshFriends);
+  useNotificationEvent("friendship.removed", refreshFriends);
 
   return (
     <div className="flex w-full flex-col gap-6 p-8">
@@ -35,7 +46,10 @@ function ProfilePage() {
 
       <FriendSearch />
 
-      <FriendRequests onFriendAccepted={handleFriendAccepted} />
+      <FriendRequests
+        refreshKey={friendsRefreshKey}
+        onFriendAccepted={refreshFriends}
+      />
 
       <FriendList refreshKey={friendsRefreshKey} />
 
