@@ -124,7 +124,22 @@
       "stepRequired": "Elige una etapa para esta idea.",
       "titleRequired": "El título es obligatorio.",
       "voteNotFound": "Estado del voto no encontrado.",
-      "voteRefreshFailed": "Tu voto se guardó, pero no se pudo actualizar el contador. Recarga la página para sincronizarlo."
+      "voteRefreshFailed": "Tu voto se guardó, pero no se pudo actualizar el contador. Recarga la página para sincronizarlo.",
+
+      "step_not_in_travel": "La etapa debe pertenecer al mismo viaje que la idea.",
+      "dates_outside_step": "Las fechas de la idea deben estar dentro de las fechas de la etapa seleccionada.",
+      "price_only_for_lodging": "Solo un alojamiento puede tener un precio por noche.",
+      "invalid_chosen_idea": "Solo se puede elegir un alojamiento situado en una etapa.",
+      "dates_must_be_together": "Las fechas de inicio y fin deben indicarse juntas.",
+      "pool_idea_has_dates": "Una idea en el grupo de propuestas no puede tener fechas.",
+      "single_day_only": "Una idea que no sea un alojamiento solo puede durar un día.",
+      "lodging_dates_required": "Un alojamiento debe tener fechas.",
+      "placed_idea_dates_required": "Una idea situada en una etapa debe tener fechas.",
+      "lodging_before_travel": "El alojamiento no puede empezar antes del inicio del viaje.",
+      "lodging_after_travel": "El alojamiento no puede terminar después del final del viaje.",
+      "lodging_min_one_night": "Un alojamiento debe durar al menos una noche.",
+      "lodging_overlap": "Ya hay un alojamiento elegido en esta etapa para fechas que se solapan.",
+      "reaction_already_exists": "Ya has votado por esta idea."
     },
     "filters": {
       "allSteps": "Todas",

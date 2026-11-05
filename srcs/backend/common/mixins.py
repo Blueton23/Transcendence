@@ -1,22 +1,22 @@
 from typing import ClassVar
 
-from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.exceptions import (
+    NON_FIELD_ERRORS,
+    ValidationError as DjangoValidationError,
+)
 from rest_framework import serializers
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
+from rest_framework.settings import api_settings
 from rest_framework.throttling import ScopedRateThrottle
 
 
 class PublicApiMixin:
-    # Vue de l'API publique : accepte la clé API (Authorization: Token <clé>) en plus de la session.
-    # Ordre important : Session en premier -> garde le 403.
     authentication_classes: ClassVar[list] = [
         SessionAuthentication,
         TokenAuthentication,
     ]
-    # Rate limiting : scope "public_api" (limite définie dans settings.py)
     throttle_classes: ClassVar[list] = [ScopedRateThrottle]
     throttle_scope = "public_api"
-    # Affichée dans la doc Swagger (filtre : common/schema.py)
     public_api = True
 
 
@@ -25,12 +25,32 @@ class ModelValidationMixin:
         try:
             return super().save(**kwargs)
         except DjangoValidationError as exc:
-            detail = getattr(exc, "message_dict", exc.messages)
-            if isinstance(detail, dict):
-                detail = {
-                    self._client_name(key): messages for key, messages in detail.items()
+
+            def to_detail(error):
+                message = (
+                    error.message % error.params if error.params else error.message
+                )
+                return serializers.ErrorDetail(
+                    message,
+                    code=error.code or "invalid",
+                )
+
+            if hasattr(exc, "error_dict"):
+                details = {
+                    self._client_name(field): [to_detail(error) for error in errors]
+                    for field, errors in exc.error_dict.items()
                 }
-            raise serializers.ValidationError(detail) from exc
+            else:
+                details = {
+                    api_settings.NON_FIELD_ERRORS_KEY: [
+                        to_detail(error) for error in exc.error_list
+                    ]
+                }
+
+            raise serializers.ValidationError(details) from exc
 
     def _client_name(self, key):
+        if key == NON_FIELD_ERRORS:
+            return api_settings.NON_FIELD_ERRORS_KEY
+
         return f"{key}_id" if f"{key}_id" in self.fields else key

@@ -7,7 +7,6 @@ import type {
 } from "@/features/idea/types";
 
 import { getCookie } from "@/shared/api/cookies";
-import { translateIdeaError } from "./ideaErrors";
 import i18n from "@/i18n";
 
 import {
@@ -65,7 +64,7 @@ export async function postIdea(
   });
 
   const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+    await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -94,7 +93,7 @@ export async function patchIdea(
   });
 
   const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+    await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -163,7 +162,7 @@ export async function patchIdeaPlacement(
   });
 
   const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+    await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -190,7 +189,7 @@ export async function chooseIdea(
   );
 
   const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+    await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -215,7 +214,9 @@ export async function addIdeaReaction(
       },
     },
   );
-  await parseResponse<unknown>(response);
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
 }
 
 // Retirer le vote sur une idée du voyage

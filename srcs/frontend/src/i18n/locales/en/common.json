@@ -124,7 +124,22 @@
       "stepRequired": "Choose a stop for this idea.",
       "titleRequired": "The title is required.",
       "voteNotFound": "Vote status not found.",
-      "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it."
+      "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
+
+      "step_not_in_travel": "The stop must belong to the same trip as the idea.",
+      "dates_outside_step": "The idea dates must be within the dates of the selected stop.",
+      "price_only_for_lodging": "Only accommodation can have a price per night.",
+      "invalid_chosen_idea": "Only accommodation placed on a stop can be chosen.",
+      "dates_must_be_together": "Start and end dates must both be provided.",
+      "pool_idea_has_dates": "An idea in the pool cannot have dates.",
+      "single_day_only": "An idea other than accommodation can only last one day.",
+      "lodging_dates_required": "Accommodation must have dates.",
+      "placed_idea_dates_required": "An idea placed on a stop must have dates.",
+      "lodging_before_travel": "The accommodation cannot start before the trip begins.",
+      "lodging_after_travel": "The accommodation cannot end after the trip ends.",
+      "lodging_min_one_night": "Accommodation must span at least one night.",
+      "lodging_overlap": "An accommodation is already chosen on this stop for overlapping dates.",
+      "reaction_already_exists": "You have already voted for this idea."
     },
     "filters": {
       "allSteps": "All",
