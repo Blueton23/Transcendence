@@ -9,14 +9,19 @@ import { useTranslation } from "react-i18next";
 
 interface ByCategoryProps{
   category: SpendingCategory;
+  totalCategory: string;
   total: string;
 }
 
-export function ByCategory({category, total} : ByCategoryProps) {
+export function ByCategory({category, totalCategory, total} : ByCategoryProps) {
   const { t } = useTranslation();
-  return <Card>
-    <IconBadge name={spendingCategoryIcons[category]} siyze="sm"/>
-    <Heading>{t(spendingCategoryLabels[category])}</Heading>
-    <Text>{total}</Text>
-  </Card>;
+  const percentage = (Number(totalCategory) / Number(total)) * 100;
+  return (
+  <Card className="flex flex-col gap-1">
+    <IconBadge name={spendingCategoryIcons[category]} size="sm"/>
+    <Text tone="secondary" className="font-bold">{t(spendingCategoryLabels[category])}</Text>
+    <Heading>{`${totalCategory} CHF`}</Heading>
+    <Text font="mono" tone="muted">{percentage.toFixed(1)}%</Text>
+  </Card>
+  );
 }
