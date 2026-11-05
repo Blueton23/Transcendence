@@ -84,7 +84,7 @@ export function SpendingPage() {
       </div>
 
       <div className="flex flex-col gap-5">
-        {summary && (<SpendingSummary summary={summary} />)}
+        {summary && <SpendingSummary travel={travel} summary={summary} />}
         <div>
           <Text className="mb-1">{t("spending.form.type")}</Text>
           <SpendingCategoryFilter
@@ -110,7 +110,7 @@ export function SpendingPage() {
           </Text>
         )}
         {filteredSpendings.map((spending) => {
-          const payer = getPayer(summary, spending.travelerId);
+          const payer = getPayer(travel, summary, spending.travelerId);
           const step = steps.find((s) => s.id === spending.stepId);
 
           return (
