@@ -2,7 +2,7 @@ import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
-import type { Spending } from "@/features/spending/types";
+import { type Spending } from "@/features/spending/types";
 import type { Travel } from "@/features/travel/types";
 import { useSpendingForm } from "@/features/spending/hooks/useSpendingForm";
 import type { Step } from "@/features/step/types";
@@ -38,7 +38,6 @@ export function SpendingModal({
       onClose();
     },
   });
-  const colors = ["1", "2", "3", "4"] as const;
 
   const filteredIdeas = form.stepId
     ? ideas.filter((i) => i.stepId === form.stepId)
@@ -136,7 +135,7 @@ export function SpendingModal({
         <div className="flex flex-col gap-1">
           <div className="flex flex-col gap-2">
             <Text size="sm">{t("spending.form.sharedWith")}</Text>
-            {travel.travelers.map((traveler, index) => (
+            {travel.travelers.map((traveler) => (
               <label key={traveler.id} className="flex items-center gap-3">
                 <input
                   type="checkbox"
@@ -144,7 +143,7 @@ export function SpendingModal({
                   onChange={() => form.toggleShare(traveler.id)}
                   className="h-4 w-4 accent-brand-primary"
                 />
-                <Avatar size="sm" color={colors[index % colors.length]}>
+                <Avatar size="sm" color={traveler.color}>
                   {traveler.initials}
                 </Avatar>
                 <Text>{traveler.name}</Text>

@@ -12,6 +12,7 @@ import Heading from "@/shared/ui/Heading";
 import Button from "@/shared/ui/Button";
 import { useTranslation } from "react-i18next";
 import { OptionsMenu } from "@/shared/ui/OptionsMenu";
+import type { AvatarColor } from "@/shared/ui/Avatar";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -20,6 +21,7 @@ export interface IdeaCardProps {
   proposerInitials: string;
   stepName?: string;
   chooseButton?: boolean;
+  color: AvatarColor;
   onPlace?: () => void;
   onView?: () => void;
   onVote: () => Promise<void>;
@@ -35,6 +37,7 @@ export function IdeaCard({
   idea,
   proposerName,
   proposerInitials,
+  color,
   stepName,
   chooseButton,
   onPlace,
@@ -85,6 +88,7 @@ export function IdeaCard({
                 pricePerNight={idea.pricePerNight}
                 proposerName={proposerName}
                 proposerInitials={proposerInitials}
+                color={color}
               />
               {(isInPool || stepName) && (
                 <StepLabel isInPool={isInPool} stepName={stepName} />

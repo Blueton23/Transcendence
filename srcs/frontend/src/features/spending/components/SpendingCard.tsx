@@ -10,10 +10,11 @@ import Tag from "@/shared/ui/Tag";
 import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import { spendingCategoryIcons } from "@/features/spending/utils/spendingCategoryIcons";
 import { spendingCategoryLabels } from "@/features/spending/utils/spendingCategoryLabels";
+import type { AvatarColor } from "@/shared/ui/Avatar";
 
 export interface SpendingCardProps {
   spending: Spending;
-  payer: { name: string; initials: string };
+  payer: { name: string; initials: string; color: string };
   stepName?: string;
   onEdit: () => void;
   onDelete: () => Promise<void>;
@@ -52,6 +53,7 @@ export function SpendingCard({
               <SecondaryInfo
                 proposerName={payer.name}
                 proposerInitials={payer.initials}
+                color={payer.color as AvatarColor}
               />
               <Tag tone="muted" className="truncate">
                 {stepName ? `→ ${stepName}` : t("spending.wholeTravel")}
