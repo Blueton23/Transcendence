@@ -14,10 +14,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from chat.models import SystemMessageKey
+from chat.models import Message, SystemMessageKey
 from chat.services import post_system_message
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
+from idea.models import Idea
 
 from .consumers import kick_from_travel
 from .mixins import ParticipantScopedMixin
@@ -165,3 +166,27 @@ class LeaveTravelView(APIView):
         announce_participant(travel_id, request.user, "left")
         kick_from_travel(travel_id, request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TravelNotificationsView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get(self, request):
+        participations = Participation.objects.filter(
+            traveler=request.user,
+            status=ParticipationStatus.ACCEPTED,
+        ).select_related("travel")
+        data = []
+        for participation in participations:
+            messages = Message.objects.unread_for(participation).count()
+            ideas = Idea.objects.unseen_for(participation).count()
+            if messages or ideas:
+                data.append(
+                    {
+                        "travel_id": participation.travel_id,
+                        "travel_title": participation.travel.title,
+                        "unread_messages": messages,
+                        "unseen_ideas": ideas,
+                    }
+                )
+        return Response(data)

@@ -706,6 +706,158 @@ class TravelViewTest(APITestCase):
         self.assertNotIn("Mon voyage", titles)
 
 
+class TravelNotificationsViewTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="password123"
+        )
+        self.other = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="password123"
+        )
+        self.url = reverse("travel-notifications")
+
+    def _make_travel(self, title, status=ParticipationStatus.ACCEPTED):
+        travel = Travel.objects.create(
+            title=title,
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        participation = Participation.objects.create(
+            traveler=self.traveler, travel=travel, status=status
+        )
+        Participation.objects.create(
+            traveler=self.other, travel=travel, status=ParticipationStatus.ACCEPTED
+        )
+        return travel, participation
+
+    def _add_message(self, travel, **extra):
+        data = {"travel": travel, "traveler": self.other, "body": "Salut"}
+        data.update(extra)
+        return Message.objects.create(**data)
+
+    def _add_idea(self, travel, traveler=None):
+        return Idea.objects.create(
+            travel=travel,
+            traveler=traveler or self.other,
+            title="Fondue",
+            type=IdeaType.RESTAURANT,
+        )
+
+    def _get(self):
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        return {item["travel_id"]: item for item in response.data}
+
+    def test_requires_authentication(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_empty_when_no_travel(self):
+        self.assertEqual(self._get(), {})
+
+    def test_counts_messages_and_ideas_from_others(self):
+        travel, _ = self._make_travel("Suisse")
+        self._add_message(travel)
+        self._add_message(travel)
+        self._add_idea(travel)
+
+        result = self._get()
+
+        self.assertEqual(
+            result[travel.id],
+            {
+                "travel_id": travel.id,
+                "travel_title": "Suisse",
+                "unread_messages": 2,
+                "unseen_ideas": 1,
+            },
+        )
+
+    def test_returns_every_travel_with_activity(self):
+        # Regression: the first travel has nothing new, the others must still
+        # be listed (the loop used to return after the first travel).
+        quiet, _ = self._make_travel("Calme")
+        chat_only, _ = self._make_travel("Chat")
+        ideas_only, _ = self._make_travel("Idees")
+        self._add_message(chat_only)
+        self._add_idea(ideas_only)
+
+        result = self._get()
+
+        self.assertEqual(set(result), {chat_only.id, ideas_only.id})
+        self.assertNotIn(quiet.id, result)
+        self.assertEqual(result[chat_only.id]["unseen_ideas"], 0)
+        self.assertEqual(result[ideas_only.id]["unread_messages"], 0)
+
+    def test_ignores_own_messages_and_ideas(self):
+        travel, _ = self._make_travel("Suisse")
+        self._add_message(travel, traveler=self.traveler)
+        self._add_idea(travel, traveler=self.traveler)
+
+        self.assertEqual(self._get(), {})
+
+    def test_ignores_system_messages(self):
+        travel, _ = self._make_travel("Suisse")
+        self._add_message(
+            travel,
+            traveler=None,
+            is_system=True,
+            system_key=SystemMessageKey.PARTICIPANT_JOINED,
+            system_params={"name": "bob"},
+        )
+
+        self.assertEqual(self._get(), {})
+
+    def test_ignores_what_was_already_read(self):
+        travel, participation = self._make_travel("Suisse")
+        self._add_message(travel)
+        self._add_idea(travel)
+        participation.mark_read()
+        participation.mark_ideas_seen()
+
+        self.assertEqual(self._get(), {})
+
+    def test_counts_only_what_came_after_last_visit(self):
+        travel, participation = self._make_travel("Suisse")
+        self._add_message(travel)
+        self._add_idea(travel)
+        participation.mark_read()
+        participation.mark_ideas_seen()
+        self._add_message(travel)
+
+        result = self._get()
+
+        self.assertEqual(result[travel.id]["unread_messages"], 1)
+        self.assertEqual(result[travel.id]["unseen_ideas"], 0)
+
+    def test_ignores_travels_not_accepted(self):
+        for status in (
+            ParticipationStatus.INVITED,
+            ParticipationStatus.REFUSED,
+            ParticipationStatus.LEFT,
+        ):
+            travel, _ = self._make_travel(f"Voyage {status}", status=status)
+            self._add_message(travel)
+            self._add_idea(travel)
+
+        self.assertEqual(self._get(), {})
+
+    def test_ignores_travels_of_others(self):
+        travel = Travel.objects.create(
+            title="Pas le mien",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        Participation.objects.create(
+            traveler=self.other, travel=travel, status=ParticipationStatus.ACCEPTED
+        )
+        self._add_message(travel)
+        self._add_idea(travel)
+
+        self.assertEqual(self._get(), {})
+
+
 class StepViewTest(APITestCase):
     def setUp(self):
         self.traveler = Traveler.objects.create_user(

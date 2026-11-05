@@ -7,6 +7,7 @@ from .views import (
     TravelDetailView,
     TravelJoinView,
     TravelListView,
+    TravelNotificationsView,
 )
 
 urlpatterns = [
@@ -18,4 +19,7 @@ urlpatterns = [
         "<int:travel_id>/steps/<int:pk>/", StepDetailView.as_view(), name="step-detail"
     ),
     path("<int:travel_id>/leave/", LeaveTravelView.as_view(), name="travel-leave"),
+    path(
+        "notifications/", TravelNotificationsView.as_view(), name="travel-notifications"
+    ),
 ]
