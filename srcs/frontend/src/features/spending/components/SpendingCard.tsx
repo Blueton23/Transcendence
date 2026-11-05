@@ -14,7 +14,7 @@ import type { AvatarColor } from "@/shared/ui/Avatar";
 
 export interface SpendingCardProps {
   spending: Spending;
-  payer: { name: string; initials: string; color: string };
+  payer: { name: string; initials: string; color: AvatarColor };
   stepName?: string;
   onEdit: () => void;
   onDelete: () => Promise<void>;

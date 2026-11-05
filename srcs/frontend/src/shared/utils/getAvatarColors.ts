@@ -1,5 +1,6 @@
-import { colors } from "@/features/spending/types";
 import type { AvatarColor } from "@/shared/ui/Avatar";
+
+const colors = ["1", "2", "3", "4"] as const;
 
 export function getAvatarColor(
   travelers: { id: number }[],

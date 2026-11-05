@@ -11,6 +11,7 @@ import Input from "@/shared/ui/Input";
 import { SpendingCategorySelector } from "@/features/spending/components/SpendingCategorySelector";
 import Select from "@/shared/ui/Select";
 import Avatar from "@/shared/ui/Avatar";
+import { getAvatarColor } from "@/shared/utils/getAvatarColors";
 
 export interface SpendingModalProps {
   spending?: Spending;
@@ -143,7 +144,10 @@ export function SpendingModal({
                   onChange={() => form.toggleShare(traveler.id)}
                   className="h-4 w-4 accent-brand-primary"
                 />
-                <Avatar size="sm" color={traveler.color}>
+                <Avatar
+                  size="sm"
+                  color={getAvatarColor(travel.travelers, traveler.id)}
+                >
                   {traveler.initials}
                 </Avatar>
                 <Text>{traveler.name}</Text>
