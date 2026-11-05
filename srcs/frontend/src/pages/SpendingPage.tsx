@@ -84,7 +84,7 @@ export function SpendingPage() {
       </div>
 
       <div className="flex flex-col gap-5">
-        <SpendingSummary />
+        <SpendingSummary summary={summary} />
         <div>
           <Text className="mb-1">{t("spending.form.type")}</Text>
           <SpendingCategoryFilter
