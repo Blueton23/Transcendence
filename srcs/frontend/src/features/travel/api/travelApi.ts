@@ -1,4 +1,8 @@
-import type { CreateTravelData, Travel } from "@/features/travel/types";
+import type {
+  CreateTravelData,
+  Travel,
+  TravelNotification,
+} from "@/features/travel/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
 import { getApiErrorMessage } from "@/shared/api/errors";
@@ -125,4 +129,19 @@ export async function leaveTravel(travelId: number): Promise<void> {
       getApiErrorMessage(result) || i18n.t("travel.errors.leaveFailed"),
     );
   }
+}
+
+export async function getTravelNotifications(): Promise<TravelNotification[]> {
+  const response = await fetch(`${API_BASE_URL}/travels/notifications/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  const result = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      getApiErrorMessage(result) || i18n.t("travel.errors.notFound"),
+    );
+  }
+  return result;
 }

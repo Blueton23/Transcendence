@@ -19,3 +19,10 @@ export interface CreateTravelData {
 export interface Invitation extends Travel {
   isMember: boolean;
 }
+
+export interface TravelNotification {
+  travelId: number;
+  travelTitle: string;
+  unreadMessages: number;
+  unseenIdeas: number;
+}
