@@ -157,7 +157,12 @@
             "Peripl est un projet étudiant réalisé dans le cadre du cursus de l'école 42. Le service est gratuit et non commercial.",
             "Pour toute question concernant vos données :"
           ],
-          "items": ["lefur.david@bluewin.ch", "charlotte.pasquier@bluewin.ch", "sylvain.dubois25@hotmail.fr", "sebastien.cuthbert@gmail.com"]
+          "items": [
+            "lefur.david@bluewin.ch",
+            "charlotte.pasquier@bluewin.ch",
+            "sylvain.dubois25@hotmail.fr",
+            "sebastien.cuthbert@gmail.com"
+          ]
         },
         {
           "title": "2. Données que vous nous fournissez",

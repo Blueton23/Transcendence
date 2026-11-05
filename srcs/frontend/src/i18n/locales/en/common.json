@@ -157,7 +157,12 @@
             "Peripl is a student project built as part of the 42 school curriculum. The service is free and non-commercial.",
             "For any question about your data :"
           ],
-          "items": ["lefur.david@bluewin.ch", "charlotte.pasquier@bluewin.ch", "sylvain.dubois25@hotmail.fr", "sebastien.cuthbert@gmail.com"]
+          "items": [
+            "lefur.david@bluewin.ch",
+            "charlotte.pasquier@bluewin.ch",
+            "sylvain.dubois25@hotmail.fr",
+            "sebastien.cuthbert@gmail.com"
+          ]
         },
         {
           "title": "2. Data you provide",
