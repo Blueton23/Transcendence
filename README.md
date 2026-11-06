@@ -83,7 +83,7 @@ L'application est alors disponible sur **https://peripl.app**.
 
 - **La clé** : `rest_framework.authtoken` (une clé aléatoire de 40 caractères par utilisateur). `POST /api/auth/token/` (`ApiTokenView`) échange username + mot de passe contre la clé, ensuite envoyée dans `Authorization: Token <clé>`. Pas de CSRF nécessaire : un autre site ne peut pas ajouter ce header.
 - **Accès vue par vue** : `PublicApiMixin` (`common/mixins.py`) ajoute `TokenAuthentication` (après `SessionAuthentication`) et le rate limiting. Appliqué seulement sur les vues utilisant `PublicApiMixin`. Les autres (profil, amis, votes, choix d'un hébergement…) restent réservées au site.
-- **Rate limiting** (`ScopedRateThrottle`) : `public_api` = **1000 requêtes/heure par utilisateur** ; `auth_token` = **5 essais/minute par IP** (anti brute-force). `NUM_PROXIES: 1` : l'IP est lue derrière Nginx et ne peut pas être falsifiée avec un faux `X-Forwarded-For`.
+- **Rate limiting** (`ScopedRateThrottle`) : `public_api` = **1000 requêtes/minute par utilisateur** ; `auth_token` = **5 essais/minute par IP** (anti brute-force). `NUM_PROXIES: 1` : l'IP est lue derrière Nginx et ne peut pas être falsifiée avec un faux `X-Forwarded-For`.
 - **Documentation** : drf-spectacular génère le schéma OpenAPI 3 (`/api/schema/`) et Swagger (`/api/docs/`), en accès libre. Le hook `public_endpoints_only` n'y montre **que** les routes publiques.
 
 | Route | Méthodes | Remarque |
