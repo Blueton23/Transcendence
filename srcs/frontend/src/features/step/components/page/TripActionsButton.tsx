@@ -50,7 +50,13 @@ export function TripActionsButton({
             >
               {t("idea.pinIdea")}
             </MenuItem>
-            <MenuItem icon="cash" onClick={() => setIsOpen(false)}>
+            <MenuItem
+              icon="cash"
+              onClick={() => {
+                setIsOpen(false);
+                onPinExpense();
+              }}
+            >
               {t("step.addExpense")}
             </MenuItem>
           </DropdownMenu>
