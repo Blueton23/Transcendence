@@ -4,27 +4,17 @@
 
 ## 1. Configurer l'environnement
 
-Lancez la commande suivante :
+Déposer le fichier kit.tgz a la racine
+
+Lancer la commande :
 
 ```bash
-make env                  # Cette commande génère un .env pré-rempli
+make
 ```
 
-- Le reste des variables comme `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` et `VITE_MAPBOX_TOKEN` doivent être remplies manuellement
-
-Puis :
-- Glissez certs.tgz à la racine du projet
-- Ouvrez un terminal dans ce dossier et lancez :
-
-```bash
-sudo tar xzf certs.tgz    # Cette commande va créer le dossier certs/ et enregistrer les certificats et la clé
-```
-
-## 2. Lancer le projet
-
-```bash
-make up                   # construit les images et lance tous les services, migration des modèles automatique
-```
+La commande met en place :
+- Les certificats
+- Génère un .env et le rempli
 
 Uniquement au premier lancement :
 
@@ -58,6 +48,7 @@ L'application est alors disponible sur **https://peripl.app**.
 - **Backend** : Django 5.2 + DRF + Channels, servi par **Uvicorn** (ASGI : HTTP et WebSockets dans le même serveur). Utilisateur non-root (UID/GID du `.env`). `entrypoint.sh` lance `collectstatic` puis Uvicorn avec `--workers 4`. Qualité : Ruff et tests Django.
 - **Frontend** : React 19 + TypeScript + Tailwind, **build de production** construit dans l'image (`VITE_MAPBOX_TOKEN` est passé au build) et servi sur le port 3000. Dépendances avec `npm ci`. Qualité : ESLint et Prettier.
 - **Nginx** : `/api/`, `/admin/`, `/ws/` → backend ; `/static/`, `/media/` → lus directement dans les volumes ; le reste → frontend. Une seule origine : pas de CORS, les cookies de session fonctionnent naturellement. Transmet la vraie IP (`X-Forwarded-For`). HTTPS sur le port 443, avec les certificats du dossier `certs/`.
+Les certificats sont demandés par certbot et délivrés par Let's Encrypt pour une durée de 90 jours
 - **Données** : PostgreSQL (contraintes, transactions, `select_for_update`) dans le volume `postgres_data` ; Redis base 0 pour Django Channels, base 1 pour le cache (rate limiting de l'API).
 - `Makefile` : enveloppe les commandes Compose (`make up`, `make ps`, `make test`…).
 
@@ -71,6 +62,12 @@ L'application est alors disponible sur **https://peripl.app**.
 | `curl https://peripl.app/api/` | `{"status":"ok"}` | Nginx → Django |
 | `make test-db` puis `make ping` | `✅ Connexion réussie à la base : …` puis `PONG` | Django atteint PostgreSQL, Redis répond |
 | Ouvrir https://peripl.app/admin/ | page de connexion **mise en forme** | Fichiers statiques servis par Nginx |
+
+Controle certificat
+```
+sudo ls -l certs/live/peripl.app/
+sudo openssl x509 -in certs/live/peripl.app/fullchain.pem -noout -subject -issuer -enddate
+```
 
 ---
 ### API publique - clé API, rate limiting et documentation (Major, 2 points)
@@ -204,3 +201,19 @@ Résultat attendu : par exemple `david.lf david.lf@gmail.com David Lf False`. Le
 **Limites.** Le vote et le choix d'un hébergement ne font pas partie de l'API publique : ce sont des actions du site uniquement.
 
 **Comment tester.** Connecté, ouvre un voyage puis l'onglet **Idées** (`/travel/{id}/ideas`).
+
+
+---
+
+# Ressources
+https://docs.djangoproject.com/fr/6.1/
+https://docs.djangoproject.com/en/6.1/ref/
+https://medium.com/@sibyamara95/cr%C3%A9er-votre-premier-projet-django-61f3100b2cb7
+https://medium.com/tag/django
+https://www.docstring.fr/blog/creer-une-api-rest-avec-django-rest-framework/
+https://www.kienso.fr/comment-rediger-documentation-dapi-sur-django/
+https://docs.document360.com/docs/fr/how-to-use-swagger
+https://support.google.com/cloud/answer/15549257?hl=en
+https://www.microsoft.com/fr-ch/security/business/security-101/what-is-openid-connect-oidc
+https://medium.com/@tony.infisical/guide-to-using-oauth-2-0-to-access-google-apis-dead94d6866d
+https://flowbite.com/docs/getting-started/typescript/
