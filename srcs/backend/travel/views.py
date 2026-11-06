@@ -32,6 +32,7 @@ from .schema import (
 )
 from .serializers import StepSerializer, TravelSerializer
 
+
 def get_invited_travel(token):
     try:
         return Travel.objects.get(invite_token=token)
@@ -40,6 +41,7 @@ def get_invited_travel(token):
             "Invalid invitation link.",
             code="invalid_invitation_link",
         ) from exc
+
 
 class TravelJoinView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]

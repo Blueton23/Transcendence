@@ -1,4 +1,3 @@
-
 import type { Step, CreateStepData } from "@/features/step/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";

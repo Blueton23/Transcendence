@@ -63,8 +63,7 @@ export async function postIdea(
     body: JSON.stringify(payload),
   });
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -92,8 +91,7 @@ export async function patchIdea(
     body: JSON.stringify(payload),
   });
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -161,8 +159,7 @@ export async function patchIdeaPlacement(
     body: JSON.stringify(payload),
   });
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -188,8 +185,7 @@ export async function chooseIdea(
     },
   );
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 

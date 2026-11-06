@@ -1,4 +1,3 @@
-
 import type { CreateTravelData, Travel } from "@/features/travel/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";

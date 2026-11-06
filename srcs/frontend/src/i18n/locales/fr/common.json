@@ -68,14 +68,10 @@
     "serverWithStatus": "Erreur serveur ({{status}} {{statusText}})",
     "unexpected": "Une erreur est survenue.",
     "end_before_start": "La date de fin ne peut pas être antérieure à la date de début.",
-    "givenLink":{
-      "not_found":"le test fonctionne!!"
-    },
     "not_found": "Ressource introuvable!.",
     "required": "Ce champ est obligatoire.",
     "blank": "Ce champ ne peut pas être vide.",
     "invalid": "Valeur invalide."
-
   },
   "friendship": {
     "accept": "Accepter",
