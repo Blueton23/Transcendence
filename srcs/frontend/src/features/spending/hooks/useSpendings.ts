@@ -5,6 +5,10 @@ import {
   getSpendings,
   getSpendingSummary,
 } from "@/features/spending/api/spendingApi";
+import {
+  useTravelEvent,
+  useTravelSocketOpen,
+} from "@/features/travel/realtime/useTravelSocket";
 
 export function useSpendings(travelId: number) {
   const [spendings, setSpendings] = useState<Spending[]>([]);
@@ -44,6 +48,14 @@ export function useSpendings(travelId: number) {
   function refetch() {
     setRefetchTrigger((n) => n + 1);
   }
+
+  useTravelSocketOpen(refetch);
+
+  useTravelEvent("spending.created", refetch);
+  useTravelEvent("spending.updated", refetch);
+  useTravelEvent("spending.deleted", refetch);
+  useTravelEvent("participant.joined", refetch);
+  useTravelEvent("participant.left", refetch);
 
   return { spendings, summary, isLoading, error, refetch };
 }
