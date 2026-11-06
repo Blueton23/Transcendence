@@ -45,7 +45,7 @@ export function StepCard({
   const [isOpen, setIsOpen] = useState(false);
   const { t } = useTranslation();
 
-  const { submit, isSubmitting } = useSubmitAction(onDelete);
+  const { submit, isSubmitting, error } = useSubmitAction(onDelete);
 
   const StepOptionsStyle =
     "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
@@ -75,6 +75,13 @@ export function StepCard({
           onOpenChange={setIsOpen}
         />
       </div>
+      {error && (
+        <div role="alert" className="mt-2">
+          <Text tone="accent" size="sm">
+            {error}
+          </Text>
+        </div>
+      )}
     </Card>
   );
 }
