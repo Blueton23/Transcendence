@@ -66,7 +66,12 @@
     "mapbox": "Mapbox error",
     "server": "Server error.",
     "serverWithStatus": "Server error ({{status}} {{statusText}})",
-    "unexpected": "An error occurred."
+    "unexpected": "An error occurred.",
+    "end_before_start": "The end date cannot be before the start date.",
+    "not_found": "Resource not found.",
+    "required": "This field is required.",
+    "blank": "This field cannot be blank.",
+    "invalid": "Invalid value."
   },
   "friendship": {
     "accept": "Accept",
@@ -433,7 +438,10 @@
       "deleteFailed": "Unable to delete the stop.",
       "loadFailed": "No stops saved.",
       "placeNotFound": "Place not found, choose one from the list.",
-      "updateFailed": "Unable to edit the stop."
+      "updateFailed": "Unable to edit the stop.",
+      "step_before_travel": "The stop cannot start before the trip begins.",
+      "step_after_travel": "The stop cannot end after the trip ends.",
+      "step_dates_overlap": "The dates of this stop overlap with another stop."
     },
     "fromTo": "from {{start}} to {{end}}",
     "list": "List",
@@ -470,7 +478,8 @@
       "notFound": "No trip found.",
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
-      "unknown": "The trip does not exist."
+      "unknown": "The trip does not exist.",
+      "not_travel_participant": "You must be a member of this trip to perform this action."
     },
     "haveInviteLink": "I have an invitation link",
     "invitation": "INVITATION TO JOIN",

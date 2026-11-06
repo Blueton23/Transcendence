@@ -66,7 +66,16 @@
     "mapbox": "Erreur Mapbox",
     "server": "Erreur serveur.",
     "serverWithStatus": "Erreur serveur ({{status}} {{statusText}})",
-    "unexpected": "Une erreur est survenue."
+    "unexpected": "Une erreur est survenue.",
+    "end_before_start": "La date de fin ne peut pas être antérieure à la date de début.",
+    "givenLink":{
+      "not_found":"le test fonctionne!!"
+    },
+    "not_found": "Ressource introuvable!.",
+    "required": "Ce champ est obligatoire.",
+    "blank": "Ce champ ne peut pas être vide.",
+    "invalid": "Valeur invalide."
+
   },
   "friendship": {
     "accept": "Accepter",
@@ -433,7 +442,10 @@
       "deleteFailed": "Impossible de supprimer l'étape.",
       "loadFailed": "Aucune étape enregistrée.",
       "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
-      "updateFailed": "Impossible de modifier l'étape."
+      "updateFailed": "Impossible de modifier l'étape.",
+      "step_before_travel": "L'étape ne peut pas commencer avant le début du voyage.",
+      "step_after_travel": "L'étape ne peut pas se terminer après la fin du voyage.",
+      "step_dates_overlap": "Les dates de cette étape chevauchent celles d'une autre étape."
     },
     "fromTo": "du {{start}} au {{end}}",
     "list": "Liste",
@@ -470,7 +482,8 @@
       "notFound": "Aucun voyage trouvé.",
       "sameDates": "Sélectionne une date de fin différente de la date de début",
       "titleRequired": "Indique un titre avant de valider.",
-      "unknown": "Le voyage n'existe pas."
+      "unknown": "Le voyage n'existe pas.",
+      "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action."
     },
     "haveInviteLink": "J'ai un lien d'invitation",
     "invitation": "INVITATION À REJOINDRE",
