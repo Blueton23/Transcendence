@@ -18,14 +18,14 @@ from idea.models import (
     Idea,
     IdeaType,
 )
+from spending.models import (
+    Spending,
+    SpendingCategory,
+)
 from travel.consumers import (
     CLOSE_NOT_AUTHENTICATED,
     CLOSE_NOT_PARTICIPANT,
     TravelConsumer,
-)
-from spending.models import (
-    Spending,
-    SpendingCategory,
 )
 from travel.models import (
     Participation,
