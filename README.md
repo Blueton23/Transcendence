@@ -83,7 +83,7 @@ L'application est alors disponible sur **https://peripl.app**.
 
 - **La clé** : `rest_framework.authtoken` (une clé aléatoire de 40 caractères par utilisateur). `POST /api/auth/token/` (`ApiTokenView`) échange username + mot de passe contre la clé, ensuite envoyée dans `Authorization: Token <clé>`. Pas de CSRF nécessaire : un autre site ne peut pas ajouter ce header.
 - **Accès vue par vue** : `PublicApiMixin` (`common/mixins.py`) ajoute `TokenAuthentication` (après `SessionAuthentication`) et le rate limiting. Appliqué seulement sur les vues utilisant `PublicApiMixin`. Les autres (profil, amis, votes, choix d'un hébergement…) restent réservées au site.
-- **Rate limiting** (`ScopedRateThrottle`) : `public_api` = **100 requêtes/minute par utilisateur** ; `auth_token` = **5 essais/minute par IP** (anti brute-force). `NUM_PROXIES: 1` : l'IP est lue derrière Nginx et ne peut pas être falsifiée avec un faux `X-Forwarded-For`.
+- **Rate limiting** (`ScopedRateThrottle`) : `public_api` = **1000 requêtes/heure par utilisateur** ; `auth_token` = **5 essais/minute par IP** (anti brute-force). `NUM_PROXIES: 1` : l'IP est lue derrière Nginx et ne peut pas être falsifiée avec un faux `X-Forwarded-For`.
 - **Documentation** : drf-spectacular génère le schéma OpenAPI 3 (`/api/schema/`) et Swagger (`/api/docs/`), en accès libre. Le hook `public_endpoints_only` n'y montre **que** les routes publiques.
 
 | Route | Méthodes | Remarque |
@@ -102,13 +102,23 @@ for i in $(seq 1 6); do
     -H "Content-Type: application/json" -d '{"username": "<username>", "password": "faux"}'
 done
 
+docker compose exec redis redis-cli -n 1 KEYS '*'
+
+docker compose exec redis redis-cli -n 1 TTL ':1:throttle_auth_token_<ip>'
+docker compose exec backend python manage.py shell -c "from django.core.cache import cache; print(len(cache.get('throttle_auth_token_<ip>') or []))"
+
 # Test 2 : rate limiting
-TOKEN=<clé>   # la clé obtenue dans Swagger
+TOKEN=<clé>
 docker compose exec redis redis-cli -n 1 FLUSHDB
-for i in $(seq 1 101); do
+for i in $(seq 1 1001); do
   curl -s -o /dev/null -w "%{http_code}\n" https://peripl.app/api/travels/ \
     -H "Authorization: Token $TOKEN"
 done | sort | uniq -c
+
+docker compose exec redis redis-cli -n 1 KEYS '*'
+
+docker compose exec backend python manage.py shell -c "from django.core.cache import cache; print(len(cache.get('throttle_public_api_<id>') or []))"
+docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 ```
 
 ---
