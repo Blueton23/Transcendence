@@ -56,7 +56,19 @@
     "errors": {
       "max_length": "El mensaje es demasiado largo.",
       "travelChatAccessDenied": "No tienes acceso a este viaje.",
-      "travelChatMembershipRequired": "Debes ser miembro del viaje para enviar un mensaje."
+      "travelChatMembershipRequired": "Debes ser miembro del viaje para enviar un mensaje.",
+      "travel_chat_access_denied": "No tienes acceso a este viaje.",
+      "system_message_has_author": "Un mensaje del sistema no puede tener autor.",
+      "message_author_required": "Un mensaje debe tener autor.",
+      "message_author_not_member": "El autor debe ser miembro del viaje.",
+      "system_key_required": "Un mensaje del sistema debe tener una clave de sistema.",
+      "system_key_forbidden": "Solo un mensaje del sistema puede tener una clave de sistema.",
+      "message_body_required": "Un mensaje debe contener texto.",
+      "message_step_idea_conflict": "Un mensaje puede estar vinculado a una etapa o a una idea, pero no a ambas.",
+      "step_not_in_message_travel": "Esta etapa no pertenece al viaje del mensaje.",
+      "idea_not_in_message_travel": "Esta idea no pertenece al viaje del mensaje.",
+      "message_empty": "El mensaje no puede estar vacío.",
+      "message_too_long": "El mensaje no puede superar los 2 000 caracteres."
     }
   },
   "errors": {

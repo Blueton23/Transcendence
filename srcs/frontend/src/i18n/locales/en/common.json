@@ -56,7 +56,19 @@
     "errors": {
       "max_length": "The message is too long.",
       "travelChatAccessDenied": "You do not have access to this trip.",
-      "travelChatMembershipRequired": "You must be a member of this trip to send a message."
+      "travelChatMembershipRequired": "You must be a member of this trip to send a message.",
+      "travel_chat_access_denied": "You do not have access to this trip.",
+      "system_message_has_author": "A system message cannot have an author.",
+      "message_author_required": "A message must have an author.",
+      "message_author_not_member": "The author must be a member of the trip.",
+      "system_key_required": "A system message must have a system key.",
+      "system_key_forbidden": "Only a system message can have a system key.",
+      "message_body_required": "A message must contain text.",
+      "message_step_idea_conflict": "A message can be linked to a stop or an idea, but not both.",
+      "step_not_in_message_travel": "This stop does not belong to the message's trip.",
+      "idea_not_in_message_travel": "This idea does not belong to the message's trip.",
+      "message_empty": "The message cannot be empty.",
+      "message_too_long": "The message cannot exceed 2,000 characters."
     }
   },
   "errors": {

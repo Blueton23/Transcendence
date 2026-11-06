@@ -2,10 +2,18 @@ from typing import ClassVar
 
 from rest_framework import serializers
 
+from common.mixins import ModelValidationMixin
+
 from .models import MESSAGE_BODY_MAX_LENGTH, Message
 
 
-class MessageSerializer(serializers.ModelSerializer):
+class MessageSerializer(ModelValidationMixin, serializers.ModelSerializer):
+    body = serializers.CharField(
+        required=True,
+        allow_blank=True,
+        trim_whitespace=False,
+    )
+
     traveler_name = serializers.SerializerMethodField()
     user = serializers.SerializerMethodField()
     is_unread = serializers.SerializerMethodField()
@@ -78,11 +86,15 @@ class MessageSerializer(serializers.ModelSerializer):
         value = value.strip()
 
         if not value:
-            raise serializers.ValidationError("The message cannot be empty.")
+            raise serializers.ValidationError(
+                "The message cannot be empty.",
+                code="message_empty",
+            )
 
         if len(value) > MESSAGE_BODY_MAX_LENGTH:
             raise serializers.ValidationError(
-                f"The message cannot exceed {MESSAGE_BODY_MAX_LENGTH} characters."
+                f"The message cannot exceed {MESSAGE_BODY_MAX_LENGTH} characters.",
+                code="message_too_long",
             )
 
         return value
