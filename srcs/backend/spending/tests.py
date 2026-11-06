@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
+from common.realtime import travel_group
+from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaType
 from spending.models import Spending, SpendingCategory, SpendingShare
 from spending.services import (
@@ -1003,3 +1005,84 @@ class SpendingViewTest(APITestCase):
             [(s["travelerId"], s["amount"]) for s in response.json()["shares"]],
             [(self.bob.id, "90.00")],
         )
+
+
+class SpendingBroadcastTest(BroadcastListenerMixin, APITestCase):
+    def setUp(self):
+        self.jean = Traveler.objects.create_user(
+            username="Jean", email="jean@exemple.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        Participation.objects.create(
+            traveler=self.jean,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.spending = Spending.objects.create(
+            travel=self.travel,
+            traveler=self.jean,
+            category=SpendingCategory.MEALS,
+            label="Raclette",
+            amount="30.00",
+        )
+        self.client.force_authenticate(user=self.jean)
+        self.listen_to(travel_group(self.travel.id))
+
+    def request(self, method, url, data=None):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = getattr(self.client, method)(url, data, format="json")
+        return response, callbacks
+
+    def list_url(self):
+        return reverse("spending-list", kwargs={"travel_id": self.travel.id})
+
+    def detail_url(self):
+        return reverse(
+            "spending-detail",
+            kwargs={"travel_id": self.travel.id, "pk": self.spending.id},
+        )
+
+    def test_create_broadcasts_spending_created(self):
+        response, _ = self.request(
+            "post",
+            self.list_url(),
+            {
+                "travelerId": self.jean.id,
+                "category": "f",
+                "label": "Essence",
+                "amount": "60.00",
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "spending.created")
+        self.assertEqual(event["payload"]["id"], response.data["id"])
+        self.assertEqual(event["payload"]["travelId"], self.travel.id)
+
+    def test_update_broadcasts_spending_updated(self):
+        response, _ = self.request("patch", self.detail_url(), {"label": "Fondue"})
+        self.assertEqual(response.status_code, 200)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "spending.updated")
+        self.assertEqual(event["payload"]["label"], "Fondue")
+
+    def test_delete_broadcasts_spending_deleted(self):
+        response, _ = self.request("delete", self.detail_url())
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "spending.deleted", "payload": {"id": self.spending.id}},
+        )
+
+    def test_invalid_create_broadcasts_nothing(self):
+        response, callbacks = self.request(
+            "post",
+            self.list_url(),
+            {"travelerId": self.jean.id, "category": "m", "amount": "10.00"},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(callbacks, [])
