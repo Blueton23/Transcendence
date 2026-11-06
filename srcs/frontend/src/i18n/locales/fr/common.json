@@ -477,6 +477,7 @@
     "errors": {
       "createFailed": "Impossible de créer le voyage.",
       "datesRequired": "Sélectionne des dates avant de valider.",
+      "invalid_invitation_link": "Ce lien d'invitation est invalide.",
       "joinFailed": "Impossible de rejoindre le voyage.",
       "leaveFailed": "Impossible de quitter le voyage.",
       "notFound": "Aucun voyage trouvé.",

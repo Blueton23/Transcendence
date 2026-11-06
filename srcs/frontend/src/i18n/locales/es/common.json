@@ -473,6 +473,7 @@
     "errors": {
       "createFailed": "No se pudo crear el viaje.",
       "datesRequired": "Selecciona las fechas antes de confirmar.",
+      "invalid_invitation_link": "Este enlace de invitación no es válido.",
       "joinFailed": "No se pudo unirse al viaje.",
       "leaveFailed": "No se pudo abandonar el viaje.",
       "notFound": "No se encontró ningún viaje.",
