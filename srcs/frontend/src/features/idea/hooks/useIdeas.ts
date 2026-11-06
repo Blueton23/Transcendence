@@ -201,7 +201,7 @@ export function useIdeas(travelId: number) {
 
     try {
       const updatedIdea = await fetchIdea(travelId, ideaId);
-
+    
       setIdeas((currentIdeas) =>
         currentIdeas.map((idea) =>
           idea.id === ideaId
@@ -213,8 +213,10 @@ export function useIdeas(travelId: number) {
             : idea,
         ),
       );
-    } catch {
-      throw new Error(i18n.t("idea.errors.voteRefreshFailed"));
+    } catch (err) {
+      throw err instanceof Error
+        ? err
+        : new Error(i18n.t("idea.errors.voteRefreshFailed"));
     }
   }
 
