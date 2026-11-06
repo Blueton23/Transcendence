@@ -3,9 +3,10 @@ import { useSteps } from "@/features/step/hooks/useSteps";
 import { CurrentTripCard } from "@/features/travel/components/CurrentTripCard";
 import { NewTravelModal } from "@/features/travel/components/modal/NewTravelModal";
 import { TravelList } from "@/features/travel/components/TravelList";
-import { TravelNotificationsCard } from "@/features/travel/components/TravelNotificationsCard";
+import { NotificationsCard } from "@/features/notifications/components/NotificationsCard";
 import { useTravels } from "@/features/travel/hooks/useTravel";
 import { useTravelNotifications } from "@/features/travel/hooks/useTravelNotifications";
+import { useFriendRequests } from "@/features/friendship/hooks/useFriendRequests";
 import { getNextTravel } from "@/features/travel/utils/getNextTravel";
 import Button from "@/shared/ui/Button";
 import Heading from "@/shared/ui/Heading";
@@ -16,7 +17,8 @@ import { useTranslation } from "react-i18next";
 
 function TravelPage() {
   const { travels, isLoading, error, refetch } = useTravels();
-  const notifications = useTravelNotifications();
+  const travelNotifications = useTravelNotifications();
+  const friendRequests = useFriendRequests();
   const nextTravel = isLoading || error ? undefined : getNextTravel(travels);
   const [newTravelOpen, setNewTravelOpen] = useState(false);
   const { steps } = useSteps(nextTravel?.id ?? 0);
@@ -43,7 +45,10 @@ function TravelPage() {
         </Button>
       </div>
       {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
-      <TravelNotificationsCard notifications={notifications} />
+      <NotificationsCard
+        travels={travelNotifications}
+        friendRequests={friendRequests}
+      />
       <TravelList
         travels={travels.filter((t) => t.id !== nextTravel?.id)}
         onAdd={() => setNewTravelOpen(true)}
