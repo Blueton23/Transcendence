@@ -16,12 +16,14 @@ export function BalanceAndSettlements({
   return (
     <Card>
       <div className="flex flex-col gap-2">
-        <div className="flex flex-row gap-5">
+        <div className="flex flex-col gap-2 md:flex-row md:gap-5">
           {summary.balances.map((b) => {
             const traveler = getPayer(travel, summary, b.travelerId);
             return (
               <div key={b.travelerId} className="flex items-center gap-2">
-                <Avatar color={traveler.color}>{traveler.initials}</Avatar>
+                <Avatar size="sm" color={traveler.color}>
+                  {traveler.initials}
+                </Avatar>
                 <Text className="font-bold">{traveler.name}</Text>
                 {Number(b.balance) >= 0 ? (
                   <Text font="mono" tone="success" className="font-bold">

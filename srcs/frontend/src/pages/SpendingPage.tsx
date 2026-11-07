@@ -19,7 +19,6 @@ import { SpendingCategoryFilter } from "@/features/spending/components/SpendingC
 import { filterSpendings } from "@/features/spending/utils/filterSpendings";
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
 
-
 export function SpendingPage() {
   const { id } = useParams();
   const travelId = Number(id);
