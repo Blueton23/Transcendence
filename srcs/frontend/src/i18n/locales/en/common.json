@@ -8,6 +8,7 @@
     "language": "Language",
     "loading": "Loading",
     "modify": "Edit",
+    "ok": "OK",
     "options": "Options",
     "save": "Save",
     "saving": "Saving...",
@@ -386,6 +387,7 @@
       "tolls": "Tolls",
       "other": "Other"
     },
+    "deletedWhileEditing": "This expense was deleted by another traveler.",
     "edit": "Edit the expense",
     "errors": {
       "amountRequired": "The amount must be greater than 0.",

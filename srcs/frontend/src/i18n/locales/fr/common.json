@@ -8,6 +8,7 @@
     "language": "Langue",
     "loading": "Chargement...",
     "modify": "Modifier",
+    "ok": "OK",
     "options": "Options",
     "save": "Enregistrer",
     "saving": "Enregistrement...",
@@ -386,6 +387,7 @@
       "tolls": "Péages",
       "other": "Autre"
     },
+    "deletedWhileEditing": "Cette dépense a été supprimée par un autre voyageur.",
     "edit": "Modifier la dépense",
     "errors": {
       "amountRequired": "Le montant doit être supérieur à 0.",

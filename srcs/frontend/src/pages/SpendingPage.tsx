@@ -18,6 +18,8 @@ import type { SpendingFilter } from "@/features/spending/types";
 import { SpendingCategoryFilter } from "@/features/spending/components/SpendingCategoryFilter";
 import { filterSpendings } from "@/features/spending/utils/filterSpendings";
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
+import Card from "@/shared/ui/Card";
+import Button from "@/shared/ui/Button";
 
 export function SpendingPage() {
   const { id } = useParams();
@@ -61,6 +63,8 @@ export function SpendingPage() {
   const editSpending = spendings.find(
     (spending) => spending.id === spendingToModify,
   );
+
+  const editedSpendingDeleted = spendingToModify !== null && !editSpending;
 
   if (isLoading || isLoadingSteps || isLoadingTravel || isLoadingIdeas) {
     return null;
@@ -108,6 +112,17 @@ export function SpendingPage() {
               : t("spending.page.noMatch")}
           </Text>
         )}
+        {editedSpendingDeleted && (
+          <Card
+            variant="alert"
+            className="flex items-center justify-between gap-3"
+          >
+            <Text>{t("spending.deletedWhileEditing")}</Text>
+            <Button variant="dark" onClick={() => setSpendingToModify(null)}>
+              {t("actions.ok")}
+            </Button>
+          </Card>
+        )}
         {filteredSpendings.map((spending) => {
           const payer = getPayer(travel, summary, spending.travelerId);
           const step = steps.find((s) => s.id === spending.stepId);
@@ -128,7 +143,7 @@ export function SpendingPage() {
         })}
       </div>
 
-      {(isCreateOpen || spendingToModify) && (
+      {(isCreateOpen || editSpending) && (
         <SpendingModal
           spending={editSpending ?? undefined}
           travel={travel}

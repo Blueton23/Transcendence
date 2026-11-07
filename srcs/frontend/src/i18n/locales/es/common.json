@@ -8,6 +8,7 @@
     "language": "Idioma",
     "loading": "Cargando…",
     "modify": "Editar",
+    "ok": "Aceptar",
     "options": "Opciones",
     "save": "Guardar",
     "saving": "Guardando…",
@@ -386,6 +387,7 @@
       "tolls": "Peajes",
       "other": "Otros"
     },
+    "deletedWhileEditing": "Otro viajero ha eliminado este gasto.",
     "edit": "Editar el gasto",
     "errors": {
       "amountRequired": "El importe debe ser mayor que 0.",
