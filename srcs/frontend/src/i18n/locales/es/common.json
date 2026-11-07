@@ -414,22 +414,23 @@
   },
   "travel": {
     "addTravel": "Añadir un viaje",
-    "changeDates": "Cambiar las fechas",
     "copied": "Copiado ✓",
     "copy": "Copiar",
     "copyInviteLink": "Copiar enlace de invitación",
     "createMyTravel": "Crear mi viaje",
     "createTravel": "Crear un viaje",
     "creating": "Creando...",
+    "editTravel": "Editar el viaje",
     "errors": {
       "createFailed": "No se pudo crear el viaje.",
       "datesRequired": "Selecciona las fechas antes de confirmar.",
       "joinFailed": "No se pudo unirse al viaje.",
       "leaveFailed": "No se pudo abandonar el viaje.",
       "notFound": "No se encontró ningún viaje.",
-      "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio",
+      "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio.",
       "titleRequired": "Indica un título antes de confirmar.",
-      "unknown": "El viaje no existe."
+      "unknown": "El viaje no existe.",
+      "updateFailed": "No se pudo modificar el viaje."
     },
     "haveInviteLink": "Tengo un enlace de invitación",
     "invitation": "INVITACIÓN PARA UNIRSE",
