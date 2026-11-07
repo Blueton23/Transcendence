@@ -82,7 +82,7 @@ function FriendSearchInput({
         </div>
 
         <Button type="submit" variant="dark" disabled={isSearching}>
-          {isSearching ? t("friendship.searching") : t("friendship.search")}
+          {isSearching ? t("actions.searching") : t("friendship.search")}
         </Button>
       </form>
 

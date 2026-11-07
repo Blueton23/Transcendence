@@ -86,7 +86,7 @@
     "serverWithStatus": "Erreur serveur ({{status}} {{statusText}})",
     "unexpected": "Une erreur est survenue.",
     "end_before_start": "La date de fin ne peut pas être antérieure à la date de début.",
-    "not_found": "Ressource introuvable!.",
+    "not_found": "Ressource introuvable.",
     "required": "Ce champ est obligatoire.",
     "blank": "Ce champ ne peut pas être vide.",
     "invalid": "Valeur invalide."
@@ -146,7 +146,7 @@
       "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser.",
 
       "step_not_in_travel": "Cette étape n'appartient pas au voyage de l'idée.",
-      "dates_outside_step": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée!.",
+      "dates_outside_step": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée.",
       "price_only_for_lodging": "Seul un hébergement peut avoir un prix par nuit.",
       "invalid_chosen_idea": "Seul un hébergement placé sur une étape peut être choisi.",
       "dates_must_be_together": "Les dates de début et de fin doivent être renseignées ensemble.",

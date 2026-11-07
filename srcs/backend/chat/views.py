@@ -28,7 +28,7 @@ class ChatParticipationMixin:
 
         if participation is None:
             raise PermissionDenied(
-                "Vous n'avez pas accès à ce voyage.",
+                "You do not have access to this trip.",
                 code="travel_chat_access_denied",
             )
 

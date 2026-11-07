@@ -46,7 +46,6 @@ function translateCode(code: string, attr?: string | null): string | undefined {
   return undefined;
 }
 
-
 function getErrorMessage(error: ApiError): string {
   if (error.code) {
     const translated = translateCode(error.code, error.attr);
