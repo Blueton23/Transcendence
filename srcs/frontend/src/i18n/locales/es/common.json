@@ -490,7 +490,10 @@
       "notFound": "No se encontró ningún viaje.",
       "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio",
       "titleRequired": "Indica un título antes de confirmar.",
-      "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción."
+      "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción.",
+      "title": {
+        "max_length": "Título demasiado largo."
+      }
     },
     "haveInviteLink": "Tengo un enlace de invitación",
     "invitation": "INVITACIÓN PARA UNIRSE",

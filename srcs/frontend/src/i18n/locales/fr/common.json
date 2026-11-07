@@ -492,7 +492,7 @@
       "titleRequired": "Indique un titre avant de valider.",
       "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action.",
       "title": {
-        "max_length": "Titre de voyage trop long, 50 caracteres max."
+        "max_length": "Titre trop long."
       }
     },
     "haveInviteLink": "J'ai un lien d'invitation",
