@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import Button from "../../../shared/ui/Button";
-import Icon from "../../../shared/ui/Icon";
 import IconButton from "@/shared/ui/IconButton";
+import Icon from "@/shared/ui/Icon";
+import Button from "@/shared/ui/Button";
 
 interface AddExpenseButtonProps {
   onClick: () => void;
