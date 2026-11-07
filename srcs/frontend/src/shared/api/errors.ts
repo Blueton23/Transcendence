@@ -22,16 +22,21 @@ const ERROR_SCOPES = [
   "errors",
 ];
 
+
 function translateCode(code: string, attr?: string | null): string {
-  for (const scope of ERROR_SCOPES) {
-    if (attr) {
+  // Priorité aux erreurs spécifiques à un champ
+  if (attr) {
+    for (const scope of ERROR_SCOPES) {
       const attrKey = `${scope}.${attr}.${code}`;
 
       if (i18n.exists(attrKey)) {
         return i18n.t(attrKey);
       }
     }
+  }
 
+  // Sinon, recherche des erreurs génériques
+  for (const scope of ERROR_SCOPES) {
     const key = `${scope}.${code}`;
 
     if (i18n.exists(key)) {
@@ -41,6 +46,7 @@ function translateCode(code: string, attr?: string | null): string {
 
   return code;
 }
+
 
 function getErrorMessage(error: ApiError): string {
   if (error.code) {

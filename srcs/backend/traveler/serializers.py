@@ -78,11 +78,13 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
 
         if not traveler.has_usable_password():
             raise serializers.ValidationError(
-                "Un compte Google est déjà associé à cette adresse email."
+                "A Google account is already linked to this email address.",
+                code="googleEmailExists"
             )
 
         raise serializers.ValidationError(
-            "Un compte existe déjà avec cette adresse email."
+            "Username is already in use.",
+            code="unique",
         )
 
     def validate(self, attrs: dict[str, str]) -> dict[str, str]:

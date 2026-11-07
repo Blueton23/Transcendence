@@ -22,8 +22,6 @@
     "creating": "Création...",
     "errors": {
       "csrfInit": "Impossible d'initialiser la protection CSRF.",
-      "emailExists": "Un compte existe déjà avec cette adresse email.",
-      "googleAccountExists": "Un compte Google est déjà associé à cette adresse email.",
       "googleEmailExists": "Un compte existe déjà avec cet email. Connectez-vous avec votre mot de passe.",
       "googleFailed": "La connexion avec Google a échoué. Veuillez réessayer.",
       "invalid_credentials": "Identifiants invalides.",
@@ -497,7 +495,10 @@
       "sameDates": "Sélectionne une date de fin différente de la date de début",
       "titleRequired": "Indique un titre avant de valider.",
       "unknown": "Le voyage n'existe pas.",
-      "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action."
+      "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action.",
+      "title": {
+        "max_length": "Titre de voyage trop long, 50 caracteres max."
+      }
     },
     "haveInviteLink": "J'ai un lien d'invitation",
     "invitation": "INVITATION À REJOINDRE",
