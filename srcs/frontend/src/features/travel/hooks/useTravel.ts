@@ -41,6 +41,7 @@ export function useTravel(travelId: number) {
   useTravelSocketOpen(() => void reloadTravel());
   useTravelEvent("participant.joined", () => void reloadTravel());
   useTravelEvent("participant.left", () => void reloadTravel());
+  useTravelEvent("travel.updated", () => void reloadTravel());
 
   return { travel, isLoading, error };
 }

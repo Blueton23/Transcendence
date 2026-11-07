@@ -427,9 +427,10 @@
       "joinFailed": "Could not join the trip.",
       "leaveFailed": "Could not leave the trip.",
       "notFound": "No trip found.",
-      "sameDates": "Select an end date different from the start date ». profilec",
+      "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
-      "unknown": "The trip does not exist."
+      "unknown": "The trip does not exist.",
+      "updateFailed": "Could not update the trip."
     },
     "haveInviteLink": "I have an invitation link",
     "invitation": "INVITATION TO JOIN",

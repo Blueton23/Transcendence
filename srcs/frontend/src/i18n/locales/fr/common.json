@@ -427,9 +427,10 @@
       "joinFailed": "Impossible de rejoindre le voyage.",
       "leaveFailed": "Impossible de quitter le voyage.",
       "notFound": "Aucun voyage trouvé.",
-      "sameDates": "Sélectionne une date de fin différente de la date de début",
+      "sameDates": "Sélectionne une date de fin différente de la date de début.",
       "titleRequired": "Indique un titre avant de valider.",
-      "unknown": "Le voyage n'existe pas."
+      "unknown": "Le voyage n'existe pas.",
+      "updateFailed": "Impossible de modifier le voyage."
     },
     "haveInviteLink": "J'ai un lien d'invitation",
     "invitation": "INVITATION À REJOINDRE",
