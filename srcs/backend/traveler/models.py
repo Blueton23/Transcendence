@@ -1,5 +1,3 @@
-# models.py
-
 from typing import ClassVar
 
 from django.conf import settings

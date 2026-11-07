@@ -31,7 +31,6 @@ from traveler.serializers import (
     TravelerSerializer,
     TravelerUpdatePasswordSerializer,
     TravelerUpdateProfilePictureSerializer,
-    TravelerUpdateSerializer,
 )
 
 
@@ -359,7 +358,7 @@ class TravelerUpdateSerializerTest(TestCase):
         )
 
     def test_can_update_first_name_and_last_name(self):
-        serializer = TravelerUpdateSerializer(
+        serializer = TravelerSerializer(
             self.traveler,
             data={
                 "first_name": "Alicia",
@@ -377,7 +376,7 @@ class TravelerUpdateSerializerTest(TestCase):
         self.assertEqual(self.traveler.last_name, "Martin")
 
     def test_can_update_email(self):
-        serializer = TravelerUpdateSerializer(
+        serializer = TravelerSerializer(
             self.traveler,
             data={
                 "email": "new@example.com",
@@ -393,7 +392,7 @@ class TravelerUpdateSerializerTest(TestCase):
         self.assertEqual(self.traveler.email, "new@example.com")
 
     def test_profile_picture_is_read_only(self):
-        serializer = TravelerUpdateSerializer(
+        serializer = TravelerSerializer(
             self.traveler,
             data={
                 "profile_picture": "fake-picture.jpg",
@@ -526,6 +525,15 @@ class TravelerProfilePictureSerializerTest(TestCase):
 
 
 class TravelerApiTest(APITestCase):
+    def assert_validation_error_field(self, response, field):
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            field,
+            [error["attr"] for error in response.data["errors"]],
+            response.data,
+        )
+
     def setUp(self):
         self.password = "Password123!"
 
@@ -557,7 +565,7 @@ class TravelerApiTest(APITestCase):
         self.assertEqual(response.data["status"], "ok")
         self.assertEqual(
             response.data["message"],
-            "[temp]Traveler API is running",
+            "The traveler API is running.",
         )
 
     def test_create_traveler(self):
@@ -637,11 +645,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(
-            "password_confirmation",
-            response.data["details"],
-        )
+        self.assert_validation_error_field(response, "password_confirmation")
 
     def test_create_traveler_rejects_weak_password(self):
         response = self.client.post(
@@ -656,8 +660,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("password", response.data["details"])
+        self.assert_validation_error_field(response, "password")
 
     def test_create_traveler_rejects_numeric_password(self):
         response = self.client.post(
@@ -672,8 +675,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("password", response.data["details"])
+        self.assert_validation_error_field(response, "password")
 
     def test_create_traveler_rejects_duplicate_email(self):
         response = self.client.post(
@@ -803,11 +805,13 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data["type"], "client_error")
         self.assertEqual(
-            response.data["detail"],
-            "Identifiants invalides.",
+            response.data["errors"][0]["code"],
+            "invalid_credentials",
         )
+        self.assertIsNone(response.data["errors"][0]["attr"])
 
     def test_login_rejects_unknown_username(self):
         response = self.client.post(
@@ -818,7 +822,12 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data["type"], "client_error")
+        self.assertEqual(
+            response.data["errors"][0]["code"],
+            "invalid_credentials",
+        )
 
     def test_login_does_not_return_password(self):
         response = self.client.post(
@@ -845,7 +854,7 @@ class TravelerApiTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data["message"],
-            "Déconnexion réussie.",
+            "Logged out successfully.",
         )
 
     def test_update_password_requires_authentication(self):
@@ -875,7 +884,7 @@ class TravelerApiTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data["detail"],
-            "Mot de passe modifié avec succès.",
+            "Password updated successfully.",
         )
 
         self.traveler.refresh_from_db()
@@ -921,7 +930,7 @@ class TravelerApiTest(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             response.data["message"],
-            "CSRF token initialized.",
+            "CSRF protection initialized successfully.",
         )
 
     def test_create_traveler_rejects_duplicate_username(self):
@@ -937,8 +946,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("username", response.data["details"])
+        self.assert_validation_error_field(response, "username")
 
     def test_create_traveler_rejects_invalid_email(self):
         response = self.client.post(
@@ -954,7 +962,7 @@ class TravelerApiTest(APITestCase):
         )
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn("email", response.data["details"])
+        self.assert_validation_error_field(response, "email")
 
     def test_create_traveler_requires_username(self):
         response = self.client.post(
@@ -968,8 +976,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("username", response.data["details"])
+        self.assert_validation_error_field(response, "username")
 
     def test_create_traveler_requires_email(self):
         response = self.client.post(
@@ -983,8 +990,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("email", response.data["details"])
+        self.assert_validation_error_field(response, "email")
 
     def test_create_traveler_requires_password(self):
         response = self.client.post(
@@ -998,8 +1004,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("password", response.data["details"])
+        self.assert_validation_error_field(response, "password")
 
     def test_login_creates_session(self):
         response = self.client.post(
@@ -1054,8 +1059,7 @@ class TravelerApiTest(APITestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn("email", response.data["details"])
+        self.assert_validation_error_field(response, "email")
 
         self.traveler.refresh_from_db()
 
@@ -1143,11 +1147,7 @@ class TravelerApiTest(APITestCase):
             format="multipart",
         )
 
-        self.assertEqual(response.status_code, 400)
-        self.assertIn(
-            "profile_picture",
-            response.data["details"],
-        )
+        self.assert_validation_error_field(response, "profile_picture")
 
         self.traveler.refresh_from_db()
 
@@ -1230,7 +1230,12 @@ class FriendshipApiTest(APITestCase):
             {"user_id": self.bob.pk},
         )
 
-        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertEqual(
+            response.data["errors"][0]["code"],
+            "relationship_exists",
+        )
         self.assertEqual(Friendship.objects.count(), 1)
 
     def test_reverse_request_is_also_rejected(self):
@@ -1242,7 +1247,12 @@ class FriendshipApiTest(APITestCase):
             {"user_id": self.alice.pk},
         )
 
-        self.assertEqual(response.status_code, 409)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertEqual(
+            response.data["errors"][0]["code"],
+            "relationship_exists",
+        )
         self.assertEqual(Friendship.objects.count(), 1)
 
     def test_recipient_can_accept_friendship(self):
@@ -1347,28 +1357,27 @@ class FriendshipApiTest(APITestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_requests_returns_only_incoming_pending_requests(self):
+        # Alice envoie une demande à Bob : sortante pour Alice.
+        self.create_friendship(self.alice, self.bob)
 
-def test_requests_returns_only_incoming_pending_requests(self):
-    # Alice envoie une demande à Bob.
-    incoming = self.create_friendship(self.alice, self.bob)
+        # Charlie envoie une demande à Alice : entrante pour Alice.
+        incoming = self.create_friendship(self.charlie, self.alice)
 
-    # Charlie envoie une demande à Alice.
-    self.create_friendship(self.charlie, self.alice)
+        self.client.force_authenticate(user=self.alice)
 
-    self.client.force_authenticate(user=self.alice)
+        response = self.client.get(reverse("friendship-requests"))
 
-    response = self.client.get(reverse("friendship-requests"))
-
-    self.assertEqual(response.status_code, 200)
-    self.assertEqual(len(response.data["requests"]), 1)
-    self.assertEqual(
-        response.data["requests"][0]["id"],
-        incoming.pk,
-    )
-    self.assertEqual(
-        response.data["requests"][0]["traveler"]["id"],
-        self.charlie.pk,
-    )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data["requests"]), 1)
+        self.assertEqual(
+            response.data["requests"][0]["id"],
+            incoming.pk,
+        )
+        self.assertEqual(
+            response.data["requests"][0]["traveler"]["id"],
+            self.charlie.pk,
+        )
 
     def test_friendship_list_returns_only_accepted_friends(self):
         # Alice est user1 ou user2 selon les identifiants.
@@ -1415,29 +1424,50 @@ def test_requests_returns_only_incoming_pending_requests(self):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["traveler"]["id"], self.bob.pk)
+        self.assertEqual(len(response.data["travelers"]), 1)
+        self.assertEqual(
+            response.data["travelers"][0]["id"],
+            self.bob.pk,
+        )
 
-    def test_search_friend_by_email_is_case_insensitive(self):
+    def test_search_friend_by_username_is_case_insensitive(self):
         self.client.force_authenticate(user=self.alice)
 
         response = self.client.get(
             reverse("friendship-search"),
-            {"q": "BOB@EXAMPLE.COM"},
+            {"q": "BOB"},
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data["traveler"]["id"], self.bob.pk)
+        self.assertEqual(len(response.data["travelers"]), 1)
+        self.assertEqual(
+            response.data["travelers"][0]["id"],
+            self.bob.pk,
+        )
 
-    def test_search_rejects_empty_query(self):
+    def test_search_does_not_match_email(self):
         self.client.force_authenticate(user=self.alice)
 
-        for query in ("", "   "):
+        response = self.client.get(
+            reverse("friendship-search"),
+            {"q": "bob@example.com"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["travelers"], [])
+
+    def test_search_empty_query_returns_empty_list(self):
+        self.client.force_authenticate(user=self.alice)
+
+        for query in ("", "   ", "a"):
             with self.subTest(query=query):
                 response = self.client.get(
                     reverse("friendship-search"),
                     {"q": query},
                 )
-                self.assertEqual(response.status_code, 400)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertEqual(response.data["travelers"], [])
 
     def test_search_excludes_current_user(self):
         self.client.force_authenticate(user=self.alice)
@@ -1447,7 +1477,8 @@ def test_requests_returns_only_incoming_pending_requests(self):
             {"q": "alice"},
         )
 
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["travelers"], [])
 
     def test_friendship_endpoints_require_authentication(self):
         friendship = self.create_friendship(self.alice, self.bob)
@@ -1517,8 +1548,12 @@ class ApiTokenViewTest(APITestCase):
     def test_rejects_wrong_password(self):
         response = self.client.post(self.url, {"username": "dub1", "password": "wrong"})
 
-        self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.data["detail"], "Identifiants invalides.")
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.data["type"], "client_error")
+        self.assertEqual(
+            response.data["errors"][0]["code"],
+            "invalid_credentials",
+        )
         self.assertFalse(Token.objects.exists())
 
 

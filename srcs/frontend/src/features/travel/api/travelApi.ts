@@ -1,7 +1,7 @@
 import type { CreateTravelData, Travel } from "@/features/travel/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
-import { getApiErrorMessage } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 
 const API_BASE_URL = "/api";
 
@@ -11,13 +11,7 @@ export async function getTravel(travelId: number): Promise<Travel> {
     credentials: "include",
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.notFound"),
-    );
-  }
-  return result;
+  return parseResponse<Travel>(response);
 }
 
 export async function getTravels(): Promise<Travel[]> {
@@ -26,13 +20,7 @@ export async function getTravels(): Promise<Travel[]> {
     credentials: "include",
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.notFound"),
-    );
-  }
-  return result;
+  return parseResponse<Travel[]>(response);
 }
 
 export async function createTravel(data: CreateTravelData): Promise<Travel> {
@@ -52,13 +40,7 @@ export async function createTravel(data: CreateTravelData): Promise<Travel> {
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.createFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Travel>(response);
 }
 
 export async function getInvitation(
@@ -69,13 +51,7 @@ export async function getInvitation(
     credentials: "include",
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.unknown"),
-    );
-  }
-  return result;
+  return parseResponse<Travel & { isMember: boolean }>(response);
 }
 
 export async function joinTravel(token: string): Promise<Travel> {
@@ -94,13 +70,7 @@ export async function joinTravel(token: string): Promise<Travel> {
     },
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.joinFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Travel>(response);
 }
 
 export async function leaveTravel(travelId: number): Promise<void> {
@@ -120,9 +90,6 @@ export async function leaveTravel(travelId: number): Promise<void> {
   });
 
   if (!response.ok) {
-    const result = await response.json();
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.leaveFailed"),
-    );
+    await parseResponse<unknown>(response);
   }
 }

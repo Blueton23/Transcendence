@@ -100,7 +100,12 @@ class ReactionSerializer(serializers.ModelSerializer):
                 return super().save(**kwargs)
         except IntegrityError as exc:
             raise serializers.ValidationError(
-                {"reaction": "You have already reacted to this idea."}
+                {
+                    "reaction": serializers.ErrorDetail(
+                        "You have already reacted to this idea.",
+                        code="reaction_already_exists",
+                    )
+                }
             ) from exc
 
     class Meta:

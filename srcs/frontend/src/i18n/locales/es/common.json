@@ -26,9 +26,16 @@
       "googleAccountExists": "Ya hay una cuenta de Google asociada a esta dirección de correo electrónico.",
       "googleEmailExists": "Ya existe una cuenta con este correo electrónico. Inicia sesión con tu contraseña.",
       "googleFailed": "No se pudo iniciar sesión con Google. Inténtalo de nuevo.",
-      "invalidCredentials": "Credenciales no válidas.",
+      "invalid_credentials": "Credenciales no válidas.",
       "logoutFailed": "No se pudo cerrar la sesión.",
-      "notAuthenticated": "Usuario no autenticado."
+      "not_authenticated": "Usuario no autenticado.",
+      "passwordValidationFailed": "La nueva contraseña no cumple los requisitos de seguridad.",
+      "password_incorrect": "La contraseña actual es incorrecta.",
+      "password_mismatch": "Las dos contraseñas nuevas no coinciden.",
+      "password_too_short": "La nueva contraseña es demasiado corta.",
+      "password_too_common": "La nueva contraseña es demasiado común.",
+      "password_entirely_numeric": "La nueva contraseña no puede estar compuesta únicamente por números.",
+      "password_too_similar": "La nueva contraseña es demasiado similar a tu información personal."
     },
     "logginIn": "Iniciando sesión…",
     "login": "Iniciar sesión",
@@ -42,9 +49,34 @@
     "welcomeBack": "Bienvenido de nuevo"
   },
   "chat": {
+    "title": "Chat",
+    "loading": "Cargando mensajes…",
+    "formerParticipant": "Antiguo participante",
+    "unreadMessages": "Mensajes no leídos",
+    "unreadSeparator": "NO LEÍDOS",
+    "unreadCount_one": "{{count}} sin leer",
+    "unreadCount_other": "{{count}} sin leer",
+    "placeholder": "Escribe un mensaje…",
+    "sending": "Enviando…",
+    "send": "Enviar",
     "system": {
       "participant_joined": "{{name}} se ha unido al viaje.",
-      "participant_left": "{{name}} ha dejado el viaje."
+      "participant_left": "{{name}} ha abandonado el viaje."
+    },
+    "errors": {
+      "max_length": "El mensaje es demasiado largo.",
+      "travel_chat_access_denied": "No tienes acceso a este viaje.",
+      "system_message_has_author": "Un mensaje del sistema no puede tener autor.",
+      "message_author_required": "Un mensaje debe tener autor.",
+      "message_author_not_member": "El autor debe ser miembro del viaje.",
+      "system_key_required": "Un mensaje del sistema debe tener una clave de sistema.",
+      "system_key_forbidden": "Solo un mensaje del sistema puede tener una clave de sistema.",
+      "message_body_required": "Un mensaje debe contener texto.",
+      "message_step_idea_conflict": "Un mensaje puede estar vinculado a una etapa o a una idea, pero no a ambas.",
+      "step_not_in_message_travel": "Esta etapa no pertenece al viaje del mensaje.",
+      "idea_not_in_message_travel": "Esta idea no pertenece al viaje del mensaje.",
+      "message_empty": "El mensaje no puede estar vacío.",
+      "message_too_long": "El mensaje no puede superar los 2 000 caracteres."
     }
   },
   "errors": {
@@ -54,26 +86,43 @@
     "mapbox": "Error de Mapbox",
     "server": "Error del servidor.",
     "serverWithStatus": "Error del servidor ({{status}} {{statusText}})",
-    "unexpected": "Ha ocurrido un error."
+    "unexpected": "Ha ocurrido un error.",
+    "end_before_start": "La fecha de fin no puede ser anterior a la fecha de inicio.",
+    "not_found": "Recurso no encontrado.",
+    "required": "Este campo es obligatorio.",
+    "blank": "Este campo no puede estar vacío.",
+    "invalid": "Valor no válido."
   },
   "friendship": {
     "accept": "Aceptar",
     "decline": "Rechazar",
     "errors": {
+      "cannot_accept_own_request": "No puedes aceptar tu propia solicitud de amistad.",
+      "cannot_friend_yourself": "No puedes enviarte una solicitud de amistad a ti mismo.",
+      "friendship_not_found": "No se encontró la amistad.",
+      "invalidUserId": "El ID del usuario no es válido.",
       "loadFailed": "No se pudo cargar tu lista de amigos.",
       "missingRequestId": "Falta el identificador de la solicitud.",
-      "noUserSelected": "Ningún usuario seleccionado."
+      "noUserSelected": "Ningún usuario seleccionado.",
+      "not_friendship_participant": "No formas parte de esta amistad.",
+      "not_friend_request_participant": "No formas parte de esta solicitud de amistad.",
+      "relationship_exists": "Ya existe una amistad o solicitud de amistad con este usuario.",
+      "friend_request_not_found": "No se encontró la solicitud de amistad.",
+      "searchFailed": "No se pudo buscar a los usuarios.",
+      "userIdRequired": "Se requiere el ID del usuario.",
+      "user_not_found": "No se encontró al usuario."
     },
     "myFriends": "MIS AMIGOS · {{count}}",
     "noFriends": "Todavía no tienes amigos.",
     "noRequests": "No hay solicitudes de amistad pendientes.",
+    "noUsersFound": "No se encontraron usuarios.",
     "receivedRequests": "SOLICITUDES RECIBIDAS",
     "remove": "Quitar",
     "removeTitle": "¿Quitar a {{username}} de tus amigos?",
     "removing": "Eliminando…",
     "requestSent": "Solicitud de amistad enviada.",
     "search": "Buscar",
-    "searchPlaceholder": "Añadir un amigo · usuario o correo",
+    "searchPlaceholder": "Añadir un amigo · usuario",
     "sending": "Enviando…",
     "sendRequest": "Enviar solicitud",
     "title": "Amigos"
@@ -87,20 +136,31 @@
     "errors": {
       "createFailed": "No se pudo crear la idea.",
       "dateRequired": "Elige una fecha para esta idea.",
-      "datesOutsideStep": "Las fechas de la idea deben estar dentro de las fechas de la etapa seleccionada.",
       "departureBeforeArrival": "La fecha de salida debe ser posterior a la de llegada.",
       "editFailed": "No se pudo editar la idea.",
       "invalidTravelId": "ID de viaje no válido.",
       "loadFailed": "No se pudieron cargar las ideas.",
-      "lodgingAfterTravel": "El alojamiento no puede terminar después del final del viaje.",
-      "lodgingBeforeTravel": "El alojamiento no puede empezar antes del inicio del viaje.",
       "lodgingDatesRequired": "Las fechas de llegada y salida son obligatorias.",
-      "lodgingOverlap": "Ya hay un alojamiento elegido en esta etapa para fechas que se solapan.",
       "notFound": "Idea no encontrada.",
       "stepRequired": "Elige una etapa para esta idea.",
       "titleRequired": "El título es obligatorio.",
       "voteNotFound": "Estado del voto no encontrado.",
-      "voteRefreshFailed": "Tu voto se guardó, pero no se pudo actualizar el contador. Recarga la página para sincronizarlo."
+      "voteRefreshFailed": "Tu voto se guardó, pero no se pudo actualizar el contador. Recarga la página para sincronizarlo.",
+
+      "step_not_in_travel": "La etapa debe pertenecer al mismo viaje que la idea.",
+      "dates_outside_step": "Las fechas de la idea deben estar dentro de las fechas de la etapa seleccionada.",
+      "price_only_for_lodging": "Solo un alojamiento puede tener un precio por noche.",
+      "invalid_chosen_idea": "Solo se puede elegir un alojamiento situado en una etapa.",
+      "dates_must_be_together": "Las fechas de inicio y fin deben indicarse juntas.",
+      "pool_idea_has_dates": "Una idea en el grupo de propuestas no puede tener fechas.",
+      "single_day_only": "Una idea que no sea un alojamiento solo puede durar un día.",
+      "lodging_dates_required": "Un alojamiento debe tener fechas.",
+      "placed_idea_dates_required": "Una idea situada en una etapa debe tener fechas.",
+      "lodging_before_travel": "El alojamiento no puede empezar antes del inicio del viaje.",
+      "lodging_after_travel": "El alojamiento no puede terminar después del final del viaje.",
+      "lodging_min_one_night": "Un alojamiento debe durar al menos una noche.",
+      "lodging_overlap": "Ya hay un alojamiento elegido en esta etapa para fechas que se solapan.",
+      "reaction_already_exists": "Ya has votado por esta idea."
     },
     "filters": {
       "allSteps": "Todas",
@@ -361,7 +421,13 @@
     "editProfile": "Editar perfil",
     "email": "Correo electrónico",
     "errors": {
-      "noImage": "Ninguna imagen seleccionada."
+      "email": {
+        "unique": "Esta dirección de correo electrónico ya está en uso."
+      },
+      "noImage": "Ninguna imagen seleccionada.",
+      "username": {
+        "unique": "Este nombre de usuario ya está en uso."
+      }
     },
     "firstName": "Nombre",
     "lastName": "Apellido",
@@ -392,7 +458,10 @@
       "deleteFailed": "No se pudo eliminar la etapa.",
       "loadFailed": "No hay etapas guardadas.",
       "placeNotFound": "Lugar no encontrado, elige uno de la lista.",
-      "updateFailed": "No se pudo editar la etapa."
+      "updateFailed": "No se pudo editar la etapa.",
+      "step_before_travel": "La etapa no puede comenzar antes del inicio del viaje.",
+      "step_after_travel": "La etapa no puede terminar después del final del viaje.",
+      "step_dates_overlap": "Las fechas de esta etapa se solapan con las de otra etapa."
     },
     "fromTo": "del {{start}} al {{end}}",
     "list": "Lista",
@@ -424,12 +493,14 @@
     "errors": {
       "createFailed": "No se pudo crear el viaje.",
       "datesRequired": "Selecciona las fechas antes de confirmar.",
+      "invalid_invitation_link": "Este enlace de invitación no es válido.",
       "joinFailed": "No se pudo unirse al viaje.",
       "leaveFailed": "No se pudo abandonar el viaje.",
       "notFound": "No se encontró ningún viaje.",
       "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio",
       "titleRequired": "Indica un título antes de confirmar.",
-      "unknown": "El viaje no existe."
+      "unknown": "El viaje no existe.",
+      "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción."
     },
     "haveInviteLink": "Tengo un enlace de invitación",
     "invitation": "INVITACIÓN PARA UNIRSE",

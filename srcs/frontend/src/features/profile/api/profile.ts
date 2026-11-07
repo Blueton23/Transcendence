@@ -10,7 +10,7 @@ import type {
 
 import { getCsrfToken } from "@/features/auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 import i18n from "@/i18n";
 
 const API_BASE_URL = "/api";
@@ -46,6 +46,7 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -67,6 +68,7 @@ export async function modifyProfile(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -88,6 +90,7 @@ export async function modifyPassword(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -115,6 +118,7 @@ export async function modifyProfilePicture(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: formData,
     },
