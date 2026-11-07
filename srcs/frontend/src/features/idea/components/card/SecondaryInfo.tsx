@@ -23,7 +23,7 @@ export function SecondaryInfo({
       </Avatar>
       <Text tone="muted" size="sm" className="truncate">
         {proposerName}
-        {pricePerNight !== null &&
+        {pricePerNight &&
           ` · ${t("units.pricePerNight", { price: pricePerNight })}`}
       </Text>
     </div>
