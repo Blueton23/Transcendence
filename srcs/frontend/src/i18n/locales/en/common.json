@@ -491,11 +491,8 @@
     "createTravel": "Create a trip",
     "creating": "Creating...",
     "errors": {
-      "createFailed": "Could not create the trip.",
       "datesRequired": "Select dates before confirming.",
       "invalid_invitation_link": "This invitation link is invalid.",
-      "joinFailed": "Could not join the trip.",
-      "leaveFailed": "Could not leave the trip.",
       "notFound": "No trip found.",
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",

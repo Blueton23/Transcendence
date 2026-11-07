@@ -491,11 +491,8 @@
     "createTravel": "Crear un viaje",
     "creating": "Creando...",
     "errors": {
-      "createFailed": "No se pudo crear el viaje.",
       "datesRequired": "Selecciona las fechas antes de confirmar.",
       "invalid_invitation_link": "Este enlace de invitación no es válido.",
-      "joinFailed": "No se pudo unirse al viaje.",
-      "leaveFailed": "No se pudo abandonar el viaje.",
       "notFound": "No se encontró ningún viaje.",
       "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio",
       "titleRequired": "Indica un título antes de confirmar.",
