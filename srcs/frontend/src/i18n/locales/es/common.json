@@ -414,13 +414,13 @@
   },
   "travel": {
     "addTravel": "Añadir un viaje",
-    "changeDates": "Cambiar las fechas",
     "copied": "Copiado ✓",
     "copy": "Copiar",
     "copyInviteLink": "Copiar enlace de invitación",
     "createMyTravel": "Crear mi viaje",
     "createTravel": "Crear un viaje",
     "creating": "Creando...",
+    "editTravel": "Editar el viaje",
     "errors": {
       "createFailed": "No se pudo crear el viaje.",
       "datesRequired": "Selecciona las fechas antes de confirmar.",

@@ -63,10 +63,7 @@ export async function createTravel(data: CreateTravelData): Promise<Travel> {
 
 export async function updateTravel(
   travelId: number,
-  data: {
-    startDate: string;
-    endDate: string;
-  },
+  data: CreateTravelData,
 ): Promise<Travel> {
   const csrfToken = getCookie("csrftoken");
 
