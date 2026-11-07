@@ -22,8 +22,7 @@ const ERROR_SCOPES = [
   "errors",
 ];
 
-
-function translateCode(code: string, attr?: string | null): string {
+function translateCode(code: string, attr?: string | null): string | undefined {
   // Priorité aux erreurs spécifiques à un champ
   if (attr) {
     for (const scope of ERROR_SCOPES) {
@@ -44,20 +43,20 @@ function translateCode(code: string, attr?: string | null): string {
     }
   }
 
-  return code;
+  return undefined;
 }
 
 
 function getErrorMessage(error: ApiError): string {
   if (error.code) {
-    return translateCode(error.code, error.attr);
+    const translated = translateCode(error.code, error.attr);
+
+    if (translated !== undefined) {
+      return translated;
+    }
   }
 
-  if (error.detail) {
-    return error.detail;
-  }
-
-  return i18n.t("errors.unexpected");
+  return error.detail || i18n.t("errors.unexpected");
 }
 
 export function getApiErrorMessage(response: ApiErrorResponse): string {
