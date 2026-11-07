@@ -1006,6 +1006,16 @@ class SpendingViewTest(APITestCase):
             [(self.bob.id, "90.00")],
         )
 
+    def test_create_with_zero_amount_returns_400(self):
+        before = Spending.objects.count()
+        response = self.client.post(
+            self.url,
+            self._payload(amount="0.00", sharedWith=[self.jean.id, self.bob.id]),
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Spending.objects.count(), before)
+
 
 class SpendingBroadcastTest(BroadcastListenerMixin, APITestCase):
     def setUp(self):

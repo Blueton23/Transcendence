@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import ClassVar
 
 from rest_framework import serializers
@@ -72,7 +73,7 @@ class SpendingSerializer(ModelValidationMixin, serializers.ModelSerializer):
         shares = validated_data.pop("shares", None)
         shared_with = validated_data.pop("shared_with", None)
         if shared_with is not None:
-            amount = validated_data.get("amount") or instance.amount
+            amount = validated_data.get("amount", getattr(instance, "amount", None))
             return split_equally(amount, shared_with)
         if shares is not None:
             return {s["traveler"]: s["amount"] for s in shares}
@@ -110,5 +111,6 @@ class SpendingSerializer(ModelValidationMixin, serializers.ModelSerializer):
         ]
 
         extra_kwargs: ClassVar[dict] = {
-            "label": {"required": True, "allow_blank": False}
+            "label": {"required": True, "allow_blank": False},
+            "amount": {"min_value": Decimal("0.01")},
         }

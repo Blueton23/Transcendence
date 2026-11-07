@@ -388,6 +388,7 @@
     },
     "edit": "Editar el gasto",
     "errors": {
+      "amountRequired": "El importe debe ser mayor que 0.",
       "createFailed": "No se pudo crear el gasto.",
       "deleteFailed": "No se pudo eliminar el gasto.",
       "loadFailed": "No se pudieron cargar los gastos.",

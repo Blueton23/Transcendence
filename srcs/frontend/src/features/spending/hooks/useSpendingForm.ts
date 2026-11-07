@@ -12,6 +12,7 @@ import {
 } from "@/features/spending/api/spendingApi";
 import { useAuth } from "@/features/auth/context/useAuth";
 import type { Idea } from "@/features/idea/types";
+import { useTranslation } from "react-i18next";
 
 interface UseSpendingFormProps {
   spending?: Spending;
@@ -25,6 +26,7 @@ export function useSpendingForm({
   onSuccess,
 }: UseSpendingFormProps) {
   const { currentUser } = useAuth();
+  const { t } = useTranslation();
 
   const [label, setLabel] = useState(spending?.label ?? "");
   const [amount, setAmount] = useState(spending?.amount ?? "");
@@ -52,6 +54,9 @@ export function useSpendingForm({
       ideaId: ideaId,
       sharedWith: sharedWith,
     };
+    if (!(Number(amount) > 0)) {
+      throw new Error(t("spending.errors.amountRequired"));
+    }
     return spending
       ? updateSpending(travel.id, spending.id, data)
       : createSpending(travel.id, data);

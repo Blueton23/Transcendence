@@ -388,6 +388,7 @@
     },
     "edit": "Modifier la dépense",
     "errors": {
+      "amountRequired": "Le montant doit être supérieur à 0.",
       "createFailed": "Impossible de créer la dépense.",
       "deleteFailed": "Impossible de supprimer la dépense.",
       "loadFailed": "Impossible de charger les dépenses.",
