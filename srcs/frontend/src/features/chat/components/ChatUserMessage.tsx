@@ -1,5 +1,7 @@
 import Avatar from "@/shared/ui/Avatar";
 import Text from "@/shared/ui/Text";
+import { useTranslation } from "react-i18next";
+
 import type { ChatMessage as ChatMessageType } from "../types";
 
 interface ChatMessageProps {
@@ -11,7 +13,9 @@ export default function ChatUserMessage({
   message,
   currentUserId,
 }: ChatMessageProps) {
-  const time = new Intl.DateTimeFormat("fr-FR", {
+  const { t, i18n } = useTranslation();
+
+  const time = new Intl.DateTimeFormat(i18n.resolvedLanguage ?? "fr", {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(message.createdAt));
@@ -31,7 +35,11 @@ export default function ChatUserMessage({
         }`}
       >
         <Text size="sm" tone="secondary">
-          {message.author || "Ancien participant"} · {time}
+          {message.traveler === null
+            ? t("chat.formerParticipant")
+            : message.author}
+          {" · "}
+          {time}
         </Text>
 
         <div

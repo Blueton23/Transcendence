@@ -49,14 +49,22 @@
     "welcomeBack": "Bon retour"
   },
   "chat": {
+    "title": "Discussion",
+    "loading": "Chargement des messages…",
+    "formerParticipant": "Ancien participant",
+    "unreadMessages": "Messages non lus",
+    "unreadSeparator": "NON LUS",
+    "unreadCount_one": "{{count}} non lu",
+    "unreadCount_other": "{{count}} non lus",
+    "placeholder": "Écrire un message…",
+    "sending": "Envoi…",
+    "send": "Envoyer",
     "system": {
       "participant_joined": "{{name}} a rejoint le voyage.",
       "participant_left": "{{name}} a quitté le voyage."
     },
     "errors": {
       "max_length": "Le message est trop long.",
-      "travelChatAccessDenied": "Vous n'avez pas accès à ce voyage.",
-      "travelChatMembershipRequired": "Vous devez être membre du voyage pour envoyer un message.",
       "travel_chat_access_denied": "Vous n'avez pas accès à ce voyage.",
       "system_message_has_author": "Un message système ne peut pas avoir d'auteur.",
       "message_author_required": "Un message doit avoir un auteur.",

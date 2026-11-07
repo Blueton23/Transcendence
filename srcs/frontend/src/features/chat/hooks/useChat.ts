@@ -12,6 +12,7 @@ import {
   markMessagesAsRead,
 } from "../api/chatApi";
 import type { ApiChatMessage, ChatMessage, SocketChatMessage } from "../types";
+import i18n from "@/i18n";
 
 function toChatMessage(message: ApiChatMessage): ChatMessage {
   return {
@@ -72,9 +73,15 @@ export function useChat(travelId: number) {
     [travelId],
   );
 
-  const onLoadError = useCallback((error: unknown) => {
-    console.error("Erreur lors du chargement des messages :", error);
-    if (!hasLoaded.current) setError("Impossible de charger les messages.");
+  const onLoadError = useCallback((err: unknown) => {
+    console.error("Erreur lors du chargement des messages :", err);
+
+    if (!hasLoaded.current) {
+      setError(
+        err instanceof Error ? err.message : i18n.t("errors.unexpected"),
+      );
+    }
+
     setIsLoading(false);
   }, []);
 

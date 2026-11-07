@@ -201,7 +201,7 @@ export function useIdeas(travelId: number) {
 
     try {
       const updatedIdea = await fetchIdea(travelId, ideaId);
-      
+
       setIdeas((currentIdeas) =>
         currentIdeas.map((idea) =>
           idea.id === ideaId

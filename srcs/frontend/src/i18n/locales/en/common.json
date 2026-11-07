@@ -49,14 +49,22 @@
     "welcomeBack": "Welcome back"
   },
   "chat": {
+    "title": "Chat",
+    "loading": "Loading messages…",
+    "formerParticipant": "Former participant",
+    "unreadMessages": "Unread messages",
+    "unreadSeparator": "UNREAD",
+    "unreadCount_one": "{{count}} unread",
+    "unreadCount_other": "{{count}} unread",
+    "placeholder": "Write a message…",
+    "sending": "Sending…",
+    "send": "Send",
     "system": {
       "participant_joined": "{{name}} joined the trip.",
       "participant_left": "{{name}} left the trip."
     },
     "errors": {
       "max_length": "The message is too long.",
-      "travelChatAccessDenied": "You do not have access to this trip.",
-      "travelChatMembershipRequired": "You must be a member of this trip to send a message.",
       "travel_chat_access_denied": "You do not have access to this trip.",
       "system_message_has_author": "A system message cannot have an author.",
       "message_author_required": "A message must have an author.",
