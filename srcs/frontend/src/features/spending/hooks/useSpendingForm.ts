@@ -13,16 +13,21 @@ import {
 import { useAuth } from "@/features/auth/context/useAuth";
 import type { Idea } from "@/features/idea/types";
 import { useTranslation } from "react-i18next";
+import type { Step } from "@/features/step/types";
 
 interface UseSpendingFormProps {
   spending?: Spending;
   travel: Travel;
+  ideas: Idea[];
+  steps: Step[];
   onSuccess: () => void;
 }
 
 export function useSpendingForm({
   spending,
   travel,
+  ideas,
+  steps,
   onSuccess,
 }: UseSpendingFormProps) {
   const { currentUser } = useAuth();
@@ -50,8 +55,8 @@ export function useSpendingForm({
       label: label,
       amount: amount,
       paidDate: spending?.paidDate || null,
-      stepId: stepId,
-      ideaId: ideaId,
+      stepId: steps.some((s) => s.id === stepId) ? stepId : null,
+      ideaId: ideas.some((i) => i.id === ideaId) ? ideaId : null,
       sharedWith: sharedWith,
     };
     if (!(Number(amount) > 0)) {
@@ -69,6 +74,10 @@ export function useSpendingForm({
     }
   };
 
+  const selectStep = (newStepId: number | null) => {
+    setStepId(newStepId);
+    setIdeaId(null);
+  };
   const selectIdea = (idea: Idea | null) => {
     setIdeaId(idea?.id ?? null);
     if (idea && label === "") setLabel(idea.title);
@@ -92,7 +101,7 @@ export function useSpendingForm({
     travelerId,
     setTravelerId,
     stepId,
-    setStepId,
+    selectStep,
     ideaId,
     selectIdea,
     sharedWith,

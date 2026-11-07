@@ -34,6 +34,8 @@ export function SpendingModal({
   const form = useSpendingForm({
     spending,
     travel,
+    steps,
+    ideas,
     onSuccess: () => {
       refetch();
       onClose();
@@ -101,7 +103,7 @@ export function SpendingModal({
             <Select
               value={form.stepId ?? ""}
               onChange={(e) =>
-                form.setStepId(
+                form.selectStep(
                   e.target.value === "" ? null : Number(e.target.value),
                 )
               }
