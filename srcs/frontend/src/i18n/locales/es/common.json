@@ -452,11 +452,7 @@
     "detail": "Detalle de la etapa",
     "edit": "Editar la etapa",
     "errors": {
-      "createFailed": "No se pudo crear la etapa.",
-      "deleteFailed": "No se pudo eliminar la etapa.",
-      "loadFailed": "No hay etapas guardadas.",
       "placeNotFound": "Lugar no encontrado, elige uno de la lista.",
-      "updateFailed": "No se pudo editar la etapa.",
       "step_before_travel": "La etapa no puede comenzar antes del inicio del viaje.",
       "step_after_travel": "La etapa no puede terminar después del final del viaje.",
       "step_dates_overlap": "Las fechas de esta etapa se solapan con las de otra etapa."
@@ -494,7 +490,6 @@
       "notFound": "No se encontró ningún viaje.",
       "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio",
       "titleRequired": "Indica un título antes de confirmar.",
-      "unknown": "El viaje no existe.",
       "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción."
     },
     "haveInviteLink": "Tengo un enlace de invitación",

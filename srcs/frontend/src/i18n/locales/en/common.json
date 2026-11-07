@@ -452,11 +452,7 @@
     "detail": "Stop details",
     "edit": "Edit stop",
     "errors": {
-      "createFailed": "Unable to create the stop.",
-      "deleteFailed": "Unable to delete the stop.",
-      "loadFailed": "No stops saved.",
       "placeNotFound": "Place not found, choose one from the list.",
-      "updateFailed": "Unable to edit the stop.",
       "step_before_travel": "The stop cannot start before the trip begins.",
       "step_after_travel": "The stop cannot end after the trip ends.",
       "step_dates_overlap": "The dates of this stop overlap with another stop."
@@ -494,7 +490,7 @@
       "notFound": "No trip found.",
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
-      "unknown": "The trip does not exist.",
+
       "not_travel_participant": "You must be a member of this trip to perform this action."
     },
     "haveInviteLink": "I have an invitation link",
