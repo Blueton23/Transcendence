@@ -25,11 +25,11 @@ export function BalanceAndSettlements({
                 <Text className="font-bold">{traveler.name}</Text>
                 {Number(b.balance) >= 0 ? (
                   <Text font="mono" tone="success" className="font-bold">
-                    {b.balance}
+                    {`${b.balance} CHF`}
                   </Text>
                 ) : (
                   <Text font="mono" tone="accent" className="font-bold">
-                    {b.balance}
+                    {`${b.balance} CHF`}
                   </Text>
                 )}
               </div>
