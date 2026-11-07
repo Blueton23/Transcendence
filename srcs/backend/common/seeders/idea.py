@@ -67,8 +67,8 @@ def seed_ideas(fake: Faker, travelers: list, travels: list, per_travel: int) -> 
 
                 if overlaps:
                     step = None
-
-                chosen = fake.boolean(chance_of_getting_true=30)
+                else:
+                    chosen = fake.boolean(chance_of_getting_true=30)
             ideas.append(
                 Idea.objects.create(
                     travel=travel,
