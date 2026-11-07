@@ -608,17 +608,21 @@ class TravelViewTest(APITestCase):
         self.client.force_authenticate(user=self.traveler)
 
         response = self.client.get(
-            reverse("travel-join", kwargs={"token": "im_an_unknown_token"})
+            reverse(
+                "travel-join",
+                kwargs={"token": "im_an_unknown_token"},
+            )
         )
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(response.data["type"], "client_error")
+
         self.assertEqual(
             response.data["errors"],
             [
                 {
-                    "code": "not_found",
-                    "detail": "Not found.",
+                    "code": "invalid_invitation_link",
+                    "detail": "Invalid invitation link.",
                     "attr": None,
                 }
             ],

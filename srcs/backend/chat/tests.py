@@ -568,15 +568,18 @@ class ChatPermissionEnvelopeTest(TestCase):
 
     def test_every_chat_endpoint_uses_the_error_envelope(self):
         cases = [
-            ("get", "travel-messages"),
-            ("post", "travel-messages"),
-            ("get", "travel-unread-count"),
-            ("post", "travel-mark-read"),
+            ("get", "travel-messages", "travel_chat_access_denied"),
+            ("post", "travel-messages", "not_travel_participant"),
+            ("get", "travel-unread-count", "travel_chat_access_denied"),
+            ("post", "travel-mark-read", "travel_chat_access_denied"),
         ]
 
-        for method, name in cases:
+        for method, name, expected_code in cases:
             with self.subTest(method=method, name=name):
-                url = reverse(name, kwargs={"travel_id": self.travel.pk})
+                url = reverse(
+                    name,
+                    kwargs={"travel_id": self.travel.pk},
+                )
 
                 response = getattr(self.client, method)(
                     url,
@@ -588,20 +591,26 @@ class ChatPermissionEnvelopeTest(TestCase):
                     response.status_code,
                     status.HTTP_403_FORBIDDEN,
                 )
+
                 self.assertEqual(
                     response.data["type"],
                     "client_error",
                 )
+
                 self.assertEqual(
-                    response.data["errors"][0]["code"],
-                    "permission_denied",
+                    len(response.data["errors"]),
+                    1,
                 )
-                self.assertTrue(
-                    response.data["errors"][0]["detail"],
+
+                error = response.data["errors"][0]
+
+                self.assertEqual(
+                    error["code"],
+                    expected_code,
                 )
-                self.assertIsNone(
-                    response.data["errors"][0]["attr"],
-                )
+
+                self.assertTrue(error["detail"])
+                self.assertIsNone(error["attr"])
 
     def test_unknown_travel_is_403(self):
         url = reverse("travel-messages", kwargs={"travel_id": 999999})
