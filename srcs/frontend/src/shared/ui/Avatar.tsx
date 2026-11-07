@@ -8,7 +8,7 @@ import type { User } from "@/features/auth/types";
 import { useTranslation } from "react-i18next";
 
 type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
-type AvatarColor = "1" | "2" | "3" | "4";
+export type AvatarColor = "1" | "2" | "3" | "4";
 
 interface AvatarProps {
   user?: User | null;

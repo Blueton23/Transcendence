@@ -8,6 +8,7 @@
     "language": "Langue",
     "loading": "Chargement...",
     "modify": "Modifier",
+    "ok": "OK",
     "options": "Options",
     "save": "Enregistrer",
     "saving": "Enregistrement...",
@@ -375,6 +376,54 @@
   },
   "pwa": {
     "offline": "Hors ligne : certaines fonctions sont indisponibles"
+  },
+  "spending": {
+    "add": "Ajouter une dépense",
+    "categories": {
+      "lodging": "Hébergement",
+      "fuel": "Carburant",
+      "activities": "Activités",
+      "meals": "Repas",
+      "tolls": "Péages",
+      "other": "Autre"
+    },
+    "deletedWhileEditing": "Cette dépense a été supprimée par un autre voyageur.",
+    "edit": "Modifier la dépense",
+    "errors": {
+      "amountRequired": "Le montant doit être supérieur à 0.",
+      "createFailed": "Impossible de créer la dépense.",
+      "deleteFailed": "Impossible de supprimer la dépense.",
+      "loadFailed": "Impossible de charger les dépenses.",
+      "updateFailed": "Impossible de modifier la dépense."
+    },
+    "filters": {
+      "allCategories": "Toutes"
+    },
+    "form": {
+      "amount": "Montant",
+      "attachedTo": "Rattachement",
+      "category": "Catégorie",
+      "ideaLinked": "Liée à une idée",
+      "label": "Libellé de la dépense",
+      "labelPlaceholder": "Ex. : plein d'essence, ou choisis une idée ci-dessous",
+      "noIdea": "Aucune idée liée",
+      "optional": "optionnel",
+      "paidBy": "Payé par",
+      "perPerson_one": "{{count}} personne concernée · {{amount}} CHF",
+      "perPerson_other": "{{count}} personnes concernées · {{amount}} CHF chacune",
+      "sharedWith": "Réparti entre",
+      "step": "Étape",
+      "type": "Catégorie"
+    },
+    "left": "parti",
+    "page": {
+      "empty": "Aucune dépense pour ce voyage.",
+      "noMatch": "Aucune dépense ne correspond aux filtres sélectionnés."
+    },
+    "saveChanges": "Enregistrer les modifications",
+    "saving": "Enregistrement…",
+    "submitAdd": "Ajouter la dépense",
+    "wholeTravel": "Voyage entier"
   },
   "step": {
     "actions": "Action",

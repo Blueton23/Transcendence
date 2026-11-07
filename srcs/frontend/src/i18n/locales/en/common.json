@@ -8,6 +8,7 @@
     "language": "Language",
     "loading": "Loading",
     "modify": "Edit",
+    "ok": "OK",
     "options": "Options",
     "save": "Save",
     "saving": "Saving...",
@@ -375,6 +376,54 @@
   },
   "pwa": {
     "offline": "You're offline: some features are unavailable"
+  },
+  "spending": {
+    "add": "Add an expense",
+    "categories": {
+      "lodging": "Lodging",
+      "fuel": "Fuel",
+      "activities": "Activities",
+      "meals": "Meals",
+      "tolls": "Tolls",
+      "other": "Other"
+    },
+    "deletedWhileEditing": "This expense was deleted by another traveler.",
+    "edit": "Edit the expense",
+    "errors": {
+      "amountRequired": "The amount must be greater than 0.",
+      "createFailed": "Unable to create the expense.",
+      "deleteFailed": "Unable to delete the expense.",
+      "loadFailed": "Unable to load the expenses.",
+      "updateFailed": "Unable to edit the expense."
+    },
+    "filters": {
+      "allCategories": "All"
+    },
+    "form": {
+      "amount": "Amount",
+      "attachedTo": "Attached to",
+      "category": "Category",
+      "ideaLinked": "Linked to an idea",
+      "label": "Expense label",
+      "labelPlaceholder": "E.g. fuel refill, or pick an idea below",
+      "noIdea": "No linked idea",
+      "optional": "optional",
+      "paidBy": "Paid by",
+      "perPerson_one": "{{count}} person · {{amount}} CHF",
+      "perPerson_other": "{{count}} people · {{amount}} CHF each",
+      "sharedWith": "Split between",
+      "step": "Stop",
+      "type": "Category"
+    },
+    "left": "left",
+    "page": {
+      "empty": "No expenses for this trip.",
+      "noMatch": "No expenses match the selected filters."
+    },
+    "saveChanges": "Save changes",
+    "saving": "Saving…",
+    "submitAdd": "Add the expense",
+    "wholeTravel": "Whole trip"
   },
   "step": {
     "actions": "Action",

@@ -9,6 +9,8 @@ from django.urls import reverse
 from django.utils import timezone
 from rest_framework.test import APITestCase
 
+from common.realtime import travel_group
+from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaType
 from spending.models import Spending, SpendingCategory, SpendingShare
 from spending.services import (
@@ -765,7 +767,12 @@ class SpendingViewTest(APITestCase):
         self.client.force_authenticate(self.jean)
 
     def _payload(self, **overrides):
-        data = {"travelerId": self.bob.id, "category": "m", "amount": "90.00"}
+        data = {
+            "travelerId": self.bob.id,
+            "category": "m",
+            "amount": "90.00",
+            "label": "Sunshine Restaurant",
+        }
         data.update(overrides)
         return data
 
@@ -936,3 +943,156 @@ class SpendingViewTest(APITestCase):
         response = self.client.delete(self._detail_url(spending))
         self.assertEqual(response.status_code, 404)
         self.assertTrue(Spending.objects.filter(pk=spending.pk).exists())
+
+    def test_participant_leave_travel_but_keep_name_share(self):
+        self._make_spending()
+        Participation.objects.filter(traveler=self.jean, travel=self.travel).update(
+            status=ParticipationStatus.LEFT
+        )
+        self.client.force_authenticate(self.bob)
+        response = self.client.get(self._summary_url())
+        self.assertEqual(response.status_code, 200)
+        jean = next(
+            b for b in response.json()["balances"] if b["travelerId"] == self.jean.id
+        )
+        self.assertEqual(jean["name"], self.jean.username)
+        self.assertTrue(jean["hasLeft"])
+
+    def test_create_with_shared_with_splits_only_between_selected(self):
+        simon = Traveler.objects.create_user(
+            username="Simon", email="simon@exemple.com", password="password123"
+        )
+        Participation.objects.create(
+            traveler=simon, travel=self.travel, status=ParticipationStatus.ACCEPTED
+        )
+        response = self.client.post(
+            self.url,
+            self._payload(amount="10.01", sharedWith=[self.jean.id, simon.id]),
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+        shares = {
+            s["travelerId"]: Decimal(s["amount"]) for s in response.json()["shares"]
+        }
+        self.assertEqual(
+            shares, {self.jean.id: Decimal("5.01"), simon.id: Decimal("5.00")}
+        )
+
+    def test_create_with_shared_with_non_member_returns_400(self):
+        response = self.client.post(
+            self.url,
+            self._payload(sharedWith=[self.jean.id, self.alice.id]),
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+
+    def test_create_without_label_returns_400(self):
+        response = self.client.post(self.url, self._payload(label=""), format="json")
+        self.assertEqual(response.status_code, 400)
+
+    def test_patch_shared_with_keeps_amount(self):
+        spending = create_spending(
+            travel=self.travel,
+            traveler=self.jean,
+            category=SpendingCategory.MEALS,
+            label="Raclette",
+            amount="90.00",
+        )
+        url = f"{self.url}{spending.id}/"
+        response = self.client.patch(url, {"sharedWith": [self.bob.id]}, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [(s["travelerId"], s["amount"]) for s in response.json()["shares"]],
+            [(self.bob.id, "90.00")],
+        )
+
+    def test_create_with_zero_amount_returns_400(self):
+        before = Spending.objects.count()
+        response = self.client.post(
+            self.url,
+            self._payload(amount="0.00", sharedWith=[self.jean.id, self.bob.id]),
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Spending.objects.count(), before)
+
+
+class SpendingBroadcastTest(BroadcastListenerMixin, APITestCase):
+    def setUp(self):
+        self.jean = Traveler.objects.create_user(
+            username="Jean", email="jean@exemple.com", password="password123"
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        Participation.objects.create(
+            traveler=self.jean,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        self.spending = Spending.objects.create(
+            travel=self.travel,
+            traveler=self.jean,
+            category=SpendingCategory.MEALS,
+            label="Raclette",
+            amount="30.00",
+        )
+        self.client.force_authenticate(user=self.jean)
+        self.listen_to(travel_group(self.travel.id))
+
+    def request(self, method, url, data=None):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            response = getattr(self.client, method)(url, data, format="json")
+        return response, callbacks
+
+    def list_url(self):
+        return reverse("spending-list", kwargs={"travel_id": self.travel.id})
+
+    def detail_url(self):
+        return reverse(
+            "spending-detail",
+            kwargs={"travel_id": self.travel.id, "pk": self.spending.id},
+        )
+
+    def test_create_broadcasts_spending_created(self):
+        response, _ = self.request(
+            "post",
+            self.list_url(),
+            {
+                "travelerId": self.jean.id,
+                "category": "f",
+                "label": "Essence",
+                "amount": "60.00",
+            },
+        )
+        self.assertEqual(response.status_code, 201)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "spending.created")
+        self.assertEqual(event["payload"]["id"], response.data["id"])
+        self.assertEqual(event["payload"]["travelId"], self.travel.id)
+
+    def test_update_broadcasts_spending_updated(self):
+        response, _ = self.request("patch", self.detail_url(), {"label": "Fondue"})
+        self.assertEqual(response.status_code, 200)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "spending.updated")
+        self.assertEqual(event["payload"]["label"], "Fondue")
+
+    def test_delete_broadcasts_spending_deleted(self):
+        response, _ = self.request("delete", self.detail_url())
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "spending.deleted", "payload": {"id": self.spending.id}},
+        )
+
+    def test_invalid_create_broadcasts_nothing(self):
+        response, callbacks = self.request(
+            "post",
+            self.list_url(),
+            {"travelerId": self.jean.id, "category": "m", "amount": "10.00"},
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(callbacks, [])

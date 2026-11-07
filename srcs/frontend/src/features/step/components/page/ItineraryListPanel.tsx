@@ -15,6 +15,7 @@ interface ItineraryListPanelProps {
   dateLabels: string[];
   onDetailView: (step: Step) => void;
   onModifyStep: (step: Step) => void;
+  onDeleteStep: (step: Step) => Promise<void>;
   refetch: () => void;
 }
 
@@ -27,6 +28,7 @@ export function ItineraryListPanel({
   dateLabels,
   onDetailView,
   onModifyStep,
+  onDeleteStep,
   refetch,
 }: ItineraryListPanelProps) {
   const segments = isLoadingRoute ? [] : (route?.legs ?? []);
@@ -43,7 +45,7 @@ export function ItineraryListPanel({
           dateLabels={dateLabels}
           onDetailView={onDetailView}
           onModifyStep={onModifyStep}
-          refetch={refetch}
+          onDeleteStep={onDeleteStep}
         />
         <TotalSegment route={route} />
       </div>
