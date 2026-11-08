@@ -83,7 +83,7 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
             )
 
         raise serializers.ValidationError(
-            "Username is already in use.",
+            "Email is already in use.",
             code="unique",
         )
 

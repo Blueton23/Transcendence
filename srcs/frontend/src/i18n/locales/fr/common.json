@@ -425,6 +425,8 @@
       },
       "noImage": "Aucune image sélectionnée.",
       "username": {
+        "max_length": "Assurez-vous que ce champ comporte au plus 150 caractères.",
+        "invalid": "Saisissez un nom d’utilisateur valide. Il ne peut contenir que des lettres, des nombres ou les caractères « @ », « . », « + », « - » et « _ ».",
         "unique": "Ce pseudo est déjà utilisé."
       }
     },

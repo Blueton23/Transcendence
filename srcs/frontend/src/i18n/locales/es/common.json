@@ -425,7 +425,9 @@
       },
       "noImage": "Ninguna imagen seleccionada.",
       "username": {
-        "unique": "Este nombre de usuario ya está en uso."
+        "max_length": "Asegúrese de que este campo no tenga más de 150 caracteres.",
+        "invalid": "Introduza un nombre de usuario válido. Este valor puede contener únicamente letras, números y los caracteres @/./+/-/_ ",
+        "unique": "Ce pseudo est déjà utilisé."
       }
     },
     "firstName": "Nombre",
