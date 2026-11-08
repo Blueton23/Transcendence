@@ -79,7 +79,7 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
         if not traveler.has_usable_password():
             raise serializers.ValidationError(
                 "A Google account is already linked to this email address.",
-                code="googleEmailExists",
+                code="googleAccountExists",
             )
 
         raise serializers.ValidationError(
