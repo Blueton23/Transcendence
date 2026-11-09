@@ -1,3 +1,5 @@
+import { useFriends } from "@/features/friendship/hooks/useFriends";
+import { addParticipant } from "@/features/travel/api/travelApi";
 import type { Travel } from "@/features/travel/types";
 import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
@@ -11,7 +13,6 @@ interface CreatedScreenProps {
   onClose: () => void;
 }
 
-//TODO: branchement une fois que friendship est terminé
 export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
@@ -26,6 +27,28 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
     }
   };
 
+  const { friendships, error: friendsError } = useFriends();
+  const [query, setQuery] = useState("");
+  const [addedIds, setAddedIds] = useState<number[]>([]);
+  const [addError, setAddError] = useState<string | null>(null);
+
+  const search = query.trim().toLowerCase();
+  const matches = search
+    ? friendships.filter((f) =>
+        f.friend.username.toLowerCase().includes(search),
+      )
+    : [];
+
+  async function handleAdd(friendId: number) {
+    setAddError(null);
+    try {
+      await addParticipant(travel.id, friendId);
+      setAddedIds((ids) => [...ids, friendId]);
+    } catch (err) {
+      setAddError(err instanceof Error ? err.message : t("errors.unexpected"));
+    }
+  }
+
   const link = `${window.location.origin}/join/${travel.inviteToken}`;
   return (
     <div className="flex flex-col gap-3">
@@ -35,7 +58,47 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
       </Text>
       <div className="flex flex-col items-start gap-1">
         <Text>{t("travel.searchFriend")}</Text>
-        <Input placeholder={t("travel.searchFriendPlaceholder")}></Input>
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder={t("travel.searchFriendPlaceholder")}
+        ></Input>
+        {search && (
+          <Card className="flex w-full flex-col gap-2">
+            {friendsError ? (
+              <Text tone="accent">{friendsError}</Text>
+            ) : (
+              matches.length === 0 && (
+                <Text tone="muted">{t("travel.noFriendMatch")}</Text>
+              )
+            )}
+            {matches.map((f) => (
+              <div
+                key={f.friend.id}
+                className="flex items-center justify-between"
+              >
+                <Text tone="primary" className="font-bold">
+                  {f.friend.username}
+                </Text>
+                {addedIds.includes(f.friend.id) ? (
+                  <Text tone="success" className="font-bold">
+                    {t("travel.added")}
+                  </Text>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="dark"
+                    onClick={() => void handleAdd(f.friend.id)}
+                    className="md:px-4! md:py-1.5!"
+                  >
+                    {t("travel.add")}
+                  </Button>
+                )}
+              </div>
+            ))}
+            {addError && <Text tone="accent">{addError}</Text>}
+          </Card>
+        )}
       </div>
       <div className="flex flex-col items-start gap-1">
         <Text>{t("travel.inviteLink")}</Text>

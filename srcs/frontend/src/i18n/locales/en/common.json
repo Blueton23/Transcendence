@@ -543,6 +543,8 @@
     "totalRoute": "TOTAL · {{duration}} DRIVING · {{distance}} KM"
   },
   "travel": {
+    "add": "Add",
+    "added": "Added ✓",
     "addTravel": "Add a trip",
     "copied": "Copied ✓",
     "copy": "Copy",
@@ -557,6 +559,7 @@
       "notFound": "No trip found.",
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
+      "not_friend": "This person is not one of your friends.",
       "not_travel_participant": "You must be a member of this trip to perform this action.",
       "steps_before_travel_start": "Some stops start before this date: move them first.",
       "steps_after_travel_end": "Some stops end after this date: move them first.",
@@ -573,6 +576,7 @@
     "leave": "Leave the trip",
     "manageTravelers": "Manage travellers",
     "newTravel": "New trip",
+    "noFriendMatch": "No friend matches",
     "openTravel": "Open trip",
     "searchFriend": "Search for a friend",
     "searchFriendPlaceholder": "Username or first name...",

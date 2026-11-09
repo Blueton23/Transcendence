@@ -96,6 +96,34 @@ export async function joinTravel(token: string): Promise<Travel> {
   return parseResponse<Travel>(response);
 }
 
+export async function addParticipant(
+  travelId: number,
+  travelerId: number,
+): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error(i18n.t("errors.csrfMissing"));
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/travels/${travelId}/participants/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+      body: JSON.stringify({ travelerId }),
+    },
+  );
+
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
+}
+
 export async function leaveTravel(travelId: number): Promise<void> {
   const csrfToken = getCookie("csrftoken");
 
