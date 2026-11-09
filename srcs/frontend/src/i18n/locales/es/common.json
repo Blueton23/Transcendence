@@ -532,8 +532,8 @@
     "totalRoute": "TOTAL · {{duration}} DE RUTA · {{distance}} KM"
   },
   "travel": {
-    "add": "Añadir",
-    "added": "Añadido ✓",
+    "add": "Invitar",
+    "added": "Invitado ✓",
     "addTravel": "Añadir un viaje",
     "copied": "Copiado ✓",
     "copy": "Copiar",
@@ -549,6 +549,7 @@
       "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio.",
       "titleRequired": "Indica un título antes de confirmar.",
       "not_friend": "Esta persona no está entre tus amigos.",
+      "invitation_refused": "Esta persona ha rechazado la invitación.",
       "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción.",
       "steps_before_travel_start": "Algunas etapas empiezan antes de esta fecha: muévelas primero.",
       "steps_after_travel_end": "Algunas etapas terminan después de esta fecha: muévelas primero.",
@@ -561,6 +562,8 @@
     "inviteLink": "Enlace de invitación",
     "inviteTravelers": "Invita a tus viajeros para planificar {{title}} juntos",
     "joinTravel": "Unirse al viaje",
+    "pendingInvitation": "Pendiente",
+    "refusedInvitation": "Ha rechazado",
     "notNow": "Ahora no",
     "refuseInvitation": "Rechazar la invitación",
     "kms": "{{count}} km",

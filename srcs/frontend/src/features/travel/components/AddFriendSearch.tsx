@@ -1,5 +1,6 @@
 import { useFriends } from "@/features/friendship/hooks/useFriends";
 import { addParticipant } from "@/features/travel/api/travelApi";
+import type { TravelInvitation } from "@/features/travel/types";
 import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
 import Input from "@/shared/ui/Input";
@@ -9,11 +10,13 @@ import { useTranslation } from "react-i18next";
 
 interface AddFriendSearchProps {
   travelId: number;
+  invitations?: TravelInvitation[];
   memberIds?: number[];
 }
 
 export function AddFriendSearch({
   travelId,
+  invitations = [],
   memberIds = [],
 }: AddFriendSearchProps) {
   const { t } = useTranslation();
@@ -60,30 +63,38 @@ export function AddFriendSearch({
               <Text tone="muted">{t("travel.noFriendMatch")}</Text>
             )
           )}
-          {matches.map((f) => (
-            <div
-              key={f.friend.id}
-              className="flex items-center justify-between"
-            >
-              <Text tone="primary" className="font-bold">
-                {f.friend.username}
-              </Text>
-              {addedIds.includes(f.friend.id) ? (
-                <Text tone="success" className="font-bold">
-                  {t("travel.added")}
+          {matches.map((f) => {
+            const invitation = invitations.find((i) => i.id === f.friend.id);
+            const isInvited =
+              addedIds.includes(f.friend.id) ||
+              invitation?.status === "invited";
+            return (
+              <div
+                key={f.friend.id}
+                className="flex items-center justify-between"
+              >
+                <Text tone="primary" className="font-bold">
+                  {f.friend.username}
                 </Text>
-              ) : (
-                <Button
-                  size="sm"
-                  variant="dark"
-                  onClick={() => void handleAdd(f.friend.id)}
-                  className="md:px-4! md:py-1.5!"
-                >
-                  {t("travel.add")}
-                </Button>
-              )}
-            </div>
-          ))}
+                {isInvited ? (
+                  <Text tone="success" className="font-bold">
+                    {t("travel.added")}
+                  </Text>
+                ) : invitation?.status === "refused" ? (
+                  <Text tone="muted">{t("travel.refusedInvitation")}</Text>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="dark"
+                    onClick={() => void handleAdd(f.friend.id)}
+                    className="md:px-4! md:py-1.5!"
+                  >
+                    {t("travel.add")}
+                  </Button>
+                )}
+              </div>
+            );
+          })}
           {addError && <Text tone="accent">{addError}</Text>}
         </Card>
       )}
