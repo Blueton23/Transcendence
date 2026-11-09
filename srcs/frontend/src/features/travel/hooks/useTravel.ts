@@ -39,6 +39,7 @@ export function useTravel(travelId: number) {
 
   // The travelers list changes when someone joins or leaves.
   useTravelSocketOpen(() => void reloadTravel());
+  useTravelEvent("travel.updated", () => void reloadTravel());
   useTravelEvent("participant.joined", () => void reloadTravel());
   useTravelEvent("participant.left", () => void reloadTravel());
   useTravelEvent("travel.updated", () => void reloadTravel());

@@ -83,20 +83,32 @@ class Spending(TimeStampedModel, ValidatedModel):
             and self.travel_id
             and not is_travel_member(self.travel_id, self.traveler_id)
         ):
-            errors["traveler"] = "The traveler must be a participant of the travel."
+            errors["traveler"] = ValidationError(
+                "The traveler must be a participant of the travel.",
+                code="traveler_not_participant",
+            )
 
         if self.step_id and self.travel_id and self.step.travel_id != self.travel_id:
-            errors["step"] = "The step must belong to the same travel as the spending."
+            errors["step"] = ValidationError(
+                "The step must belong to the same travel as the spending.",
+                code="step_not_in_spending_travel",
+            )
 
         if self.idea_id and self.travel_id and self.idea.travel_id != self.travel_id:
-            errors["idea"] = "The idea must belong to the same travel as the spending."
+            errors["idea"] = ValidationError(
+                "The idea must belong to the same travel as the spending.",
+                code="idea_not_in_spending_travel",
+            )
         elif (
             self.idea_id
             and self.step_id
             and self.idea.step_id
             and self.idea.step_id != self.step_id
         ):
-            errors["step"] = "The step must match the step of the linked idea."
+            errors["step"] = ValidationError(
+                "The step must match the step of the linked idea.",
+                code="step_idea_mismatch",
+            )
 
         if errors:
             raise ValidationError(errors)
@@ -141,5 +153,10 @@ class SpendingShare(TimeStampedModel, ValidatedModel):
             and not is_travel_member(self.spending.travel_id, self.traveler_id)
         ):
             raise ValidationError(
-                {"traveler": "The traveler must be a participant of the travel."}
+                {
+                    "traveler": ValidationError(
+                        "The traveler must be a participant of the travel.",
+                        code="traveler_not_participant",
+                    )
+                }
             )

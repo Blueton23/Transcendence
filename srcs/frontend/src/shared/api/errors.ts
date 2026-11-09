@@ -17,6 +17,7 @@ const ERROR_SCOPES = [
   "chat.errors",
   "idea.errors",
   "profile.errors",
+  "spending.errors",
   "step.errors",
   "travel.errors",
   "errors",

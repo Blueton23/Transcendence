@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
@@ -158,6 +158,11 @@ class StepDetailView(
         broadcast_step("step.updated", serializer.save())
 
     def perform_destroy(self, instance):
+        if instance.spendings.exists():
+            raise ValidationError(
+                "This stop has expenses: move or delete them first",
+                code="step_has_spending",
+            )
         instance.soft_delete()
         # Ideas placed on this step go back to the pool: clients refetch them.
         broadcast(travel_group(instance.travel_id), "step.deleted", {"id": instance.id})
