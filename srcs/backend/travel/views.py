@@ -55,6 +55,10 @@ class TravelJoinView(APIView):
             traveler=request.user,
             status=ParticipationStatus.ACCEPTED,
         ).exists()
+        data["is_invited"] = travel.participations.filter(
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        ).exists()
         return Response(data)
 
     def post(self, request, token):
@@ -74,6 +78,21 @@ class TravelJoinView(APIView):
                 participation.save()
                 announce_participant(travel.id, request.user, "joined")
         return Response(TravelSerializer(travel).data)
+
+
+class RefuseInvitationView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request, token):
+        participation = get_object_or_404(
+            Participation,
+            travel__invite_token=token,
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        )
+        participation.status = ParticipationStatus.REFUSED
+        participation.save(update_fields=["status"])
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AddParticipantView(APIView):
@@ -102,8 +121,7 @@ class AddParticipantView(APIView):
         if participation.status != ParticipationStatus.ACCEPTED:
             participation.status = ParticipationStatus.INVITED
             participation.save(update_fields=["status"])
-
-        broadcast(user_group(friend.id), "travel.invited", {"travel_id": travel_id})
+            broadcast(user_group(friend.id), "travel.invited", {"travel_id": travel_id})
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
