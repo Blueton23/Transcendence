@@ -22,13 +22,19 @@
     "creating": "Création...",
     "errors": {
       "csrfInit": "Impossible d'initialiser la protection CSRF.",
-      "emailExists": "Un compte existe déjà avec cette adresse email.",
-      "googleAccountExists": "Un compte Google est déjà associé à cette adresse email.",
       "googleEmailExists": "Un compte existe déjà avec cet email. Connectez-vous avec votre mot de passe.",
       "googleFailed": "La connexion avec Google a échoué. Veuillez réessayer.",
-      "invalidCredentials": "Identifiants invalides.",
+      "googleAccountExists": "Un compte Google est déjà associé à cette adresse email.",
+      "invalid_credentials": "Identifiants invalides.",
       "logoutFailed": "Impossible de se déconnecter.",
-      "notAuthenticated": "Utilisateur non authentifié."
+      "not_authenticated": "Utilisateur non authentifié.",
+      "passwordValidationFailed": "Le nouveau mot de passe ne respecte pas les règles de sécurité.",
+      "password_incorrect": "Le mot de passe actuel est incorrect.",
+      "password_mismatch": "Les deux nouveaux mots de passe ne correspondent pas.",
+      "password_too_short": "Le nouveau mot de passe est trop court.",
+      "password_too_common": "Le nouveau mot de passe est trop courant.",
+      "password_entirely_numeric": "Le nouveau mot de passe ne peut pas être uniquement numérique.",
+      "password_too_similar": "Le nouveau mot de passe est trop similaire à vos informations personnelles."
     },
     "logginIn": "Connexion…",
     "login": "Se connecter",
@@ -36,44 +42,86 @@
     "loginSubtitle": "Connectez-vous pour retrouver vos voyages",
     "newPassword": "Nouveau mot de passe",
     "noAccount": "Pas encore de compte ?",
-    "oldPassword": "Ancien mot de passe",
+    "oldPassword": "Mot de passe actuel",
     "password": "Mot de passe",
     "username": "Pseudo",
     "welcomeBack": "Bon retour"
   },
   "chat": {
+    "title": "Discussion",
+    "loading": "Chargement des messages…",
+    "formerParticipant": "Ancien participant",
+    "unreadMessages": "Messages non lus",
+    "unreadSeparator": "NON LUS",
+    "unreadCount_one": "{{count}} non lu",
+    "unreadCount_other": "{{count}} non lus",
+    "placeholder": "Écrire un message…",
+    "sending": "Envoi…",
+    "send": "Envoyer",
     "system": {
       "participant_joined": "{{name}} a rejoint le voyage.",
       "participant_left": "{{name}} a quitté le voyage."
+    },
+    "errors": {
+      "max_length": "Le message est trop long.",
+      "travel_chat_access_denied": "Vous n'avez pas accès à ce voyage.",
+      "system_message_has_author": "Un message système ne peut pas avoir d'auteur.",
+      "message_author_required": "Un message doit avoir un auteur.",
+      "message_author_not_member": "L'auteur doit être membre du voyage.",
+      "system_key_required": "Un message système doit avoir une clé système.",
+      "system_key_forbidden": "Seul un message système peut avoir une clé système.",
+      "message_body_required": "Un message doit contenir du texte.",
+      "message_step_idea_conflict": "Un message peut être lié à une étape ou à une idée, mais pas aux deux.",
+      "step_not_in_message_travel": "Cette étape n'appartient pas au voyage du message.",
+      "idea_not_in_message_travel": "Cette idée n'appartient pas au voyage du message.",
+      "message_empty": "Le message ne peut pas être vide.",
+      "message_too_long": "Le message ne peut pas dépasser 2 000 caractères."
     }
   },
   "errors": {
-    "csrfMissing": "errors.csrfMissing",
+    "csrfMissing": "Jeton CSRF introuvable.",
     "generic": "Error",
     "invalidResponse": "Réponse serveur invalide.",
     "mapbox": "Erreur Mapbox",
     "server": "Erreur serveur.",
     "serverWithStatus": "Erreur serveur ({{status}} {{statusText}})",
-    "unexpected": "Une erreur est survenue."
+    "unexpected": "Une erreur est survenue.",
+    "end_before_start": "La date de fin ne peut pas être antérieure à la date de début.",
+    "not_found": "Ressource introuvable.",
+    "required": "Ce champ est obligatoire.",
+    "blank": "Ce champ ne peut pas être vide.",
+    "invalid": "Valeur invalide."
   },
   "friendship": {
     "accept": "Accepter",
     "decline": "Refuser",
     "errors": {
+      "cannot_accept_own_request": "Vous ne pouvez pas accepter votre propre demande d'amitié.",
+      "cannot_friend_yourself": "Vous ne pouvez pas vous envoyer une demande d'amitié.",
+      "friendship_not_found": "Amitié introuvable.",
+      "invalidUserId": "Identifiant utilisateur invalide.",
       "loadFailed": "Impossible de charger votre liste d'amis.",
       "missingRequestId": "Identifiant de la demande manquant.",
-      "noUserSelected": "Aucun utilisateur sélectionné."
+      "noUserSelected": "Aucun utilisateur sélectionné.",
+      "not_friendship_participant": "Vous ne faites pas partie de cette amitié.",
+      "not_friend_request_participant": "Vous ne participez pas à cette demande d'amitié.",
+      "relationship_exists": "Une amitié ou une demande d'amitié existe déjà avec cet utilisateur.",
+      "friend_request_not_found": "Demande d'amitié introuvable.",
+      "searchFailed": "Impossible de rechercher les utilisateurs.",
+      "userIdRequired": "L'identifiant de l'utilisateur est requis.",
+      "user_not_found": "Utilisateur introuvable."
     },
     "myFriends": "MES AMIS · {{count}}",
     "noFriends": "Vous n'avez pas encore d'amis.",
     "noRequests": "Aucune demande d'amitié en attente.",
+    "noUsersFound": "Aucun utilisateur trouvé.",
     "receivedRequests": "DEMANDES REÇUES",
     "remove": "Retirer",
     "removeTitle": "Retirer {{username}} de vos amis ?",
     "removing": "Suppression…",
     "requestSent": "Demande d'amitié envoyée.",
     "search": "Rechercher",
-    "searchPlaceholder": "Ajouter un ami · pseudo ou email",
+    "searchPlaceholder": "Ajouter un ami · pseudo",
     "sending": "Envoi…",
     "sendRequest": "Envoyer une demande",
     "title": "Amis"
@@ -87,20 +135,31 @@
     "errors": {
       "createFailed": "Impossible de créer l'idée.",
       "dateRequired": "Choisis une date pour cette idée.",
-      "datesOutsideStep": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée.",
       "departureBeforeArrival": "La date de départ doit être après la date d'arrivée.",
       "editFailed": "Impossible de modifier l'idée.",
       "invalidTravelId": "Identifiant de voyage invalide.",
       "loadFailed": "Impossible de charger les idées.",
-      "lodgingAfterTravel": "L'hébergement ne peut pas se terminer après la fin du voyage.",
-      "lodgingBeforeTravel": "L'hébergement ne peut pas commencer avant le début du voyage.",
       "lodgingDatesRequired": "Les dates d'arrivée et de départ sont obligatoires.",
-      "lodgingOverlap": "Un hébergement est déjà choisi sur cette étape pour des dates qui chevauchent celles-ci.",
       "notFound": "Idée introuvable.",
       "stepRequired": "Choisis une étape pour cette idée.",
       "titleRequired": "Le titre est obligatoire.",
       "voteNotFound": "État du vote introuvable.",
-      "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser."
+      "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser.",
+
+      "step_not_in_travel": "Cette étape n'appartient pas au voyage de l'idée.",
+      "dates_outside_step": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée.",
+      "price_only_for_lodging": "Seul un hébergement peut avoir un prix par nuit.",
+      "invalid_chosen_idea": "Seul un hébergement placé sur une étape peut être choisi.",
+      "dates_must_be_together": "Les dates de début et de fin doivent être renseignées ensemble.",
+      "pool_idea_has_dates": "Une idée dans le pool ne peut pas avoir de dates.",
+      "single_day_only": "Une idée autre qu'un hébergement ne peut durer qu'une seule journée.",
+      "lodging_dates_required": "Un hébergement doit obligatoirement avoir des dates.",
+      "placed_idea_dates_required": "Une idée placée sur une étape doit avoir des dates.",
+      "lodging_before_travel": "L'hébergement ne peut pas commencer avant le début du voyage.",
+      "lodging_after_travel": "L'hébergement ne peut pas se terminer après la fin du voyage.",
+      "lodging_min_one_night": "Un hébergement doit durer au moins une nuit.",
+      "lodging_overlap": "Un hébergement est déjà choisi sur cette étape pour des dates qui chevauchent celles-ci.",
+      "reaction_already_exists": "Vous avez déjà voté pour cette idée."
     },
     "filters": {
       "allSteps": "Toutes",
@@ -361,7 +420,15 @@
     "editProfile": "Modifier le profil",
     "email": "Email",
     "errors": {
-      "noImage": "Aucune image sélectionnée."
+      "email": {
+        "unique": "Cette adresse e-mail est déjà utilisée."
+      },
+      "noImage": "Aucune image sélectionnée.",
+      "username": {
+        "max_length": "Assurez-vous que ce champ comporte au plus 150 caractères.",
+        "invalid": "Saisissez un nom d’utilisateur valide. Il ne peut contenir que des lettres, des nombres ou les caractères « @ », « . », « + », « - » et « _ ».",
+        "unique": "Ce pseudo est déjà utilisé."
+      }
     },
     "firstName": "Prénom",
     "lastName": "Nom",
@@ -388,11 +455,10 @@
     "detail": "Détail d'étape",
     "edit": "Modifier l'étape",
     "errors": {
-      "createFailed": "Impossible de créer l'étape.",
-      "deleteFailed": "Impossible de supprimer l'étape.",
-      "loadFailed": "Aucune étape enregistrée.",
       "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
-      "updateFailed": "Impossible de modifier l'étape."
+      "step_before_travel": "L'étape ne peut pas commencer avant le début du voyage.",
+      "step_after_travel": "L'étape ne peut pas se terminer après la fin du voyage.",
+      "step_dates_overlap": "Les dates de cette étape chevauchent celles d'une autre étape."
     },
     "fromTo": "du {{start}} au {{end}}",
     "list": "Liste",
@@ -422,15 +488,16 @@
     "creating": "Création...",
     "editTravel": "Modifier le voyage",
     "errors": {
-      "createFailed": "Impossible de créer le voyage.",
       "datesRequired": "Sélectionne des dates avant de valider.",
-      "joinFailed": "Impossible de rejoindre le voyage.",
-      "leaveFailed": "Impossible de quitter le voyage.",
+      "invalid_invitation_link": "Ce lien d'invitation est invalide.",
       "notFound": "Aucun voyage trouvé.",
       "sameDates": "Sélectionne une date de fin différente de la date de début.",
       "titleRequired": "Indique un titre avant de valider.",
-      "unknown": "Le voyage n'existe pas.",
+      "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action.",
+      "title": {
+        "max_length": "Titre trop long.",
       "updateFailed": "Impossible de modifier le voyage."
+      }
     },
     "haveInviteLink": "J'ai un lien d'invitation",
     "invitation": "INVITATION À REJOINDRE",

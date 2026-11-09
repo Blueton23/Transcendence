@@ -1,6 +1,7 @@
 import type { AuthResponse, LoginData } from "../types";
 import { getCookie } from "@/shared/api/cookies";
 import i18n from "@/i18n";
+import { parseResponse } from "@/shared/api/parseResponse";
 
 const API_BASE_URL = "/api";
 
@@ -30,17 +31,12 @@ export async function login(data: LoginData): Promise<AuthResponse> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.detail || i18n.t("auth.errors.invalidCredentials"));
-  }
-
-  return result;
+  return parseResponse<AuthResponse>(response);
 }
 
 export async function getMe(): Promise<AuthResponse> {
@@ -49,13 +45,7 @@ export async function getMe(): Promise<AuthResponse> {
     credentials: "include",
   });
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.detail || i18n.t("auth.errors.notAuthenticated"));
-  }
-
-  return result;
+  return parseResponse<AuthResponse>(response);
 }
 
 export async function logout(): Promise<void> {
@@ -70,6 +60,7 @@ export async function logout(): Promise<void> {
     credentials: "include",
     headers: {
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 

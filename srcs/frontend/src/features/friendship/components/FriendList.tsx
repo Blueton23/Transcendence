@@ -11,6 +11,8 @@ import Icon from "@/shared/ui/Icon";
 import FriendRemove from "./FriendRemove";
 import { useTranslation } from "react-i18next";
 import i18n from "@/i18n";
+import Modal from "@/shared/ui/Modal";
+import ProfileInfo from "@/features/profile/components/ProfileInfo";
 
 interface FriendListProps {
   refreshKey: number;
@@ -19,6 +21,10 @@ interface FriendListProps {
 function FriendList({ refreshKey }: FriendListProps) {
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [profileFriendship, setProfileFriendship] = useState<Friendship | null>(
+    null,
+  );
   const [selectedFriendship, setSelectedFriendship] =
     useState<Friendship | null>(null);
 
@@ -43,6 +49,7 @@ function FriendList({ refreshKey }: FriendListProps) {
 
     setSelectedFriendship(null);
   }
+
   const { t } = useTranslation();
 
   return (
@@ -74,6 +81,20 @@ function FriendList({ refreshKey }: FriendListProps) {
                     <Text>{friend.username}</Text>
                     <Text>{friend.email}</Text>
                   </div>
+
+                  <div>
+                    <Button
+                      type="button"
+                      icon={<Icon name="user" size={16} />}
+                      variant="dark"
+                      onClick={() => {
+                        setProfileFriendship(friendship);
+                        setIsProfileOpen(true);
+                      }}
+                    >
+                      {t("nav.profile")}
+                    </Button>
+                  </div>
                 </div>
 
                 <Button
@@ -88,6 +109,19 @@ function FriendList({ refreshKey }: FriendListProps) {
             );
           })}
         </div>
+      )}
+
+      {isProfileOpen && profileFriendship && (
+        <Modal
+          title={t("profile.title")}
+          icon="user"
+          onClose={() => {
+            setIsProfileOpen(false);
+            setProfileFriendship(null);
+          }}
+        >
+          <ProfileInfo user={profileFriendship.friend} full />
+        </Modal>
       )}
 
       {selectedFriendship && (
