@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from chat.models import SystemMessageKey
 from chat.services import post_system_message
 from common.mixins import PublicApiMixin
-from common.realtime import broadcast, travel_group
+from common.realtime import broadcast, travel_group, user_group
 from traveler.models import Friendship, Status, Traveler
 
 from .consumers import kick_from_travel
@@ -90,13 +90,20 @@ class AddParticipantView(APIView):
             raise ValidationError(
                 "This traveler is not your friend.", code="not_friend"
             )
-        Participation.objects.update_or_create(
+        participation, _ = Participation.objects.get_or_create(
             traveler=friend,
             travel_id=travel_id,
-            defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
+            defaults={"status": ParticipationStatus.INVITED, "left_at": None},
         )
+        if participation.status == ParticipationStatus.REFUSED:
+            raise ValidationError(
+                "This traveler declined the invitation.", code="invitation_refused"
+            )
+        if participation.status != ParticipationStatus.ACCEPTED:
+            participation.status = ParticipationStatus.INVITED
+            participation.save(update_fields=["status"])
 
-        announce_participant(travel_id, friend, "joined")
+        broadcast(user_group(friend.id), "travel.invited", {"travel_id": travel_id})
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
