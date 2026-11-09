@@ -40,7 +40,7 @@ L'application est alors disponible sur **https://peripl.app**.
 
 **Réalisé par :** dle-fur (socle technique : Docker Compose, les 5 services, Nginx, Makefile).
 
-**Ce que ça apporte.** Toute l'application démarre avec une seule commande (`make up`) et tourne de la même façon chez chaque membre de l'équipe. Le backend utilise **Django + Django REST Framework**, le frontend **React + TypeScript + Vite**. Nginx est le **seul point d'entrée** (port 443).
+**Ce que ça apporte.** Toute l'application démarre avec une seule commande (`make`) et tourne de la même façon chez chaque membre de l'équipe. Le backend utilise **Django + Django REST Framework**, le frontend **React + TypeScript + Vite**. Nginx est le **seul point d'entrée** (port 443).
 
 **Comment c'est implémenté.**
 
@@ -54,7 +54,7 @@ Les certificats sont demandés par certbot et délivrés par Let's Encrypt pour 
 
 **Limites.** Le code source n'est pas monté dans les conteneurs : chaque modification demande de reconstruire les images (`make up`, qui lance `--build`).
 
-**Comment tester.** Projet lancé (`make up`) :
+**Comment tester.** Projet lancé :
 
 | Commande / action | Résultat attendu | Ce que ça prouve |
 |---|---|---|
@@ -62,12 +62,6 @@ Les certificats sont demandés par certbot et délivrés par Let's Encrypt pour 
 | `curl https://peripl.app/api/` | `{"status":"ok"}` | Nginx → Django |
 | `make test-db` puis `make ping` | `✅ Connexion réussie à la base : …` puis `PONG` | Django atteint PostgreSQL, Redis répond |
 | Ouvrir https://peripl.app/admin/ | page de connexion **mise en forme** | Fichiers statiques servis par Nginx |
-
-Controle certificat
-```
-sudo ls -l certs/live/peripl.app/
-sudo openssl x509 -in certs/live/peripl.app/fullchain.pem -noout -subject -issuer -enddate
-```
 
 ---
 ### API publique - clé API, rate limiting et documentation (Major, 2 points)
