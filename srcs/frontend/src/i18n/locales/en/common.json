@@ -482,13 +482,13 @@
     "add": "Add",
     "added": "Added ✓",
     "addTravel": "Add a trip",
-    "changeDates": "Change dates",
     "copied": "Copied ✓",
     "copy": "Copy",
     "copyInviteLink": "Copy invitation link",
     "createMyTravel": "Create my trip",
     "createTravel": "Create a trip",
     "creating": "Creating...",
+    "editTravel": "Edit trip",
     "errors": {
       "datesRequired": "Select dates before confirming.",
       "invalid_invitation_link": "This invitation link is invalid.",
@@ -497,6 +497,8 @@
       "titleRequired": "Enter a title before confirming.",
       "not_friend": "This person is not one of your friends.",
       "not_travel_participant": "You must be a member of this trip to perform this action.",
+      "steps_before_travel_start": "Some stops start before this date: move them first.",
+      "steps_after_travel_end": "Some stops end after this date: move them first.",
       "title": {
         "max_length": "Title too long."
       }

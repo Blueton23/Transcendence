@@ -128,7 +128,8 @@ travel_detail_schema = extend_schema_view(
             "### Règles\n\n"
             "- Tout participant du voyage peut le modifier (sinon `404`).\n"
             "- `endDate` : le même jour que `startDate` ou après.\n"
-            "- Changer les dates du voyage ne déplace pas ses étapes."
+            "- Les étapes doivent rester dans les nouvelles dates (sinon `400`) : "
+            "les déplacer d'abord."
         ),
         examples=TRAVEL_PATCH_EXAMPLE,
     ),

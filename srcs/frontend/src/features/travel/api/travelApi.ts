@@ -43,6 +43,29 @@ export async function createTravel(data: CreateTravelData): Promise<Travel> {
   return parseResponse<Travel>(response);
 }
 
+export async function updateTravel(
+  travelId: number,
+  data: CreateTravelData,
+): Promise<Travel> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error(i18n.t("errors.csrfMissing"));
+  }
+
+  const response = await fetch(`${API_BASE_URL}/travels/${travelId}/`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": csrfToken,
+    },
+    body: JSON.stringify(data),
+  });
+
+  return parseResponse<Travel>(response);
+}
+
 export async function getInvitation(
   token: string,
 ): Promise<Travel & { isMember: boolean }> {

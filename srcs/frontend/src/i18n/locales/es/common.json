@@ -482,21 +482,23 @@
     "add": "Añadir",
     "added": "Añadido ✓",
     "addTravel": "Añadir un viaje",
-    "changeDates": "Cambiar las fechas",
     "copied": "Copiado ✓",
     "copy": "Copiar",
     "copyInviteLink": "Copiar enlace de invitación",
     "createMyTravel": "Crear mi viaje",
     "createTravel": "Crear un viaje",
     "creating": "Creando...",
+    "editTravel": "Editar el viaje",
     "errors": {
       "datesRequired": "Selecciona las fechas antes de confirmar.",
       "invalid_invitation_link": "Este enlace de invitación no es válido.",
       "notFound": "No se encontró ningún viaje.",
-      "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio",
+      "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio.",
       "titleRequired": "Indica un título antes de confirmar.",
       "not_friend": "Esta persona no está entre tus amigos.",
       "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción.",
+      "steps_before_travel_start": "Algunas etapas empiezan antes de esta fecha: muévelas primero.",
+      "steps_after_travel_end": "Algunas etapas terminan después de esta fecha: muévelas primero.",
       "title": {
         "max_length": "Título demasiado largo."
       }
