@@ -480,20 +480,22 @@
   },
   "travel": {
     "addTravel": "Ajouter un voyage",
-    "changeDates": "Changer les dates",
     "copied": "Copié ✓",
     "copy": "Copier",
     "copyInviteLink": "Copier le lien d'invitation",
     "createMyTravel": "Créer mon voyage",
     "createTravel": "Créer un voyage",
     "creating": "Création...",
+    "editTravel": "Modifier le voyage",
     "errors": {
       "datesRequired": "Sélectionne des dates avant de valider.",
       "invalid_invitation_link": "Ce lien d'invitation est invalide.",
       "notFound": "Aucun voyage trouvé.",
-      "sameDates": "Sélectionne une date de fin différente de la date de début",
+      "sameDates": "Sélectionne une date de fin différente de la date de début.",
       "titleRequired": "Indique un titre avant de valider.",
       "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action.",
+      "steps_before_travel_start": "Des étapes commencent avant cette date : déplace-les d'abord.",
+      "steps_after_travel_end": "Des étapes se terminent après cette date : déplace-les d'abord.",
       "title": {
         "max_length": "Titre trop long."
       }
