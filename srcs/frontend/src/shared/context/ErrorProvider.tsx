@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { ErrorContext } from "./ErrorContext";
+import { ErrorContext } from "@/shared/context/ErrorContext";
 
 const DISPLAY_MS = 5000;
 
