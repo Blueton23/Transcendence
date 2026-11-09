@@ -19,7 +19,12 @@ def split_equally(amount: Decimal, travelers: Iterable) -> dict:
     travelers = sorted(travelers, key=lambda traveler: traveler.pk)
     if not travelers:
         raise ValidationError(
-            {"shares": "At least one traveler must share the spending."}
+            {
+                "shares": ValidationError(
+                    "At least one traveler must share the spending.",
+                    code="shares_required",
+                )
+            }
         )
 
     cents = int(Decimal(amount).quantize(CENT) / CENT)
@@ -44,15 +49,23 @@ def set_shares(spending: Spending, shares: Mapping) -> list[SpendingShare]:
 
     if not shares:
         raise ValidationError(
-            {"shares": "At least one traveler must share the spending."}
+            {
+                "shares": ValidationError(
+                    "At least one traveler must share the spending.",
+                    code="shares_required",
+                )
+            }
         )
 
     total = sum((Decimal(amount) for amount in shares.values()), Decimal(0))
     if total.quantize(CENT) != Decimal(spending.amount).quantize(CENT):
         raise ValidationError(
             {
-                "shares": f"The shares total ({total}) must equal "
-                f"the spending amount ({spending.amount})."
+                "shares": ValidationError(
+                    f"The shares total ({total}) must equal "
+                    f"the spending amount ({spending.amount}).",
+                    code="shares_mismatch_total",
+                )
             }
         )
 
@@ -85,7 +98,12 @@ def update_spending(
     travel_id = fields.get("travel_id", travel.pk if travel else spending.travel_id)
     if travel_id != spending.travel_id:
         raise ValidationError(
-            {"travel": "A spending cannot be moved to another travel."}
+            {
+                "travel": ValidationError(
+                    "A spending cannot be moved to another travel.",
+                    code="spending_travel_change",
+                )
+            }
         )
 
     previous_amount = spending.amount

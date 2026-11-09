@@ -154,7 +154,8 @@ class StepDetailView(
     def perform_destroy(self, instance):
         if instance.spendings.exists():
             raise ValidationError(
-                {"detail": "This stop has expenses: move or delete them first"}
+                "This stop has expenses: move or delete them first",
+                code="step_has_spending",
             )
         instance.soft_delete()
         # Ideas placed on this step go back to the pool: clients refetch them.
