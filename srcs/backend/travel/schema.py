@@ -130,7 +130,6 @@ travel_detail_schema = extend_schema_view(
             "- `endDate` : le même jour que `startDate` ou après.\n"
             "- Les étapes doivent rester dans les nouvelles dates (sinon `400`) : "
             "les déplacer d'abord."
-
         ),
         examples=TRAVEL_PATCH_EXAMPLE,
     ),
