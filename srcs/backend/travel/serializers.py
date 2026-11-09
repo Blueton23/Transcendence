@@ -23,6 +23,25 @@ def validate_date_range(instance, attrs):
     return attrs
 
 
+def validate_steps_within_dates(travel, attrs):
+    start = attrs.get("start_date", travel.start_date)
+    end = attrs.get("end_date", travel.end_date)
+    steps = travel.steps.alive()
+    errors = {}
+    if steps.filter(start_date__lt=start).exists():
+        errors["start_date"] = serializers.ErrorDetail(
+            "Some stops start before this date: move them first.",
+            code="steps_before_travel_start",
+        )
+    if steps.filter(end_date__gt=end).exists():
+        errors["end_date"] = serializers.ErrorDetail(
+            "Some stops end after this date: move them first.",
+            code="steps_after_travel_end",
+        )
+    if errors:
+        raise serializers.ValidationError(errors)
+
+
 def validate_date_within_travel(travel, instance, attrs):
     start = attrs.get("start_date", getattr(instance, "start_date", None))
     end = attrs.get("end_date", getattr(instance, "end_date", None))
@@ -67,6 +86,8 @@ class TravelSerializer(serializers.ModelSerializer):
 
     def validate(self, attrs):
         validate_date_range(self.instance, attrs)
+        if self.instance:
+            validate_steps_within_dates(self.instance, attrs)
         return attrs
 
     class Meta:

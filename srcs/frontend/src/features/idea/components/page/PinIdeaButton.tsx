@@ -14,10 +14,11 @@ export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
       {/* Gère le mobile */}
       <div className="md:hidden">
         <IconButton
-          icon={<Icon name="pinplus" size={18} />}
+          icon={<Icon name="pinplus" size={28} />}
           label={t("idea.pinIdea")}
           variant="primary"
           onClick={onClick}
+          size="lg"
         />
       </div>
 

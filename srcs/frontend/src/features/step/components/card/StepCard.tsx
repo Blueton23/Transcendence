@@ -1,16 +1,12 @@
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
-import IconButton from "@/shared/ui/IconButton";
 import Icon from "@/shared/ui/Icon";
-import MenuItem from "@/shared/ui/MenuItem";
-import DropdownMenu from "@/shared/ui/DropdownMenu";
 import { useState } from "react";
-import Divider from "@/shared/ui/Divider";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
-import { deleteStep } from "@/features/step/api/stepApi";
 import type { Step } from "@/features/step/types";
 import { useTranslation } from "react-i18next";
+import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 
 interface StepCardProps {
   step: Step;
@@ -18,71 +14,7 @@ interface StepCardProps {
   lodging?: { lodged: number; total: number };
   onModify: () => void;
   onClick?: () => void;
-  refetch: () => void;
-}
-
-const StepOptionsStyle =
-  "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
-
-interface StepOptionsButtonProps {
-  onModify: () => void;
-  refetch: () => void;
-  stepId: number;
-  travelId: number;
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-}
-
-function StepOptionsButton({
-  onModify,
-  refetch,
-  stepId,
-  travelId,
-  isOpen,
-  setIsOpen,
-}: StepOptionsButtonProps) {
-  // rajouter error une fois que bandeau error en place
-  const { t } = useTranslation();
-  const { submit, isSubmitting } = useSubmitAction(() =>
-    deleteStep(travelId, stepId),
-  );
-
-  //A rajouter un bandeau d'erreur en cas d'erreur pour eviter le remplacement de la card
-  //if (error) return <p>{error}</p>;
-
-  const handleOnSubmit = async () => {
-    const result = await submit();
-    if (result.success) refetch();
-  };
-  return (
-    <div className={StepOptionsStyle} onClick={(e) => e.stopPropagation()}>
-      <IconButton
-        icon={<Icon name="dots" size={16} />}
-        label={t("actions.options")}
-        onClick={() => setIsOpen(!isOpen)}
-        onMouseDown={(e) => e.stopPropagation()}
-      />
-      {isOpen && (
-        <DropdownMenu
-          onClose={() => setIsOpen(false)}
-          className="top-full right-0 mt-2"
-        >
-          <MenuItem onClick={onModify} icon="edit">
-            {t("step.edit")}
-          </MenuItem>
-          <Divider />
-          <MenuItem
-            icon="x"
-            tone="danger"
-            onClick={handleOnSubmit}
-            disabled={isSubmitting}
-          >
-            {t("step.delete")}
-          </MenuItem>
-        </DropdownMenu>
-      )}
-    </div>
-  );
+  onDelete: () => Promise<void>;
 }
 
 function StepDescription({
@@ -108,9 +40,15 @@ export function StepCard({
   lodging,
   onClick,
   onModify,
-  refetch,
+  onDelete,
 }: StepCardProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
+
+  const { submit, isSubmitting, error } = useSubmitAction(onDelete);
+
+  const StepOptionsStyle =
+    "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
 
   return (
     <Card
@@ -127,14 +65,23 @@ export function StepCard({
         <StepDescription step={step} lodging={lodging} />
         <Icon name="arrow" size={17} className="ml-auto text-muted" />
       </div>
-      <StepOptionsButton
-        onModify={onModify}
-        stepId={step.id}
-        travelId={step.travelId}
-        refetch={refetch}
-        isOpen={isOpen}
-        setIsOpen={setIsOpen}
-      />
+      <div className={StepOptionsStyle}>
+        <OptionsMenu
+          editLabel={t("step.edit")}
+          deleteLabel={t("step.delete")}
+          disabled={isSubmitting}
+          onEdit={onModify}
+          onDelete={() => void submit()}
+          onOpenChange={setIsOpen}
+        />
+      </div>
+      {error && (
+        <div role="alert" className="mt-2">
+          <Text tone="accent" size="sm">
+            {error}
+          </Text>
+        </div>
+      )}
     </Card>
   );
 }

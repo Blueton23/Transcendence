@@ -12,11 +12,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.mixins import PublicApiMixin
+from common.realtime import broadcast, travel_group
 from spending.models import Spending
 from spending.serializers import SpendingSerializer
 from spending.services import compute_balances, compute_settlements
 from travel.mixins import ParticipantScopedMixin
-from travel.models import Travel
+from travel.models import ParticipationStatus, Travel
 from travel.permissions import IsTravelParticipant
 
 from .schema import (
@@ -27,6 +28,12 @@ from .schema import (
 
 def _money(value) -> str:
     return f"{value:.2f}"
+
+
+def broadcast_spending(event_type, spending):
+    broadcast(
+        travel_group(spending.travel_id), event_type, SpendingSerializer(spending).data
+    )
 
 
 @extend_schema(tags=["Spendings"])
@@ -48,9 +55,10 @@ class SpendingListView(PublicApiMixin, ListCreateAPIView):
         )
 
     def perform_create(self, serializer):
-        serializer.save(
+        spending = serializer.save(
             travel_id=self.kwargs["travel_id"],
         )
+        broadcast_spending("spending.created", spending)
 
 
 @extend_schema(tags=["Spendings"])
@@ -68,6 +76,15 @@ class SpendingDetailView(
     def get_queryset(self):
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
+    def perform_update(self, serializer):
+        broadcast_spending("spending.updated", serializer.save())
+
+    def perform_destroy(self, instance):
+        payload = {"id": instance.id}
+        group = travel_group(instance.travel_id)
+        instance.delete()
+        broadcast(group, "spending.deleted", payload)
+
 
 class SpendingSummaryView(APIView):
     permission_classes: ClassVar[list] = [
@@ -84,6 +101,11 @@ class SpendingSummaryView(APIView):
         )
         balances = compute_balances(travel)
         settlements = compute_settlements(travel)
+        accepted_ids = set(
+            travel.participations.filter(
+                status=ParticipationStatus.ACCEPTED
+            ).values_list("traveler_id", flat=True)
+        )
         data = {
             "total": _money(sum(row["total"] for row in by_category)),
             "by_category": [
@@ -93,6 +115,8 @@ class SpendingSummaryView(APIView):
             "balances": [
                 {
                     "traveler_id": b.traveler.pk,
+                    "name": b.traveler.username,
+                    "has_left": b.traveler.pk not in accepted_ids,
                     "paid": _money(b.paid),
                     "owed": _money(b.owed),
                     "balance": _money(b.balance),

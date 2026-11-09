@@ -18,6 +18,10 @@ from idea.models import (
     Idea,
     IdeaType,
 )
+from spending.models import (
+    Spending,
+    SpendingCategory,
+)
 from travel.consumers import (
     CLOSE_NOT_AUTHENTICATED,
     CLOSE_NOT_PARTICIPANT,
@@ -602,6 +606,90 @@ class TravelViewTest(APITestCase):
         titles = [t["title"] for t in response.data]
         self.assertIn("Nouvelle aventure", titles)
 
+    def test_update_travel_dates_with_step_return_400(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"end_date": "2026-06-07"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.mon_voyage.refresh_from_db()
+        self.assertEqual(self.mon_voyage.end_date, datetime.date(2026, 6, 15))
+
+    def test_update_travel_start_after_step_start_return_400(self):
+        self.client.force_authenticate(user=self.traveler)
+        Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"start_date": "2026-06-03"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_extend_travel_dates_return_200(self):
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"start_date": "2026-05-28", "end_date": "2026-06-20"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.mon_voyage.refresh_from_db()
+        self.assertEqual(self.mon_voyage.end_date, datetime.date(2026, 6, 20))
+
+    def test_shrink_travel_dates_without_conflict_return_200(self):
+        self.client.force_authenticate(user=self.traveler)
+        Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"end_date": "2026-06-08"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_trashed_step_does_not_block_new_dates(self):
+        self.client.force_authenticate(user=self.traveler)
+        step = Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 10),
+            end_date=datetime.date(2026, 6, 12),
+            **COORDS,
+        )
+        step.soft_delete()
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"end_date": "2026-06-05"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
     # Tests for TravelJoinView
 
     def test_unknown_invite_token(self):
@@ -943,6 +1031,25 @@ class StepViewTest(APITestCase):
         self.mon_step.refresh_from_db()
         self.assertEqual(self.autre_step.localisation, "Paris")
 
+    def test_cannot_delete_step_with_spendings(self):
+        Spending.objects.create(
+            travel=self.mon_voyage,
+            traveler=self.traveler,
+            step=self.mon_step,
+            category=SpendingCategory.MEALS,
+            amount="30.00",
+        )
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.delete(
+            reverse(
+                "step-detail",
+                kwargs={"travel_id": self.mon_voyage.id, "pk": self.mon_step.id},
+            )
+        )
+        self.assertEqual(response.status_code, 400)
+        self.mon_step.refresh_from_db()
+        self.assertIsNone(self.mon_step.deleted_at)
+
 
 # --- WebSocket tests ---
 
@@ -1019,6 +1126,17 @@ class StepBroadcastTest(BroadcastListenerMixin, APITestCase):
             self.receive_event(),
             {"type": "step.deleted", "payload": {"id": self.step.id}},
         )
+
+    def test_update_travel_broadcasts_travel_updated(self):
+        response, _ = self.request(
+            "patch",
+            reverse("travel-detail", kwargs={"pk": self.travel.id}),
+            {"title": "Nouveau titre"},
+        )
+        self.assertEqual(response.status_code, 200)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "travel.updated")
+        self.assertEqual(event["payload"]["title"], "Nouveau titre")
 
     def test_invalid_update_broadcasts_nothing(self):
         response, callbacks = self.request(

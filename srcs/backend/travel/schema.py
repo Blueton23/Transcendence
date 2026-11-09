@@ -128,7 +128,8 @@ travel_detail_schema = extend_schema_view(
             "### Règles\n\n"
             "- Tout participant du voyage peut le modifier (sinon `404`).\n"
             "- `endDate` : le même jour que `startDate` ou après.\n"
-            "- Changer les dates du voyage ne déplace pas ses étapes."
+            "- Les étapes doivent rester dans les nouvelles dates (sinon `400`) : "
+            "les déplacer d'abord."
         ),
         examples=TRAVEL_PATCH_EXAMPLE,
     ),
@@ -190,6 +191,8 @@ step_detail_schema = extend_schema_view(
             "plus servir de `stepId`.\n\n"
             "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`).\n"
+            "- Refusé si l'étape a des dépenses (`400`) : les déplacer "
+            "ou les supprimer d'abord.\n"
             "- Les idées de l'étape retournent dans le pool. Les restaurants, "
             "activités et lieux gardent leur date : pour les modifier ensuite, "
             "envoyer aussi `startDate` et `endDate` à `null`."

@@ -1,4 +1,3 @@
-import { IdeaOptionsMenu } from "@/features/idea/components/card/IdeaOptionsMenu";
 import type { Idea } from "@/features/idea/types";
 import { lodgingCountNights } from "@/features/idea/utils/lodgingCountNights";
 import type { IdeaActions } from "@/features/step/types";
@@ -6,6 +5,7 @@ import { formatDate } from "@/features/step/utils/stepDates";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import IconBadge from "@/shared/ui/IconBadge";
+import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
 
@@ -39,7 +39,7 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
           </div>
         </div>
       </div>
-      <IdeaOptionsMenu
+      <OptionsMenu
         onDelete={() => actions.onDelete(night.id)}
         onEdit={() => actions.onEdit(night.id)}
       />

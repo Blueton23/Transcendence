@@ -115,6 +115,7 @@ export function IdeasPage() {
               idea={idea}
               proposerName={proposer?.name ?? t("idea.unknownProposer")}
               proposerInitials={proposer?.initials ?? "?"}
+              color={proposer?.color}
               stepName={step?.localisation}
               onVote={() => handleVote(idea.id)}
               onPlace={() => setIdeaPlaceId(idea.id)}
