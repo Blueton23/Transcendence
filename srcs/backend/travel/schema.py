@@ -190,6 +190,8 @@ step_detail_schema = extend_schema_view(
             "plus servir de `stepId`.\n\n"
             "### Règles\n\n"
             "- Réservé aux participants du voyage (sinon `404`).\n"
+            "- Refusé si l'étape a des dépenses (`400`) : les déplacer "
+            "ou les supprimer d'abord.\n"
             "- Les idées de l'étape retournent dans le pool. Les restaurants, "
             "activités et lieux gardent leur date : pour les modifier ensuite, "
             "envoyer aussi `startDate` et `endDate` à `null`."
