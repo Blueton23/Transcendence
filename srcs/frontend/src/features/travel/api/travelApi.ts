@@ -1,4 +1,8 @@
-import type { CreateTravelData, Travel } from "@/features/travel/types";
+import type {
+  CreateTravelData,
+  Invitation,
+  Travel,
+} from "@/features/travel/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
 import { parseResponse } from "@/shared/api/parseResponse";
@@ -66,15 +70,37 @@ export async function updateTravel(
   return parseResponse<Travel>(response);
 }
 
-export async function getInvitation(
-  token: string,
-): Promise<Travel & { isMember: boolean }> {
+export async function getInvitation(token: string): Promise<Invitation> {
   const response = await fetch(`${API_BASE_URL}/travels/join/${token}/`, {
     method: "GET",
     credentials: "include",
   });
 
-  return parseResponse<Travel & { isMember: boolean }>(response);
+  return parseResponse<Invitation>(response);
+}
+
+export async function refuseInvitation(token: string): Promise<void> {
+  const csrfToken = getCookie("csrftoken");
+
+  if (!csrfToken) {
+    throw new Error(i18n.t("errors.csrfMissing"));
+  }
+
+  const response = await fetch(
+    `${API_BASE_URL}/travels/join/${token}/refuse/`,
+    {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      },
+    },
+  );
+
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
 }
 
 export async function joinTravel(token: string): Promise<Travel> {

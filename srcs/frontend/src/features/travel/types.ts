@@ -18,4 +18,5 @@ export interface CreateTravelData {
 
 export interface Invitation extends Travel {
   isMember: boolean;
+  isInvited: boolean;
 }
