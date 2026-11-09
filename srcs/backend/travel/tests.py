@@ -364,6 +364,7 @@ class TravelSerializerTest(TestCase):
         expected_keys = {
             "id",
             "travelers",
+            "invitations",
             "title",
             "start_date",
             "end_date",
