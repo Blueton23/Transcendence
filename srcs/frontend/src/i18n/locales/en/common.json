@@ -22,13 +22,19 @@
     "creating": "Creating…",
     "errors": {
       "csrfInit": "Could not initialise CSRF protection.",
-      "emailExists": "An account already exists with this email address.",
-      "googleAccountExists": "A Google account is already linked to this email address.",
       "googleEmailExists": "An account already exists with this email. Please log in with your password.",
       "googleFailed": "Google sign-in failed. Please try again.",
-      "invalidCredentials": "Invalid credentials.",
+      "googleAccountExists": "A Google account is already linked to this email address.",
+      "invalid_credentials": "Invalid credentials.",
       "logoutFailed": "Could not log out.",
-      "notAuthenticated": "User not authenticated."
+      "not_authenticated": "User not authenticated.",
+      "passwordValidationFailed": "The new password does not meet the security requirements.",
+      "password_incorrect": "The current password is incorrect.",
+      "password_mismatch": "The two new passwords do not match.",
+      "password_too_short": "The new password is too short.",
+      "password_too_common": "The new password is too common.",
+      "password_entirely_numeric": "The new password cannot consist entirely of numbers.",
+      "password_too_similar": "The new password is too similar to your personal information."
     },
     "logginIn": "Logging in…",
     "login": "Log in",
@@ -36,15 +42,40 @@
     "loginSubtitle": "Log in to find your trips",
     "newPassword": "New Password",
     "noAccount": "No account yet?",
-    "oldPassword": "Old Password",
+    "oldPassword": "Current password",
     "password": "Password",
     "username": "Username",
     "welcomeBack": "Welcome back"
   },
   "chat": {
+    "title": "Chat",
+    "loading": "Loading messages…",
+    "formerParticipant": "Former participant",
+    "unreadMessages": "Unread messages",
+    "unreadSeparator": "UNREAD",
+    "unreadCount_one": "{{count}} unread",
+    "unreadCount_other": "{{count}} unread",
+    "placeholder": "Write a message…",
+    "sending": "Sending…",
+    "send": "Send",
     "system": {
       "participant_joined": "{{name}} joined the trip.",
       "participant_left": "{{name}} left the trip."
+    },
+    "errors": {
+      "max_length": "The message is too long.",
+      "travel_chat_access_denied": "You do not have access to this trip.",
+      "system_message_has_author": "A system message cannot have an author.",
+      "message_author_required": "A message must have an author.",
+      "message_author_not_member": "The author must be a member of the trip.",
+      "system_key_required": "A system message must have a system key.",
+      "system_key_forbidden": "Only a system message can have a system key.",
+      "message_body_required": "A message must contain text.",
+      "message_step_idea_conflict": "A message can be linked to a stop or an idea, but not both.",
+      "step_not_in_message_travel": "This stop does not belong to the message's trip.",
+      "idea_not_in_message_travel": "This idea does not belong to the message's trip.",
+      "message_empty": "The message cannot be empty.",
+      "message_too_long": "The message cannot exceed 2,000 characters."
     }
   },
   "errors": {
@@ -54,18 +85,35 @@
     "mapbox": "Mapbox error",
     "server": "Server error.",
     "serverWithStatus": "Server error ({{status}} {{statusText}})",
-    "unexpected": "An error occurred."
+    "unexpected": "An error occurred.",
+    "end_before_start": "The end date cannot be before the start date.",
+    "not_found": "Resource not found.",
+    "required": "This field is required.",
+    "blank": "This field cannot be blank.",
+    "invalid": "Invalid value."
   },
   "friendship": {
     "accept": "Accept",
     "decline": "Decline",
     "errors": {
+      "cannot_accept_own_request": "You cannot accept your own friend request.",
+      "cannot_friend_yourself": "You cannot send a friend request to yourself.",
+      "friendship_not_found": "Friendship not found.",
+      "invalidUserId": "Invalid user ID.",
       "loadFailed": "Could not load your friends list.",
       "missingRequestId": "Request ID missing.",
-      "noUserSelected": "No user selected."
+      "noUserSelected": "No user selected.",
+      "not_friendship_participant": "You are not a participant in this friendship.",
+      "not_friend_request_participant": "You are not a participant in this friend request.",
+      "relationship_exists": "A friendship or friend request already exists with this user.",
+      "friend_request_not_found": "Friend request not found.",
+      "searchFailed": "Unable to search for users.",
+      "userIdRequired": "User ID is required.",
+      "user_not_found": "User not found."
     },
     "myFriends": "MY FRIENDS · {{count}}",
     "noFriends": "You don't have any friends yet.",
+    "noUsersFound": "No users found.",
     "noRequests": "No pending friend requests.",
     "receivedRequests": "RECEIVED REQUESTS",
     "remove": "Remove",
@@ -73,7 +121,7 @@
     "removing": "Removing…",
     "requestSent": "Friend request sent.",
     "search": "Search",
-    "searchPlaceholder": "Add a friend · username or email",
+    "searchPlaceholder": "Add a friend · username",
     "sending": "Sending…",
     "sendRequest": "Send a request",
     "title": "Friends"
@@ -87,20 +135,31 @@
     "errors": {
       "createFailed": "Unable to create the idea.",
       "dateRequired": "Choose a date for this idea.",
-      "datesOutsideStep": "The idea dates must be within the dates of the selected stop.",
       "departureBeforeArrival": "The check-out date must be after the check-in date.",
       "editFailed": "Unable to edit the idea.",
       "invalidTravelId": "Invalid trip ID.",
       "loadFailed": "Unable to load the ideas.",
-      "lodgingAfterTravel": "The accommodation cannot end after the trip ends.",
-      "lodgingBeforeTravel": "The accommodation cannot start before the trip begins.",
       "lodgingDatesRequired": "Check-in and check-out dates are required.",
-      "lodgingOverlap": "An accommodation is already chosen on this stop for overlapping dates.",
       "notFound": "Idea not found.",
       "stepRequired": "Choose a stop for this idea.",
       "titleRequired": "The title is required.",
       "voteNotFound": "Vote status not found.",
-      "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it."
+      "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
+
+      "step_not_in_travel": "The stop must belong to the same trip as the idea.",
+      "dates_outside_step": "The idea dates must be within the dates of the selected stop.",
+      "price_only_for_lodging": "Only accommodation can have a price per night.",
+      "invalid_chosen_idea": "Only accommodation placed on a stop can be chosen.",
+      "dates_must_be_together": "Start and end dates must both be provided.",
+      "pool_idea_has_dates": "An idea in the pool cannot have dates.",
+      "single_day_only": "An idea other than accommodation can only last one day.",
+      "lodging_dates_required": "Accommodation must have dates.",
+      "placed_idea_dates_required": "An idea placed on a stop must have dates.",
+      "lodging_before_travel": "The accommodation cannot start before the trip begins.",
+      "lodging_after_travel": "The accommodation cannot end after the trip ends.",
+      "lodging_min_one_night": "Accommodation must span at least one night.",
+      "lodging_overlap": "An accommodation is already chosen on this stop for overlapping dates.",
+      "reaction_already_exists": "You have already voted for this idea."
     },
     "filters": {
       "allSteps": "All",
@@ -370,7 +429,15 @@
     "editProfile": "Edit profile",
     "email": "Email",
     "errors": {
-      "noImage": "No image selected."
+      "email": {
+        "unique": "This email address is already in use."
+      },
+      "noImage": "No image selected.",
+      "username": {
+        "max_length": "Ensure this field has no more than 150 characters.",
+        "invalid": "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.",
+        "unique": "This username is already in use."
+      }
     },
     "firstName": "First name",
     "lastName": "Last name",
@@ -397,11 +464,10 @@
     "detail": "Stop details",
     "edit": "Edit stop",
     "errors": {
-      "createFailed": "Unable to create the stop.",
-      "deleteFailed": "Unable to delete the stop.",
-      "loadFailed": "No stops saved.",
       "placeNotFound": "Place not found, choose one from the list.",
-      "updateFailed": "Unable to edit the stop."
+      "step_before_travel": "The stop cannot start before the trip begins.",
+      "step_after_travel": "The stop cannot end after the trip ends.",
+      "step_dates_overlap": "The dates of this stop overlap with another stop."
     },
     "fromTo": "from {{start}} to {{end}}",
     "list": "List",
@@ -431,14 +497,15 @@
     "createTravel": "Create a trip",
     "creating": "Creating...",
     "errors": {
-      "createFailed": "Could not create the trip.",
       "datesRequired": "Select dates before confirming.",
-      "joinFailed": "Could not join the trip.",
-      "leaveFailed": "Could not leave the trip.",
+      "invalid_invitation_link": "This invitation link is invalid.",
       "notFound": "No trip found.",
-      "sameDates": "Select an end date different from the start date ». profilec",
+      "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
-      "unknown": "The trip does not exist."
+      "not_travel_participant": "You must be a member of this trip to perform this action.",
+      "title": {
+        "max_length": "Title too long."
+      }
     },
     "haveInviteLink": "I have an invitation link",
     "invitation": "INVITATION TO JOIN",

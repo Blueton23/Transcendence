@@ -7,14 +7,13 @@ import type {
 } from "@/features/idea/types";
 
 import { getCookie } from "@/shared/api/cookies";
-import { translateIdeaError } from "./ideaErrors";
 import i18n from "@/i18n";
 
 import {
   mapIdeaFromApi,
   mapCreateIdeaToApi,
 } from "@/features/idea/api/ideaMapper";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 
 // Récupérer les idées du voyage
 export async function fetchIdeas(travelId: number): Promise<Idea[]> {
@@ -64,8 +63,7 @@ export async function postIdea(
     body: JSON.stringify(payload),
   });
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -93,8 +91,7 @@ export async function patchIdea(
     body: JSON.stringify(payload),
   });
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -162,8 +159,7 @@ export async function patchIdeaPlacement(
     body: JSON.stringify(payload),
   });
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -189,8 +185,7 @@ export async function chooseIdea(
     },
   );
 
-  const data =
-    await parseResponse<IdeaApiResponse>(response).catch(translateIdeaError);
+  const data = await parseResponse<IdeaApiResponse>(response);
   return mapIdeaFromApi(data);
 }
 
@@ -215,7 +210,9 @@ export async function addIdeaReaction(
       },
     },
   );
-  await parseResponse<unknown>(response);
+  if (!response.ok) {
+    await parseResponse<unknown>(response);
+  }
 }
 
 // Retirer le vote sur une idée du voyage

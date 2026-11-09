@@ -203,5 +203,13 @@ def validate_no_dates_overlap(travel, start, end, exclude_pk=None):
         )
         .exclude(pk=exclude_pk)
     )
+
     if conflicts.exists():
-        raise ValidationError({"start_date": "Overlaps with another step"})
+        raise ValidationError(
+            {
+                "start_date": ValidationError(
+                    "Overlaps with another step",
+                    code="step_dates_overlap",
+                )
+            }
+        )
