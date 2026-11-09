@@ -810,14 +810,10 @@ class TravelViewTest(APITestCase):
             Participation.objects.filter(
                 traveler=self.other_traveler,
                 travel=self.mon_voyage,
-                status=ParticipationStatus.ACCEPTED,
+                status=ParticipationStatus.INVITED,
             ).exists()
         )
-        self.assertTrue(
-            Message.objects.filter(
-                travel=self.mon_voyage, system_key=SystemMessageKey.PARTICIPANT_JOINED
-            ).exists()
-        )
+        self.assertFalse(Message.objects.filter(travel=self.mon_voyage).exists())
 
     def test_add_friend_who_left(self):
         self.befriend()
@@ -835,8 +831,7 @@ class TravelViewTest(APITestCase):
             traveler=self.other_traveler,
             travel=self.mon_voyage,
         )
-        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
-        self.assertIsNone(participation.left_at)
+        self.assertEqual(participation.status, ParticipationStatus.INVITED)
 
     def test_add_not_friend_returns_400(self):
         response = self.add_participant(self.other_traveler.id)
@@ -874,6 +869,114 @@ class TravelViewTest(APITestCase):
     def test_add_unknown_traveler_returns_404(self):
         response = self.add_participant(9999999)
         self.assertEqual(response.status_code, 404)
+
+    def test_add_member_changes_nothing(self):
+        self.befriend()
+        Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 204)
+        participation = Participation.objects.get(
+            traveler=self.other_traveler, travel=self.mon_voyage
+        )
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+
+    def test_add_freind_who_refused_returns_400(self):
+        self.befriend()
+        Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.REFUSED,
+        )
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_invited_friend_accepts_with_join(self):
+        self.befriend()
+        self.add_participant(self.other_traveler.id)
+        self.client.force_authenticate(user=self.other_traveler)
+
+        response = self.client.post(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        participation = Participation.objects.get(
+            traveler=self.other_traveler, travel=self.mon_voyage
+        )
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+        self.assertTrue(
+            Message.objects.filter(
+                travel=self.mon_voyage, system_key=SystemMessageKey.PARTICIPANT_JOINED
+            ).exists()
+        )
+
+    def test_join_page_says_invited(self):
+        self.befriend()
+        self.add_participant(self.other_traveler.id)
+        self.client.force_authenticate(user=self.other_traveler)
+
+        response = self.client.get(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+
+        self.assertTrue(response.data["is_invited"])
+        self.assertFalse(response.data["is_member"])
+
+    def test_refuse_invitation(self):
+        self.befriend()
+        self.add_participant(self.other_traveler.id)
+        self.client.force_authenticate(user=self.other_traveler)
+
+        response = self.client.post(
+            reverse(
+                "travel-refuse-invitation",
+                kwargs={"token": self.mon_voyage.invite_token},
+            )
+        )
+
+        self.assertEqual(response.status_code, 204)
+        participation = Participation.objects.get(
+            traveler=self.other_traveler, travel=self.mon_voyage
+        )
+        self.assertEqual(participation.status, ParticipationStatus.REFUSED)
+
+    def test_refuse_without_invitation_returns_404(self):
+        self.client.force_authenticate(user=self.other_traveler)
+
+        response = self.client.post(
+            reverse(
+                "travel-refuse-invitation",
+                kwargs={"token": self.mon_voyage.invite_token},
+            )
+        )
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_invitations_lists_my_pending_invitations(self):
+        self.befriend()
+        self.add_participant(self.other_traveler.id)
+        self.client.force_authenticate(user=self.other_traveler)
+
+        response = self.client.get(reverse("travel-invitations"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data,
+            [
+                {
+                    "travel_id": self.mon_voyage.id,
+                    "travel_title": "Mon voyage",
+                    "invite_token": self.mon_voyage.invite_token,
+                }
+            ],
+        )
 
     # Test for LeaveTravelView
     def test_traveler_leaves_travel(self):
