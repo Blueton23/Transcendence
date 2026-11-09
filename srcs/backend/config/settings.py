@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "rest_framework.authtoken",
     "rest_framework",
     "drf_spectacular",
+    "drf_standardized_errors",
     "common",
     "traveler",
     "travel",
@@ -58,6 +59,7 @@ AUTH_USER_MODEL = "traveler.Traveler"
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -136,7 +138,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
-    "EXCEPTION_HANDLER": "common.exceptions.custom_exception_handler",
+    "EXCEPTION_HANDLER": "drf_standardized_errors.handler.exception_handler",
     # Conversion automatique snake_case <-> camelCase aux frontières HTTP
     "DEFAULT_RENDERER_CLASSES": [
         "djangorestframework_camel_case.render.CamelCaseJSONRenderer",

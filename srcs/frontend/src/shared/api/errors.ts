@@ -1,60 +1,70 @@
 import i18n from "@/i18n";
 
-export interface ApiErrorResponse {
-  status?: number;
+export interface ApiError {
   code?: string;
-  message?: string;
   detail?: string;
-  details?: Record<string, string[]> | null;
+  attr?: string | null;
 }
 
-export function getApiErrorMessage(result: ApiErrorResponse): string {
-  if (result.details) {
-    return Object.entries(result.details)
-      .map(([field, messages]) => `${field} : ${messages.join(", ")}`)
-      .join("\n");
-  }
-
-  return result.detail ?? result.message ?? i18n.t("errors.unexpected");
+export interface ApiErrorResponse {
+  type?: string;
+  errors?: ApiError[];
 }
 
-export async function parseResponse<T>(response: Response): Promise<T> {
-  const contentType = response.headers.get("content-type");
+const ERROR_SCOPES = [
+  "auth.errors",
+  "friendship.errors",
+  "chat.errors",
+  "idea.errors",
+  "profile.errors",
+  "spending.errors",
+  "step.errors",
+  "travel.errors",
+  "errors",
+];
 
-  if (!response.ok) {
-    const rawBody = await response.text();
+function translateCode(code: string, attr?: string | null): string | undefined {
+  // Priorité aux erreurs spécifiques à un champ
+  if (attr) {
+    for (const scope of ERROR_SCOPES) {
+      const attrKey = `${scope}.${attr}.${code}`;
 
-    console.error("API ERROR", {
-      status: response.status,
-      statusText: response.statusText,
-      contentType,
-      body: rawBody,
-    });
-
-    if (contentType?.includes("application/json")) {
-      let result: ApiErrorResponse;
-
-      try {
-        result = JSON.parse(rawBody) as ApiErrorResponse;
-      } catch {
-        throw new Error(rawBody || i18n.t("errors.server"));
+      if (i18n.exists(attrKey)) {
+        return i18n.t(attrKey);
       }
-
-      throw new Error(getApiErrorMessage(result));
     }
-
-    throw new Error(
-      rawBody ||
-        i18n.t("errors.serverWithStatus", {
-          status: response.status,
-          statusText: response.statusText,
-        }),
-    );
   }
 
-  if (contentType?.includes("application/json")) {
-    return response.json() as Promise<T>;
+  // Sinon, recherche des erreurs génériques
+  for (const scope of ERROR_SCOPES) {
+    const key = `${scope}.${code}`;
+
+    if (i18n.exists(key)) {
+      return i18n.t(key);
+    }
   }
 
-  throw new Error(i18n.t("errors.invalidResponse"));
+  return undefined;
+}
+
+function getErrorMessage(error: ApiError): string {
+  if (error.code) {
+    const translated = translateCode(error.code, error.attr);
+
+    if (translated !== undefined) {
+      return translated;
+    }
+  }
+
+  return error.detail || i18n.t("errors.unexpected");
+}
+
+export function getApiErrorMessage(response: ApiErrorResponse): string {
+  if (!response.errors?.length) {
+    return i18n.t("errors.unexpected");
+  }
+
+  const messages = response.errors.map(getErrorMessage);
+
+  return [...new Set(messages)].join("\n");
 }

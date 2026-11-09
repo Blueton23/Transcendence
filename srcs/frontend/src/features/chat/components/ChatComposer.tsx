@@ -4,6 +4,7 @@ import type { FormEvent, KeyboardEvent } from "react";
 import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
+import { useTranslation } from "react-i18next";
 
 interface ChatComposerProps {
   onSend: (body: string) => Promise<void>;
@@ -13,6 +14,7 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
   const [body, setBody] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -31,12 +33,8 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
 
       // Conserver le focus pour écrire le message suivant.
       requestAnimationFrame(() => textareaRef.current?.focus());
-    } catch (sendError) {
-      setError(
-        sendError instanceof Error
-          ? sendError.message
-          : "Impossible d'envoyer le message.",
-      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : null);
     } finally {
       setIsSending(false);
     }
@@ -66,7 +64,7 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
           value={body}
           onChange={(event) => setBody(event.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Écrire un message…"
+          placeholder={t("chat.placeholder")}
           maxLength={2000}
           disabled={isSending}
           aria-describedby={error ? "chat-message-error" : undefined}
@@ -80,14 +78,14 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
         >
           <span className="inline-flex items-center gap-2">
             <Icon name="arrow" size={16} />
-            {isSending ? "Envoi…" : "Envoyer"}
+            {isSending ? t("chat.sending") : t("chat.send")}
           </span>
         </Button>
       </div>
 
       {error && (
         <div id="chat-message-error" role="alert" className="mt-2">
-          <Text tone="accent" size="sm">
+          <Text tone="accent" size="sm" className="whitespace-pre-line">
             {error}
           </Text>
         </div>

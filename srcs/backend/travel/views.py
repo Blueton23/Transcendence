@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
@@ -32,11 +33,21 @@ from .schema import (
 from .serializers import StepSerializer, TravelSerializer
 
 
+def get_invited_travel(token):
+    try:
+        return Travel.objects.get(invite_token=token)
+    except Travel.DoesNotExist as exc:
+        raise NotFound(
+            "Invalid invitation link.",
+            code="invalid_invitation_link",
+        ) from exc
+
+
 class TravelJoinView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def get(self, request, token):
-        travel = get_object_or_404(Travel, invite_token=token)
+        travel = get_invited_travel(token)
         data = TravelSerializer(travel).data
         data["is_member"] = travel.participations.filter(
             traveler=request.user,
@@ -45,7 +56,7 @@ class TravelJoinView(APIView):
         return Response(data)
 
     def post(self, request, token):
-        travel = get_object_or_404(Travel, invite_token=token)
+        travel = get_invited_travel(token)
         with transaction.atomic():
             participation, created = (
                 Participation.objects.select_for_update().get_or_create(
@@ -104,6 +115,12 @@ class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPI
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
+    def perform_update(self, serializer):
+        travel = serializer.save()
+        broadcast(
+            travel_group(travel.id), "travel.updated", TravelSerializer(travel).data
+        )
+
 
 def broadcast_step(event_type, step):
     broadcast(travel_group(step.travel_id), event_type, StepSerializer(step).data)
@@ -141,6 +158,11 @@ class StepDetailView(
         broadcast_step("step.updated", serializer.save())
 
     def perform_destroy(self, instance):
+        if instance.spendings.exists():
+            raise ValidationError(
+                "This stop has expenses: move or delete them first",
+                code="step_has_spending",
+            )
         instance.soft_delete()
         # Ideas placed on this step go back to the pool: clients refetch them.
         broadcast(travel_group(instance.travel_id), "step.deleted", {"id": instance.id})
