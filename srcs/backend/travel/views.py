@@ -125,6 +125,25 @@ class AddParticipantView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+class TravelInvitationsView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get(self, request):
+        participations = Participation.objects.filter(
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        ).select_related("travel")
+        data = [
+            {
+                "travel_id": participation.travel_id,
+                "travel_title": participation.travel.title,
+                "invite_token": participation.travel.invite_token,
+            }
+            for participation in participations
+        ]
+        return Response(data)
+
+
 PARTICIPANT_MESSAGES = {
     "joined": SystemMessageKey.PARTICIPANT_JOINED,
     "left": SystemMessageKey.PARTICIPANT_LEFT,

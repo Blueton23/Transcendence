@@ -7,6 +7,7 @@ from .views import (
     StepDetailView,
     StepListView,
     TravelDetailView,
+    TravelInvitationsView,
     TravelJoinView,
     TravelListView,
 )
@@ -20,6 +21,7 @@ urlpatterns = [
         RefuseInvitationView.as_view(),
         name="travel-refuse-invitation",
     ),
+    path("invitations/", TravelInvitationsView.as_view(), name="travel-invitations"),
     path(
         "<int:travel_id>/participants/",
         AddParticipantView.as_view(),
