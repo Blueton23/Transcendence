@@ -5,6 +5,7 @@ from .models import Participation, ParticipationStatus
 
 class IsTravelParticipant(BasePermission):
     message = "Vous devez être membre du voyage."
+    code = "not_travel_participant"
 
     def has_permission(self, request, view):
         travel_id = view.kwargs.get("travel_id")

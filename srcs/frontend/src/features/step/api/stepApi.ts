@@ -1,7 +1,7 @@
 import type { Step, CreateStepData } from "@/features/step/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
-import { getApiErrorMessage } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 
 const API_BASE_URL = "/api";
 
@@ -11,13 +11,7 @@ export async function getSteps(travelId: number): Promise<Step[]> {
     credentials: "include",
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("step.errors.loadFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Step[]>(response);
 }
 
 export async function createStep(
@@ -40,13 +34,7 @@ export async function createStep(
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("step.errors.createFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Step>(response);
 }
 
 export async function updateStep(
@@ -73,13 +61,7 @@ export async function updateStep(
     },
   );
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("step.errors.updateFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Step>(response);
 }
 
 export async function deleteStep(
@@ -98,16 +80,12 @@ export async function deleteStep(
       method: "DELETE",
       credentials: "include",
       headers: {
-        "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
       },
     },
   );
 
   if (!response.ok) {
-    const result = await response.json();
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("step.errors.deleteFailed"),
-    );
+    await parseResponse<unknown>(response);
   }
 }

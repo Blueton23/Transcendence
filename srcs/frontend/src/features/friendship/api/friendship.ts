@@ -6,7 +6,7 @@ import type {
 } from "../types";
 
 import { getCookie } from "@/shared/api/cookies";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 import i18n from "@/i18n";
 
 const API_BASE_URL = "/api";
@@ -39,6 +39,7 @@ export async function sendFriendRequest(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify({
       user_id: userId,
@@ -70,6 +71,7 @@ export async function acceptFriendRequest(friendshipId: number): Promise<void> {
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
@@ -90,6 +92,7 @@ export async function removeFriendRequest(friendshipId: number): Promise<void> {
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );

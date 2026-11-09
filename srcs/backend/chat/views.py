@@ -25,8 +25,13 @@ class ChatParticipationMixin:
             traveler=self.request.user,
             status__in=[ParticipationStatus.ACCEPTED, ParticipationStatus.LEFT],
         ).first()
+
         if participation is None:
-            raise PermissionDenied("Vous n'avez pas accès à ce voyage.")
+            raise PermissionDenied(
+                "You do not have access to this trip.",
+                code="travel_chat_access_denied",
+            )
+
         return participation
 
 
@@ -54,15 +59,17 @@ class TravelMessageListCreateView(ChatParticipationMixin, APIView):
         serializer = MessageSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        message = Message(
+        message = serializer.save(
             travel_id=travel_id,
             traveler=request.user,
-            body=serializer.validated_data["body"],
         )
-        message.save()
+
         broadcast_message(message)
 
-        return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
+        return Response(
+            MessageSerializer(message).data,
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class TravelUnreadCountView(ChatParticipationMixin, APIView):

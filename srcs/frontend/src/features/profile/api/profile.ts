@@ -10,28 +10,10 @@ import type {
 
 import { getCsrfToken } from "@/features/auth/api/auth";
 import { getCookie } from "@/shared/api/cookies";
-import { parseResponse } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 import i18n from "@/i18n";
 
 const API_BASE_URL = "/api";
-
-function translateErrorMail(error: unknown): never {
-  if (error instanceof Error) {
-    const message = error.message
-      .replace(
-        "Un compte Google est déjà associé à cette adresse email.",
-        i18n.t("auth.errors.googleAccountExists"),
-      )
-      .replace(
-        "Un compte existe déjà avec cette adresse email.",
-        i18n.t("auth.errors.emailExists"),
-      );
-
-    throw new Error(message);
-  }
-
-  throw error;
-}
 
 export async function signup(data: SignupData): Promise<SignupResponse> {
   await getCsrfToken();
@@ -46,11 +28,12 @@ export async function signup(data: SignupData): Promise<SignupResponse> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
 
-  return parseResponse<SignupResponse>(response).catch(translateErrorMail);
+  return parseResponse<SignupResponse>(response);
 }
 
 export async function modifyProfile(
@@ -67,6 +50,7 @@ export async function modifyProfile(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -88,6 +72,7 @@ export async function modifyPassword(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -115,6 +100,7 @@ export async function modifyProfilePicture(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: formData,
     },

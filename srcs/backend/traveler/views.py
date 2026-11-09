@@ -1,5 +1,3 @@
-# views.py
-
 import logging
 from typing import ClassVar
 
@@ -21,6 +19,12 @@ from drf_spectacular.utils import extend_schema
 from joserfc.errors import JoseError
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+from rest_framework.exceptions import (
+    AuthenticationFailed,
+    NotFound,
+    PermissionDenied,
+    ValidationError,
+)
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -32,12 +36,12 @@ from common.realtime import broadcast, user_group
 from .models import Friendship, Status
 from .schema import api_token_schema
 from .serializers import (
+    FriendshipCreateSerializer,
     LoginSerializer,
     TravelerCreateSerializer,
     TravelerSerializer,
     TravelerUpdatePasswordSerializer,
     TravelerUpdateProfilePictureSerializer,
-    TravelerUpdateSerializer,
 )
 
 Traveler = get_user_model()
@@ -60,7 +64,7 @@ class TravelerPingView(APIView):
     def get(self, request: Request) -> Response:
         return Response(
             {
-                "message": "[temp]Traveler API is running",
+                "message": "The traveler API is running.",
                 "status": "ok",
             }
         )
@@ -80,9 +84,7 @@ class TravelerCreateView(APIView):
             email=serializer.validated_data["email"],
         )
 
-        traveler.set_password(
-            serializer.validated_data["password"],
-        )
+        traveler.set_password(serializer.validated_data["password"])
         traveler.save()
 
         return Response(
@@ -102,7 +104,7 @@ class TravelerUpdateView(APIView):
     def patch(self, request: Request) -> Response:
         traveler = request.user
 
-        serializer = TravelerUpdateSerializer(
+        serializer = TravelerSerializer(
             traveler,
             data=request.data,
             partial=True,
@@ -113,7 +115,7 @@ class TravelerUpdateView(APIView):
 
         return Response(
             {
-                "traveler": TravelerUpdateSerializer(
+                "traveler": TravelerSerializer(
                     traveler,
                     context={"request": request},
                 ).data,
@@ -166,9 +168,7 @@ class TravelerUpdatePasswordView(APIView):
         update_session_auth_hash(request, request.user)
 
         return Response(
-            {
-                "detail": "Mot de passe modifié avec succès.",
-            },
+            {"detail": "Password updated successfully."},
             status=status.HTTP_200_OK,
         )
 
@@ -180,21 +180,16 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        username = serializer.validated_data["username"]
-        password = serializer.validated_data["password"]
-
         traveler = authenticate(
             request=request,
-            username=username,
-            password=password,
+            username=serializer.validated_data["username"],
+            password=serializer.validated_data["password"],
         )
 
         if traveler is None:
-            return Response(
-                {
-                    "detail": "Identifiants invalides.",
-                },
-                status=status.HTTP_401_UNAUTHORIZED,
+            raise AuthenticationFailed(
+                "Invalid username or password.",
+                code="invalid_credentials",
             )
 
         login(request, traveler)
@@ -205,6 +200,41 @@ class LoginView(APIView):
                     traveler,
                     context={"request": request},
                 ).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+@extend_schema(tags=["Auth"])
+@api_token_schema
+class ApiTokenView(APIView):
+    authentication_classes: ClassVar[list] = []
+    permission_classes: ClassVar[list] = [AllowAny]
+    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
+    throttle_scope = "auth_token"
+    public_api = True
+
+    def post(self, request: Request) -> Response:
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        traveler = authenticate(
+            request=request,
+            username=serializer.validated_data["username"],
+            password=serializer.validated_data["password"],
+        )
+
+        if traveler is None:
+            raise AuthenticationFailed(
+                "Invalid username or password.",
+                code="invalid_credentials",
+            )
+
+        token, _ = Token.objects.get_or_create(user=traveler)
+
+        return Response(
+            {
+                "token": token.key,
             },
             status=status.HTTP_200_OK,
         )
@@ -232,9 +262,7 @@ class LogoutView(APIView):
         logout(request)
 
         return Response(
-            {
-                "message": "Déconnexion réussie.",
-            },
+            {"message": "Logged out successfully."},
             status=status.HTTP_200_OK,
         )
 
@@ -246,9 +274,7 @@ class CsrfTokenView(APIView):
         get_token(request)
 
         return Response(
-            {
-                "message": "CSRF token initialized.",
-            },
+            {"message": "CSRF protection initialized successfully."},
             status=status.HTTP_200_OK,
         )
 
@@ -259,28 +285,22 @@ class FriendshipSearchView(APIView):
     def get(self, request: Request) -> Response:
         query = request.query_params.get("q", "").strip()
 
-        if not query:
-            return Response(
-                {"detail": "Veuillez saisir un username ou un email."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        if len(query) < 2:
+            return Response({"travelers": []})
 
-        traveler = (
-            Traveler.objects.filter(Q(username__iexact=query) | Q(email__iexact=query))
+        travelers = (
+            Traveler.objects.filter(
+                username__icontains=query,
+            )
             .exclude(pk=request.user.pk)
-            .first()
+            .order_by("username")[:10]
         )
-
-        if traveler is None:
-            return Response(
-                {"detail": "Aucun utilisateur trouvé."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
 
         return Response(
             {
-                "traveler": TravelerSerializer(
-                    traveler,
+                "travelers": TravelerSerializer(
+                    travelers,
+                    many=True,
                     context={"request": request},
                 ).data,
             },
@@ -304,61 +324,44 @@ class FriendshipRequestView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def post(self, request: Request) -> Response:
+        serializer = FriendshipCreateSerializer(
+            data=request.data,
+        )
+        serializer.is_valid(raise_exception=True)
+
         user = request.user
-        user_id = request.data.get("user_id")
-
-        if not user_id:
-            return Response(
-                {"detail": "L'utilisateur est requis."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        try:
-            user_id = int(user_id)
-        except (ValueError, TypeError):
-            return Response(
-                {"error": "user_id doit etre un entier valide"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        user_id = serializer.validated_data["user_id"]
 
         try:
             target = Traveler.objects.get(pk=user_id)
-        except Traveler.DoesNotExist:
-            return Response(
-                {"detail": "Utilisateur introuvable."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        except Traveler.DoesNotExist as exc:
+            raise NotFound(
+                "User not found.",
+                code="user_not_found",
+            ) from exc
 
         if target.pk == user.pk:
-            return Response(
-                {"detail": "Vous ne pouvez pas vous envoyer une demande d'amitié."},
-                status=status.HTTP_400_BAD_REQUEST,
+            raise ValidationError(
+                "You cannot send a friend request to yourself.",
+                code="cannot_friend_yourself",
             )
 
         user1_id = min(user.pk, target.pk)
         user2_id = max(user.pk, target.pk)
 
-        if Friendship.objects.filter(
-            user1_id=user1_id,
-            user2_id=user2_id,
-        ).exists():
-            return Response(
-                {"detail": "Une relation existe déjà avec cet utilisateur."},
-                status=status.HTTP_409_CONFLICT,
-            )
-
         try:
-            friendship = Friendship.objects.create(
-                user1_id=user1_id,
-                user2_id=user2_id,
-                requested_by=user,
-                status=Status.PENDING,
-            )
-        except IntegrityError:
-            return Response(
-                {"detail": "Une relation existe déjà avec cet utilisateur."},
-                status=status.HTTP_409_CONFLICT,
-            )
+            with transaction.atomic():
+                friendship = Friendship.objects.create(
+                    user1_id=user1_id,
+                    user2_id=user2_id,
+                    requested_by=user,
+                    status=Status.PENDING,
+                )
+        except IntegrityError as exc:
+            raise ValidationError(
+                "A friendship or friend request already exists.",
+                code="relationship_exists",
+            ) from exc
         notify_friendship("requested", friendship)
 
         return Response(
@@ -420,25 +423,25 @@ class FriendshipAcceptView(APIView):
                 pk=friendship_id,
                 status=Status.PENDING,
             )
-        except Friendship.DoesNotExist:
-            return Response(
-                {"detail": "Demande d'amitié introuvable."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        except Friendship.DoesNotExist as exc:
+            raise NotFound(
+                "Friend request not found.",
+                code="friend_request_not_found",
+            ) from exc
 
         if request.user.pk == friendship.requested_by_id:
-            return Response(
-                {"detail": "Vous ne pouvez pas accepter votre propre demande."},
-                status=status.HTTP_403_FORBIDDEN,
+            raise PermissionDenied(
+                "You cannot accept your own friend request.",
+                code="cannot_accept_own_request",
             )
 
         if request.user.pk not in {
             friendship.user1_id,
             friendship.user2_id,
         }:
-            return Response(
-                {"detail": "Vous n'êtes pas concerné par cette demande."},
-                status=status.HTTP_403_FORBIDDEN,
+            raise PermissionDenied(
+                "You are not a participant in this friend request.",
+                code="not_friend_request_participant",
             )
 
         friendship.status = Status.ACCEPTED
@@ -446,7 +449,7 @@ class FriendshipAcceptView(APIView):
         notify_friendship("accepted", friendship)
 
         return Response(
-            {"detail": "Demande d'amitié acceptée."},
+            {"detail": "Friend request accepted successfully."},
             status=status.HTTP_200_OK,
         )
 
@@ -459,19 +462,19 @@ class FriendshipRemoveView(APIView):
             friendship = Friendship.objects.get(
                 pk=friendship_id,
             )
-        except Friendship.DoesNotExist:
-            return Response(
-                {"detail": "Amitié introuvable."},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        except Friendship.DoesNotExist as exc:
+            raise NotFound(
+                "Friendship not found.",
+                code="friendship_not_found",
+            ) from exc
 
         if request.user.pk not in {
             friendship.user1_id,
             friendship.user2_id,
         }:
-            return Response(
-                {"detail": "Vous n'êtes pas concerné par cette relation"},
-                status=status.HTTP_403_FORBIDDEN,
+            raise PermissionDenied(
+                "You are not a participant in this friendship.",
+                code="not_friendship_participant",
             )
 
         with transaction.atomic():
@@ -480,7 +483,7 @@ class FriendshipRemoveView(APIView):
             friendship.delete()
 
         return Response(
-            {"detail": "Amitié supprimée."},
+            {"detail": "Friendship removed successfully."},
             status=status.HTTP_200_OK,
         )
 
@@ -521,46 +524,6 @@ class FriendshipListView(APIView):
 
         return Response(
             {"friendships": friendship_list},
-            status=status.HTTP_200_OK,
-        )
-
-
-# ===================================================================#
-
-# Connexion avec Token (swagger)
-
-
-@extend_schema(tags=["Auth"])
-@api_token_schema
-class ApiTokenView(APIView):
-    authentication_classes: ClassVar[list] = []
-    permission_classes: ClassVar[list] = [AllowAny]
-    throttle_classes: ClassVar[list] = [ScopedRateThrottle]
-    throttle_scope = "auth_token"
-    public_api = True
-
-    def post(self, request: Request) -> Response:
-        serializer = LoginSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        traveler = authenticate(
-            request=request,
-            username=serializer.validated_data["username"],
-            password=serializer.validated_data["password"],
-        )
-
-        if traveler is None:
-            return Response(
-                {"detail": "Identifiants invalides."},
-                status=status.HTTP_401_UNAUTHORIZED,
-            )
-
-        token, _ = Token.objects.get_or_create(user=traveler)
-
-        return Response(
-            {
-                "token": token.key,
-            },
             status=status.HTTP_200_OK,
         )
 

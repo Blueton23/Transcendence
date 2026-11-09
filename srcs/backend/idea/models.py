@@ -111,10 +111,17 @@ class Idea(TimeStampedModel, ValidatedModel):
 
     def clean(self) -> None:
         super().clean()
-        errors: dict[str, str] = {}
+        errors: dict[str, list[ValidationError]] = {}
+
+        def add_error(field: str, message: str, code: str) -> None:
+            errors.setdefault(field, []).append(ValidationError(message, code=code))
 
         if self.step_id and self.travel_id and self.step.travel_id != self.travel_id:
-            errors["step"] = "The step must belong to the same travel as the idea."
+            add_error(
+                "step",
+                "The step must belong to the same travel as the idea.",
+                "step_not_in_travel",
+            )
 
         if (
             self.step_id
@@ -126,28 +133,60 @@ class Idea(TimeStampedModel, ValidatedModel):
                 or self.end_date > self.step.end_date
             )
         ):
-            errors["step"] = "The idea dates must be within the step dates."
+            add_error(
+                "step",
+                "The idea dates must be within the step dates.",
+                "dates_outside_step",
+            )
 
         if self.type != IdeaType.LODGING and self.price_per_night is not None:
-            errors["price_per_night"] = "Only a lodging can have a price per night."
+            add_error(
+                "price_per_night",
+                "Only a lodging can have a price per night.",
+                "price_only_for_lodging",
+            )
 
         if self.chosen_at is not None and (
             self.type != IdeaType.LODGING or self.is_in_pool
         ):
-            errors["chosen_at"] = "Only a lodging placed on a step can be chosen."
+            add_error(
+                "chosen_at",
+                "Only a lodging placed on a step can be chosen.",
+                "invalid_chosen_idea",
+            )
 
         if bool(self.start_date) != bool(self.end_date):
-            errors["end_date"] = "Both dates must be set together, or neither."
+            add_error(
+                "end_date",
+                "Both dates must be set together, or neither.",
+                "dates_must_be_together",
+            )
         elif self.start_date and self.end_date:
             if self.type != IdeaType.LODGING:
                 if self.is_in_pool:
-                    errors["start_date"] = "An idea in the pool cannot have dates."
+                    add_error(
+                        "start_date",
+                        "An idea in the pool cannot have dates.",
+                        "pool_idea_has_dates",
+                    )
                 elif self.start_date != self.end_date:
-                    errors["end_date"] = "A non-lodging idea only spans a single day."
+                    add_error(
+                        "end_date",
+                        "A non-lodging idea only spans a single day.",
+                        "single_day_only",
+                    )
         elif self.type == IdeaType.LODGING:
-            errors["start_date"] = "A lodging must always have dates."
+            add_error(
+                "start_date",
+                "A lodging must always have dates.",
+                "lodging_dates_required",
+            )
         elif not self.is_in_pool:
-            errors["start_date"] = "An idea placed on a step must have dates."
+            add_error(
+                "start_date",
+                "An idea placed on a step must have dates.",
+                "placed_idea_dates_required",
+            )
 
         if (
             self.type == IdeaType.LODGING
@@ -157,9 +196,18 @@ class Idea(TimeStampedModel, ValidatedModel):
             and self.end_date
         ):
             if self.start_date < self.travel.start_date:
-                errors["start_date"] = "The lodging cannot start before the travel."
+                add_error(
+                    "start_date",
+                    "The lodging cannot start before the travel.",
+                    "lodging_before_travel",
+                )
+
             if self.end_date > self.travel.end_date:
-                errors["end_date"] = "The lodging cannot end after the travel."
+                add_error(
+                    "end_date",
+                    "The lodging cannot end after the travel.",
+                    "lodging_after_travel",
+                )
 
         if (
             self.type == IdeaType.LODGING
@@ -167,7 +215,11 @@ class Idea(TimeStampedModel, ValidatedModel):
             and self.end_date
             and self.start_date == self.end_date
         ):
-            errors["end_date"] = "A lodging must span at least one night."
+            add_error(
+                "end_date",
+                "A lodging must span at least one night.",
+                "lodging_min_one_night",
+            )
 
         if errors:
             raise ValidationError(errors)
@@ -189,11 +241,13 @@ class Idea(TimeStampedModel, ValidatedModel):
                 .exclude(pk=self.pk)
                 .exists()
             )
+
             if overlapping:
                 raise ValidationError(
                     {
-                        "start_date": (
-                            "Another chosen lodging on this step overlaps these dates."
+                        "start_date": ValidationError(
+                            "Another chosen lodging on this step overlaps these dates.",
+                            code="lodging_overlap",
                         )
                     }
                 )
