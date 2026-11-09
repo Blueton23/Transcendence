@@ -1,4 +1,6 @@
+import { getInvitation } from "@/features/travel/api/travelApi";
 import { extractToken } from "@/features/travel/utils/extractToken";
+import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
 import Divider from "@/shared/ui/Divider";
@@ -19,6 +21,19 @@ interface ChoiceScreenProps {
 export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
   const [link, setLink] = useState("");
   const { t } = useTranslation();
+  const { submit, isSubmitting, error } = useSubmitAction(async () => {
+    const token = extractToken(link);
+    if (!token) throw new Error(t("travel.errors.invalid_invitation_link"));
+    await getInvitation(token);
+    return token;
+  });
+
+  async function handleJoin() {
+    const result = await submit();
+    if (result.success && result.data) {
+      onJoin(result.data);
+    }
+  }
   return (
     <div className="flex flex-col gap-5">
       <Card
@@ -43,10 +58,15 @@ export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
           onChange={(e) => setLink(e.target.value)}
           placeholder="peripl.app/join/…"
         ></Input>
-        <Button variant="dark" onClick={() => onJoin(extractToken(link))}>
+        <Button
+          variant="dark"
+          onClick={() => void handleJoin()}
+          disabled={isSubmitting}
+        >
           {t("actions.continue")}
         </Button>
       </div>
+      {error && <Text tone="accent">{error}</Text>}
     </div>
   );
 }
