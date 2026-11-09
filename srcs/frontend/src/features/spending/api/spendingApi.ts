@@ -5,7 +5,7 @@ import type {
 } from "@/features/spending/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
-import { getApiErrorMessage } from "@/shared/api/errors";
+import { parseResponse } from "@/shared/api/parseResponse";
 
 const API_BASE_URL = "/api";
 
@@ -18,13 +18,7 @@ export async function getSpendings(travelId: number): Promise<Spending[]> {
     },
   );
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("spending.errors.loadFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Spending[]>(response);
 }
 
 export async function createSpending(
@@ -50,13 +44,7 @@ export async function createSpending(
     },
   );
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("spending.errors.createFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Spending>(response);
 }
 
 export async function updateSpending(
@@ -83,13 +71,7 @@ export async function updateSpending(
     },
   );
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("spending.errors.updateFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Spending>(response);
 }
 
 export async function deleteSpending(
@@ -115,10 +97,7 @@ export async function deleteSpending(
   );
 
   if (!response.ok) {
-    const result = await response.json();
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("spending.errors.deleteFailed"),
-    );
+    await parseResponse<unknown>(response);
   }
 }
 
@@ -133,11 +112,5 @@ export async function getSpendingSummary(
     },
   );
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("spending.errors.loadFailed"),
-    );
-  }
-  return result;
+  return parseResponse<SpendingSummary>(response);
 }

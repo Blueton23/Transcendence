@@ -458,10 +458,13 @@
     "edit": "Edit the expense",
     "errors": {
       "amountRequired": "The amount must be greater than 0.",
-      "createFailed": "Unable to create the expense.",
-      "deleteFailed": "Unable to delete the expense.",
-      "loadFailed": "Unable to load the expenses.",
-      "updateFailed": "Unable to edit the expense."
+      "traveler_not_participant": "This traveler is not part of the trip.",
+      "step_not_in_spending_travel": "This stop does not belong to this trip.",
+      "idea_not_in_spending_travel": "This idea does not belong to this trip.",
+      "step_idea_mismatch": "The stop must be the one of the selected idea.",
+      "shares_required": "At least one traveler must share the expense.",
+      "shares_mismatch_total": "The total of the shares must equal the amount.",
+      "spending_travel_change": "An expense cannot be moved to another trip."
     },
     "filters": {
       "allCategories": "All"
@@ -507,7 +510,8 @@
       "placeNotFound": "Place not found, choose one from the list.",
       "step_before_travel": "The stop cannot start before the trip begins.",
       "step_after_travel": "The stop cannot end after the trip ends.",
-      "step_dates_overlap": "The dates of this stop overlap with another stop."
+      "step_dates_overlap": "The dates of this stop overlap with another stop.",
+      "step_has_spending": "This stop has expenses: move or delete them first."
     },
     "fromTo": "from {{start}} to {{end}}",
     "list": "List",

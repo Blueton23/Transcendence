@@ -458,10 +458,13 @@
     "edit": "Editar el gasto",
     "errors": {
       "amountRequired": "El importe debe ser mayor que 0.",
-      "createFailed": "No se pudo crear el gasto.",
-      "deleteFailed": "No se pudo eliminar el gasto.",
-      "loadFailed": "No se pudieron cargar los gastos.",
-      "updateFailed": "No se pudo editar el gasto."
+      "traveler_not_participant": "Este viajero no forma parte del viaje.",
+      "step_not_in_spending_travel": "Esta etapa no pertenece a este viaje.",
+      "idea_not_in_spending_travel": "Esta idea no pertenece a este viaje.",
+      "step_idea_mismatch": "La etapa debe ser la de la idea elegida.",
+      "shares_required": "Al menos un viajero debe compartir el gasto.",
+      "shares_mismatch_total": "El total de las partes debe ser igual al importe.",
+      "spending_travel_change": "Un gasto no puede cambiar de viaje."
     },
     "filters": {
       "allCategories": "Todas"
@@ -507,7 +510,8 @@
       "placeNotFound": "Lugar no encontrado, elige uno de la lista.",
       "step_before_travel": "La etapa no puede comenzar antes del inicio del viaje.",
       "step_after_travel": "La etapa no puede terminar después del final del viaje.",
-      "step_dates_overlap": "Las fechas de esta etapa se solapan con las de otra etapa."
+      "step_dates_overlap": "Las fechas de esta etapa se solapan con las de otra etapa.",
+      "step_has_spending": "Esta etapa tiene gastos: muévelos o elimínalos primero."
     },
     "fromTo": "del {{start}} al {{end}}",
     "list": "Lista",

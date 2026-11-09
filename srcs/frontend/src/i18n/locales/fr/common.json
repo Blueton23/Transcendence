@@ -458,10 +458,13 @@
     "edit": "Modifier la dépense",
     "errors": {
       "amountRequired": "Le montant doit être supérieur à 0.",
-      "createFailed": "Impossible de créer la dépense.",
-      "deleteFailed": "Impossible de supprimer la dépense.",
-      "loadFailed": "Impossible de charger les dépenses.",
-      "updateFailed": "Impossible de modifier la dépense."
+      "traveler_not_participant": "Ce voyageur ne fait pas partie du voyage.",
+      "step_not_in_spending_travel": "Cette étape n'appartient pas à ce voyage.",
+      "idea_not_in_spending_travel": "Cette idée n'appartient pas à ce voyage.",
+      "step_idea_mismatch": "L'étape doit être celle de l'idée choisie.",
+      "shares_required": "Au moins un voyageur doit partager la dépense.",
+      "shares_mismatch_total": "Le total des parts doit être égal au montant.",
+      "spending_travel_change": "Une dépense ne peut pas changer de voyage."
     },
     "filters": {
       "allCategories": "Toutes"
@@ -507,7 +510,8 @@
       "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
       "step_before_travel": "L'étape ne peut pas commencer avant le début du voyage.",
       "step_after_travel": "L'étape ne peut pas se terminer après la fin du voyage.",
-      "step_dates_overlap": "Les dates de cette étape chevauchent celles d'une autre étape."
+      "step_dates_overlap": "Les dates de cette étape chevauchent celles d'une autre étape.",
+      "step_has_spending": "Cette étape a des dépenses : déplace-les ou supprime-les d'abord."
     },
     "fromTo": "du {{start}} au {{end}}",
     "list": "Liste",
