@@ -52,7 +52,7 @@ export function NewTravelModal({ onClose, refetch }: NewTravelModalProps) {
           }}
         />
       )}
-      {screen === "form" && <FormScreen onCreated={handleCreated} />}
+      {screen === "form" && <FormScreen onSuccess={handleCreated} />}
       {screen === "created" && created && (
         <CreatedScreen travel={created} onClose={onClose} />
       )}

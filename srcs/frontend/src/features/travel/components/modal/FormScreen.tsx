@@ -11,11 +11,12 @@ import Icon from "@/shared/ui/Icon";
 import { useTranslation } from "react-i18next";
 
 interface FormScreenProps {
-  onCreated: (travel: Travel) => void;
+  travel?: Travel;
+  onSuccess: (travel: Travel) => void;
 }
 
-export function FormScreen({ onCreated }: FormScreenProps) {
-  const form = useTravelForm({ onCreated });
+export function FormScreen({ travel, onSuccess }: FormScreenProps) {
+  const form = useTravelForm({ travel, onSuccess });
   const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-5">
@@ -54,7 +55,13 @@ export function FormScreen({ onCreated }: FormScreenProps) {
         variant="primary"
         className="w-full md:text-md"
       >
-        {form.isSubmitting ? t("travel.creating") : t("travel.createMyTravel")}
+        {form.isSubmitting
+          ? travel
+            ? t("actions.saving")
+            : t("travel.creating")
+          : travel
+            ? t("actions.save")
+            : t("travel.createMyTravel")}
       </Button>
       {form.error && <Text tone="accent">{form.error}</Text>}
     </div>

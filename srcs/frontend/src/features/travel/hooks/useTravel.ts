@@ -42,6 +42,7 @@ export function useTravel(travelId: number) {
   useTravelEvent("travel.updated", () => void reloadTravel());
   useTravelEvent("participant.joined", () => void reloadTravel());
   useTravelEvent("participant.left", () => void reloadTravel());
+  useTravelEvent("travel.updated", () => void reloadTravel());
 
   return { travel, isLoading, error };
 }

@@ -115,6 +115,12 @@ class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPI
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
+    def perform_update(self, serializer):
+        travel = serializer.save()
+        broadcast(
+            travel_group(travel.id), "travel.updated", TravelSerializer(travel).data
+        )
+
 
 def broadcast_step(event_type, step):
     broadcast(travel_group(step.travel_id), event_type, StepSerializer(step).data)
