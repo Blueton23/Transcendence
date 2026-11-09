@@ -257,7 +257,7 @@
           "title": "5. Qui peut voir vos données",
           "items": [
             "Les participants d'un voyage voient tout son contenu : étapes, idées, coups de cœur, messages, dépenses et soldes.",
-            "Vos amis, les participants de vos voyages et toute personne qui vous recherche avec votre nom d'utilisateur ou votre adresse email exacte voient votre nom d'utilisateur, votre prénom, votre nom, votre adresse email, votre photo de profil et votre statut en ligne.",
+            "Vos amis, les participants de vos voyages et toute personne qui vous recherche avec une partie de votre nom d'utilisateur voient votre nom d'utilisateur, votre prénom, votre nom, votre adresse email, votre photo de profil et votre statut en ligne.",
             "Toute personne disposant d'un compte et du lien d'invitation d'un voyage peut le rejoindre et accéder à son contenu.",
             "Votre arrivée dans un voyage et votre départ sont annoncés automatiquement dans la discussion."
           ]

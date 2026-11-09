@@ -25,7 +25,7 @@ api_token_schema = extend_schema_view(
                 fields={"token": serializers.CharField()},
             ),
             400: OpenApiResponse(description="Champ manquant dans le body."),
-            401: OpenApiResponse(description="Identifiants invalides."),
+            403: OpenApiResponse(description="Accès refusé."),
             429: OpenApiResponse(description="Trop de tentatives (5/minute par IP)."),
         },
     )

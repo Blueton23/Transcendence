@@ -257,7 +257,7 @@
           "title": "5. Who can see your data",
           "items": [
             "A trip's participants see all of its content: stops, ideas, likes, messages, expenses and balances.",
-            "Your friends, the participants of your trips and anyone who searches for your exact username or email address can see your username, first name, last name, email address, profile picture and online status.",
+            "Your friends, the participants in your trips, and anyone who searches for you using part of your username can see your username, your first name, your last name, your email address, your profile picture, and your online status.",
             "Anyone with an account and a trip's invitation link can join it and access its content.",
             "When you join or leave a trip, it is automatically announced in the chat."
           ]
