@@ -610,11 +610,27 @@ class TravelViewTest(APITestCase):
 
     def test_unknown_invite_token(self):
         self.client.force_authenticate(user=self.traveler)
+
         response = self.client.get(
-            reverse("travel-join", kwargs={"token": "im_an_unknown_token"})
+            reverse(
+                "travel-join",
+                kwargs={"token": "im_an_unknown_token"},
+            )
         )
+
         self.assertEqual(response.status_code, 404)
-        self.assertIn("No Travel", response.data["message"])
+        self.assertEqual(response.data["type"], "client_error")
+
+        self.assertEqual(
+            response.data["errors"],
+            [
+                {
+                    "code": "invalid_invitation_link",
+                    "detail": "Invalid invitation link.",
+                    "attr": None,
+                }
+            ],
+        )
 
     def test_traveler_is_not_connected(self):
 
@@ -822,7 +838,11 @@ class StepViewTest(APITestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
-        self.assertIn("start_date", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "start_date",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
     def test_rejects_end_date_after_travel_end_date(self):
         self.client.force_authenticate(user=self.traveler)
@@ -838,7 +858,11 @@ class StepViewTest(APITestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
-        self.assertIn("end_date", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "end_date",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
     def test_rejects_dates_overlaping(self):
         self.client.force_authenticate(user=self.traveler)
@@ -854,7 +878,11 @@ class StepViewTest(APITestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
-        self.assertIn("start_date", response.data["details"])
+        self.assertEqual(response.data["type"], "validation_error")
+        self.assertIn(
+            "start_date",
+            [error["attr"] for error in response.data["errors"]],
+        )
 
     def test_403_is_traveler_has_not_accepted_participation(self):
         other_traveler = Traveler.objects.create_user(

@@ -99,40 +99,75 @@ class Message(TimeStampedModel, ValidatedModel):
 
     def clean(self) -> None:
         super().clean()
-        errors: dict[str, str] = {}
+        errors: dict[str, list[ValidationError]] = {}
+
+        def add_error(field: str, message: str, code: str) -> None:
+            errors.setdefault(field, []).append(ValidationError(message, code=code))
 
         if self.is_system and self.traveler_id:
-            errors["traveler"] = "A system message cannot have an author."
-        # A la creation seulement : un message dont l'auteur a disparu (SET NULL)
-        # ou a ete retire du voyage doit rester modifiable.
+            add_error(
+                "traveler",
+                "A system message cannot have an author.",
+                "system_message_has_author",
+            )
         elif self._state.adding and not self.is_system:
             if not self.traveler_id:
-                errors["traveler"] = "A message must have an author."
+                add_error(
+                    "traveler",
+                    "A message must have an author.",
+                    "message_author_required",
+                )
             elif self.travel_id and not is_travel_member(
                 self.travel_id, self.traveler_id
             ):
-                errors["traveler"] = "The author must be a participant of the travel."
+                add_error(
+                    "traveler",
+                    "The author must be a participant of the travel.",
+                    "message_author_not_member",
+                )
 
-        if self.is_system and not self.system_key:
-            errors["system_key"] = "A system message must have a system key."
-        elif not self.is_system and self.system_key:
-            errors["system_key"] = "Only a system message can have a system key."
-        elif not self.is_system and not self.body:
-            errors["body"] = "A message must have a body."
+        if self.is_system:
+            if not self.system_key:
+                add_error(
+                    "system_key",
+                    "A system message must have a system key.",
+                    "system_key_required",
+                )
+        else:
+            if self.system_key:
+                add_error(
+                    "system_key",
+                    "Only a system message can have a system key.",
+                    "system_key_forbidden",
+                )
+
+            if not self.body:
+                add_error(
+                    "body",
+                    "A message must have a body.",
+                    "message_body_required",
+                )
 
         if self.step_id and self.idea_id:
-            errors["idea"] = "A message is attached to a step or an idea, not both."
+            add_error(
+                "idea",
+                "A message is attached to a step or an idea, not both.",
+                "message_step_idea_conflict",
+            )
 
         if self.step_id and self.travel_id and self.step.travel_id != self.travel_id:
-            errors["step"] = "The step must belong to the same travel as the message."
+            add_error(
+                "step",
+                "The step must belong to the same travel as the message.",
+                "step_not_in_message_travel",
+            )
 
-        if (
-            self.idea_id
-            and self.travel_id
-            and self.idea.travel_id != self.travel_id
-            and "idea" not in errors
-        ):
-            errors["idea"] = "The idea must belong to the same travel as the message."
+        if self.idea_id and self.travel_id and self.idea.travel_id != self.travel_id:
+            add_error(
+                "idea",
+                "The idea must belong to the same travel as the message.",
+                "idea_not_in_message_travel",
+            )
 
         if errors:
             raise ValidationError(errors)
