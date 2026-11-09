@@ -29,9 +29,15 @@ def validate_steps_within_dates(travel, attrs):
     steps = travel.steps.alive()
     errors = {}
     if steps.filter(start_date__lt=start).exists():
-        errors["start_date"] = "Some stops start before this date: move them first."
+        errors["start_date"] = serializers.ErrorDetail(
+            "Some stops start before this date: move them first.",
+            code="steps_before_travel_start",
+        )
     if steps.filter(end_date__gt=end).exists():
-        errors["end_date"] = "Some stops end after this date: move them first"
+        errors["end_date"] = serializers.ErrorDetail(
+            "Some stops end after this date: move them first.",
+            code="steps_after_travel_end",
+        )
     if errors:
         raise serializers.ValidationError(errors)
 
