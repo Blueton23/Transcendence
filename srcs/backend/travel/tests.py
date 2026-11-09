@@ -8,6 +8,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from chat.models import Message, SystemMessageKey
@@ -32,7 +33,7 @@ from travel.models import (
     is_travel_member,
 )
 from travel.serializers import StepSerializer, TravelSerializer
-from traveler.models import Traveler
+from traveler.models import Friendship, Status, Traveler
 
 COORDS = {"latitude": 46.5197, "longitude": 6.6323}
 
@@ -523,6 +524,9 @@ class TravelViewTest(APITestCase):
         self.traveler = Traveler.objects.create_user(
             username="alice", email="alice@example.com", password="password123"
         )
+        self.other_traveler = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="password123"
+        )
         self.mon_voyage = Travel.objects.create(
             title="Mon voyage",
             start_date=datetime.date(2026, 6, 1),
@@ -539,6 +543,20 @@ class TravelViewTest(APITestCase):
             start_date=datetime.date(2026, 7, 1),
             end_date=datetime.date(2026, 7, 15),
         )
+
+    def befriend(self, status=Status.ACCEPTED):
+        user1, user2 = sorted([self.traveler, self.other_traveler], key=lambda t: t.pk)
+        Friendship.objects.create(
+            user1=user1, user2=user2, requested_by=self.traveler, status=status
+        )
+
+    def add_participant(self, traveler_id, travel=None):
+        self.client.force_authenticate(user=self.traveler)
+        url = reverse(
+            "travel-add-participant",
+            kwargs={"travel_id": (travel or self.mon_voyage).id},
+        )
+        return self.client.post(url, {"travelerId": traveler_id}, format="json")
 
     def test_list_returns_only_my_travels(self):
         self.client.force_authenticate(user=self.traveler)
@@ -676,6 +694,82 @@ class TravelViewTest(APITestCase):
                 travel=self.autre_voyage, traveler=self.traveler
             ).exists()
         )
+
+    # Test for AddParticipantView
+    def test_add_friend_to_travel(self):
+        self.befriend()
+
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(
+            Participation.objects.filter(
+                traveler=self.other_traveler,
+                travel=self.mon_voyage,
+                status=ParticipationStatus.ACCEPTED,
+            ).exists()
+        )
+        self.assertTrue(
+            Message.objects.filter(
+                travel=self.mon_voyage, system_key=SystemMessageKey.PARTICIPANT_JOINED
+            ).exists()
+        )
+
+    def test_add_friend_who_left(self):
+        self.befriend()
+        Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.LEFT,
+            left_at=timezone.now(),
+        )
+
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 204)
+        participation = Participation.objects.get(
+            traveler=self.other_traveler,
+            travel=self.mon_voyage,
+        )
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+        self.assertIsNone(participation.left_at)
+
+    def test_add_not_friend_returns_400(self):
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            Participation.objects.filter(
+                traveler=self.other_traveler,
+            ).exists()
+        )
+
+    def test_add_pending_friend_returns_400(self):
+        self.befriend(Status.PENDING)
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            Participation.objects.filter(
+                traveler=self.other_traveler,
+            ).exists()
+        )
+
+    def test_add_to_travel_im_not_in_returns_403(self):
+        self.befriend()
+
+        response = self.add_participant(
+            self.other_traveler.id, travel=self.autre_voyage
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(
+            Participation.objects.filter(traveler=self.other_traveler).exists()
+        )
+
+    def test_add_unknown_traveler_returns_404(self):
+        response = self.add_participant(9999999)
+        self.assertEqual(response.status_code, 404)
 
     # Test for LeaveTravelView
     def test_traveler_leaves_travel(self):
