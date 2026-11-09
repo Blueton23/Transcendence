@@ -63,13 +63,7 @@ export async function updateTravel(
     body: JSON.stringify(data),
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.updateFailed"),
-    );
-  }
-  return result;
+  return parseResponse<Travel>(response);
 }
 
 export async function getInvitation(

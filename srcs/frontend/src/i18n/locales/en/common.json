@@ -494,9 +494,10 @@
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
       "not_travel_participant": "You must be a member of this trip to perform this action.",
+      "steps_before_travel_start": "Some stops start before this date: move them first.",
+      "steps_after_travel_end": "Some stops end after this date: move them first.",
       "title": {
-        "max_length": "Title too long.",
-      "updateFailed": "Could not update the trip."
+        "max_length": "Title too long."
       }
     },
     "haveInviteLink": "I have an invitation link",

@@ -494,9 +494,10 @@
       "sameDates": "Sélectionne une date de fin différente de la date de début.",
       "titleRequired": "Indique un titre avant de valider.",
       "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action.",
+      "steps_before_travel_start": "Des étapes commencent avant cette date : déplace-les d'abord.",
+      "steps_after_travel_end": "Des étapes se terminent après cette date : déplace-les d'abord.",
       "title": {
-        "max_length": "Titre trop long.",
-      "updateFailed": "Impossible de modifier le voyage."
+        "max_length": "Titre trop long."
       }
     },
     "haveInviteLink": "J'ai un lien d'invitation",
