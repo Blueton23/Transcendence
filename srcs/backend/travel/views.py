@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
@@ -35,11 +35,21 @@ from .schema import (
 from .serializers import StepSerializer, TravelSerializer
 
 
+def get_invited_travel(token):
+    try:
+        return Travel.objects.get(invite_token=token)
+    except Travel.DoesNotExist as exc:
+        raise NotFound(
+            "Invalid invitation link.",
+            code="invalid_invitation_link",
+        ) from exc
+
+
 class TravelJoinView(APIView):
     permission_classes: ClassVar[list] = [IsAuthenticated]
 
     def get(self, request, token):
-        travel = get_object_or_404(Travel, invite_token=token)
+        travel = get_invited_travel(token)
         data = TravelSerializer(travel).data
         data["is_member"] = travel.participations.filter(
             traveler=request.user,
@@ -48,7 +58,7 @@ class TravelJoinView(APIView):
         return Response(data)
 
     def post(self, request, token):
-        travel = get_object_or_404(Travel, invite_token=token)
+        travel = get_invited_travel(token)
         with transaction.atomic():
             participation, created = (
                 Participation.objects.select_for_update().get_or_create(

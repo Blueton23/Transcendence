@@ -8,6 +8,7 @@ import ChatDateSeparator from "./ChatDateSeparator";
 import ChatUserMessage from "./ChatUserMessage";
 import ChatSystemMessage from "./ChatSystemMessage";
 import UnreadSeparator from "./ChatUnreadSeparator";
+import { useTranslation } from "react-i18next";
 
 interface ChatTimelineProps {
   messages: ChatMessage[];
@@ -17,7 +18,6 @@ interface ChatTimelineProps {
 
 function getDayKey(date: string) {
   const value = new Date(date);
-
   return `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
 }
 
@@ -27,12 +27,13 @@ export default function ChatTimeline({
   error,
 }: ChatTimelineProps) {
   const { currentUser } = useAuth();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
       <div className="p-5">
         <Text tone="secondary" size="sm">
-          Chargement des messages…
+          {t("chat.loading")}
         </Text>
       </div>
     );
@@ -40,8 +41,8 @@ export default function ChatTimeline({
 
   if (error) {
     return (
-      <div className="p-5">
-        <Text tone="accent" size="sm">
+      <div className="p-5" role="alert">
+        <Text tone="accent" size="sm" className="whitespace-pre-line">
           {error}
         </Text>
       </div>
