@@ -10,7 +10,6 @@ import Icon from "@/shared/ui/Icon";
 
 import FriendRemove from "./FriendRemove";
 import { useTranslation } from "react-i18next";
-import i18n from "@/i18n";
 import Modal from "@/shared/ui/Modal";
 import ProfileInfo from "@/features/profile/components/ProfileInfo";
 
@@ -34,8 +33,8 @@ function FriendList({ refreshKey }: FriendListProps) {
         const response = await getFriends();
         setFriendships(response.friendships);
         setError(null);
-      } catch {
-        setError(i18n.t("friendship.errors.loadFailed"));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : null);
       }
     }
 
@@ -60,7 +59,11 @@ function FriendList({ refreshKey }: FriendListProps) {
         </Text>
       </div>
 
-      {error && <Text tone="accent">{error}</Text>}
+      {error && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {error}
+        </Text>
+      )}
 
       {friendships.length === 0 ? (
         <Text tone="muted">{t("friendship.noFriends")}</Text>

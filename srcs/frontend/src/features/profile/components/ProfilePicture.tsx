@@ -35,7 +35,7 @@ function ProfilePicture() {
 
   async function handleSubmit() {
     if (!selectedFile) return;
-    
+
     const result = await submit();
 
     if (result.success && result.data) {

@@ -45,7 +45,11 @@ function FriendRemove({
       onClose={onCancel}
     >
       <div className="flex flex-col items-center gap-6">
-        {error && <Text tone="accent">{error}</Text>}
+        {error && (
+          <Text tone="accent" className="whitespace-pre-line">
+            {error}
+          </Text>
+        )}
 
         <div className="flex justify-end gap-3">
           <Button

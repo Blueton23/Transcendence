@@ -100,7 +100,6 @@
       "cannot_accept_own_request": "Vous ne pouvez pas accepter votre propre demande d'amitié.",
       "cannot_friend_yourself": "Vous ne pouvez pas vous envoyer une demande d'amitié.",
       "friendship_not_found": "Amitié introuvable.",
-      "invalidUserId": "Identifiant utilisateur invalide.",
       "loadFailed": "Impossible de charger votre liste d'amis.",
       "missingRequestId": "Identifiant de la demande manquant.",
       "noUserSelected": "Aucun utilisateur sélectionné.",
@@ -108,8 +107,6 @@
       "not_friend_request_participant": "Vous ne participez pas à cette demande d'amitié.",
       "relationship_exists": "Une amitié ou une demande d'amitié existe déjà avec cet utilisateur.",
       "friend_request_not_found": "Demande d'amitié introuvable.",
-      "searchFailed": "Impossible de rechercher les utilisateurs.",
-      "userIdRequired": "L'identifiant de l'utilisateur est requis.",
       "user_not_found": "Utilisateur introuvable."
     },
     "myFriends": "MES AMIS · {{count}}",

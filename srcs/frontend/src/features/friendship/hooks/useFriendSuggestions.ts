@@ -38,7 +38,7 @@ export function useFriendSuggestions(query: string, enabled: boolean) {
         setResult({
           query: value,
           travelers: [],
-          error: "Failed to search for users.",
+          error: err instanceof Error ? err.message : null,
         });
       }
     }, 300);
