@@ -27,9 +27,9 @@ export function AddFriendSearch({
   const matches = search
     ? friendships.filter(
         (f) =>
-          (!memberIds.includes(f.friend.id) &&
-            f.friend.username.toLowerCase().includes(search)) ||
-          f.friend.firstName?.toLowerCase().includes(search),
+          !memberIds.includes(f.friend.id) &&
+          (f.friend.username.toLowerCase().includes(search) ||
+            f.friend.firstName?.toLowerCase().includes(search)),
       )
     : [];
 
