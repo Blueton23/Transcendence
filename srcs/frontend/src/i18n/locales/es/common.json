@@ -479,6 +479,8 @@
     "totalRoute": "TOTAL · {{duration}} DE RUTA · {{distance}} KM"
   },
   "travel": {
+    "add": "Añadir",
+    "added": "Añadido ✓",
     "addTravel": "Añadir un viaje",
     "changeDates": "Cambiar las fechas",
     "copied": "Copiado ✓",
@@ -493,6 +495,7 @@
       "notFound": "No se encontró ningún viaje.",
       "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio",
       "titleRequired": "Indica un título antes de confirmar.",
+      "not_friend": "Esta persona no está entre tus amigos.",
       "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción.",
       "title": {
         "max_length": "Título demasiado largo."
@@ -507,6 +510,7 @@
     "leave": "Abandonar el viaje",
     "manageTravelers": "Gestionar viajeros",
     "newTravel": "Nuevo viaje",
+    "noFriendMatch": "Ningún amigo coincide",
     "openTravel": "Abrir viaje",
     "searchFriend": "Buscar un amigo",
     "searchFriendPlaceholder": "Usuario o nombre...",
