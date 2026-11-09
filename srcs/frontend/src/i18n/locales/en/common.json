@@ -63,7 +63,6 @@
       "participant_left": "{{name}} left the trip."
     },
     "errors": {
-      "max_length": "The message is too long.",
       "travel_chat_access_denied": "You do not have access to this trip.",
       "system_message_has_author": "A system message cannot have an author.",
       "message_author_required": "A message must have an author.",
@@ -90,7 +89,8 @@
     "not_found": "Resource not found.",
     "required": "This field is required.",
     "blank": "This field cannot be blank.",
-    "invalid": "Invalid value."
+    "invalid": "Invalid value.",
+    "null": "This field cannot be null."
   },
   "friendship": {
     "accept": "Accept",
@@ -421,9 +421,23 @@
     "email": "Email",
     "errors": {
       "email": {
-        "unique": "This email address is already in use."
+        "unique": "This email address is already in use.",
+        "max_length": "The email address cannot exceed 254 characters.",
+        "invalid": "Enter a valid email address."
       },
-      "noImage": "No image selected.",
+      "first_name": {
+        "max_length": "The first name cannot exceed 150 characters."
+      },
+      "last_name": {
+        "max_length": "The last name cannot exceed 150 characters."
+      },
+      "profile_picture": {
+        "max_size": "The profile picture must not exceed 5 MB.",
+        "invalid_image": "The selected file is not a valid image.",
+        "empty": "The selected file is empty.",
+        "invalid": "The uploaded file is invalid.",
+        "max_length": "The image filename is too long."
+      },
       "username": {
         "max_length": "Ensure this field has no more than 150 characters.",
         "invalid": "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.",

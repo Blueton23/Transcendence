@@ -182,7 +182,11 @@ function Signup() {
         </label>
 
         {/* Erreur */}
-        {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+        {error && (
+          <p className="text-sm font-medium whitespace-pre-line text-red-500">
+            {error}
+          </p>
+        )}
 
         {/* Bouton */}
         <div className="mt-3">

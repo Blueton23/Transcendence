@@ -63,7 +63,6 @@
       "participant_left": "{{name}} ha abandonado el viaje."
     },
     "errors": {
-      "max_length": "El mensaje es demasiado largo.",
       "travel_chat_access_denied": "No tienes acceso a este viaje.",
       "system_message_has_author": "Un mensaje del sistema no puede tener autor.",
       "message_author_required": "Un mensaje debe tener autor.",
@@ -90,7 +89,8 @@
     "not_found": "Recurso no encontrado.",
     "required": "Este campo es obligatorio.",
     "blank": "Este campo no puede estar vacío.",
-    "invalid": "Valor no válido."
+    "invalid": "Valor no válido.",
+    "null": "Este campo no puede ser nulo."
   },
   "friendship": {
     "accept": "Aceptar",
@@ -421,9 +421,23 @@
     "email": "Correo electrónico",
     "errors": {
       "email": {
-        "unique": "Esta dirección de correo electrónico ya está en uso."
+        "unique": "Esta dirección de correo electrónico ya está en uso.",
+        "max_length": "La dirección de correo electrónico no puede superar los 254 caracteres.",
+        "invalid": "Introduce una dirección de correo electrónico válida."
       },
-      "noImage": "Ninguna imagen seleccionada.",
+      "first_name": {
+        "max_length": "El nombre no puede superar los 150 caracteres."
+      },
+      "last_name": {
+        "max_length": "El apellido no puede superar los 150 caracteres."
+      },
+      "profile_picture": {
+        "max_size": "La foto de perfil no puede superar los 5 MB.",
+        "invalid_image": "El archivo seleccionado no es una imagen válida.",
+        "empty": "El archivo seleccionado está vacío.",
+        "invalid": "El archivo enviado no es válido.",
+        "max_length": "El nombre del archivo de imagen es demasiado largo."
+      },
       "username": {
         "max_length": "Asegúrese de que este campo no tenga más de 150 caracteres.",
         "invalid": "Introduza un nombre de usuario válido. Este valor puede contener únicamente letras, números y los caracteres @/./+/-/_ ",
