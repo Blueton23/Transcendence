@@ -561,6 +561,8 @@
     "inviteLink": "Enlace de invitación",
     "inviteTravelers": "Invita a tus viajeros para planificar {{title}} juntos",
     "joinTravel": "Unirse al viaje",
+    "notNow": "Ahora no",
+    "refuseInvitation": "Rechazar la invitación",
     "kms": "{{count}} km",
     "leave": "Abandonar el viaje",
     "manageTravelers": "Gestionar viajeros",
