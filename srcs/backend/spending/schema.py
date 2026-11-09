@@ -92,6 +92,7 @@ SPENDING_RULES = (
     "l'utilisateur connecté).\n"
     "- `category` : `l` hébergement, `f` carburant, `a` activités, `m` repas, "
     "`t` péages, `o` autre.\n"
+    "- `amount` : supérieur à 0 (sinon `400`).\n"
     "- `stepId` et `ideaId` : facultatifs, de ce voyage. Avec les deux, l'idée "
     "doit être sur cette étape.\n"
     "- `shares` : facultatif. Absent = parts égales entre les participants ; "

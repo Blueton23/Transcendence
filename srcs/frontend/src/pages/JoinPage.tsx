@@ -10,6 +10,7 @@ import Icon from "@/shared/ui/Icon";
 import IconBadge from "@/shared/ui/IconBadge";
 import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
+import { getAvatarColor } from "@/shared/utils/getAvatarColors";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate, useParams } from "react-router";
 
@@ -45,7 +46,6 @@ function JoinPage() {
   const DatesLabel = computeTravelDates(travel.startDate, travel.endDate);
   const visible = travel.travelers.slice(0, 3);
   const hidden = travel.travelers.length - visible.length;
-  const colors = ["1", "2", "3", "4"] as const;
   return (
     <div className="flex min-h-dvh items-center justify-center p-6">
       <Card className="w-full max-w-100 bg-surface-container p-10">
@@ -57,11 +57,11 @@ function JoinPage() {
           <Heading>{travel.title}</Heading>
           <Tag>{DatesLabel}</Tag>
           <div className="flex -space-x-2">
-            {visible.map((traveler, index) => (
+            {visible.map((traveler) => (
               <Avatar
                 key={traveler.id}
                 className="ring-2 ring-surface-container"
-                color={colors[index % colors.length]}
+                color={getAvatarColor(travel.travelers, traveler.id)}
               >
                 {traveler.initials}
               </Avatar>

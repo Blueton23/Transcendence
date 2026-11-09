@@ -25,6 +25,7 @@ export function DayIdeas({ ideas, travel, actions }: DayIdeasProps) {
             onChoose={() => actions.onChoose(idea.id)}
             proposerName={proposer.name}
             proposerInitials={proposer.initials}
+            color={proposer.color}
           />
         );
       })}

@@ -31,6 +31,7 @@ export function ProposalsNights({
             chooseButton
             proposerName={proposer.name}
             proposerInitials={proposer.initials}
+            color={proposer.color}
             onVote={() => actions.onVote(proposal.id)}
             onEdit={() => actions.onEdit(proposal.id)}
             onDelete={() => actions.onDelete(proposal.id)}

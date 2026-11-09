@@ -7,7 +7,13 @@ import MenuItem from "@/shared/ui/MenuItem";
 import { PinIdeaButton } from "@/features/idea/components/page/PinIdeaButton";
 import { useTranslation } from "react-i18next";
 
-export function TripActionsButton({ onPinIdea }: { onPinIdea: () => void }) {
+export function TripActionsButton({
+  onPinIdea,
+  onPinExpense,
+}: {
+  onPinIdea: () => void;
+  onPinExpense: () => void;
+}) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -15,7 +21,7 @@ export function TripActionsButton({ onPinIdea }: { onPinIdea: () => void }) {
     <div className="relative">
       <div className="hidden grid-cols-2 gap-5 md:grid">
         <PinIdeaButton onClick={onPinIdea} />
-        <AddExpenseButton />
+        <AddExpenseButton onClick={onPinExpense} />
       </div>
       <div
         className="fixed right-5 bottom-20 z-30 md:hidden"
@@ -44,7 +50,13 @@ export function TripActionsButton({ onPinIdea }: { onPinIdea: () => void }) {
             >
               {t("idea.pinIdea")}
             </MenuItem>
-            <MenuItem icon="cash" onClick={() => setIsOpen(false)}>
+            <MenuItem
+              icon="cash"
+              onClick={() => {
+                setIsOpen(false);
+                onPinExpense();
+              }}
+            >
               {t("step.addExpense")}
             </MenuItem>
           </DropdownMenu>

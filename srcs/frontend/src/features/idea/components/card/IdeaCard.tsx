@@ -3,7 +3,6 @@ import { VoteButton } from "@/features/idea/components/card/VoteButton";
 import { StepButton } from "@/features/idea/components/card/StepButton";
 import { SecondaryInfo } from "@/features/idea/components/card/SecondaryInfo";
 import { StepLabel } from "@/features/idea/components/card/StepLabel";
-import { IdeaOptionsMenu } from "@/features/idea/components/card/IdeaOptionsMenu";
 import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import Text from "@/shared/ui/Text";
@@ -12,6 +11,8 @@ import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Button from "@/shared/ui/Button";
 import { useTranslation } from "react-i18next";
+import { OptionsMenu } from "@/shared/ui/OptionsMenu";
+import type { AvatarColor } from "@/shared/ui/Avatar";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -20,6 +21,7 @@ export interface IdeaCardProps {
   proposerInitials: string;
   stepName?: string;
   chooseButton?: boolean;
+  color: AvatarColor;
   onPlace?: () => void;
   onView?: () => void;
   onVote: () => Promise<void>;
@@ -35,6 +37,7 @@ export function IdeaCard({
   idea,
   proposerName,
   proposerInitials,
+  color,
   stepName,
   chooseButton,
   onPlace,
@@ -85,6 +88,7 @@ export function IdeaCard({
                 pricePerNight={idea.pricePerNight}
                 proposerName={proposerName}
                 proposerInitials={proposerInitials}
+                color={color}
               />
               {(isInPool || stepName) && (
                 <StepLabel isInPool={isInPool} stepName={stepName} />
@@ -113,26 +117,20 @@ export function IdeaCard({
           </div>
 
           <div className="order-2 md:order-3">
-            <IdeaOptionsMenu
+            <OptionsMenu
               disabled={isActionPending}
               onEdit={onEdit}
-              onDelete={() => {
-                if (isActionPending) {
-                  return;
-                }
-
-                void submitDelete();
-              }}
-              onChoose={
+              onDelete={() => void submitDelete()}
+              extraActions={
                 canChoose && !chooseButton
-                  ? () => {
-                      if (isActionPending) {
-                        return;
-                      }
-
-                      void submitChoose();
-                    }
-                  : undefined
+                  ? [
+                      {
+                        icon: "check",
+                        label: t("idea.chooseLodging"),
+                        onClick: () => void submitChoose(),
+                      },
+                    ]
+                  : []
               }
             />
           </div>
