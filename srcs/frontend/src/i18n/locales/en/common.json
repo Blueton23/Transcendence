@@ -427,7 +427,7 @@
       "username": {
         "max_length": "Ensure this field has no more than 150 characters.",
         "invalid": "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.",
-        "unique": "Ce pseudo est déjà utilisé."
+        "unique": "This username is already in use."
       }
     },
     "firstName": "First name",
