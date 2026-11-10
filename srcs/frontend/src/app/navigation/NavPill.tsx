@@ -23,6 +23,7 @@ export function NavPill({
   return (
     <NavLink
       to={to}
+      end
       className={({ isActive }) =>
         `${styles.base} ${isActive ? styles.active : styles.inactive}`
       }
