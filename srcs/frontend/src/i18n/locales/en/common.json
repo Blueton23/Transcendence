@@ -87,7 +87,7 @@
     "server": "Server error.",
     "serverWithStatus": "Server error ({{status}} {{statusText}})",
     "unexpected": "An error occurred.",
-    "end_before_start": "The end date cannot be before the start date.",
+    "end_not_after_start": "The end date must be after the start date.",
     "not_found": "Resource not found.",
     "required": "This field is required.",
     "blank": "This field cannot be blank.",

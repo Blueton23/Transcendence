@@ -579,6 +579,20 @@ class TravelViewTest(APITestCase):
         )
         return self.client.post(url, {"travelerId": traveler_id}, format="json")
 
+    def test_travel_start_date_cant_equal_end_date(self):
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.post(
+            reverse("travel-list"),
+            {
+                "title": "France Road Trip",
+                "start_date": "2026-06-02",
+                "end_date": "2026-06-02",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["errors"][0]["code"], "end_not_after_start")
+
     def test_list_returns_only_my_travels(self):
         self.client.force_authenticate(user=self.traveler)
 

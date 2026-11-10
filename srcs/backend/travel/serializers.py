@@ -10,12 +10,12 @@ from .models import ParticipationStatus, Step, Travel, validate_no_dates_overlap
 def validate_date_range(instance, attrs):
     start = attrs.get("start_date", getattr(instance, "start_date", None))
     end = attrs.get("end_date", getattr(instance, "end_date", None))
-    if start and end and end < start:
+    if start and end and end <= start:
         raise serializers.ValidationError(
             {
                 "end_date": serializers.ErrorDetail(
-                    "Must be on or after the start date.",
-                    code="end_before_start",
+                    "Must be after the start date.",
+                    code="end_not_after_start",
                 )
             }
         )
