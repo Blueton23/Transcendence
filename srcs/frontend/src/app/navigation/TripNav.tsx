@@ -45,11 +45,6 @@ function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
       label: "nav.chat",
       badgeCount: unreadCount,
     },
-    {
-      to: `/travel/${tripId}/assistant`,
-      iconName: "spark",
-      label: "nav.assistant",
-    },
   ];
 }
 
