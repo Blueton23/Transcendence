@@ -5,7 +5,6 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import type { DateRange } from "@daypicker/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import i18n from "@/i18n";
 
 export function useTravelForm({
   travel,
@@ -28,8 +27,8 @@ export function useTravelForm({
     if (!dates?.from || !dates?.to) {
       throw new Error(t("travel.errors.datesRequired"));
     }
-    if (dates?.from === dates?.to) {
-      throw new Error(i18n.t("travel.errors.sameDates"));
+    if (toApiDateString(dates.from) === toApiDateString(dates.to)) {
+      throw new Error(t("travel.errors.sameDates"));
     }
     const data = {
       title,

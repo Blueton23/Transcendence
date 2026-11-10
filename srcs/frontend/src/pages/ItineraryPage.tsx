@@ -87,7 +87,6 @@ function ItineraryPage() {
           route={route}
           mobileView={mobileView}
           onToggle={setMobileView}
-          refetch={refetch}
           isDetailView={detailView !== null}
         />
       </StickyHeader>
