@@ -33,8 +33,6 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
     if (result.success) navigate("/travel");
   };
 
-  if (error) return <p>{error}</p>;
-
   return (
     <div
       className="absolute top-4 right-4"
@@ -81,6 +79,14 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
           >
             {t("travel.leave")}
           </MenuItem>
+          {error && (
+            <div
+              role="alert"
+              className="max-w-xs px-3 py-2 text-sm whitespace-pre-line text-error"
+            >
+              {error}
+            </div>
+          )}
         </DropdownMenu>
       )}
       {isEditOpen && (

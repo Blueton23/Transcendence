@@ -23,7 +23,7 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      console.error("le lien n'a pas ete copié");
+      console.error("The link was not copied.");
     }
   };
 
@@ -53,8 +53,7 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
   return (
     <div className="flex flex-col gap-3">
       <Text font="mono" tone="muted">
-        {" "}
-        {t("travel.inviteTravelers")} {travel.title}
+        {t("travel.inviteTravelers", { title: travel.title })}
       </Text>
       <div className="flex flex-col items-start gap-1">
         <Text>{t("travel.searchFriend")}</Text>
@@ -66,7 +65,9 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
         {search && (
           <Card className="flex w-full flex-col gap-2">
             {friendsError ? (
-              <Text tone="accent">{friendsError}</Text>
+              <Text tone="accent" className="whitespace-pre-line">
+                {friendsError}
+              </Text>
             ) : (
               matches.length === 0 && (
                 <Text tone="muted">{t("travel.noFriendMatch")}</Text>
@@ -96,7 +97,11 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
                 )}
               </div>
             ))}
-            {addError && <Text tone="accent">{addError}</Text>}
+            {addError && (
+              <Text tone="accent" className="whitespace-pre-line">
+                {addError}
+              </Text>
+            )}
           </Card>
         )}
       </div>

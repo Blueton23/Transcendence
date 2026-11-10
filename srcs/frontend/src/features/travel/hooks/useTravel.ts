@@ -33,7 +33,7 @@ export function useTravel(travelId: number) {
     try {
       setTravel(await getTravel(travelId));
     } catch (err) {
-      console.error("Impossible de recharger le voyage :", err);
+      console.error("Unable to recharge the trip :", err);
     }
   }
 
@@ -42,8 +42,7 @@ export function useTravel(travelId: number) {
   useTravelEvent("travel.updated", () => void reloadTravel());
   useTravelEvent("participant.joined", () => void reloadTravel());
   useTravelEvent("participant.left", () => void reloadTravel());
-  useTravelEvent("travel.updated", () => void reloadTravel());
-
+ 
   return { travel, isLoading, error };
 }
 
