@@ -1,6 +1,6 @@
 import type {
   CreateTravelData,
-  Invitation
+  Invitation,
   Travel,
   TravelNotification,
 } from "@/features/travel/types";

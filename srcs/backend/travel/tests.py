@@ -884,6 +884,10 @@ class TravelViewTest(APITestCase):
         self.add_participant(self.other_traveler.id)
 
         self.client.force_authenticate(user=self.other_traveler)
+        self.client.post(
+            reverse("travel-join", kwargs={"token": self.mon_voyage.invite_token})
+        )
+
         response = self.client.get(reverse("travel-notifications"))
         self.assertEqual(response.data, [])
 
