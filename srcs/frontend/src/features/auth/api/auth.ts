@@ -11,9 +11,7 @@ export async function getCsrfToken(): Promise<void> {
     credentials: "include",
   });
 
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }
 
 export async function login(data: LoginData): Promise<AuthResponse> {
@@ -64,7 +62,5 @@ export async function logout(): Promise<void> {
     },
   });
 
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }

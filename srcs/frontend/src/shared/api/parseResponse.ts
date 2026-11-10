@@ -1,6 +1,16 @@
 import i18n from "@/i18n";
-
 import { getApiErrorMessage, type ApiErrorResponse } from "./errors";
+
+export class ApiHttpError extends Error {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly codes: string[] = [],
+  ) {
+    super(message);
+    this.name = "ApiHttpError";
+  }
+}
 
 export async function parseResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get("content-type");
@@ -8,10 +18,21 @@ export async function parseResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     if (contentType?.includes("application/json")) {
       const error = (await response.json()) as ApiErrorResponse;
-      throw new Error(getApiErrorMessage(error));
+
+      const codes = (error.errors ?? [])
+        .map((item) => item.code)
+        .filter((code): code is string => typeof code === "string");
+
+      throw new ApiHttpError(getApiErrorMessage(error), response.status, codes);
     }
+
     const detail = await response.text();
-    throw new Error(detail || i18n.t("errors.server"));
+
+    throw new ApiHttpError(detail || i18n.t("errors.server"), response.status);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
   }
 
   if (contentType?.includes("application/json")) {
