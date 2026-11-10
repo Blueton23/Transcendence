@@ -85,6 +85,16 @@ class Participation(models.Model):
     def __str__(self) -> str:
         return f"{self.traveler} -> {self.travel} ({self.status})"
 
+    def accept(self) -> None:
+        """Makes the traveler a member. What was posted before they joined is
+        marked as read, so it doesn't show up as new for them."""
+        now = timezone.now()
+        self.status = ParticipationStatus.ACCEPTED
+        self.left_at = None
+        self.last_read_at = now
+        self.ideas_seen_at = now
+        self.save()
+
     def mark_read(self) -> None:
         self.last_read_at = timezone.now()
         self.save(update_fields=["last_read_at"])

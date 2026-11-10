@@ -165,6 +165,22 @@ class ParticipationModelTest(TestCase):
         participation.refresh_from_db()
         self.assertIsNotNone(participation.last_read_at)
 
+    def test_accept_makes_member_and_marks_everything_read(self):
+        participation = Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.LEFT,
+            left_at=timezone.now(),
+        )
+
+        participation.accept()
+
+        participation.refresh_from_db()
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+        self.assertIsNone(participation.left_at)
+        self.assertIsNotNone(participation.last_read_at)
+        self.assertIsNotNone(participation.ideas_seen_at)
+
     def test_is_travel_member_depends_on_status(self):
         self.assertFalse(is_travel_member(self.travel.id, self.traveler.id))
 
@@ -837,6 +853,67 @@ class TravelViewTest(APITestCase):
         )
         self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
         self.assertIsNone(participation.left_at)
+
+    def test_add_existing_member_changes_nothing(self):
+        self.befriend()
+        participation = Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 204)
+        participation.refresh_from_db()
+        self.assertIsNone(participation.last_read_at)
+        self.assertFalse(
+            Message.objects.filter(
+                travel=self.mon_voyage, system_key=SystemMessageKey.PARTICIPANT_JOINED
+            ).exists()
+        )
+
+    def test_added_friend_does_not_see_old_activity_as_new(self):
+        self.befriend()
+        Message.objects.create(
+            travel=self.mon_voyage, traveler=self.traveler, body="Salut"
+        )
+        Idea.objects.create(
+            travel=self.mon_voyage,
+            traveler=self.traveler,
+            title="Fondue",
+            type=IdeaType.RESTAURANT,
+        )
+
+        self.add_participant(self.other_traveler.id)
+
+        self.client.force_authenticate(user=self.other_traveler)
+        response = self.client.get(reverse("travel-notifications"))
+        self.assertEqual(response.data, [])
+
+    def test_joiner_does_not_see_old_activity_as_new(self):
+        Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.autre_voyage,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        Message.objects.create(
+            travel=self.autre_voyage, traveler=self.other_traveler, body="Salut"
+        )
+        Idea.objects.create(
+            travel=self.autre_voyage,
+            traveler=self.other_traveler,
+            title="Fondue",
+            type=IdeaType.RESTAURANT,
+        )
+        self.client.force_authenticate(user=self.traveler)
+
+        self.client.post(
+            reverse("travel-join", kwargs={"token": self.autre_voyage.invite_token})
+        )
+
+        response = self.client.get(reverse("travel-notifications"))
+        self.assertEqual(response.data, [])
 
     def test_add_not_friend_returns_400(self):
         response = self.add_participant(self.other_traveler.id)

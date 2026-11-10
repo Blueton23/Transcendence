@@ -61,18 +61,12 @@ class TravelJoinView(APIView):
     def post(self, request, token):
         travel = get_invited_travel(token)
         with transaction.atomic():
-            participation, created = (
-                Participation.objects.select_for_update().get_or_create(
-                    traveler=request.user,
-                    travel=travel,
-                    defaults={"status": ParticipationStatus.ACCEPTED},
-                )
+            participation, _ = Participation.objects.select_for_update().get_or_create(
+                traveler=request.user, travel=travel
             )
             # Opening the invite link again as a member changes nothing.
-            if created or participation.status != ParticipationStatus.ACCEPTED:
-                participation.status = ParticipationStatus.ACCEPTED
-                participation.left_at = None
-                participation.save()
+            if participation.status != ParticipationStatus.ACCEPTED:
+                participation.accept()
                 announce_participant(travel.id, request.user, "joined")
         return Response(TravelSerializer(travel).data)
 
@@ -91,13 +85,14 @@ class AddParticipantView(APIView):
             raise ValidationError(
                 "This traveler is not your friend.", code="not_friend"
             )
-        Participation.objects.update_or_create(
-            traveler=friend,
-            travel_id=travel_id,
-            defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
-        )
-
-        announce_participant(travel_id, friend, "joined")
+        with transaction.atomic():
+            participation, _ = Participation.objects.select_for_update().get_or_create(
+                traveler=friend, travel_id=travel_id
+            )
+            # Adding someone who is already a member changes nothing.
+            if participation.status != ParticipationStatus.ACCEPTED:
+                participation.accept()
+                announce_participant(travel_id, friend, "joined")
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
