@@ -13,6 +13,7 @@ import Text from "@/shared/ui/Text";
 
 interface NotificationsCardProps {
   travels: TravelNotification[];
+  travelsError?: string | null;
   friendRequests: FriendshipRequest[];
 }
 
@@ -27,11 +28,13 @@ const tagButtonStyle =
 
 export function NotificationsCard({
   travels,
+  travelsError,
   friendRequests,
 }: NotificationsCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const isEmpty = travels.length === 0 && friendRequests.length === 0;
+  const isEmpty =
+    !travelsError && travels.length === 0 && friendRequests.length === 0;
 
   return (
     <Card variant="default" className="flex flex-col gap-4">
@@ -44,6 +47,7 @@ export function NotificationsCard({
         <Text tone="muted">{t("notifications.allCaughtUp")}</Text>
       ) : (
         <div className="flex flex-col gap-2">
+          {travelsError && <Text tone="accent">{travelsError}</Text>}
           {travels.map((n) => (
             <div key={n.travelId} className={`${rowStyle} flex-wrap`}>
               <IconBadge name="mtn" size="sm" />

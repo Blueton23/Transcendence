@@ -17,7 +17,8 @@ import { useTranslation } from "react-i18next";
 
 function TravelPage() {
   const { travels, isLoading, error, refetch } = useTravels();
-  const travelNotifications = useTravelNotifications();
+  const { notifications: travelNotifications, error: notificationsError } =
+    useTravelNotifications();
   const friendRequests = useFriendRequests();
   const nextTravel = isLoading || error ? undefined : getNextTravel(travels);
   const [newTravelOpen, setNewTravelOpen] = useState(false);
@@ -47,6 +48,7 @@ function TravelPage() {
       {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
       <NotificationsCard
         travels={travelNotifications}
+        travelsError={notificationsError}
         friendRequests={friendRequests}
       />
       <TravelList
