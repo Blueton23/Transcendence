@@ -523,6 +523,7 @@
     "edit": "Modifier l'étape",
     "errors": {
       "placeNotFound": "Lieu introuvable, choisis-en un dans la liste.",
+      "routeFailed": "Impossible de calculer l'itinéraire.",
       "step_before_travel": "L'étape ne peut pas commencer avant le début du voyage.",
       "step_after_travel": "L'étape ne peut pas se terminer après la fin du voyage.",
       "step_dates_overlap": "Les dates de cette étape chevauchent celles d'une autre étape.",

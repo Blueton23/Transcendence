@@ -523,6 +523,7 @@
     "edit": "Editar la etapa",
     "errors": {
       "placeNotFound": "Lugar no encontrado, elige uno de la lista.",
+      "routeFailed": "No se pudo calcular el itinerario.",
       "step_before_travel": "La etapa no puede comenzar antes del inicio del viaje.",
       "step_after_travel": "La etapa no puede terminar después del final del viaje.",
       "step_dates_overlap": "Las fechas de esta etapa se solapan con las de otra etapa.",

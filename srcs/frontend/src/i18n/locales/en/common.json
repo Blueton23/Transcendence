@@ -523,6 +523,7 @@
     "edit": "Edit stop",
     "errors": {
       "placeNotFound": "Place not found, choose one from the list.",
+      "routeFailed": "Unable to calculate the route.",
       "step_before_travel": "The stop cannot start before the trip begins.",
       "step_after_travel": "The stop cannot end after the trip ends.",
       "step_dates_overlap": "The dates of this stop overlap with another stop.",

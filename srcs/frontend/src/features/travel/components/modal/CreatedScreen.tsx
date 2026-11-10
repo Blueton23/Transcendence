@@ -105,7 +105,6 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
       <div className="flex flex-col items-start gap-1">
         <Text>{t("travel.inviteLink")}</Text>
         <Card className="flex w-full items-center justify-between bg-surface-control p-2! pl-4!">
-          {copyError && <Text tone="accent">{copyError}</Text>}
           <Text font="mono">{link}</Text>
           <Button
             size="sm"
@@ -116,6 +115,7 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
             {copied ? t("travel.copied") : t("travel.copy")}
           </Button>
         </Card>
+        {copyError && <Text tone="accent">{copyError}</Text>}
       </div>
 
       <Button variant="ghost" className="w-full underline" onClick={onClose}>
