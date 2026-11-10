@@ -2,6 +2,7 @@ import { useParams } from "react-router";
 import { NavFrameDesktop, NavFrameMobile } from "./NavFrame";
 import { AppNavDesktop, AppNavMobile } from "./AppNav";
 import { TripNavDesktop, TripNavMobile } from "./TripNav";
+import { MobileTopBar } from "@/app/navigation/MobileTopBar";
 
 export function Navigation() {
   const { id: tripId } = useParams();
@@ -12,6 +13,7 @@ export function Navigation() {
         <AppNavDesktop />
         {tripId && <TripNavDesktop tripId={tripId} />}
       </NavFrameDesktop>
+      <MobileTopBar />
       <NavFrameMobile>
         {tripId ? <TripNavMobile tripId={tripId} /> : <AppNavMobile />}
       </NavFrameMobile>
