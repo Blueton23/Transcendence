@@ -4,7 +4,7 @@ import type { IconName } from "../../shared/ui/Icon";
 import { useUnreadCount } from "@/features/chat/hooks/useUnreadCount";
 import { useUnseenIdeasCount } from "@/features/idea/hooks/useUnseenIdeasCount";
 import { useTranslation } from "react-i18next";
-import { TravelIdentity } from "@/app/navigation/TravelIdentity";
+import { TravelIdentity } from "@/features/travel/components/TravelIdentity";
 
 interface TripNavProps {
   tripId: string;

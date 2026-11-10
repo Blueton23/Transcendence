@@ -1,5 +1,5 @@
 import { AccountSheet } from "@/app/navigation/AccountSheet";
-import { TravelTitle } from "@/app/navigation/TravelTitle";
+import { TravelTitle } from "@/features/travel/components/TravelTitle";
 import { TravelOptionsButton } from "@/features/travel/components/TravelOptionsButton";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import Avatar from "@/shared/ui/Avatar";
