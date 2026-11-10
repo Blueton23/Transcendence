@@ -414,6 +414,15 @@
     "profile": "Profil",
     "trips": "Mes voyages"
   },
+  "notifications": {
+    "title": "Pendant ton absence",
+    "allCaughtUp": "Rien de nouveau, tu es à jour",
+    "messages_one": "{{count}} nouveau message",
+    "messages_other": "{{count}} nouveaux messages",
+    "ideas_one": "{{count}} nouvelle idée",
+    "ideas_other": "{{count}} nouvelles idées",
+    "friendRequest": "{{name}} veut être ton ami·e"
+  },
   "profile": {
     "alreadyAccount": "Déjà un compte ?",
     "changeAvatar": "Changer l'avatar",
