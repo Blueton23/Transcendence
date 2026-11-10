@@ -105,6 +105,7 @@
       "friendship_not_found": "Amitié introuvable.",
       "invalidUserId": "Identifiant utilisateur invalide.",
       "loadFailed": "Impossible de charger votre liste d'amis.",
+      "requestsLoadFailed": "Impossible de récupérer les demandes d'amis.",
       "missingRequestId": "Identifiant de la demande manquant.",
       "noUserSelected": "Aucun utilisateur sélectionné.",
       "not_friendship_participant": "Vous ne faites pas partie de cette amitié.",
