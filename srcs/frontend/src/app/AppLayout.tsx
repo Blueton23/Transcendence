@@ -15,7 +15,7 @@ export function AppLayout() {
       <Navigation />
       <main className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-24 md:pb-0">
         <OfflineBanner />
-        <ErrorBanner/>
+        <ErrorBanner />
         <Outlet />
         <div className="md:hidden">
           <Footer />
