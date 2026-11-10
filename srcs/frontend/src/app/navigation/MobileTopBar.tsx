@@ -15,7 +15,7 @@ function CurrentTravelTitle({ travelId }: { travelId: string }) {
   if (!travel) return null;
   return (
     <>
-      <div className="flex min-w-0 flex-1 justify-center text-center">
+      <div className="flex min-w-0 flex-1 justify-center px-2 text-center">
         <TravelTitle travel={travel} inverse={true} />
       </div>
       <TravelOptionsButton travel={travel} />
@@ -29,40 +29,40 @@ export function MobileTopBar() {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
 
   return (
-    <header className="relative z-20 flex h-15 shrink-0 items-center gap-2.5 bg-brand-dark px-3 text-inverse md:hidden">
-      {travelId ? (
-        <>
-          <Link
-            to="/travel"
-            aria-label={t("nav.trips")}
-            title={t("nav.trips")}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-control"
-          >
-            <Icon name="home" size={22} className="text-text" />
-          </Link>
-          <div className="flex min-w-0 flex-1 justify-center text-center">
+    <>
+      <header className="relative z-20 flex h-15 shrink-0 items-center gap-2.5 bg-brand-dark px-3 text-inverse md:hidden">
+        {travelId ? (
+          <>
+            <Link
+              to="/travel"
+              aria-label={t("nav.trips")}
+              title={t("nav.trips")}
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-control"
+            >
+              <Icon name="home" size={22} className="text-text" />
+            </Link>
             <CurrentTravelTitle travelId={travelId} />
+          </>
+        ) : (
+          <div className="flex items-center gap-2.5">
+            <IconBadge color="brand" name="compass" />
+            <Heading size="sm" className="text-inverse!">
+              Peripl
+            </Heading>
           </div>
-        </>
-      ) : (
-        <div className="flex items-center gap-2.5">
-          <IconBadge color="brand" name="compass" />
-          <Heading size="sm" className="text-inverse!">
-            Peripl
-          </Heading>
-        </div>
-      )}
-      <button
-        type="button"
-        aria-label={t("nav.account")}
-        onClick={() => setIsAccountOpen(true)}
-        className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center"
-      >
-        <Avatar className="ring-2 ring-white" />
-      </button>
+        )}
+        <button
+          type="button"
+          aria-label={t("nav.account")}
+          onClick={() => setIsAccountOpen(true)}
+          className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center"
+        >
+          <Avatar className="ring-2 ring-white" />
+        </button>
+      </header>
       {isAccountOpen && (
         <AccountSheet onClose={() => setIsAccountOpen(false)} />
       )}
-    </header>
+    </>
   );
 }

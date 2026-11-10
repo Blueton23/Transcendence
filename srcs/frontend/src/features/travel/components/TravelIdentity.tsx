@@ -1,4 +1,4 @@
-import { TravelTitle } from "@/app/navigation/TravelTitle";
+import { TravelTitle } from "@/features/travel/components/TravelTitle";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import { getStatus } from "@/features/travel/utils/getStatus";
 import Avatar from "@/shared/ui/Avatar";

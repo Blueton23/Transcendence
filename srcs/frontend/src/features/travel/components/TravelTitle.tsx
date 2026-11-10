@@ -1,5 +1,6 @@
 import type { Travel } from "@/features/travel/types";
 import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
+import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
 
@@ -14,9 +15,13 @@ export function TravelTitle({
 
   return (
     <div className="flex min-w-0 flex-col">
-      <Text className={`truncate font-bold ${inverse ? "text-inverse!" : ""}`}>
+      <Heading
+        level={2}
+        size="sm"
+        className={`truncate font-bold ${inverse ? "text-inverse!" : ""}`}
+      >
         {travel.title}
-      </Text>
+      </Heading>
       <Text
         size="sm"
         tone="secondary"
