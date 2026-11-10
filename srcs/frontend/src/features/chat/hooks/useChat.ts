@@ -36,7 +36,7 @@ function addMessage(current: ChatMessage[], message: ChatMessage) {
 
 function markAsRead(travelId: number) {
   markMessagesAsRead(travelId).catch((error) => {
-    console.error("Impossible de marquer les messages comme lus :", error);
+    console.error("Unable to mark messages as read :", error);
   });
 }
 

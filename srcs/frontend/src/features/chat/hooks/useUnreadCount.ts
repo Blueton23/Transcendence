@@ -24,7 +24,7 @@ export function useUnreadCount(travelId: number): number {
       setUnreadCount(result.unreadCount);
     } catch (error) {
       console.error(
-        "Impossible de récupérer le nombre de messages non lus :",
+        "Unable to retrieve the number of unread messages :",
         error,
       );
     }
