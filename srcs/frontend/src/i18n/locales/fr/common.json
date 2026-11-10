@@ -558,6 +558,7 @@
     "creating": "Création...",
     "editTravel": "Modifier le voyage",
     "errors": {
+      "copyFailed": "Impossible de copier le lien.",
       "datesRequired": "Sélectionne des dates avant de valider.",
       "invalid_invitation_link": "Ce lien d'invitation est invalide.",
       "loadFailed": "Impossible de charger le voyage.",

@@ -558,6 +558,7 @@
     "creating": "Creating...",
     "editTravel": "Edit trip",
     "errors": {
+      "copyFailed": "Unable to copy the link.",
       "datesRequired": "Select dates before confirming.",
       "invalid_invitation_link": "This invitation link is invalid.",
       "loadFailed": "Unable to load the trip.",

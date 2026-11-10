@@ -15,15 +15,17 @@ interface CreatedScreenProps {
 
 export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState<string | null>(null);
   const { t } = useTranslation();
 
   const handleCopy = async () => {
+    setCopyError(null);
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      console.error("le lien n'a pas ete copié");
+      setCopyError(t("travel.errors.copyFailed"));
     }
   };
 
@@ -103,6 +105,7 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
       <div className="flex flex-col items-start gap-1">
         <Text>{t("travel.inviteLink")}</Text>
         <Card className="flex w-full items-center justify-between bg-surface-control p-2! pl-4!">
+          {copyError && <Text tone="accent">{copyError}</Text>}
           <Text font="mono">{link}</Text>
           <Button
             size="sm"

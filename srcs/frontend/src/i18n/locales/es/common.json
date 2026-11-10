@@ -558,6 +558,7 @@
     "creating": "Creando...",
     "editTravel": "Editar el viaje",
     "errors": {
+      "copyFailed": "No se pudo copiar el enlace.",
       "datesRequired": "Selecciona las fechas antes de confirmar.",
       "invalid_invitation_link": "Este enlace de invitación no es válido.",
       "loadFailed": "No se pudo cargar el viaje.",
