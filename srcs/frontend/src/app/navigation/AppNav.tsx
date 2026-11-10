@@ -1,6 +1,6 @@
 import IconBadge from "../../shared/ui/IconBadge";
 import Heading from "../../shared/ui/Heading";
-import NavPill, { NavPillMobile } from "./NavPill";
+import NavPill from "./NavPill";
 import { useTranslation } from "react-i18next";
 
 export function AppNavDesktop() {
@@ -24,10 +24,21 @@ export function AppNavDesktop() {
 }
 
 export function AppNavMobile() {
+  const { t } = useTranslation();
   return (
-    <div className="flex gap-1">
-      <NavPillMobile to="/travel" iconName="home"></NavPillMobile>
-      <NavPillMobile to="/profile" iconName="user"></NavPillMobile>
+    <div className="flex flex-1 justify-center gap-1">
+      <NavPill
+        to="/travel"
+        iconName="home"
+        label={t("nav.tripsShort")}
+        variant="mobile"
+      ></NavPill>
+      <NavPill
+        to="/profile"
+        iconName="user"
+        label={t("nav.profile")}
+        variant="mobile"
+      ></NavPill>
     </div>
   );
 }

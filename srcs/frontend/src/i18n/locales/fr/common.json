@@ -414,7 +414,8 @@
     "main": "Navigation principale",
     "profile": "Profil",
     "trip": "Navigation du voyage",
-    "trips": "Mes voyages"
+    "trips": "Mes voyages",
+    "tripsShort": "Voyages"
   },
   "notifications": {
     "title": "Pendant ton absence",

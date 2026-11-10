@@ -25,9 +25,15 @@ export function NavFrameDesktop({ children }: NavFrameProps) {
   );
 }
 
-export function NavFrameMobile({ children }: NavFrameProps) {
+export function NavFrameMobile({
+  children,
+  wide = false,
+}: NavFrameProps & { wide?: boolean }) {
+  const position = wide ? "inset-x-3" : "inset-x-1/4";
   return (
-    <div className="fixed bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center rounded-full bg-brand-dark p-2 md:hidden">
+    <div
+      className={`fixed bottom-4 z-30 flex rounded-full bg-brand-dark p-1.5 md:hidden ${position}`}
+    >
       {children}
     </div>
   );

@@ -14,7 +14,7 @@ export function Navigation() {
         {tripId && <TripNavDesktop tripId={tripId} />}
       </NavFrameDesktop>
       <MobileTopBar />
-      <NavFrameMobile>
+      <NavFrameMobile wide={!!tripId}>
         {tripId ? <TripNavMobile tripId={tripId} /> : <AppNavMobile />}
       </NavFrameMobile>
     </>

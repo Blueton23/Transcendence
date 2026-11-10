@@ -1,4 +1,4 @@
-import NavPill, { NavPillMobile } from "./NavPill";
+import NavPill from "./NavPill";
 import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
 import { useUnreadCount } from "@/features/chat/hooks/useUnreadCount";
@@ -74,18 +74,21 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
 }
 
 export function TripNavMobile({ tripId }: TripNavProps) {
+  const { t } = useTranslation();
   const unreadCount = useUnreadCount(Number(tripId));
   const unseenIdeasCount = useUnseenIdeasCount(Number(tripId));
   const items = getTripNavItems(tripId, unreadCount, unseenIdeasCount);
 
   return (
-    <div className="flex gap-1">
+    <div className="flex w-full gap-1">
       {items.map((item) => (
-        <NavPillMobile
+        <NavPill
           key={item.to}
           to={item.to}
           iconName={item.iconName}
           badgeCount={item.badgeCount}
+          label={t(item.label)}
+          variant="mobile"
         />
       ))}
     </div>

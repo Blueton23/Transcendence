@@ -414,7 +414,8 @@
     "main": "Navegación principal",
     "profile": "Perfil",
     "trip": "Navegación del viaje",
-    "trips": "Mis viajes"
+    "trips": "Mis viajes",
+    "tripsShort": "Viajes"
   },
   "notifications": {
     "title": "Mientras no estabas",
