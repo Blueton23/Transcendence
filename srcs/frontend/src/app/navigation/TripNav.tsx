@@ -1,6 +1,4 @@
 import NavPill, { NavPillMobile } from "./NavPill";
-import IconBadge from "../../shared/ui/IconBadge";
-import Text from "../../shared/ui/Text";
 import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
 import { useUnreadCount } from "@/features/chat/hooks/useUnreadCount";
@@ -54,20 +52,17 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center gap-4">
-        <IconBadge color="brand" name="mtn" />
-        <Text size="md" className="font-bold">
-          Road trip Suisse
-        </Text>
-      </div>
-      <div>TODO: identite du voyages (nom, dates, avatars)</div>
+    <div className="flex flex-col gap-4">
       <Divider />
-      <div className="flex flex-col gap-1">
+      <div>TODO: identite du voyages (nom, dates, avatars)</div>
+      <nav
+        aria-label={t("nav.trip")}
+        className="ml-2.5 flex flex-col gap-1 border-l border-border-control pl-2.5"
+      >
         {items.map((item) => (
           <NavPill key={item.to} {...item} label={t(item.label)} />
         ))}
-      </div>
+      </nav>
     </div>
   );
 }

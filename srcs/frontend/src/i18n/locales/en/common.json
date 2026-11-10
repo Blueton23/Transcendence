@@ -411,7 +411,9 @@
     "home": "Home",
     "ideas": "Ideas",
     "itinerary": "Itinerary",
+    "main": "Main navigation",
     "profile": "Profile",
+    "trip": "Trip navigation",
     "trips": "My trips"
   },
   "profile": {

@@ -9,7 +9,8 @@ export function Navigation() {
   return (
     <>
       <NavFrameDesktop>
-        {tripId ? <TripNavDesktop tripId={tripId} /> : <AppNavDesktop />}
+        <AppNavDesktop />
+        {tripId && <TripNavDesktop tripId={tripId} />}
       </NavFrameDesktop>
       <NavFrameMobile>
         {tripId ? <TripNavMobile tripId={tripId} /> : <AppNavMobile />}

@@ -10,7 +10,7 @@ interface NavFrameProps {
 export function NavFrameDesktop({ children }: NavFrameProps) {
   const { t } = useTranslation();
   return (
-    <div className="hidden md:flex md:w-62.5 md:flex-col md:p-6">
+    <div className="hidden md:flex md:w-62.5 md:flex-col md:gap-6 md:border-r md:border-border md:bg-surface-container md:p-6">
       {children}
       <div className="mt-auto flex flex-col gap-4">
         <LanguageSwitcher />
