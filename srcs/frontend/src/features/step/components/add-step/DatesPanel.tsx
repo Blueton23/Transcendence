@@ -110,7 +110,11 @@ export function DatesPanel({
             {isSubmitting ? t("step.adding") : t("step.addStep")}
           </Button>
         )}
-        {error && <Text tone="accent">{error}</Text>}
+        {error && (
+          <Text tone="accent" className="whitespace-pre-line">
+            {error}
+          </Text>
+        )}
       </Card>
     </div>
   );

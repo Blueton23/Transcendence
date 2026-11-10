@@ -12,7 +12,7 @@ export async function getCsrfToken(): Promise<void> {
   });
 
   if (!response.ok) {
-    throw new Error(i18n.t("auth.errors.csrfInit"));
+    await parseResponse<unknown>(response);
   }
 }
 
@@ -65,8 +65,6 @@ export async function logout(): Promise<void> {
   });
 
   if (!response.ok) {
-    const result = await response.json();
-
-    throw new Error(result.detail || i18n.t("auth.errors.logoutFailed"));
+    await parseResponse<unknown>(response);
   }
 }
