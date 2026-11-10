@@ -1,11 +1,12 @@
 from typing import ClassVar
 
 from django.db import transaction
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateAPIView,
@@ -20,6 +21,7 @@ from chat.services import post_system_message
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
 from idea.models import Idea
+from traveler.models import Friendship, Status, Traveler
 
 from .consumers import kick_from_travel
 from .mixins import ParticipantScopedMixin
@@ -75,6 +77,30 @@ class TravelJoinView(APIView):
         return Response(TravelSerializer(travel).data)
 
 
+class AddParticipantView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated, IsTravelParticipant]
+
+    def post(self, request, travel_id):
+        friend = get_object_or_404(Traveler, pk=request.data.get("traveler_id"))
+
+        is_friend = Friendship.objects.filter(
+            Q(user1=request.user, user2=friend) | Q(user1=friend, user2=request.user),
+            status=Status.ACCEPTED,
+        ).exists()
+        if not is_friend:
+            raise ValidationError(
+                "This traveler is not your friend.", code="not_friend"
+            )
+        Participation.objects.update_or_create(
+            traveler=friend,
+            travel_id=travel_id,
+            defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
+        )
+
+        announce_participant(travel_id, friend, "joined")
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 PARTICIPANT_MESSAGES = {
     "joined": SystemMessageKey.PARTICIPANT_JOINED,
     "left": SystemMessageKey.PARTICIPANT_LEFT,
@@ -116,6 +142,12 @@ class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPI
     queryset = Travel.objects.all()
     serializer_class = TravelSerializer
 
+    def perform_update(self, serializer):
+        travel = serializer.save()
+        broadcast(
+            travel_group(travel.id), "travel.updated", TravelSerializer(travel).data
+        )
+
 
 def broadcast_step(event_type, step):
     broadcast(travel_group(step.travel_id), event_type, StepSerializer(step).data)
@@ -153,6 +185,11 @@ class StepDetailView(
         broadcast_step("step.updated", serializer.save())
 
     def perform_destroy(self, instance):
+        if instance.spendings.exists():
+            raise ValidationError(
+                "This stop has expenses: move or delete them first",
+                code="step_has_spending",
+            )
         instance.soft_delete()
         # Ideas placed on this step go back to the pool: clients refetch them.
         broadcast(travel_group(instance.travel_id), "step.deleted", {"id": instance.id})

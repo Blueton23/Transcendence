@@ -8,6 +8,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.db import IntegrityError, transaction
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APITestCase
 
 from chat.models import Message, SystemMessageKey
@@ -17,6 +18,10 @@ from config.asgi import application
 from idea.models import (
     Idea,
     IdeaType,
+)
+from spending.models import (
+    Spending,
+    SpendingCategory,
 )
 from travel.consumers import (
     CLOSE_NOT_AUTHENTICATED,
@@ -32,7 +37,7 @@ from travel.models import (
     is_travel_member,
 )
 from travel.serializers import StepSerializer, TravelSerializer
-from traveler.models import Traveler
+from traveler.models import Friendship, Status, Traveler
 
 COORDS = {"latitude": 46.5197, "longitude": 6.6323}
 
@@ -523,6 +528,9 @@ class TravelViewTest(APITestCase):
         self.traveler = Traveler.objects.create_user(
             username="alice", email="alice@example.com", password="password123"
         )
+        self.other_traveler = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="password123"
+        )
         self.mon_voyage = Travel.objects.create(
             title="Mon voyage",
             start_date=datetime.date(2026, 6, 1),
@@ -539,6 +547,20 @@ class TravelViewTest(APITestCase):
             start_date=datetime.date(2026, 7, 1),
             end_date=datetime.date(2026, 7, 15),
         )
+
+    def befriend(self, status=Status.ACCEPTED):
+        user1, user2 = sorted([self.traveler, self.other_traveler], key=lambda t: t.pk)
+        Friendship.objects.create(
+            user1=user1, user2=user2, requested_by=self.traveler, status=status
+        )
+
+    def add_participant(self, traveler_id, travel=None):
+        self.client.force_authenticate(user=self.traveler)
+        url = reverse(
+            "travel-add-participant",
+            kwargs={"travel_id": (travel or self.mon_voyage).id},
+        )
+        return self.client.post(url, {"travelerId": traveler_id}, format="json")
 
     def test_list_returns_only_my_travels(self):
         self.client.force_authenticate(user=self.traveler)
@@ -601,6 +623,90 @@ class TravelViewTest(APITestCase):
         self.assertEqual(len(response.data), 2)
         titles = [t["title"] for t in response.data]
         self.assertIn("Nouvelle aventure", titles)
+
+    def test_update_travel_dates_with_step_return_400(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"end_date": "2026-06-07"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.mon_voyage.refresh_from_db()
+        self.assertEqual(self.mon_voyage.end_date, datetime.date(2026, 6, 15))
+
+    def test_update_travel_start_after_step_start_return_400(self):
+        self.client.force_authenticate(user=self.traveler)
+        Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"start_date": "2026-06-03"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_extend_travel_dates_return_200(self):
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"start_date": "2026-05-28", "end_date": "2026-06-20"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.mon_voyage.refresh_from_db()
+        self.assertEqual(self.mon_voyage.end_date, datetime.date(2026, 6, 20))
+
+    def test_shrink_travel_dates_without_conflict_return_200(self):
+        self.client.force_authenticate(user=self.traveler)
+        Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 8),
+            **COORDS,
+        )
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"end_date": "2026-06-08"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+
+    def test_trashed_step_does_not_block_new_dates(self):
+        self.client.force_authenticate(user=self.traveler)
+        step = Step.objects.create(
+            travel=self.mon_voyage,
+            localisation="Paris",
+            start_date=datetime.date(2026, 6, 10),
+            end_date=datetime.date(2026, 6, 12),
+            **COORDS,
+        )
+        step.soft_delete()
+        response = self.client.patch(
+            reverse("travel-detail", kwargs={"pk": self.mon_voyage.id}),
+            {"end_date": "2026-06-05"},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
 
     # Tests for TravelJoinView
 
@@ -692,6 +798,82 @@ class TravelViewTest(APITestCase):
                 travel=self.autre_voyage, traveler=self.traveler
             ).exists()
         )
+
+    # Test for AddParticipantView
+    def test_add_friend_to_travel(self):
+        self.befriend()
+
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 204)
+        self.assertTrue(
+            Participation.objects.filter(
+                traveler=self.other_traveler,
+                travel=self.mon_voyage,
+                status=ParticipationStatus.ACCEPTED,
+            ).exists()
+        )
+        self.assertTrue(
+            Message.objects.filter(
+                travel=self.mon_voyage, system_key=SystemMessageKey.PARTICIPANT_JOINED
+            ).exists()
+        )
+
+    def test_add_friend_who_left(self):
+        self.befriend()
+        Participation.objects.create(
+            traveler=self.other_traveler,
+            travel=self.mon_voyage,
+            status=ParticipationStatus.LEFT,
+            left_at=timezone.now(),
+        )
+
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 204)
+        participation = Participation.objects.get(
+            traveler=self.other_traveler,
+            travel=self.mon_voyage,
+        )
+        self.assertEqual(participation.status, ParticipationStatus.ACCEPTED)
+        self.assertIsNone(participation.left_at)
+
+    def test_add_not_friend_returns_400(self):
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            Participation.objects.filter(
+                traveler=self.other_traveler,
+            ).exists()
+        )
+
+    def test_add_pending_friend_returns_400(self):
+        self.befriend(Status.PENDING)
+        response = self.add_participant(self.other_traveler.id)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            Participation.objects.filter(
+                traveler=self.other_traveler,
+            ).exists()
+        )
+
+    def test_add_to_travel_im_not_in_returns_403(self):
+        self.befriend()
+
+        response = self.add_participant(
+            self.other_traveler.id, travel=self.autre_voyage
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(
+            Participation.objects.filter(traveler=self.other_traveler).exists()
+        )
+
+    def test_add_unknown_traveler_returns_404(self):
+        response = self.add_participant(9999999)
+        self.assertEqual(response.status_code, 404)
 
     # Test for LeaveTravelView
     def test_traveler_leaves_travel(self):
@@ -1095,6 +1277,25 @@ class StepViewTest(APITestCase):
         self.mon_step.refresh_from_db()
         self.assertEqual(self.autre_step.localisation, "Paris")
 
+    def test_cannot_delete_step_with_spendings(self):
+        Spending.objects.create(
+            travel=self.mon_voyage,
+            traveler=self.traveler,
+            step=self.mon_step,
+            category=SpendingCategory.MEALS,
+            amount="30.00",
+        )
+        self.client.force_authenticate(user=self.traveler)
+        response = self.client.delete(
+            reverse(
+                "step-detail",
+                kwargs={"travel_id": self.mon_voyage.id, "pk": self.mon_step.id},
+            )
+        )
+        self.assertEqual(response.status_code, 400)
+        self.mon_step.refresh_from_db()
+        self.assertIsNone(self.mon_step.deleted_at)
+
 
 # --- WebSocket tests ---
 
@@ -1171,6 +1372,17 @@ class StepBroadcastTest(BroadcastListenerMixin, APITestCase):
             self.receive_event(),
             {"type": "step.deleted", "payload": {"id": self.step.id}},
         )
+
+    def test_update_travel_broadcasts_travel_updated(self):
+        response, _ = self.request(
+            "patch",
+            reverse("travel-detail", kwargs={"pk": self.travel.id}),
+            {"title": "Nouveau titre"},
+        )
+        self.assertEqual(response.status_code, 200)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "travel.updated")
+        self.assertEqual(event["payload"]["title"], "Nouveau titre")
 
     def test_invalid_update_broadcasts_nothing(self):
         response, callbacks = self.request(
