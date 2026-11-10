@@ -13,6 +13,7 @@ import { leaveTravel } from "@/features/travel/api/travelApi";
 import { Link, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { TravelEditModal } from "@/features/travel/components/modal/TravelEditModal";
+import { TravelersModal } from "@/features/travel/components/modal/TravelersModal";
 
 interface TravelHeaderProps {
   travel: Travel;
@@ -24,6 +25,7 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isManageOpen, setIsManageOpen] = useState(false);
   const { submit, isSubmitting, error } = useSubmitAction(() =>
     leaveTravel(travel.id),
   );
@@ -62,7 +64,15 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
           >
             {t("travel.copyInviteLink")}
           </MenuItem>
-          <MenuItem icon="users">{t("travel.manageTravelers")}</MenuItem>
+          <MenuItem
+            icon="users"
+            onClick={() => {
+              setIsOpen(false);
+              setIsManageOpen(true);
+            }}
+          >
+            {t("travel.manageTravelers")}
+          </MenuItem>
           <MenuItem
             onClick={() => {
               setIsOpen(false);
@@ -85,6 +95,12 @@ function TravelOptionsButton({ travel }: { travel: Travel }) {
       )}
       {isEditOpen && (
         <TravelEditModal travel={travel} onClose={() => setIsEditOpen(false)} />
+      )}
+      {isManageOpen && (
+        <TravelersModal
+          travel={travel}
+          onClose={() => setIsManageOpen(false)}
+        />
       )}
     </div>
   );
