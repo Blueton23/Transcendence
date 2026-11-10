@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework.serializers import ValidationError as DRFValidationError
 from rest_framework.test import APITestCase
 
-from common.realtime import travel_group
+from common.realtime import travel_group, user_group
 from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
@@ -4174,3 +4174,76 @@ class IdeaUnseenTest(APITestCase):
 
     def test_anonymous_receives_403(self):
         self.assertIn(self.client.get(self.unseen_url).status_code, (401, 403))
+
+
+class IdeaActivityNotificationTest(BroadcastListenerMixin, APITestCase):
+    """Creating or deleting an idea tells the other members' personal sockets
+    that the travel has news, so their "while you were away" card reloads."""
+
+    def setUp(self):
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        self.author = self.make_member("Jean")
+        self.other = self.make_member("Paul")
+        self.client.force_authenticate(user=self.author)
+
+    def make_member(self, username):
+        traveler = Traveler.objects.create_user(
+            username=username, email=f"{username}@exemple.com", password="pw123456"
+        )
+        Participation.objects.create(
+            traveler=traveler, travel=self.travel, status=ParticipationStatus.ACCEPTED
+        )
+        return traveler
+
+    def request(self, method, url, data=None):
+        with self.captureOnCommitCallbacks(execute=True):
+            return getattr(self.client, method)(url, data, format="json")
+
+    def assert_other_notified(self):
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "travel.activity", "payload": {"travelId": self.travel.id}},
+        )
+
+    def test_create_notifies_other_member(self):
+        self.listen_to(user_group(self.other.id))
+
+        self.request(
+            "post",
+            reverse("idea-list", kwargs={"travel_id": self.travel.id}),
+            {"title": "Musée", "type": IdeaType.ACTIVITY},
+        )
+
+        self.assert_other_notified()
+
+    def test_delete_notifies_other_member(self):
+        idea = Idea.objects.create(
+            traveler=self.author,
+            travel=self.travel,
+            title="Restaurant japonais",
+            type=IdeaType.RESTAURANT,
+        )
+        self.listen_to(user_group(self.other.id))
+
+        self.request(
+            "delete",
+            reverse("idea-detail", kwargs={"travel_id": self.travel.id, "pk": idea.id}),
+        )
+
+        self.assert_other_notified()
+
+    def test_author_is_not_notified(self):
+        self.listen_to(user_group(self.author.id))
+
+        self.request(
+            "post",
+            reverse("idea-list", kwargs={"travel_id": self.travel.id}),
+            {"title": "Musée", "type": IdeaType.ACTIVITY},
+        )
+
+        with self.assertRaises(TimeoutError):
+            self.receive_event(timeout=0.5)

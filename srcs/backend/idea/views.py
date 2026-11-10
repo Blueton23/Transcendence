@@ -19,6 +19,7 @@ from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
 from idea.models import Idea, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
+from travel.activity import notify_travel_activity
 from travel.mixins import ParticipantScopedMixin
 from travel.models import Participation, ParticipationStatus, Step
 from travel.permissions import IsTravelParticipant
@@ -69,6 +70,7 @@ class IdeaListView(PublicApiMixin, ListCreateAPIView):
             traveler=self.request.user,
         )
         broadcast_idea("idea.created", idea)
+        notify_travel_activity(idea.travel_id, self.request.user.id)
 
 
 # Récupérer un seul objet (GET, PATCH, PUT, DELETE)
@@ -92,9 +94,11 @@ class IdeaDetailView(
 
     def perform_destroy(self, instance):
         payload = {"id": instance.id}
-        group = travel_group(instance.travel_id)
+        travel_id = instance.travel_id
         instance.delete()
-        broadcast(group, "idea.deleted", payload)
+        broadcast(travel_group(travel_id), "idea.deleted", payload)
+        # An unseen idea may be gone: the others' counts have to reload.
+        notify_travel_activity(travel_id, self.request.user.id)
 
 
 # Choisir un hébergement placé sur une étape (POST)
