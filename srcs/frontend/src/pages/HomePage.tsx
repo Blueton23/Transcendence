@@ -8,17 +8,20 @@ import Avatar from "@/shared/ui/Avatar";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
 import { useTranslation } from "react-i18next";
 import { Footer } from "@/app/Footer";
+import { ErrorBanner } from "@/app/ErrorBanner";
+import { useError } from "@/shared/context/useError";
 
 function HomePage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { t } = useTranslation();
+  const { showError } = useError();
 
   async function handleLogout() {
     try {
       await logout();
-    } catch (error) {
-      console.error("Erreur lors de la déconnexion :", error);
+    } catch {
+      showError(t("auth.errors.logoutFailed"));
     }
   }
 
@@ -39,6 +42,7 @@ function HomePage() {
       </div>
 
       <div className="flex w-full max-w-3xl flex-col items-center gap-6 text-center">
+        <ErrorBanner />
         <div className="flex flex-col gap-2">
           <Heading level={1} size="lg">
             Accueil
