@@ -416,6 +416,15 @@
     "trip": "Navegación del viaje",
     "trips": "Mis viajes"
   },
+  "notifications": {
+    "title": "Mientras no estabas",
+    "allCaughtUp": "Nada nuevo, estás al día",
+    "messages_one": "{{count}} mensaje nuevo",
+    "messages_other": "{{count}} mensajes nuevos",
+    "ideas_one": "{{count}} idea nueva",
+    "ideas_other": "{{count}} ideas nuevas",
+    "friendRequest": "{{name}} quiere ser tu amigo/a"
+  },
   "profile": {
     "alreadyAccount": "¿Ya tienes una cuenta?",
     "changeAvatar": "Cambiar avatar",

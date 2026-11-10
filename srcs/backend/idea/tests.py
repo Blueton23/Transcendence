@@ -9,7 +9,7 @@ from django.utils import timezone
 from rest_framework.serializers import ValidationError as DRFValidationError
 from rest_framework.test import APITestCase
 
-from common.realtime import travel_group
+from common.realtime import travel_group, user_group
 from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
@@ -4048,3 +4048,202 @@ class IdeaBroadcastTest(BroadcastListenerMixin, APITestCase):
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(callbacks, [])
+
+
+class IdeaUnseenTest(APITestCase):
+    def setUp(self):
+        self.traveler = Traveler.objects.create_user(
+            username="alice_unseen",
+            email="alice_unseen@example.com",
+            password="password123",
+        )
+        self.other = Traveler.objects.create_user(
+            username="bob_unseen",
+            email="bob_unseen@example.com",
+            password="password123",
+        )
+        self.stranger = Traveler.objects.create_user(
+            username="carol_unseen",
+            email="carol_unseen@example.com",
+            password="password123",
+        )
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        self.other_travel = Travel.objects.create(
+            title="Autre voyage",
+            start_date=datetime.date(2026, 7, 1),
+            end_date=datetime.date(2026, 7, 15),
+        )
+        self.participation = Participation.objects.create(
+            traveler=self.traveler,
+            travel=self.travel,
+            status=ParticipationStatus.ACCEPTED,
+        )
+        for travel in (self.travel, self.other_travel):
+            Participation.objects.create(
+                traveler=self.other,
+                travel=travel,
+                status=ParticipationStatus.ACCEPTED,
+            )
+        self.unseen_url = reverse(
+            "idea-unseen-count", kwargs={"travel_id": self.travel.pk}
+        )
+        self.mark_seen_url = reverse(
+            "idea-mark-seen", kwargs={"travel_id": self.travel.pk}
+        )
+
+    def _make_idea(self, traveler=None, travel=None):
+        return Idea.objects.create(
+            travel=travel or self.travel,
+            traveler=traveler or self.other,
+            title="Fondue",
+            type=IdeaType.RESTAURANT,
+        )
+
+    # --- Modele ---
+
+    def test_ideas_from_others_are_unseen_before_first_visit(self):
+        self._make_idea(traveler=self.traveler)
+        theirs = self._make_idea()
+
+        unseen = Idea.objects.unseen_for(self.participation)
+
+        self.assertEqual(list(unseen), [theirs])
+
+    def test_mark_seen_clears_unseen_until_a_new_idea(self):
+        self._make_idea()
+
+        self.participation.mark_ideas_seen()
+
+        self.assertFalse(Idea.objects.unseen_for(self.participation).exists())
+
+        new = self._make_idea()
+
+        self.assertEqual(list(Idea.objects.unseen_for(self.participation)), [new])
+
+    def test_unseen_ignores_deleted_ideas_and_other_travels(self):
+        self._make_idea().delete()
+        self._make_idea(travel=self.other_travel)
+
+        self.assertFalse(Idea.objects.unseen_for(self.participation).exists())
+
+    # --- Vues ---
+
+    def test_mark_seen_resets_unseen_count_to_zero(self):
+        self._make_idea()
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.get(self.unseen_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["unseen_count"], 1)
+
+        response = self.client.post(self.mark_seen_url)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(self.unseen_url)
+        self.assertEqual(response.data["unseen_count"], 0)
+
+    def test_mark_seen_only_touches_my_participation(self):
+        self._make_idea(traveler=self.traveler)
+        self.client.force_authenticate(user=self.traveler)
+
+        self.client.post(self.mark_seen_url)
+
+        other_participation = Participation.objects.get(
+            traveler=self.other, travel=self.travel
+        )
+        self.assertIsNone(other_participation.ideas_seen_at)
+        self.assertEqual(Idea.objects.unseen_for(other_participation).count(), 1)
+
+    def test_non_member_receives_403(self):
+        self.client.force_authenticate(user=self.stranger)
+
+        self.assertEqual(self.client.get(self.unseen_url).status_code, 403)
+        self.assertEqual(self.client.post(self.mark_seen_url).status_code, 403)
+
+    def test_left_member_receives_403(self):
+        self.participation.status = ParticipationStatus.LEFT
+        self.participation.save()
+        self.client.force_authenticate(user=self.traveler)
+
+        self.assertEqual(self.client.get(self.unseen_url).status_code, 403)
+        self.assertEqual(self.client.post(self.mark_seen_url).status_code, 403)
+
+    def test_anonymous_receives_403(self):
+        self.assertIn(self.client.get(self.unseen_url).status_code, (401, 403))
+
+
+class IdeaActivityNotificationTest(BroadcastListenerMixin, APITestCase):
+    """Creating or deleting an idea tells the other members' personal sockets
+    that the travel has news, so their "while you were away" card reloads."""
+
+    def setUp(self):
+        self.travel = Travel.objects.create(
+            title="Road trip Suisse",
+            start_date=datetime.date(2026, 6, 2),
+            end_date=datetime.date(2026, 6, 10),
+        )
+        self.author = self.make_member("Jean")
+        self.other = self.make_member("Paul")
+        self.client.force_authenticate(user=self.author)
+
+    def make_member(self, username):
+        traveler = Traveler.objects.create_user(
+            username=username, email=f"{username}@exemple.com", password="pw123456"
+        )
+        Participation.objects.create(
+            traveler=traveler, travel=self.travel, status=ParticipationStatus.ACCEPTED
+        )
+        return traveler
+
+    def request(self, method, url, data=None):
+        with self.captureOnCommitCallbacks(execute=True):
+            return getattr(self.client, method)(url, data, format="json")
+
+    def assert_other_notified(self):
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "travel.activity", "payload": {"travelId": self.travel.id}},
+        )
+
+    def test_create_notifies_other_member(self):
+        self.listen_to(user_group(self.other.id))
+
+        self.request(
+            "post",
+            reverse("idea-list", kwargs={"travel_id": self.travel.id}),
+            {"title": "Musée", "type": IdeaType.ACTIVITY},
+        )
+
+        self.assert_other_notified()
+
+    def test_delete_notifies_other_member(self):
+        idea = Idea.objects.create(
+            traveler=self.author,
+            travel=self.travel,
+            title="Restaurant japonais",
+            type=IdeaType.RESTAURANT,
+        )
+        self.listen_to(user_group(self.other.id))
+
+        self.request(
+            "delete",
+            reverse("idea-detail", kwargs={"travel_id": self.travel.id, "pk": idea.id}),
+        )
+
+        self.assert_other_notified()
+
+    def test_author_is_not_notified(self):
+        self.listen_to(user_group(self.author.id))
+
+        self.request(
+            "post",
+            reverse("idea-list", kwargs={"travel_id": self.travel.id}),
+            {"title": "Musée", "type": IdeaType.ACTIVITY},
+        )
+
+        with self.assertRaises(TimeoutError):
+            self.receive_event(timeout=0.5)

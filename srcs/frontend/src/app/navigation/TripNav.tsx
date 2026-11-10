@@ -2,6 +2,7 @@ import NavPill, { NavPillMobile } from "./NavPill";
 import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
 import { useUnreadCount } from "@/features/chat/hooks/useUnreadCount";
+import { useUnseenIdeasCount } from "@/features/idea/hooks/useUnseenIdeasCount";
 import { useTranslation } from "react-i18next";
 import { TravelIdentity } from "@/app/navigation/TravelIdentity";
 
@@ -16,11 +17,14 @@ interface TripNavItem {
   badgeCount?: number;
 }
 
-// badgeCount => valeurs de test pour l'instant.
-// - "ideas" : nombre d'idées à placer (Idea sans step) calculable à partir des idées
-// - "chat"  : messages NON LUS --> nécessite un LastMessageReadAt par participation côté backend.
-// TODO(backend): brancher ces compteurs sur les vraies données.
-function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
+// badgeCount :
+// - "ideas" : nouvelles idées des autres depuis le dernier passage sur la page
+// - "chat"  : messages non lus
+function getTripNavItems(
+  tripId: string,
+  unreadCount: number,
+  unseenIdeasCount: number,
+): TripNavItem[] {
   return [
     {
       to: `/travel/${tripId}/itinerary`,
@@ -31,7 +35,7 @@ function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
       to: `/travel/${tripId}/ideas`,
       iconName: "pinplus",
       label: "nav.ideas",
-      badgeCount: 2,
+      badgeCount: unseenIdeasCount,
     },
     {
       to: `/travel/${tripId}/expenses`,
@@ -49,7 +53,8 @@ function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
 
 export function TripNavDesktop({ tripId }: TripNavProps) {
   const unreadCount = useUnreadCount(Number(tripId));
-  const items = getTripNavItems(tripId, unreadCount);
+  const unseenIdeasCount = useUnseenIdeasCount(Number(tripId));
+  const items = getTripNavItems(tripId, unreadCount, unseenIdeasCount);
   const { t } = useTranslation();
 
   return (
@@ -70,7 +75,8 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
 
 export function TripNavMobile({ tripId }: TripNavProps) {
   const unreadCount = useUnreadCount(Number(tripId));
-  const items = getTripNavItems(tripId, unreadCount);
+  const unseenIdeasCount = useUnseenIdeasCount(Number(tripId));
+  const items = getTripNavItems(tripId, unreadCount, unseenIdeasCount);
 
   return (
     <div className="flex gap-1">

@@ -71,6 +71,8 @@ class Participation(models.Model):
     # Dernier passage dans le chat du voyage : les non-lus se deduisent des
     # messages crees apres. Vide tant que le chat n'a jamais ete ouvert.
     last_read_at = models.DateTimeField(null=True, blank=True)
+    # Dernier passage sur la page des idees : meme principe que last_read_at.
+    ideas_seen_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -83,9 +85,23 @@ class Participation(models.Model):
     def __str__(self) -> str:
         return f"{self.traveler} -> {self.travel} ({self.status})"
 
+    def accept(self) -> None:
+        """Makes the traveler a member. What was posted before they joined is
+        marked as read, so it doesn't show up as new for them."""
+        now = timezone.now()
+        self.status = ParticipationStatus.ACCEPTED
+        self.left_at = None
+        self.last_read_at = now
+        self.ideas_seen_at = now
+        self.save()
+
     def mark_read(self) -> None:
         self.last_read_at = timezone.now()
         self.save(update_fields=["last_read_at"])
+
+    def mark_ideas_seen(self) -> None:
+        self.ideas_seen_at = timezone.now()
+        self.save(update_fields=["ideas_seen_at"])
 
 
 # LEFT compte comme membre : un ex-participant garde ce qu'il a produit.

@@ -416,6 +416,15 @@
     "trip": "Trip navigation",
     "trips": "My trips"
   },
+  "notifications": {
+    "title": "While you were away",
+    "allCaughtUp": "Nothing new, you're all caught up",
+    "messages_one": "{{count}} new message",
+    "messages_other": "{{count}} new messages",
+    "ideas_one": "{{count}} new idea",
+    "ideas_other": "{{count}} new ideas",
+    "friendRequest": "{{name}} wants to be your friend"
+  },
   "profile": {
     "alreadyAccount": "Already have an account?",
     "changeAvatar": "Change avatar",
