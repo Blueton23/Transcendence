@@ -9,7 +9,6 @@ export function AppNavDesktop() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-4">
-        <IconBadge color="brand" name="compass" size="md" />
         <Link to="/travel" className="flex items-center gap-4">
           <IconBadge color="brand" name="compass" size="md" />
           <Heading>Peripl</Heading>
