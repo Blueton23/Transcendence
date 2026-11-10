@@ -65,6 +65,8 @@
     },
     "errors": {
       "max_length": "The message is too long.",
+      "loadFailed": "Unable to load the messages.",
+      "markReadFailed": "Unable to mark the messages as read.",
       "travel_chat_access_denied": "You do not have access to this trip.",
       "system_message_has_author": "A system message cannot have an author.",
       "message_author_required": "A message must have an author.",
@@ -554,7 +556,7 @@
     "errors": {
       "datesRequired": "Select dates before confirming.",
       "invalid_invitation_link": "This invitation link is invalid.",
-      "loadFailed": "Could not load the trip.",
+      "loadFailed": "Unable to load the trip.",
       "notFound": "No trip found.",
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
