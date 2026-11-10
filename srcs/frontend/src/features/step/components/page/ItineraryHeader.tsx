@@ -33,7 +33,9 @@ export function ItineraryHeader({
   const [isAddStepOpen, setIsAddStepOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4 pb-4 md:pb-0">
-      <TravelHeader travel={travel} totalKms={route?.totalDistanceKm ?? 0} />
+      <div className="hidden md:block">
+        <TravelHeader travel={travel} totalKms={route?.totalDistanceKm ?? 0} />
+      </div>
       {!isDetailView && (
         <div className="flex justify-between gap-5 md:hidden">
           <div

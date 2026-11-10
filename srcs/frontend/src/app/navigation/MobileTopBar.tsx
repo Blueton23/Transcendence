@@ -1,5 +1,6 @@
 import { AccountSheet } from "@/app/navigation/AccountSheet";
 import { TravelTitle } from "@/app/navigation/TravelTitle";
+import { TravelOptionsButton } from "@/features/travel/components/TravelOptionsButton";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import Avatar from "@/shared/ui/Avatar";
 import Heading from "@/shared/ui/Heading";
@@ -12,7 +13,14 @@ import { Link, useParams } from "react-router";
 function CurrentTravelTitle({ travelId }: { travelId: string }) {
   const { travel } = useTravel(Number(travelId));
   if (!travel) return null;
-  return <TravelTitle travel={travel} inverse={true} />;
+  return (
+    <>
+      <div className="flex min-w-0 flex-1 justify-center text-center">
+        <TravelTitle travel={travel} inverse={true} />
+      </div>
+      <TravelOptionsButton travel={travel} />
+    </>
+  );
 }
 
 export function MobileTopBar() {
@@ -21,7 +29,7 @@ export function MobileTopBar() {
   const [isAccountOpen, setIsAccountOpen] = useState(false);
 
   return (
-    <header className="flex h-15 shrink-0 items-center gap-2.5 bg-brand-dark px-3 text-inverse md:hidden">
+    <header className="relative z-20 flex h-15 shrink-0 items-center gap-2.5 bg-brand-dark px-3 text-inverse md:hidden">
       {travelId ? (
         <>
           <Link
