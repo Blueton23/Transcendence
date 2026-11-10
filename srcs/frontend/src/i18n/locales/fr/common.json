@@ -554,6 +554,7 @@
     "errors": {
       "datesRequired": "Sélectionne des dates avant de valider.",
       "invalid_invitation_link": "Ce lien d'invitation est invalide.",
+      "loadFailed": "Impossible de charger le voyage.",
       "notFound": "Aucun voyage trouvé.",
       "sameDates": "Sélectionne une date de fin différente de la date de début.",
       "titleRequired": "Indique un titre avant de valider.",

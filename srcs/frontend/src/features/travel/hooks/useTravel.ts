@@ -34,8 +34,8 @@ export function useTravel(travelId: number) {
   async function reloadTravel() {
     try {
       setTravel(await getTravel(travelId));
-    } catch (err) {
-      showError(err instanceof Error ? err.message : i18n.t("errors.generic"));
+    } catch {
+      showError(i18n.t("travel.errors.loadFailed"));
     }
   }
 

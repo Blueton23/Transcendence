@@ -554,6 +554,7 @@
     "errors": {
       "datesRequired": "Selecciona las fechas antes de confirmar.",
       "invalid_invitation_link": "Este enlace de invitación no es válido.",
+      "loadFailed": "No se pudo cargar el viaje.",
       "notFound": "No se encontró ningún viaje.",
       "sameDates": "Selecciona una fecha de fin distinta de la fecha de inicio.",
       "titleRequired": "Indica un título antes de confirmar.",
