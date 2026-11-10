@@ -421,6 +421,7 @@
     "messages_other": "{{count}} nouveaux messages",
     "ideas_one": "{{count}} nouvelle idée",
     "ideas_other": "{{count}} nouvelles idées",
+    "invitation": "Tu es invité·e à {{title}}",
     "friendRequest": "{{name}} veut être ton ami·e"
   },
   "profile": {

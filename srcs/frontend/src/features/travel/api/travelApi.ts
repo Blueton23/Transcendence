@@ -1,6 +1,7 @@
 import type {
   CreateTravelData,
   Invitation,
+  InvitationNotification,
   Travel,
   TravelNotification,
 } from "@/features/travel/types";
@@ -78,6 +79,15 @@ export async function getInvitation(token: string): Promise<Invitation> {
   });
 
   return parseResponse<Invitation>(response);
+}
+
+export async function getInvitations(): Promise<InvitationNotification[]> {
+  const response = await fetch(`${API_BASE_URL}/travels/invitations/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  return parseResponse<InvitationNotification[]>(response);
 }
 
 export async function refuseInvitation(token: string): Promise<void> {

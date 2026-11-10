@@ -1,6 +1,6 @@
 import { useFriends } from "@/features/friendship/hooks/useFriends";
 import { addParticipant } from "@/features/travel/api/travelApi";
-import type { TravelInvitation } from "@/features/travel/types";
+import type { InvitedTraveler } from "@/features/travel/types";
 import Button from "@/shared/ui/Button";
 import Card from "@/shared/ui/Card";
 import Input from "@/shared/ui/Input";
@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 
 interface AddFriendSearchProps {
   travelId: number;
-  invitations?: TravelInvitation[];
+  invitations?: InvitedTraveler[];
   memberIds?: number[];
 }
 
@@ -41,6 +41,7 @@ export function AddFriendSearch({
     try {
       await addParticipant(travelId, friendId);
       setAddedIds((ids) => [...ids, friendId]);
+      setQuery("");
     } catch (err) {
       setAddError(err instanceof Error ? err.message : t("errors.unexpected"));
     }

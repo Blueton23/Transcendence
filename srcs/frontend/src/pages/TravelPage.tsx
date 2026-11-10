@@ -14,12 +14,17 @@ import Icon from "@/shared/ui/Icon";
 import Text from "@/shared/ui/Text";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useInvitationNotifications } from "@/features/travel/hooks/useInvitationNotifications";
 
 function TravelPage() {
   const { travels, isLoading, error, refetch } = useTravels();
   const { notifications: travelNotifications, error: notificationsError } =
     useTravelNotifications();
   const friendRequests = useFriendRequests();
+  const {
+    notifications: invitationNotifications,
+    error: InvitationNotificationsError,
+  } = useInvitationNotifications();
   const nextTravel = isLoading || error ? undefined : getNextTravel(travels);
   const [newTravelOpen, setNewTravelOpen] = useState(false);
   const { steps } = useSteps(nextTravel?.id ?? 0);
@@ -50,6 +55,8 @@ function TravelPage() {
         travels={travelNotifications}
         travelsError={notificationsError}
         friendRequests={friendRequests}
+        invitations={invitationNotifications}
+        invitationsError={InvitationNotificationsError}
       />
       <TravelList
         travels={travels.filter((t) => t.id !== nextTravel?.id)}

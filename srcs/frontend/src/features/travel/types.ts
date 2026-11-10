@@ -1,7 +1,7 @@
 export interface Travel {
   id: number;
   travelers: TravelerSummary[];
-  invitations: TravelInvitation[];
+  invitations: InvitedTraveler[];
   title: string;
   startDate: string;
   endDate: string;
@@ -18,7 +18,7 @@ export interface TravelerSummary {
   name: string;
 }
 
-export interface TravelInvitation extends TravelerSummary {
+export interface InvitedTraveler extends TravelerSummary {
   status: "invited" | "refused";
 }
 
@@ -38,4 +38,10 @@ export interface TravelNotification {
   travelTitle: string;
   unreadMessages: number;
   unseenIdeas: number;
+}
+
+export interface InvitationNotification {
+  travelId: number;
+  travelTitle: string;
+  inviteToken: string;
 }
