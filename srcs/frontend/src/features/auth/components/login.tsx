@@ -18,7 +18,7 @@ import { useTranslation } from "react-i18next";
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname ?? "/profile";
+  const from = location.state?.from?.pathname ?? "/travel";
   const { setCurrentUser } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -143,7 +143,7 @@ function Login() {
 
               <button
                 type="button"
-                onClick={() => navigate("/signup")}
+                onClick={() => navigate("/signup", { state: location.state })}
                 className="font-medium text-brand-primary hover:underline"
               >
                 {t("auth.createAccount")}

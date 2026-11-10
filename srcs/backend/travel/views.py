@@ -19,7 +19,7 @@ from rest_framework.views import APIView
 from chat.models import Message, SystemMessageKey
 from chat.services import post_system_message
 from common.mixins import PublicApiMixin
-from common.realtime import broadcast, travel_group
+from common.realtime import broadcast, travel_group, user_group
 from idea.models import Idea
 from traveler.models import Friendship, Status, Traveler
 
@@ -56,6 +56,10 @@ class TravelJoinView(APIView):
             traveler=request.user,
             status=ParticipationStatus.ACCEPTED,
         ).exists()
+        data["is_invited"] = travel.participations.filter(
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        ).exists()
         return Response(data)
 
     def post(self, request, token):
@@ -69,6 +73,26 @@ class TravelJoinView(APIView):
                 participation.accept()
                 announce_participant(travel.id, request.user, "joined")
         return Response(TravelSerializer(travel).data)
+
+
+class RefuseInvitationView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request, token):
+        participation = get_object_or_404(
+            Participation,
+            travel__invite_token=token,
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        )
+        participation.status = ParticipationStatus.REFUSED
+        participation.save(update_fields=["status"])
+        broadcast(
+            travel_group(participation.travel_id),
+            "participant.refused",
+            {"traveler_id": request.user.id},
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AddParticipantView(APIView):
@@ -85,15 +109,44 @@ class AddParticipantView(APIView):
             raise ValidationError(
                 "This traveler is not your friend.", code="not_friend"
             )
-        with transaction.atomic():
-            participation, _ = Participation.objects.select_for_update().get_or_create(
-                traveler=friend, travel_id=travel_id
+        participation, _ = Participation.objects.get_or_create(
+            traveler=friend,
+            travel_id=travel_id,
+            defaults={"status": ParticipationStatus.INVITED, "left_at": None},
+        )
+        if participation.status == ParticipationStatus.REFUSED:
+            raise ValidationError(
+                "This traveler declined the invitation.", code="invitation_refused"
             )
-            # Adding someone who is already a member changes nothing.
-            if participation.status != ParticipationStatus.ACCEPTED:
-                participation.accept()
-                announce_participant(travel_id, friend, "joined")
+        if participation.status != ParticipationStatus.ACCEPTED:
+            participation.status = ParticipationStatus.INVITED
+            participation.save(update_fields=["status"])
+            broadcast(user_group(friend.id), "travel.invited", {"travel_id": travel_id})
+            broadcast(
+                travel_group(travel_id),
+                "participant.invited",
+                {"traveler_id": friend.id},
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TravelInvitationsView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get(self, request):
+        participations = Participation.objects.filter(
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        ).select_related("travel")
+        data = [
+            {
+                "travel_id": participation.travel_id,
+                "travel_title": participation.travel.title,
+                "invite_token": participation.travel.invite_token,
+            }
+            for participation in participations
+        ]
+        return Response(data)
 
 
 PARTICIPANT_MESSAGES = {
