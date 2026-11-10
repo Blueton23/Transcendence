@@ -85,7 +85,5 @@ export async function deleteStep(
     },
   );
 
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }
