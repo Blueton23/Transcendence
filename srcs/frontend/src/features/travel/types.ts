@@ -32,3 +32,10 @@ export interface Invitation extends Travel {
   isMember: boolean;
   isInvited: boolean;
 }
+
+export interface TravelNotification {
+  travelId: number;
+  travelTitle: string;
+  unreadMessages: number;
+  unseenIdeas: number;
+}

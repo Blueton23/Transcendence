@@ -9,7 +9,7 @@ from django.db.models.signals import pre_delete
 from django.dispatch import receiver
 
 from common.models import TimeStampedModel, ValidatedModel
-from travel.models import Step, Travel
+from travel.models import Participation, Step, Travel
 
 
 class IdeaType(models.TextChoices):
@@ -28,6 +28,16 @@ class IdeaStatus(models.TextChoices):
 class IdeaQuerySet(models.QuerySet):
     def pool(self) -> "IdeaQuerySet":
         return self.filter(Q(step__isnull=True) | Q(step__deleted_at__isnull=False))
+
+    # Nouvelles idees pour un participant : celles des autres, proposees depuis
+    # son dernier passage sur la page (toutes si elle n'a jamais ete ouverte).
+    def unseen_for(self, participation: Participation) -> "IdeaQuerySet":
+        unseen = self.filter(travel_id=participation.travel_id).exclude(
+            traveler_id=participation.traveler_id
+        )
+        if participation.ideas_seen_at is not None:
+            unseen = unseen.filter(created_at__gt=participation.ideas_seen_at)
+        return unseen
 
 
 class Idea(TimeStampedModel, ValidatedModel):
