@@ -3,6 +3,7 @@ import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
 import { useUnreadCount } from "@/features/chat/hooks/useUnreadCount";
 import { useTranslation } from "react-i18next";
+import { TravelIdentity } from "@/app/navigation/TravelIdentity";
 
 interface TripNavProps {
   tripId: string;
@@ -54,7 +55,7 @@ export function TripNavDesktop({ tripId }: TripNavProps) {
   return (
     <div className="flex flex-col gap-4">
       <Divider />
-      <div>TODO: identite du voyages (nom, dates, avatars)</div>
+      <TravelIdentity travelId={tripId} />
       <nav
         aria-label={t("nav.trip")}
         className="ml-2.5 flex flex-col gap-1 border-l border-border-control pl-2.5"
