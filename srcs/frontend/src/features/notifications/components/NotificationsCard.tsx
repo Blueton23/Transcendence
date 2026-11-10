@@ -61,7 +61,7 @@ export function NotificationsCard({
           {travelsError && <Text tone="accent">{travelsError}</Text>}
           {travels.map((n) => (
             <div key={n.travelId} className={`${rowStyle} flex-wrap`}>
-              <IconBadge name="mtn" size="sm" />
+              <IconBadge name="van" size="sm" />
               <Text className="min-w-0 flex-1 truncate font-semibold">
                 {n.travelTitle}
               </Text>
@@ -85,7 +85,7 @@ export function NotificationsCard({
                     className={tagButtonStyle}
                     onClick={() => navigate(`/travel/${n.travelId}/ideas`)}
                   >
-                    <Tag icon={<Icon name="pinplus" size={14} />}>
+                    <Tag icon={<Icon name="bulb" size={14} />}>
                       {t("notifications.ideas", { count: n.unseenIdeas })}
                     </Tag>
                   </button>

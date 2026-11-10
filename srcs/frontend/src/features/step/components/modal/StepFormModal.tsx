@@ -37,7 +37,7 @@ export function StepFormModal({
   });
   return (
     <Modal
-      icon="pinplus"
+      icon="bulb"
       title={step ? t("step.edit") : "Ajouter une etape"}
       onClose={onClose}
       size="narrow"

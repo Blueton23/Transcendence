@@ -86,7 +86,7 @@ function DesignSystem() {
           <Button variant="danger">Confirmer</Button>
         </Specimen>
         <Specimen label="icon">
-          <Button variant="primary" icon={<Icon name="pinplus" size={16} />}>
+          <Button variant="primary" icon={<Icon name="bulb" size={16} />}>
             Epingler une idee
           </Button>
         </Specimen>
@@ -114,7 +114,7 @@ function DesignSystem() {
         </Specimen>
         <Specimen label='variant="primary" · size="md" — 44px'>
           <IconButton
-            icon={<Icon name="pinplus" size={20} />}
+            icon={<Icon name="bulb" size={20} />}
             label="Epingler une idee"
             variant="primary"
             size="md"
@@ -136,14 +136,14 @@ function DesignSystem() {
       >
         <Specimen label="size={20} (défaut) · la couleur suit le texte parent">
           <Icon name="pin" />
-          <Icon name="heart" className="text-brand-primary" />
+          <Icon name="heart-f" className="text-brand-primary" />
           <Icon name="check" className="text-success" />
           <Icon name="moon" className="text-muted" />
         </Specimen>
         <Specimen label="size — en pixels, largeur et hauteur à la fois">
-          <Icon name="mtn" size={14} />
-          <Icon name="mtn" size={20} />
-          <Icon name="mtn" size={28} />
+          <Icon name="backpack" size={14} />
+          <Icon name="backpack" size={20} />
+          <Icon name="backpack" size={28} />
         </Specimen>
         <Specimen label={`name — les ${iconNames.length} icônes du sprite`}>
           <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(84px,1fr))] gap-3">
@@ -175,7 +175,7 @@ function DesignSystem() {
           <Chip
             active={cat === "hebergement"}
             onClick={() => setCat("hebergement")}
-            icon={<Icon name="bed" size={16} />}
+            icon={<Icon name="tent" size={16} />}
           >
             Hébergement
           </Chip>
@@ -196,7 +196,7 @@ function DesignSystem() {
           </Badge>
         </Specimen>
         <Specimen label='variant="warning" — en attente, info neutre, en tete'>
-          <Badge variant="warning" icon={<Icon name="clock" size={16} />}>
+          <Badge variant="warning" icon={<Icon name="cal" size={16} />}>
             En attente
           </Badge>
           <Badge variant="warning">Séjour · 2 nuits</Badge>

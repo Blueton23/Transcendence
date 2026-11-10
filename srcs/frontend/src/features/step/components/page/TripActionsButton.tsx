@@ -42,7 +42,7 @@ export function TripActionsButton({
             className="right-0 bottom-full mb-2"
           >
             <MenuItem
-              icon="pinplus"
+              icon="bulb"
               onClick={() => {
                 setIsOpen(false);
                 onPinIdea();

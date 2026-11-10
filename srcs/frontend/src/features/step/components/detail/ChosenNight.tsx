@@ -22,7 +22,7 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
       className="flex min-w-0 flex-1 items-start justify-between md:items-center"
     >
       <div className="flex flex-1 gap-2 md:gap-3">
-        <IconBadge color="chosen" name="bed" />
+        <IconBadge color="chosen" name="tent" />
         <div className="flex flex-col">
           <Heading size="xs" className="text-success-text!">
             {night.title}

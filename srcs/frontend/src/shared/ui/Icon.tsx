@@ -26,7 +26,6 @@ export const iconNames = [
   "logout",
   "moon",
   "pin",
-  "pinplus",
   "plus",
   "route",
   "search",
@@ -38,7 +37,6 @@ export const iconNames = [
   "wifi-off",
   "x",
 ] as const;
-
 
 export type IconName = (typeof iconNames)[number];
 

@@ -64,7 +64,7 @@ export function EditIdeaModal({
   if (hasTrashedStep) {
     return (
       <Modal
-        icon="pinplus"
+        icon="bulb"
         title={t("idea.editIdea")}
         subtitle={travelTitle}
         onClose={onClose}
@@ -85,7 +85,7 @@ export function EditIdeaModal({
 
   return (
     <Modal
-      icon="pinplus"
+      icon="bulb"
       title={t("idea.editIdea")}
       subtitle={travelTitle}
       onClose={() => {

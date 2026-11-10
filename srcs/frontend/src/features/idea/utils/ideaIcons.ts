@@ -1,8 +1,8 @@
 export const ideaIcons = {
   restaurant: "fork",
-  accommodation: "bed",
-  activity: "mtn",
-  sightseeing: "pin",
+  accommodation: "tent",
+  activity: "backpack",
+  sightseeing: "binoculars",
 } as const;
 
 /*

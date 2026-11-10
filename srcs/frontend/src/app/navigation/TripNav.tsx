@@ -33,13 +33,13 @@ function getTripNavItems(
     },
     {
       to: `/travel/${tripId}/ideas`,
-      iconName: "pinplus",
+      iconName: "bulb",
       label: "nav.ideas",
       badgeCount: unseenIdeasCount,
     },
     {
       to: `/travel/${tripId}/expenses`,
-      iconName: "wallet",
+      iconName: "cash",
       label: "nav.expenses",
     },
     {

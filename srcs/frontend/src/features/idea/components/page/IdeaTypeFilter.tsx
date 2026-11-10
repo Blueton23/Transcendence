@@ -30,7 +30,7 @@ export function IdeaTypeFilter({
       <Chip
         active={typeActiveFilter === "accommodation"}
         onClick={() => onChange("accommodation")}
-        icon={<Icon name="bed" size={18} />}
+        icon={<Icon name="tent" size={18} />}
       >
         {t("idea.types.accommodation")}
       </Chip>
@@ -38,7 +38,7 @@ export function IdeaTypeFilter({
       <Chip
         active={typeActiveFilter === "activity"}
         onClick={() => onChange("activity")}
-        icon={<Icon name="mtn" size={18} />}
+        icon={<Icon name="backpack" size={18} />}
       >
         {t("idea.types.activity")}
       </Chip>
@@ -46,7 +46,7 @@ export function IdeaTypeFilter({
       <Chip
         active={typeActiveFilter === "sightseeing"}
         onClick={() => onChange("sightseeing")}
-        icon={<Icon name="pin" size={18} />}
+        icon={<Icon name="binoculars" size={18} />}
       >
         {t("idea.types.sightseeing")}
       </Chip>

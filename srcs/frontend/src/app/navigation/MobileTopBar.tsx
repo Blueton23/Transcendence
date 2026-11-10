@@ -39,7 +39,7 @@ export function MobileTopBar() {
               title={t("nav.trips")}
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-surface-control"
             >
-              <Icon name="home" size={22} className="text-text" />
+              <Icon name="van" size={22} className="text-text" />
             </Link>
             <CurrentTravelTitle travelId={travelId} />
           </>

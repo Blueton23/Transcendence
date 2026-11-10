@@ -48,7 +48,7 @@ export function SpendingModal({
 
   return (
     <Modal
-      icon="pinplus"
+      icon="bulb"
       title={spending ? t("spending.edit") : t("spending.add")}
       onClose={onClose}
       size="narrow"

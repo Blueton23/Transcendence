@@ -57,7 +57,7 @@ export function AccountSheet({ onClose }: { onClose: () => void }) {
 
         <Link to="/travel" onClick={onClose} className={rowStyle}>
           <div className="flex items-center gap-3">
-            <Icon name="home" size={20} />
+            <Icon name="van" size={20} />
             {t("nav.trips")}
           </div>
           <Icon name="chev-right" size={20} className="text-text" />

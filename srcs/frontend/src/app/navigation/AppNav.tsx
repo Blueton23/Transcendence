@@ -15,7 +15,7 @@ export function AppNavDesktop() {
         </Link>
       </div>
       <nav aria-label={t("nav.main")} className="flex flex-col gap-1">
-        <NavPill to="/travel" iconName="home" label={t("nav.trips")}></NavPill>
+        <NavPill to="/travel" iconName="van" label={t("nav.trips")}></NavPill>
         <NavPill
           to="/profile"
           iconName="user"
@@ -32,7 +32,7 @@ export function AppNavMobile() {
     <div className="flex flex-1 justify-center gap-1">
       <NavPill
         to="/travel"
-        iconName="home"
+        iconName="van"
         label={t("nav.tripsShort")}
         variant="mobile"
       ></NavPill>

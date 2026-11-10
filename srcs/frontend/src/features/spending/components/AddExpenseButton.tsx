@@ -24,7 +24,7 @@ function AddExpenseButton({ onClick }: AddExpenseButtonProps) {
       <div className="hidden md:block">
         <Button
           variant="primary"
-          icon={<Icon name="pinplus" size={18} />}
+          icon={<Icon name="bulb" size={18} />}
           onClick={onClick}
           className="w-full"
         >
