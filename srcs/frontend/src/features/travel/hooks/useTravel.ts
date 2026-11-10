@@ -6,11 +6,13 @@ import {
   useTravelSocketOpen,
 } from "@/features/travel/realtime/useTravelSocket";
 import i18n from "@/i18n";
+import { useError } from "@/shared/context/useError";
 
 export function useTravel(travelId: number) {
   const [travel, setTravel] = useState<Travel>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { showError } = useError();
 
   useEffect(() => {
     async function loadTravel() {
@@ -33,7 +35,7 @@ export function useTravel(travelId: number) {
     try {
       setTravel(await getTravel(travelId));
     } catch (err) {
-      console.error("Impossible de recharger le voyage :", err);
+      showError(err instanceof Error ? err.message : i18n.t("errors.generic"));
     }
   }
 
