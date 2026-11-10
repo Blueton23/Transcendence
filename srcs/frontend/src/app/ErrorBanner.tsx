@@ -7,7 +7,7 @@ export function ErrorBanner() {
   if (!message) return null;
 
   return (
-    <Banner variant="warning" icon={<Icon name="info" size={16} />}>
+    <Banner variant="error" icon={<Icon name="info" size={16} />}>
       {message}
     </Banner>
   );

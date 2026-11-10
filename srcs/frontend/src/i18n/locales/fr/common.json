@@ -144,9 +144,11 @@
       "invalidTravelId": "Identifiant de voyage invalide.",
       "loadFailed": "Impossible de charger les idées.",
       "lodgingDatesRequired": "Les dates d'arrivée et de départ sont obligatoires.",
+      "markSeenFailed": "Impossible de marquer les idées comme vues.",
       "notFound": "Idée introuvable.",
       "stepRequired": "Choisis une étape pour cette idée.",
       "titleRequired": "Le titre est obligatoire.",
+      "unseenCountFailed": "Impossible de récupérer le nombre de nouvelles idées.",
       "voteNotFound": "État du vote introuvable.",
       "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser.",
 

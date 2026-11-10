@@ -144,9 +144,11 @@
       "invalidTravelId": "Invalid trip ID.",
       "loadFailed": "Unable to load the ideas.",
       "lodgingDatesRequired": "Check-in and check-out dates are required.",
+      "markSeenFailed": "Unable to mark the ideas as seen.",
       "notFound": "Idea not found.",
       "stepRequired": "Choose a stop for this idea.",
       "titleRequired": "The title is required.",
+      "unseenCountFailed": "Unable to load the number of new ideas.",
       "voteNotFound": "Vote status not found.",
       "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
 
