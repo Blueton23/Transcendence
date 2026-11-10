@@ -1,4 +1,8 @@
-import type { CreateTravelData, Travel } from "@/features/travel/types";
+import type {
+  CreateTravelData,
+  Travel,
+  TravelNotification,
+} from "@/features/travel/types";
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
 import { parseResponse } from "@/shared/api/parseResponse";
@@ -143,4 +147,13 @@ export async function leaveTravel(travelId: number): Promise<void> {
   if (!response.ok) {
     await parseResponse<unknown>(response);
   }
+}
+
+export async function getTravelNotifications(): Promise<TravelNotification[]> {
+  const response = await fetch(`${API_BASE_URL}/travels/notifications/`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  return parseResponse<TravelNotification[]>(response);
 }

@@ -13,13 +13,15 @@ from rest_framework.generics import (
 )
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
 from idea.models import Idea, Reaction
 from idea.serializers import IdeaSerializer, ReactionSerializer
+from travel.activity import notify_travel_activity
 from travel.mixins import ParticipantScopedMixin
-from travel.models import Step
+from travel.models import Participation, ParticipationStatus, Step
 from travel.permissions import IsTravelParticipant
 
 from .schema import idea_detail_schema, ideas_list_schema
@@ -68,6 +70,7 @@ class IdeaListView(PublicApiMixin, ListCreateAPIView):
             traveler=self.request.user,
         )
         broadcast_idea("idea.created", idea)
+        notify_travel_activity(idea.travel_id, self.request.user.id)
 
 
 # Récupérer un seul objet (GET, PATCH, PUT, DELETE)
@@ -91,9 +94,11 @@ class IdeaDetailView(
 
     def perform_destroy(self, instance):
         payload = {"id": instance.id}
-        group = travel_group(instance.travel_id)
+        travel_id = instance.travel_id
         instance.delete()
-        broadcast(group, "idea.deleted", payload)
+        broadcast(travel_group(travel_id), "idea.deleted", payload)
+        # An unseen idea may be gone: the others' counts have to reload.
+        notify_travel_activity(travel_id, self.request.user.id)
 
 
 # Choisir un hébergement placé sur une étape (POST)
@@ -140,6 +145,30 @@ class IdeaChoiceView(ParticipantScopedMixin, GenericAPIView):
             self.get_serializer(idea).data,
             status=status.HTTP_200_OK,
         )
+
+
+# Nouvelles idées depuis le dernier passage sur la page (badge du menu)
+class IdeaSeenMixin:
+    permission_classes: ClassVar[list] = [IsAuthenticated, IsTravelParticipant]
+
+    def get_participation(self):
+        return Participation.objects.get(
+            travel_id=self.kwargs["travel_id"],
+            traveler=self.request.user,
+            status=ParticipationStatus.ACCEPTED,
+        )
+
+
+class IdeaUnseenCountView(IdeaSeenMixin, APIView):
+    def get(self, request, travel_id):
+        count = Idea.objects.unseen_for(self.get_participation()).count()
+        return Response({"unseen_count": count})
+
+
+class IdeaMarkSeenView(IdeaSeenMixin, APIView):
+    def post(self, request, travel_id):
+        self.get_participation().mark_ideas_seen()
+        return Response({"success": True})
 
 
 # ========================================================================#

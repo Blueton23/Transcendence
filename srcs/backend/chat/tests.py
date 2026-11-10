@@ -9,7 +9,7 @@ from rest_framework.test import APIClient
 
 from chat.models import MESSAGE_BODY_MAX_LENGTH, Message, SystemMessageKey
 from chat.serializers import MessageSerializer
-from common.realtime import travel_group
+from common.realtime import travel_group, user_group
 from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaType
 from travel.models import Participation, ParticipationStatus, Step, Travel
@@ -668,3 +668,60 @@ class ChatBroadcastTest(BroadcastListenerMixin, TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(callbacks, [])
+
+
+class ChatActivityNotificationTest(BroadcastListenerMixin, TestCase):
+    """A message tells the other members' personal sockets that the travel
+    has news, so their "while you were away" card reloads."""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.travel = Travel.objects.create(
+            title="Road trip",
+            start_date=datetime.date(2026, 6, 1),
+            end_date=datetime.date(2026, 6, 15),
+        )
+        self.author = self.make_member("erin")
+        self.other = self.make_member("fred")
+        self.client.force_authenticate(user=self.author)
+
+    def make_member(self, username, status=ParticipationStatus.ACCEPTED):
+        traveler = Traveler.objects.create_user(
+            username=username, email=f"{username}@example.com", password="pw123456"
+        )
+        Participation.objects.create(
+            traveler=traveler, travel=self.travel, status=status
+        )
+        return traveler
+
+    def post(self):
+        url = reverse("travel-messages", kwargs={"travel_id": self.travel.pk})
+        with self.captureOnCommitCallbacks(execute=True):
+            return self.client.post(url, {"body": "Salut"}, format="json")
+
+    def test_other_member_is_notified(self):
+        self.listen_to(user_group(self.other.id))
+
+        self.post()
+
+        self.assertEqual(
+            self.receive_event(),
+            {"type": "travel.activity", "payload": {"travelId": self.travel.id}},
+        )
+
+    def test_author_is_not_notified(self):
+        self.listen_to(user_group(self.author.id))
+
+        self.post()
+
+        with self.assertRaises(TimeoutError):
+            self.receive_event(timeout=0.5)
+
+    def test_member_who_left_is_not_notified(self):
+        gone = self.make_member("gina", status=ParticipationStatus.LEFT)
+        self.listen_to(user_group(gone.id))
+
+        self.post()
+
+        with self.assertRaises(TimeoutError):
+            self.receive_event(timeout=0.5)

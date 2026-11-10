@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from travel.activity import notify_travel_activity
 from travel.models import Participation, ParticipationStatus
 from travel.permissions import IsTravelParticipant
 
@@ -65,6 +66,7 @@ class TravelMessageListCreateView(ChatParticipationMixin, APIView):
         )
 
         broadcast_message(message)
+        notify_travel_activity(travel_id, request.user.id)
 
         return Response(
             MessageSerializer(message).data,
