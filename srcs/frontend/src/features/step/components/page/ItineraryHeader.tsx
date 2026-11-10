@@ -1,14 +1,8 @@
 import { TravelHeader } from "@/features/travel/components/TravelHeader";
 import type { Travel } from "@/features/travel/types";
-import { ToggleMobileButton } from "@/features/step/components/mobile/ToggleMobileButton";
-import { useState } from "react";
-import IconButton from "@/shared/ui/IconButton";
-import Heading from "@/shared/ui/Heading";
-import Icon from "@/shared/ui/Icon";
-import { StepFormModal } from "@/features/step/components/modal/StepFormModal";
 import type { Step } from "@/features/step/types";
 import type { Route } from "@/features/map/types";
-import { useTranslation } from "react-i18next";
+import { ItineraryMobileHeader } from "@/features/step/components/mobile/ItineraryMobileHeader";
 
 export interface ItineraryHeaderProps {
   travel: Travel;
@@ -16,7 +10,6 @@ export interface ItineraryHeaderProps {
   route: Route | null;
   mobileView: "list" | "map";
   onToggle: (view: "list" | "map") => void;
-  refetch: () => void;
   isDetailView: boolean;
 }
 
@@ -26,40 +19,19 @@ export function ItineraryHeader({
   route,
   mobileView,
   onToggle,
-  refetch,
   isDetailView,
 }: ItineraryHeaderProps) {
-  const { t } = useTranslation();
-  const [isAddStepOpen, setIsAddStepOpen] = useState(false);
   return (
     <div className="flex flex-col gap-4 pb-4 md:pb-0">
       <div className="hidden md:block">
         <TravelHeader travel={travel} totalKms={route?.totalDistanceKm ?? 0} />
       </div>
       {!isDetailView && (
-        <div className="flex justify-between gap-5 md:hidden">
-          <div
-            className="flex cursor-pointer items-center gap-3 md:hidden"
-            onClick={() => setIsAddStepOpen(true)}
-          >
-            <IconButton
-              variant="primary"
-              icon={<Icon name="pinplus" size={20} />}
-              label={t("step.add")}
-            />
-            <Heading size="sm" level={3}>
-              {t("step.add")}
-            </Heading>
-          </div>
-          <ToggleMobileButton mobileView={mobileView} onToggle={onToggle} />
-        </div>
-      )}
-      {isAddStepOpen && (
-        <StepFormModal
+        <ItineraryMobileHeader
           steps={steps}
-          travel={travel}
-          refetch={refetch}
-          onClose={() => setIsAddStepOpen(false)}
+          route={route}
+          mobileView={mobileView}
+          onToggle={onToggle}
         />
       )}
     </div>

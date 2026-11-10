@@ -34,9 +34,7 @@ export function ItineraryListPanel({
   const segments = isLoadingRoute ? [] : (route?.legs ?? []);
   return (
     <>
-      <div className="hidden md:block">
-        <AddStepForm steps={steps} travel={travel} refetch={refetch} />
-      </div>
+      <AddStepForm steps={steps} travel={travel} refetch={refetch} />
       <div className="flex flex-col gap-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
         <ItineraryTimeline
           steps={steps}
