@@ -78,7 +78,7 @@ export function IdeasPage() {
   return (
     <div className="px-4 pt-8 md:px-8">
       <div className="mb-6 flex items-center justify-between">
-        <Heading level={1} size="lg">
+        <Heading level={1} size="xl">
           {t("nav.ideas")}
         </Heading>
         <PinIdeaButton onClick={() => setCreateIdeaModalOpen(true)} />

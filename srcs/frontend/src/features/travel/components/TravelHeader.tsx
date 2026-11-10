@@ -16,7 +16,7 @@ export function TravelHeader({ travel, totalKms }: TravelHeaderProps) {
   const { t } = useTranslation();
   return (
     <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-6">
-      <Heading level={1} size="lg" className="text-inverse!">
+      <Heading level={1} size="xl" className="text-inverse!">
         {travel.title}
       </Heading>
       <div className="flex flex-nowrap gap-2">

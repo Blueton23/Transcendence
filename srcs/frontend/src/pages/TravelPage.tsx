@@ -41,7 +41,7 @@ function TravelPage() {
   return (
     <div className="flex flex-col gap-4 p-4 md:p-8">
       <div className="flex items-center justify-between">
-        <Heading size="lg">{t("nav.trips")}</Heading>
+        <Heading size="xl">{t("nav.trips")}</Heading>
         <Button
           variant="primary"
           icon={<Icon name="plus" size={18} />}

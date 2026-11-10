@@ -23,6 +23,7 @@
   --text-lg: 1.125rem; /* 18px — sous-titres */
   --text-xl: 1.375rem; /* 22px — titres de carte/modale ("Montreux", "Épingler une idée") */
   --text-2xl: 2rem; /* 32px — titres de page ("Mes voyages", "Road trip Suisse") */
+  --text-3xl: 2.375rem;
 
   --leading-tight: 1.2;
   --leading-normal: 1.4;

@@ -29,7 +29,7 @@ function LegalPage({ doc }: { doc: "privacy" | "terms" }) {
         <Icon name="back" size={16} />
         {t("legal.back")}
       </Link>
-      <Heading level={1} size="lg">
+      <Heading level={1} size="xl">
         {t(`legal.${doc}`)}
       </Heading>
       <Text tone="muted" size="sm">
