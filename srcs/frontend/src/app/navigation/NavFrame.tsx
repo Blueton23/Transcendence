@@ -1,3 +1,4 @@
+import { AccountCard } from "@/app/navigation/AccountCard";
 import { LanguageSwitcher } from "@/app/navigation/LanguageSwitcher";
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,7 +15,8 @@ export function NavFrameDesktop({ children }: NavFrameProps) {
       {children}
       <div className="mt-auto flex flex-col gap-4">
         <LanguageSwitcher />
-        <nav className="flex flex-col gap-1 text-xs text-muted underline">
+        <AccountCard />
+        <nav className="flex justify-between text-xs text-muted underline">
           <Link to="/privacy">{t("legal.privacy")}</Link>
           <Link to="/terms">{t("legal.terms")}</Link>
         </nav>
