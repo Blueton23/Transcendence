@@ -87,6 +87,11 @@ class RefuseInvitationView(APIView):
         )
         participation.status = ParticipationStatus.REFUSED
         participation.save(update_fields=["status"])
+        broadcast(
+            travel_group(participation.travel_id),
+            "participant.refused",
+            {"traveler_id": request.user.id},
+        )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -117,6 +122,11 @@ class AddParticipantView(APIView):
             participation.status = ParticipationStatus.INVITED
             participation.save(update_fields=["status"])
             broadcast(user_group(friend.id), "travel.invited", {"travel_id": travel_id})
+            broadcast(
+                travel_group(travel_id),
+                "participant.invited",
+                {"traveler_id": friend.id},
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
