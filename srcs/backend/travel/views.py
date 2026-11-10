@@ -16,10 +16,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from chat.models import SystemMessageKey
+from chat.models import Message, SystemMessageKey
 from chat.services import post_system_message
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
+from idea.models import Idea
 from traveler.models import Friendship, Status, Traveler
 
 from .consumers import kick_from_travel
@@ -60,18 +61,12 @@ class TravelJoinView(APIView):
     def post(self, request, token):
         travel = get_invited_travel(token)
         with transaction.atomic():
-            participation, created = (
-                Participation.objects.select_for_update().get_or_create(
-                    traveler=request.user,
-                    travel=travel,
-                    defaults={"status": ParticipationStatus.ACCEPTED},
-                )
+            participation, _ = Participation.objects.select_for_update().get_or_create(
+                traveler=request.user, travel=travel
             )
             # Opening the invite link again as a member changes nothing.
-            if created or participation.status != ParticipationStatus.ACCEPTED:
-                participation.status = ParticipationStatus.ACCEPTED
-                participation.left_at = None
-                participation.save()
+            if participation.status != ParticipationStatus.ACCEPTED:
+                participation.accept()
                 announce_participant(travel.id, request.user, "joined")
         return Response(TravelSerializer(travel).data)
 
@@ -90,13 +85,14 @@ class AddParticipantView(APIView):
             raise ValidationError(
                 "This traveler is not your friend.", code="not_friend"
             )
-        Participation.objects.update_or_create(
-            traveler=friend,
-            travel_id=travel_id,
-            defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
-        )
-
-        announce_participant(travel_id, friend, "joined")
+        with transaction.atomic():
+            participation, _ = Participation.objects.select_for_update().get_or_create(
+                traveler=friend, travel_id=travel_id
+            )
+            # Adding someone who is already a member changes nothing.
+            if participation.status != ParticipationStatus.ACCEPTED:
+                participation.accept()
+                announce_participant(travel_id, friend, "joined")
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -213,3 +209,27 @@ class LeaveTravelView(APIView):
         announce_participant(travel_id, request.user, "left")
         kick_from_travel(travel_id, request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TravelNotificationsView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get(self, request):
+        participations = Participation.objects.filter(
+            traveler=request.user,
+            status=ParticipationStatus.ACCEPTED,
+        ).select_related("travel")
+        data = []
+        for participation in participations:
+            messages = Message.objects.unread_for(participation).count()
+            ideas = Idea.objects.unseen_for(participation).count()
+            if messages or ideas:
+                data.append(
+                    {
+                        "travel_id": participation.travel_id,
+                        "travel_title": participation.travel.title,
+                        "unread_messages": messages,
+                        "unseen_ideas": ideas,
+                    }
+                )
+        return Response(data)
