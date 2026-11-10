@@ -67,6 +67,7 @@
       "max_length": "Le message est trop long.",
       "loadFailed": "Impossible de charger les messages.",
       "markReadFailed": "Impossible de marquer les messages comme lus.",
+      "unreadCountFailed": "Impossible de récupérer le nombre de messages non lus.",
       "travel_chat_access_denied": "Vous n'avez pas accès à ce voyage.",
       "system_message_has_author": "Un message système ne peut pas avoir d'auteur.",
       "message_author_required": "Un message doit avoir un auteur.",
