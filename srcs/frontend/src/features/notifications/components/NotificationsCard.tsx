@@ -2,7 +2,10 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
 import type { FriendshipRequest } from "@/features/friendship/types";
-import type { TravelNotification } from "@/features/travel/types";
+import type {
+  InvitationNotification,
+  TravelNotification,
+} from "@/features/travel/types";
 import Avatar from "@/shared/ui/Avatar";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
@@ -15,6 +18,8 @@ interface NotificationsCardProps {
   travels: TravelNotification[];
   travelsError?: string | null;
   friendRequests: FriendshipRequest[];
+  invitations: InvitationNotification[];
+  invitationsError?: string | null;
 }
 
 // Same look as the friend requests rows on the profile page.
@@ -30,11 +35,17 @@ export function NotificationsCard({
   travels,
   travelsError,
   friendRequests,
+  invitations,
+  invitationsError,
 }: NotificationsCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isEmpty =
-    !travelsError && travels.length === 0 && friendRequests.length === 0;
+    !travelsError &&
+    !invitationsError &&
+    travels.length === 0 &&
+    friendRequests.length === 0 &&
+    invitations.length === 0;
 
   return (
     <Card variant="default" className="flex flex-col gap-4">
@@ -94,6 +105,22 @@ export function NotificationsCard({
               <Text className="min-w-0 flex-1 truncate">
                 {t("notifications.friendRequest", {
                   name: request.traveler.username,
+                })}
+              </Text>
+              <Icon name="chev-right" size={18} className="text-muted" />
+            </button>
+          ))}
+          {invitations.map((invitation) => (
+            <button
+              key={`invitation-${invitation.travelId}`}
+              type="button"
+              className={`${rowStyle} ${clickableStyle} w-full text-left`}
+              onClick={() => navigate(`/join/${invitation.inviteToken}`)}
+            >
+              <IconBadge name="email" size="sm" color="purple" />
+              <Text className="min-w-0 flex-1 truncate">
+                {t("notifications.invitation", {
+                  title: invitation.travelTitle,
                 })}
               </Text>
               <Icon name="chev-right" size={18} className="text-muted" />
