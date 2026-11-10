@@ -405,6 +405,7 @@
     "searchOffline": "Search unavailable offline"
   },
   "nav": {
+    "account": "My account",
     "assistant": "AI assistant",
     "chat": "Chat",
     "expenses": "Expenses",

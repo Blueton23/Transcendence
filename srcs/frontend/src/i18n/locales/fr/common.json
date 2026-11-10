@@ -405,6 +405,7 @@
     "searchOffline": "Recherche indisponible hors ligne"
   },
   "nav": {
+    "account": "Mon compte",
     "assistant": "Assistant IA",
     "chat": "Discussion",
     "expenses": "Dépenses",

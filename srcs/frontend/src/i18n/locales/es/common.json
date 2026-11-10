@@ -405,6 +405,7 @@
     "searchOffline": "Búsqueda no disponible sin conexión"
   },
   "nav": {
+    "account": "Mi cuenta",
     "assistant": "Asistente AI",
     "chat": "Chat",
     "expenses": "Gastos",

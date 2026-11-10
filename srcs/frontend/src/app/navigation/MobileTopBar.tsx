@@ -1,9 +1,11 @@
+import { AccountSheet } from "@/app/navigation/AccountSheet";
 import { TravelTitle } from "@/app/navigation/TravelTitle";
 import { useTravel } from "@/features/travel/hooks/useTravel";
 import Avatar from "@/shared/ui/Avatar";
 import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
 import IconBadge from "@/shared/ui/IconBadge";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useParams } from "react-router";
 
@@ -16,6 +18,7 @@ function CurrentTravelTitle({ travelId }: { travelId: string }) {
 export function MobileTopBar() {
   const { t } = useTranslation();
   const { id: travelId } = useParams();
+  const [isAccountOpen, setIsAccountOpen] = useState(false);
 
   return (
     <header className="flex h-15 shrink-0 items-center gap-2.5 bg-brand-dark px-3 text-inverse md:hidden">
@@ -41,9 +44,17 @@ export function MobileTopBar() {
           </Heading>
         </div>
       )}
-      <div className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center">
+      <button
+        type="button"
+        aria-label={t("nav.account")}
+        onClick={() => setIsAccountOpen(true)}
+        className="ml-auto flex h-11 w-11 shrink-0 items-center justify-center"
+      >
         <Avatar className="ring-2 ring-white" />
-      </div>
+      </button>
+      {isAccountOpen && (
+        <AccountSheet onClose={() => setIsAccountOpen(false)} />
+      )}
     </header>
   );
 }
