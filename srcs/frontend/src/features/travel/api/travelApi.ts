@@ -6,7 +6,6 @@ import type {
 import i18n from "@/i18n";
 import { getCookie } from "@/shared/api/cookies";
 import { parseResponse } from "@/shared/api/parseResponse";
-import { getApiErrorMessage } from "@/shared/api/errors";
 
 const API_BASE_URL = "/api";
 
@@ -156,11 +155,5 @@ export async function getTravelNotifications(): Promise<TravelNotification[]> {
     credentials: "include",
   });
 
-  const result = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      getApiErrorMessage(result) || i18n.t("travel.errors.notFound"),
-    );
-  }
-  return result;
+  return parseResponse<TravelNotification[]>(response);
 }
