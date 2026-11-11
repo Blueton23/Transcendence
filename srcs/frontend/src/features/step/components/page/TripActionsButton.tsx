@@ -30,9 +30,9 @@ export function TripActionsButton({
         <IconButton
           icon={<Icon name="plus" size={25} />}
           label={t("step.actions")}
-          variant="outline"
+          variant="primary"
           size="lg"
-          className="border-2 border-brand-primary! bg-surface-control! text-brand-primary!"
+          className="shadow-brand"
           onClick={() => setIsOpen(!isOpen)}
           onMouseDown={(e) => e.stopPropagation()}
         />
