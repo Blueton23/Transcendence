@@ -510,6 +510,7 @@
     "wholeTravel": "Voyage entier"
   },
   "step": {
+    "nightToChoose": "Nuit du {{start}} au {{end}} · à choisir",
     "noRoute": "Trajet impossible en voiture",
     "unplannedNights_one": "{{count}} nuit sans étape",
     "unplannedNights_other": "{{count}} nuits sans étape",
@@ -530,7 +531,7 @@
       "step_dates_overlap": "Les dates de cette étape chevauchent celles d'une autre étape.",
       "step_has_spending": "Cette étape a des dépenses : déplace-les ou supprime-les d'abord."
     },
-    "fromTo": "du {{start}} au {{end}}",
+    "fromTo": "{{start}} → {{end}}",
     "list": "Liste",
     "lodgedRatio": "{{lodged}}/{{total}} hébergement",
     "map": "Carte",

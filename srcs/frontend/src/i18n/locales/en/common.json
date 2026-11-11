@@ -510,6 +510,7 @@
     "wholeTravel": "Whole trip"
   },
   "step": {
+    "nightToChoose": "Night of the {{start}} to the {{end}} · to choose",
     "noRoute": "No route by car",
     "unplannedNights_one": "{{count}} night without a stop",
     "unplannedNights_other": "{{count}} nights without a stop",
@@ -530,7 +531,7 @@
       "step_dates_overlap": "The dates of this stop overlap with another stop.",
       "step_has_spending": "This stop has expenses: move or delete them first."
     },
-    "fromTo": "from {{start}} to {{end}}",
+    "fromTo": "{{start}} → {{end}}",
     "list": "List",
     "lodgedRatio": "{{lodged}}/{{total}} accommodation",
     "map": "Map",

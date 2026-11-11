@@ -39,6 +39,7 @@ function IdeaDay({
   const dotStyle =
     "mt-1 h-3.5 w-3.5 shrink-0 rounded-full border-[3px] border-brand-primary bg-surface";
   const lineStyle = "w-0.5 flex-1 bg-border-control";
+
   return (
     <div className="flex gap-3">
       <div className={railStyle}>
@@ -68,6 +69,7 @@ function IdeaDay({
             )}
             {night && !night?.chosen && night?.proposals.length > 0 && (
               <ProposalsNights
+                date={night.date}
                 proposals={night.proposals}
                 travel={travel}
                 actions={actions}
