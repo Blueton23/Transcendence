@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useIdeas } from "@/features/idea/hooks/useIdeas";
+import { useMarkIdeasSeen } from "@/features/idea/hooks/useMarkIdeasSeen";
 import { IdeaCard } from "@/features/idea/components/card/IdeaCard";
 import { PinIdeaButton } from "@/features/idea/components/page/PinIdeaButton";
 import { IdeaTypeFilter } from "@/features/idea/components/page/IdeaTypeFilter";
@@ -33,6 +34,8 @@ export function IdeasPage() {
     handleChooseIdea,
     handleVote,
   } = useIdeas(travelId);
+
+  useMarkIdeasSeen(travelId);
 
   const {
     steps,
@@ -81,7 +84,7 @@ export function IdeasPage() {
   return (
     <div className="px-4 pt-8 md:px-8">
       <div className="mb-6 flex items-center justify-between">
-        <Heading level={1} size="lg">
+        <Heading level={1} size="xl">
           {t("nav.ideas")}
         </Heading>
         <PinIdeaButton onClick={() => setCreateIdeaModalOpen(true)} />

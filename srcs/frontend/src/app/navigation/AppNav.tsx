@@ -1,39 +1,47 @@
 import IconBadge from "../../shared/ui/IconBadge";
 import Heading from "../../shared/ui/Heading";
-import Button from "../../shared/ui/Button";
-import NavPill, { NavPillMobile } from "./NavPill";
-import { useNavigate } from "react-router";
+import NavPill from "./NavPill";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router";
 
 export function AppNavDesktop() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center gap-4">
-        <IconBadge color="brand" name="compass" size="md" />
-        <Heading>Peripl</Heading>
+        <Link to="/travel" className="flex items-center gap-4">
+          <IconBadge color="brand" name="compass" size="md" />
+          <Heading>Peripl</Heading>
+        </Link>
       </div>
-      <div className="flex flex-col gap-1">
+      <nav aria-label={t("nav.main")} className="flex flex-col gap-1">
         <NavPill to="/travel" iconName="home" label={t("nav.trips")}></NavPill>
         <NavPill
           to="/profile"
           iconName="user"
           label={t("nav.profile")}
         ></NavPill>
-      </div>
-      <Button variant="outline" onClick={() => navigate("/")}>
-        {t("nav.home")}
-      </Button>
+      </nav>
     </div>
   );
 }
 
 export function AppNavMobile() {
+  const { t } = useTranslation();
   return (
-    <div className="flex gap-1">
-      <NavPillMobile to="/travel" iconName="home"></NavPillMobile>
-      <NavPillMobile to="/profile" iconName="user"></NavPillMobile>
+    <div className="flex flex-1 justify-center gap-1">
+      <NavPill
+        to="/travel"
+        iconName="home"
+        label={t("nav.tripsShort")}
+        variant="mobile"
+      ></NavPill>
+      <NavPill
+        to="/profile"
+        iconName="user"
+        label={t("nav.profile")}
+        variant="mobile"
+      ></NavPill>
     </div>
   );
 }

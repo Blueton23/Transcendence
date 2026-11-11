@@ -16,10 +16,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from chat.models import SystemMessageKey
+from chat.models import Message, SystemMessageKey
 from chat.services import post_system_message
 from common.mixins import PublicApiMixin
-from common.realtime import broadcast, travel_group
+from common.realtime import broadcast, travel_group, user_group
+from idea.models import Idea
 from traveler.models import Friendship, Status, Traveler
 
 from .consumers import kick_from_travel
@@ -55,25 +56,43 @@ class TravelJoinView(APIView):
             traveler=request.user,
             status=ParticipationStatus.ACCEPTED,
         ).exists()
+        data["is_invited"] = travel.participations.filter(
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        ).exists()
         return Response(data)
 
     def post(self, request, token):
         travel = get_invited_travel(token)
         with transaction.atomic():
-            participation, created = (
-                Participation.objects.select_for_update().get_or_create(
-                    traveler=request.user,
-                    travel=travel,
-                    defaults={"status": ParticipationStatus.ACCEPTED},
-                )
+            participation, _ = Participation.objects.select_for_update().get_or_create(
+                traveler=request.user, travel=travel
             )
             # Opening the invite link again as a member changes nothing.
-            if created or participation.status != ParticipationStatus.ACCEPTED:
-                participation.status = ParticipationStatus.ACCEPTED
-                participation.left_at = None
-                participation.save()
+            if participation.status != ParticipationStatus.ACCEPTED:
+                participation.accept()
                 announce_participant(travel.id, request.user, "joined")
         return Response(TravelSerializer(travel).data)
+
+
+class RefuseInvitationView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def post(self, request, token):
+        participation = get_object_or_404(
+            Participation,
+            travel__invite_token=token,
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        )
+        participation.status = ParticipationStatus.REFUSED
+        participation.save(update_fields=["status"])
+        broadcast(
+            travel_group(participation.travel_id),
+            "participant.refused",
+            {"traveler_id": request.user.id},
+        )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class AddParticipantView(APIView):
@@ -90,14 +109,44 @@ class AddParticipantView(APIView):
             raise ValidationError(
                 "This traveler is not your friend.", code="not_friend"
             )
-        Participation.objects.update_or_create(
+        participation, _ = Participation.objects.get_or_create(
             traveler=friend,
             travel_id=travel_id,
-            defaults={"status": ParticipationStatus.ACCEPTED, "left_at": None},
+            defaults={"status": ParticipationStatus.INVITED, "left_at": None},
         )
-
-        announce_participant(travel_id, friend, "joined")
+        if participation.status == ParticipationStatus.REFUSED:
+            raise ValidationError(
+                "This traveler declined the invitation.", code="invitation_refused"
+            )
+        if participation.status != ParticipationStatus.ACCEPTED:
+            participation.status = ParticipationStatus.INVITED
+            participation.save(update_fields=["status"])
+            broadcast(user_group(friend.id), "travel.invited", {"travel_id": travel_id})
+            broadcast(
+                travel_group(travel_id),
+                "participant.invited",
+                {"traveler_id": friend.id},
+            )
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TravelInvitationsView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get(self, request):
+        participations = Participation.objects.filter(
+            traveler=request.user,
+            status=ParticipationStatus.INVITED,
+        ).select_related("travel")
+        data = [
+            {
+                "travel_id": participation.travel_id,
+                "travel_title": participation.travel.title,
+                "invite_token": participation.travel.invite_token,
+            }
+            for participation in participations
+        ]
+        return Response(data)
 
 
 PARTICIPANT_MESSAGES = {
@@ -213,3 +262,27 @@ class LeaveTravelView(APIView):
         announce_participant(travel_id, request.user, "left")
         kick_from_travel(travel_id, request.user.id)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TravelNotificationsView(APIView):
+    permission_classes: ClassVar[list] = [IsAuthenticated]
+
+    def get(self, request):
+        participations = Participation.objects.filter(
+            traveler=request.user,
+            status=ParticipationStatus.ACCEPTED,
+        ).select_related("travel")
+        data = []
+        for participation in participations:
+            messages = Message.objects.unread_for(participation).count()
+            ideas = Idea.objects.unseen_for(participation).count()
+            if messages or ideas:
+                data.append(
+                    {
+                        "travel_id": participation.travel_id,
+                        "travel_title": participation.travel.title,
+                        "unread_messages": messages,
+                        "unseen_ideas": ideas,
+                    }
+                )
+        return Response(data)

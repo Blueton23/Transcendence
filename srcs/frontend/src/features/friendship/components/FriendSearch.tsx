@@ -48,8 +48,6 @@ function FriendSearch() {
   }
 
   async function handleSendRequest() {
-    if (!traveler) return;
-
     clearMessages();
 
     const result = await submitRequest();

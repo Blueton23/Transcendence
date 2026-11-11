@@ -1,4 +1,4 @@
-import { joinTravel } from "@/features/travel/api/travelApi";
+import { joinTravel, refuseInvitation } from "@/features/travel/api/travelApi";
 import { useInvitation } from "@/features/travel/hooks/useInvitation";
 import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
@@ -24,6 +24,11 @@ function JoinPage() {
     isSubmitting,
     error: joinError,
   } = useSubmitAction(() => joinTravel(token ?? ""));
+  const {
+    submit: submitRefuse,
+    isSubmitting: isRefusing,
+    error: refuseError,
+  } = useSubmitAction(() => refuseInvitation(token ?? ""));
   if (isLoading) return null;
   if (error)
     return (
@@ -40,6 +45,13 @@ function JoinPage() {
     const result = await submit();
     if (result.success && result.data) {
       navigate(`/travel/${result.data.id}/itinerary`);
+    }
+  };
+
+  const handleRefuse = async () => {
+    const result = await submitRefuse();
+    if (result.success) {
+      navigate(`/travel`);
     }
   };
 
@@ -76,16 +88,33 @@ function JoinPage() {
           >
             {t("travel.joinTravel")}
           </Button>
+          {travel.isInvited ? (
+            <Button
+              disabled={isRefusing || isSubmitting}
+              variant="ghost"
+              icon={<Icon name="x" />}
+              onClick={handleRefuse}
+              className="underline"
+            >
+              {t("travel.refuseInvitation")}
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              className="underline"
+              onClick={() => navigate("/travel")}
+            >
+              {t("travel.notNow")}
+            </Button>
+          )}
           <Text>
             {t("travel.travelersOnBoard", { count: travel.travelers.length })}
           </Text>
         </div>
-        {joinError && (
-          <div role="alert">
+        {(joinError || refuseError) && (
             <Text tone="accent" className="whitespace-pre-line">
-              {joinError}
+              {joinError || refuseError}
             </Text>
-          </div>
         )}
       </Card>
     </div>

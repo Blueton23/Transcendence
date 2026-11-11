@@ -48,7 +48,7 @@ export function StepCard({
   const { submit, isSubmitting, error } = useSubmitAction(onDelete);
 
   const StepOptionsStyle =
-    "absolute top-3 right-3 opacity-0 transition-opacity group-hover:opacity-100";
+    "absolute top-3 right-3 md:opacity-0 md:transition-opacity md:group-hover:opacity-100";
 
   return (
     <Card

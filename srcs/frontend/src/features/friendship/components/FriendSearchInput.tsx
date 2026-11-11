@@ -1,6 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
-
+import { useRef, useState, type SubmitEvent } from "react";
 import type { User } from "@/features/auth/types";
 import Button from "@/shared/ui/Button";
 import Input from "@/shared/ui/Input";
@@ -10,6 +8,8 @@ import { useTranslation } from "react-i18next";
 
 import FriendSearchResult from "./FriendSearchResult";
 import { useFriendSuggestions } from "../hooks/useFriendSuggestions";
+import { useListKeyboard } from "@/shared/hooks/useListKeyboard";
+import { useOnClickOutside } from "@/shared/hooks/useOnClickOutside";
 
 interface FriendSearchInputProps {
   query: string;
@@ -26,6 +26,7 @@ function FriendSearchInput({
 }: FriendSearchInputProps) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  useOnClickOutside(containerRef, () => setIsOpen(false));
   const { t } = useTranslation();
 
   const { travelers, isSearching, error } = useFriendSuggestions(
@@ -33,24 +34,7 @@ function FriendSearchInput({
     !selectedUser,
   );
 
-  useEffect(() => {
-    function handleOutsideClick(event: MouseEvent) {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleOutsideClick);
-
-    return () => {
-      document.removeEventListener("mousedown", handleOutsideClick);
-    };
-  }, []);
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsOpen(true);
   }
@@ -59,6 +43,8 @@ function FriendSearchInput({
     onSelect(user);
     setIsOpen(false);
   }
+
+  const list = useListKeyboard(travelers, handleSelect);
 
   return (
     <div ref={containerRef} className="relative">
@@ -70,7 +56,9 @@ function FriendSearchInput({
             onChange={(event) => {
               onQueryChange(event.target.value);
               setIsOpen(true);
+              list.reset();
             }}
+            onKeyDown={list.handleKeyDown}
             onFocus={() => {
               if (query.trim().length >= 2 && !selectedUser) {
                 setIsOpen(true);
@@ -114,11 +102,12 @@ function FriendSearchInput({
 
           {!isSearching &&
             !error &&
-            travelers.map((user) => (
+            travelers.map((user, index) => (
               <FriendSearchResult
                 key={user.id}
                 user={user}
                 onSelect={handleSelect}
+                isActive={index === list.activeIndex}
               />
             ))}
         </div>

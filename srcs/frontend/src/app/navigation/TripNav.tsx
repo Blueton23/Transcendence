@@ -1,10 +1,10 @@
-import NavPill, { NavPillMobile } from "./NavPill";
-import IconBadge from "../../shared/ui/IconBadge";
-import Text from "../../shared/ui/Text";
+import NavPill from "./NavPill";
 import Divider from "../../shared/ui/Divider";
 import type { IconName } from "../../shared/ui/Icon";
 import { useUnreadCount } from "@/features/chat/hooks/useUnreadCount";
+import { useUnseenIdeasCount } from "@/features/idea/hooks/useUnseenIdeasCount";
 import { useTranslation } from "react-i18next";
+import { TravelIdentity } from "@/features/travel/components/TravelIdentity";
 
 interface TripNavProps {
   tripId: string;
@@ -17,11 +17,14 @@ interface TripNavItem {
   badgeCount?: number;
 }
 
-// badgeCount => valeurs de test pour l'instant.
-// - "ideas" : nombre d'idées à placer (Idea sans step) calculable à partir des idées
-// - "chat"  : messages NON LUS --> nécessite un LastMessageReadAt par participation côté backend.
-// TODO(backend): brancher ces compteurs sur les vraies données.
-function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
+// badgeCount :
+// - "ideas" : nouvelles idées des autres depuis le dernier passage sur la page
+// - "chat"  : messages non lus
+function getTripNavItems(
+  tripId: string,
+  unreadCount: number,
+  unseenIdeasCount: number,
+): TripNavItem[] {
   return [
     {
       to: `/travel/${tripId}/itinerary`,
@@ -32,7 +35,7 @@ function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
       to: `/travel/${tripId}/ideas`,
       iconName: "pinplus",
       label: "nav.ideas",
-      badgeCount: 2,
+      badgeCount: unseenIdeasCount,
     },
     {
       to: `/travel/${tripId}/expenses`,
@@ -45,50 +48,47 @@ function getTripNavItems(tripId: string, unreadCount: number): TripNavItem[] {
       label: "nav.chat",
       badgeCount: unreadCount,
     },
-    {
-      to: `/travel/${tripId}/assistant`,
-      iconName: "spark",
-      label: "nav.assistant",
-    },
   ];
 }
 
 export function TripNavDesktop({ tripId }: TripNavProps) {
   const unreadCount = useUnreadCount(Number(tripId));
-  const items = getTripNavItems(tripId, unreadCount);
+  const unseenIdeasCount = useUnseenIdeasCount(Number(tripId));
+  const items = getTripNavItems(tripId, unreadCount, unseenIdeasCount);
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col gap-8">
-      <div className="flex items-center gap-4">
-        <IconBadge color="brand" name="mtn" />
-        <Text size="md" className="font-bold">
-          Road trip Suisse
-        </Text>
-      </div>
-      <div>TODO: identite du voyages (nom, dates, avatars)</div>
+    <div className="flex flex-col gap-4">
       <Divider />
-      <div className="flex flex-col gap-1">
+      <TravelIdentity travelId={tripId} />
+      <nav
+        aria-label={t("nav.trip")}
+        className="ml-2.5 flex flex-col gap-1 border-l border-border-control pl-2.5"
+      >
         {items.map((item) => (
           <NavPill key={item.to} {...item} label={t(item.label)} />
         ))}
-      </div>
+      </nav>
     </div>
   );
 }
 
 export function TripNavMobile({ tripId }: TripNavProps) {
+  const { t } = useTranslation();
   const unreadCount = useUnreadCount(Number(tripId));
-  const items = getTripNavItems(tripId, unreadCount);
+  const unseenIdeasCount = useUnseenIdeasCount(Number(tripId));
+  const items = getTripNavItems(tripId, unreadCount, unseenIdeasCount);
 
   return (
-    <div className="flex gap-1">
+    <div className="flex w-full gap-1">
       {items.map((item) => (
-        <NavPillMobile
+        <NavPill
           key={item.to}
           to={item.to}
           iconName={item.iconName}
           badgeCount={item.badgeCount}
+          label={t(item.label)}
+          variant="mobile"
         />
       ))}
     </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 
 import { signup } from "../api/profile";
 import { login } from "@/features/auth/api/auth";
@@ -27,6 +27,8 @@ const INITIAL_FORM: SignupData = {
 
 function Signup() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname ?? "/travel";
   const { setCurrentUser } = useAuth();
   const [form, setForm] = useState<SignupData>(INITIAL_FORM);
 
@@ -54,7 +56,7 @@ function Signup() {
       });
 
       setCurrentUser(loginResult.traveler);
-      navigate("/profile");
+      navigate(from, { replace: true });
     }
   }
 
@@ -209,14 +211,14 @@ function Signup() {
             onClick={() => {
               window.location.href = "/api/auth/google/";
             }}
-            className="border-none bg-transparent font-medium !text-brand-primary shadow-none outline-none hover:bg-transparent hover:underline"
+            className="border-none bg-transparent font-medium text-brand-primary! shadow-none outline-none hover:bg-transparent hover:underline"
           >
             {t("auth.continueWithGoogle")}
           </Button>
 
           <button
             type="button"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate("/login", { state: location.state })}
             className="font-medium text-brand-primary hover:underline"
           >
             {t("auth.login")}

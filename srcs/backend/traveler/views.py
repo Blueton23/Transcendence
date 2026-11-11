@@ -586,7 +586,7 @@ class GoogleCallbackView(APIView):
             return redirect("/login?error=google_email_exists")
 
         login(request, traveler)
-        return redirect("/profile")
+        return redirect("/travel")
 
 
 def generate_username(email: str) -> str:

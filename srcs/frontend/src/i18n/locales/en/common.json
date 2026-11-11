@@ -87,7 +87,7 @@
     "server": "Server error.",
     "serverWithStatus": "Server error ({{status}} {{statusText}})",
     "unexpected": "An error occurred.",
-    "end_before_start": "The end date cannot be before the start date.",
+    "end_not_after_start": "The end date must be after the start date.",
     "not_found": "Resource not found.",
     "required": "This field is required.",
     "blank": "This field cannot be blank.",
@@ -403,14 +403,28 @@
     "searchOffline": "Search unavailable offline"
   },
   "nav": {
+    "account": "My account",
     "assistant": "AI assistant",
     "chat": "Chat",
     "expenses": "Expenses",
     "home": "Home",
     "ideas": "Ideas",
     "itinerary": "Itinerary",
+    "main": "Main navigation",
     "profile": "Profile",
-    "trips": "My trips"
+    "trip": "Trip navigation",
+    "trips": "My trips",
+    "tripsShort": "Trips"
+  },
+  "notifications": {
+    "title": "While you were away",
+    "allCaughtUp": "Nothing new, you're all caught up",
+    "messages_one": "{{count}} new message",
+    "messages_other": "{{count}} new messages",
+    "ideas_one": "{{count}} new idea",
+    "ideas_other": "{{count}} new ideas",
+    "invitation": "You're invited to {{title}}",
+    "friendRequest": "{{name}} wants to be your friend"
   },
   "profile": {
     "alreadyAccount": "Already have an account?",
@@ -544,8 +558,8 @@
     "totalRoute": "TOTAL · {{duration}} DRIVING · {{distance}} KM"
   },
   "travel": {
-    "add": "Add",
-    "added": "Added ✓",
+    "add": "Invite",
+    "added": "Invited ✓",
     "addTravel": "Add a trip",
     "copied": "Copied ✓",
     "copy": "Copy",
@@ -561,6 +575,7 @@
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",
       "not_friend": "This person is not one of your friends.",
+      "invitation_refused": "This person declined the invitation.",
       "not_travel_participant": "You must be a member of this trip to perform this action.",
       "steps_before_travel_start": "Some stops start before this date: move them first.",
       "steps_after_travel_end": "Some stops end after this date: move them first."
@@ -570,13 +585,17 @@
     "inviteLink": "Invitation link",
     "inviteTravelers": "Invite your travelers to plan the trip: {{title}}",
     "joinTravel": "Join the trip",
+    "pendingInvitation": "Pending",
+    "refusedInvitation": "Declined",
+    "notNow": "Not now",
+    "refuseInvitation": "Decline the invitation",
     "kms": "{{count}} km",
     "leave": "Leave the trip",
     "manageTravelers": "Manage travellers",
     "newTravel": "New trip",
     "noFriendMatch": "No friend matches",
     "openTravel": "Open trip",
-    "searchFriend": "Search for a friend",
+    "searchFriend": "Add a friend",
     "searchFriendPlaceholder": "Username or first name...",
     "skipForNow": "Skip for now",
     "status": {
@@ -595,6 +614,8 @@
     "nights_one": "{{count}} night",
     "nights_other": "{{count}} nights",
     "nights_zero": "No nights",
-    "pricePerNight": "{{price}} CHF/night"
+    "pricePerNight": "{{price}} CHF/night",
+    "steps_one": "{{count}} stop",
+    "steps_other": "{{count}} stops"
   }
 }
