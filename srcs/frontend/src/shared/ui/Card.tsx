@@ -24,7 +24,7 @@ const variantStyles = {
     "bg-alert-dashed-bg border-dashed border-[1.5px] border-border-alert-dashed text-error",
 };
 
-const baseStyle = "border bg-clip-padding rounded-md p-4";
+const baseStyle = "border bg-clip-padding rounded-md p-3 md:py-2";
 const interactiveStyle =
   "transition-all hover:border-brand-primary/25 hover:-translate-y-px cursor-pointer";
 
@@ -51,7 +51,7 @@ function Card({
         >
           {band}
         </div>
-        <div className={`px-4 pt-3 pb-4 ${className}`}>{children}</div>
+        <div className={`px-4 py-3 ${className}`}>{children}</div>
       </div>
     );
   }

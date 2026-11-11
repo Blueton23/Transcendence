@@ -510,6 +510,9 @@
     "wholeTravel": "Viaje completo"
   },
   "step": {
+    "noRoute": "Sin ruta en coche",
+    "unplannedNights_one": "{{count}} noche sin etapa",
+    "unplannedNights_other": "{{count}} noches sin etapa",
     "actions": "Acción",
     "add": "Añadir una etapa",
     "addExpense": "Añadir un gasto",

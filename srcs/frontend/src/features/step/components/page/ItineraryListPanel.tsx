@@ -5,6 +5,7 @@ import { AddStepForm } from "@/features/step/components/add-step";
 import type { Travel } from "@/features/travel/types";
 import type { Route } from "@/features/map/types";
 import type { Idea } from "@/features/idea/types";
+import { useRef } from "react";
 
 interface ItineraryListPanelProps {
   steps: Step[];
@@ -32,9 +33,23 @@ export function ItineraryListPanel({
   refetch,
 }: ItineraryListPanelProps) {
   const segments = isLoadingRoute ? [] : (route?.legs ?? []);
+  const addInputRef = useRef<HTMLInputElement>(null);
+
+  function focusAddStep() {
+    addInputRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+    addInputRef.current?.focus();
+  }
   return (
     <>
-      <AddStepForm steps={steps} travel={travel} refetch={refetch} />
+      <AddStepForm
+        steps={steps}
+        travel={travel}
+        refetch={refetch}
+        inputRef={addInputRef}
+      />
       <div className="flex flex-col gap-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
         <ItineraryTimeline
           steps={steps}
@@ -44,6 +59,7 @@ export function ItineraryListPanel({
           onDetailView={onDetailView}
           onModifyStep={onModifyStep}
           onDeleteStep={onDeleteStep}
+          onAddStep={focusAddStep}
         />
         <TotalSegment route={route} />
       </div>

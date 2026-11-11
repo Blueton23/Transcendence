@@ -510,6 +510,9 @@
     "wholeTravel": "Whole trip"
   },
   "step": {
+    "noRoute": "No route by car",
+    "unplannedNights_one": "{{count}} night without a stop",
+    "unplannedNights_other": "{{count}} nights without a stop",
     "actions": "Action",
     "add": "Add a stop",
     "addExpense": "Add an expense",
