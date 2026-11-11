@@ -1,3 +1,4 @@
+
 import { useFriends } from "@/features/friendship/hooks/useFriends";
 import { addParticipant } from "@/features/travel/api/travelApi";
 import type { InvitedTraveler } from "@/features/travel/types";
@@ -60,19 +61,23 @@ export function AddFriendSearch({
         value={query}
         onChange={(e) => {
           setQuery(e.target.value);
+          setAddError(null);
           list.reset();
         }}
         placeholder={t("travel.searchFriendPlaceholder")}
         onKeyDown={list.handleKeyDown}
       ></Input>
-      {search && (
+      {friendsError && (
+        <div role="alert" className="w-full">
+          <Text tone="accent" className="whitespace-pre-line">
+            {friendsError}
+          </Text>
+        </div>
+      )}
+      {search && !friendsError && (
         <div className="flex w-full flex-col rounded-md bg-surface p-1">
-          {friendsError ? (
-            <Text tone="accent">{friendsError}</Text>
-          ) : (
-            matches.length === 0 && (
-              <Text tone="muted">{t("travel.noFriendMatch")}</Text>
-            )
+          {matches.length === 0 && (
+            <Text tone="muted">{t("travel.noFriendMatch")}</Text>
           )}
           {matches.map((f, index) => {
             const invitation = invitations.find((i) => i.id === f.friend.id);
@@ -109,7 +114,13 @@ export function AddFriendSearch({
               </div>
             );
           })}
-          {addError && <Text tone="accent">{addError}</Text>}
+        </div>
+      )}
+      {addError && (
+        <div role="alert" className="w-full">
+          <Text tone="accent" className="whitespace-pre-line">
+            {addError}
+          </Text>
         </div>
       )}
     </div>
