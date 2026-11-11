@@ -5,6 +5,8 @@ import { formatDateRange } from "@/features/step/utils/stepDates";
 import type { Travel } from "@/features/travel/types";
 import type { Step } from "@/features/step/types";
 import { useStepForm } from "@/features/step/hooks/useStepForm";
+import type { Place } from "@/features/map/types";
+import { useListKeyboard } from "@/shared/hooks/useListKeyboard";
 
 interface AddStepFromProps {
   steps: Step[];
@@ -15,12 +17,21 @@ interface AddStepFromProps {
 export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
   const form = useStepForm({ travel, onSuccess: refetch });
 
+  const pickPlace = (place: Place) => {
+    form.selectPlace(place);
+    form.setOpenPanel("calendar");
+  };
+  const list = useListKeyboard(form.suggestions, pickPlace);
+
   return (
     <div className="relative">
       <PlaceSearchField
         value={form.query}
         dateLabel={formatDateRange(form.selected)}
-        onChange={(e) => form.changeQuery(e.target.value)}
+        onChange={(e) => {
+          form.changeQuery(e.target.value);
+          list.reset();
+        }}
         onBlur={() =>
           form.setOpenPanel((current) => (current === "place" ? null : current))
         }
@@ -30,12 +41,14 @@ export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
             current === "calendar" ? null : "calendar",
           );
         }}
+        onKeyDown={list.handleKeyDown}
       />
       {form.openPanel === "place" && form.query !== "" && (
         <PlaceSuggestions
           items={form.suggestions}
           isLoading={form.isLoading}
-          onSelect={form.selectPlace}
+          onSelect={pickPlace}
+          activeIndex={list.activeIndex}
         />
       )}
       {form.openPanel === "calendar" && (

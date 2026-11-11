@@ -10,6 +10,8 @@ import { formatDateRange } from "@/features/step/utils/stepDates";
 import { DateRangeField } from "@/shared/ui/DateRangeField";
 import { useStepForm } from "@/features/step/hooks/useStepForm";
 import { useTranslation } from "react-i18next";
+import { useListKeyboard } from "@/shared/hooks/useListKeyboard";
+import type { Place } from "@/features/map/types";
 
 export interface StepFormModalProps {
   step?: Step;
@@ -35,6 +37,12 @@ export function StepFormModal({
       onClose();
     },
   });
+
+  const pickPlace = (place: Place) => {
+    form.selectPlace(place);
+    form.setOpenPanel("calendar");
+  };
+  const list = useListKeyboard(form.suggestions, pickPlace);
   return (
     <Modal
       icon="pinplus"
@@ -51,19 +59,24 @@ export function StepFormModal({
             <PlaceSearchField
               variant="white"
               value={form.query}
-              onChange={(e) => form.changeQuery(e.target.value)}
+              onChange={(e) => {
+                form.changeQuery(e.target.value);
+                list.reset();
+              }}
               onBlur={() =>
                 form.setOpenPanel((current) =>
                   current === "place" ? null : current,
                 )
               }
               onFocus={() => form.setOpenPanel("place")}
+              onKeyDown={list.handleKeyDown}
             />
             {form.openPanel === "place" && form.query !== "" && (
               <PlaceSuggestions
                 items={form.suggestions}
                 isLoading={form.isLoading}
-                onSelect={form.selectPlace}
+                onSelect={pickPlace}
+                activeIndex={list.activeIndex}
               />
             )}
           </div>

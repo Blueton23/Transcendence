@@ -24,7 +24,7 @@ export function TripActionsButton({
         <AddExpenseButton onClick={onPinExpense} />
       </div>
       <div
-        className="fixed right-5 bottom-20 z-30 md:hidden"
+        className="fixed right-5 bottom-25 z-30 md:hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <IconButton

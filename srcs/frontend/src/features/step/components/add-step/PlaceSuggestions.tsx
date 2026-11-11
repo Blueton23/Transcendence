@@ -8,12 +8,14 @@ interface PlaceSuggestionsProps {
   items: Place[];
   isLoading: boolean;
   onSelect: (place: Place) => void;
+  activeIndex: number;
 }
 
 export function PlaceSuggestions({
   items,
   isLoading,
   onSelect,
+  activeIndex,
 }: PlaceSuggestionsProps) {
   const { t } = useTranslation();
   const isOnline = useOnlineNetworkStatus();
@@ -28,10 +30,13 @@ export function PlaceSuggestions({
           {t("actions.searching")}
         </Text>
       ) : items.length > 0 ? (
-        items.map((place) => (
+        items.map((place, index) => (
           <button
             type="button"
-            className="flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface-raised"
+            aria-selected={index === activeIndex}
+            className={`flex cursor-pointer items-center gap-2 px-3 py-2 text-sm text-muted hover:bg-surface-raised ${
+              index === activeIndex ? "bg-surface-raised text-text" : ""
+            }`}
             key={`${place.latitude}-${place.longitude}`}
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => {

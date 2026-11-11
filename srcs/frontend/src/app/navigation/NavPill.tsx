@@ -1,58 +1,36 @@
-import { pillBase, pillStateStyles } from "./pillStyles";
 import { NavLink } from "react-router";
 import type { IconName } from "../../shared/ui/Icon";
 import Icon from "../../shared/ui/Icon";
-import { navPillMobileBase, navPillMobileStateStyles } from "./pillStyles";
 import CountBadge from "./CountBadge";
-
-interface NavPillMobileProps {
-  to: string;
-  iconName: IconName;
-  badgeCount?: number;
-}
-
-const mobilePillActive = navPillMobileStateStyles.active;
-const mobilePillInactive = navPillMobileStateStyles.inactive;
-
-export function NavPillMobile({
-  to,
-  iconName,
-  badgeCount,
-}: NavPillMobileProps) {
-  return (
-    <NavLink
-      to={to}
-      className={({ isActive }) =>
-        `${navPillMobileBase} ${isActive ? mobilePillActive : mobilePillInactive}`
-      }
-    >
-      <Icon name={iconName} size={23} />
-      <CountBadge count={badgeCount} variant="mobile" />
-    </NavLink>
-  );
-}
+import { pillStyles } from "@/app/navigation/pillStyles";
 
 interface NavPillProps {
   to: string;
   iconName: IconName;
   label: string;
   badgeCount?: number;
+  variant?: "desktop" | "mobile";
 }
 
-const pillActive = pillStateStyles.active;
-const pillInactive = pillStateStyles.inactive;
-
-export function NavPill({ to, iconName, label, badgeCount }: NavPillProps) {
+export function NavPill({
+  to,
+  iconName,
+  label,
+  badgeCount,
+  variant = "desktop",
+}: NavPillProps) {
+  const styles = pillStyles[variant];
   return (
     <NavLink
       to={to}
+      end
       className={({ isActive }) =>
-        `${pillBase} ${isActive ? pillActive : pillInactive}`
+        `${styles.base} ${isActive ? styles.active : styles.inactive}`
       }
     >
-      <Icon name={iconName} />
+      <Icon name={iconName} size={variant === "mobile" ? 20 : undefined} />
       {label}
-      <CountBadge count={badgeCount} />
+      <CountBadge count={badgeCount} variant={variant} />
     </NavLink>
   );
 }

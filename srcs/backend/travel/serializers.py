@@ -10,12 +10,12 @@ from .models import ParticipationStatus, Step, Travel, validate_no_dates_overlap
 def validate_date_range(instance, attrs):
     start = attrs.get("start_date", getattr(instance, "start_date", None))
     end = attrs.get("end_date", getattr(instance, "end_date", None))
-    if start and end and end < start:
+    if start and end and end <= start:
         raise serializers.ValidationError(
             {
                 "end_date": serializers.ErrorDetail(
-                    "Must be on or after the start date.",
-                    code="end_before_start",
+                    "Must be after the start date.",
+                    code="end_not_after_start",
                 )
             }
         )
@@ -65,6 +65,7 @@ def validate_date_within_travel(travel, instance, attrs):
 class TravelSerializer(serializers.ModelSerializer):
     status = serializers.SerializerMethodField()
     travelers = serializers.SerializerMethodField()
+    invitations = serializers.SerializerMethodField()
     nights = serializers.SerializerMethodField()
 
     def get_status(self, obj) -> str:
@@ -81,6 +82,22 @@ class TravelSerializer(serializers.ModelSerializer):
             for participation in accepted
         ]
 
+    def get_invitations(self, obj) -> list[dict]:
+        pending = obj.participations.filter(
+            status__in=[ParticipationStatus.INVITED, ParticipationStatus.REFUSED]
+        )
+        return [
+            {
+                "id": p.traveler.id,
+                "initials": p.traveler.username[:2].upper(),
+                "name": p.traveler.username,
+                "status": "invited"
+                if p.status == ParticipationStatus.INVITED
+                else "refused",
+            }
+            for p in pending
+        ]
+
     def get_nights(self, obj) -> int:
         return (obj.end_date - obj.start_date).days
 
@@ -95,6 +112,7 @@ class TravelSerializer(serializers.ModelSerializer):
         fields: ClassVar[list[str]] = [
             "id",
             "travelers",
+            "invitations",
             "title",
             "start_date",
             "end_date",

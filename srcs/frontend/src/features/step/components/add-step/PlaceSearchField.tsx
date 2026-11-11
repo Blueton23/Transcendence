@@ -1,6 +1,10 @@
 import Icon from "@/shared/ui/Icon";
 import Divider from "@/shared/ui/Divider";
-import { type ChangeEventHandler, type FocusEventHandler } from "react";
+import {
+  type ChangeEventHandler,
+  type FocusEventHandler,
+  type KeyboardEventHandler,
+} from "react";
 import IconButton from "@/shared/ui/IconButton";
 import { useTranslation } from "react-i18next";
 
@@ -12,6 +16,7 @@ interface PlaceSearchFieldProps {
   onBlur: FocusEventHandler<HTMLInputElement>;
   onFocus: FocusEventHandler<HTMLInputElement>;
   onCalendarClick?: () => void;
+  onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
 }
 
 const variantStyle = {
@@ -27,6 +32,7 @@ export function PlaceSearchField({
   onBlur,
   onFocus,
   onCalendarClick,
+  onKeyDown,
 }: PlaceSearchFieldProps) {
   const { t } = useTranslation();
   return (
@@ -41,6 +47,7 @@ export function PlaceSearchField({
         onFocus={onFocus}
         className="flex-1 text-sm text-text outline-none placeholder:text-muted"
         placeholder={t("step.placePlaceholder")}
+        onKeyDown={onKeyDown}
       ></input>
       {onCalendarClick && (
         <>
