@@ -59,6 +59,7 @@ export async function postIdea(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(payload),
   });
@@ -87,6 +88,7 @@ export async function patchIdea(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(payload),
   });
@@ -111,12 +113,11 @@ export async function removeIdea(
     credentials: "include",
     headers: {
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }
 
 // Placer une idée sur le voyage
@@ -155,6 +156,7 @@ export async function patchIdeaPlacement(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(payload),
   });
@@ -181,6 +183,7 @@ export async function chooseIdea(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
@@ -207,12 +210,11 @@ export async function addIdeaReaction(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<unknown>(response);
 }
 
 // Retirer le vote sur une idée du voyage
@@ -232,10 +234,9 @@ export async function removeIdeaReaction(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }
