@@ -1,12 +1,28 @@
-import type { IdeaFilter } from "@/features/idea/types";
+import type { IdeaFilter, IdeaType } from "@/features/idea/types";
+import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
 import Chip from "@/shared/ui/Chip";
-import Icon from "@/shared/ui/Icon";
 import { useTranslation } from "react-i18next";
 
 interface IdeaTypeFilterProps {
   typeActiveFilter: IdeaFilter;
   onChange: (filter: IdeaFilter) => void;
 }
+
+const ideaTypes: IdeaType[] = [
+  "restaurant",
+  "accommodation",
+  "activity",
+  "sightseeing",
+];
+
+const dotColors: Record<IdeaType, string> = {
+  restaurant: "bg-idea-restaurant-dot",
+  accommodation: "bg-idea-lodging-dot",
+  activity: "bg-idea-activity-dot",
+  sightseeing: "bg-idea-sightseeing-dot",
+};
+
+const dotStyle = "size-2.5 shrink-0 rounded-full";
 
 export function IdeaTypeFilter({
   typeActiveFilter,
@@ -19,37 +35,21 @@ export function IdeaTypeFilter({
         {t("idea.filters.allTypes")}
       </Chip>
 
-      <Chip
-        active={typeActiveFilter === "restaurant"}
-        onClick={() => onChange("restaurant")}
-        icon={<Icon name="fork" size={18} />}
-      >
-        {t("idea.types.restaurant")}
-      </Chip>
-
-      <Chip
-        active={typeActiveFilter === "accommodation"}
-        onClick={() => onChange("accommodation")}
-        icon={<Icon name="tent" size={18} />}
-      >
-        {t("idea.types.accommodation")}
-      </Chip>
-
-      <Chip
-        active={typeActiveFilter === "activity"}
-        onClick={() => onChange("activity")}
-        icon={<Icon name="backpack" size={18} />}
-      >
-        {t("idea.types.activity")}
-      </Chip>
-
-      <Chip
-        active={typeActiveFilter === "sightseeing"}
-        onClick={() => onChange("sightseeing")}
-        icon={<Icon name="binoculars" size={18} />}
-      >
-        {t("idea.types.sightseeing")}
-      </Chip>
+      {ideaTypes.map((type) => (
+        <Chip
+          key={type}
+          active={typeActiveFilter === type}
+          onClick={() => onChange(type)}
+          icon={
+            <span
+              aria-hidden="true"
+              className={`${dotStyle} ${dotColors[type]}`}
+            />
+          }
+        >
+          {t(ideaTypeLabels[type])}
+        </Chip>
+      ))}
     </div>
   );
 }

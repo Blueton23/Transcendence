@@ -1,7 +1,14 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
-export type ButtonVariant =
-  "primary" | "dark" | "outline" | "danger" | "ghost" | "success" | "vote";
+type ButtonVariant =
+  | "primary"
+  | "dark"
+  | "outline"
+  | "danger"
+  | "ghost"
+  | "success"
+  | "white"
+  | "voted";
 
 type ButtonSize = "xs" | "sm" | "md";
 
@@ -19,7 +26,8 @@ const variantStyles = {
   danger: "bg-error text-inverse border-transparent",
   ghost: "bg-transparent text-text",
   success: "bg-success text-inverse border-transparent",
-  vote: "text-brand-primary",
+  voted: "text-brand-primary", // voted heart in a step detail row
+  white: "bg-surface border border-border text-brand-primary", // voted heart on an idea card
 };
 
 const sizeStyles = {

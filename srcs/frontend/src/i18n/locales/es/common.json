@@ -613,7 +613,8 @@
     "nights_one": "{{count}} noche",
     "nights_other": "{{count}} noches",
     "nights_zero": "Sin noches",
-    "pricePerNight": "{{price}} CHF/noche",
+    "perNight": "por noche",
+    "pricePerNight": "{{price}} CHF por noche",
     "steps_one": "{{count}} etapa",
     "steps_other": "{{count}} etapas"
   }

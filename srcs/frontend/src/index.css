@@ -84,6 +84,11 @@
   --color-band-4: #cdd7dd; /* mist */
   --color-band-5: #d2d1da; /* slate, derived from ink */
 
+  --color-idea-restaurant-dot: #e7a23c;
+  --color-idea-lodging-dot: #6c6597;
+  --color-idea-activity-dot: #3fb477;
+  --color-idea-sightseeing-dot: #e2704f;
+
   /* Idea types: background + text */
   --color-idea-restaurant-bg: #f8ebd3;
   --color-idea-restaurant: #7a5410;

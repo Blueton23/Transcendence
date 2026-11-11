@@ -3,16 +3,18 @@ import { VoteButton } from "@/features/idea/components/card/VoteButton";
 import { StepButton } from "@/features/idea/components/card/StepButton";
 import { SecondaryInfo } from "@/features/idea/components/card/SecondaryInfo";
 import { StepLabel } from "@/features/idea/components/card/StepLabel";
-import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import Text from "@/shared/ui/Text";
-import IconBadge from "@/shared/ui/IconBadge";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Button from "@/shared/ui/Button";
 import { useTranslation } from "react-i18next";
 import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import type { AvatarColor } from "@/shared/ui/Avatar";
+import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
+import { ideaBands } from "@/features/idea/utils/ideaBands";
+import Divider from "@/shared/ui/Divider";
+import Icon from "@/shared/ui/Icon";
 
 // Défini les composant d'entrée
 export interface IdeaCardProps {
@@ -69,39 +71,20 @@ export function IdeaCard({
   } = useSubmitAction(onVote);
 
   const canChoose = idea.type === "accommodation" && idea.status === "placed";
+  const isLodging = idea.type === "accommodation";
+  const isChosen = isLodging && idea.status === "chosen";
 
   const isActionPending = isDeleting || isChoosing || isVoting;
 
   return (
-    <Card>
-      <div className="flex md:items-center md:justify-between">
-        <div className="flex min-w-0 flex-1 items-start gap-2 md:items-center md:gap-3">
-          <IconBadge name={ideaIcons[idea.type]} size="md" />
-
-          <div className="flex min-w-0 flex-1 flex-col">
-            <Heading level={3} size="xs" className="truncate">
-              {idea.title}
-            </Heading>
-
-            <div className="flex min-w-0 flex-col items-start gap-1 md:flex-row md:items-center md:gap-1.5">
-              <SecondaryInfo
-                pricePerNight={idea.pricePerNight}
-                proposerName={proposerName}
-                proposerInitials={proposerInitials}
-                color={color}
-              />
-              {(isInPool || stepName) && (
-                <StepLabel isInPool={isInPool} stepName={stepName} />
-              )}
-              {idea.type === "accommodation" && idea.status === "chosen" && (
-                <Text size="sm">{t("idea.chosenLodging")}</Text>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 whitespace-nowrap md:flex-nowrap md:gap-3">
-          <div className="order-1">
+    <Card
+      band={
+        <>
+          <span className="flex items-center gap-1 text-sm font-semibold">
+            {isChosen && <Icon name="check" size={14} />}
+            {isChosen ? t("idea.chosenLodging") : t(ideaTypeLabels[idea.type])}
+          </span>
+          <div className="ml-auto flex items-center gap-1">
             <VoteButton
               voteCount={idea.voteCount}
               voted={idea.voted}
@@ -113,12 +96,11 @@ export function IdeaCard({
 
                 void submitVote();
               }}
+              ideaCard
             />
-          </div>
-
-          <div className="order-2 md:order-3">
             <OptionsMenu
               disabled={isActionPending}
+              variant="ghost"
               onEdit={onEdit}
               onDelete={() => void submitDelete()}
               extraActions={
@@ -134,55 +116,76 @@ export function IdeaCard({
               }
             />
           </div>
-
-          <div className="order-3 flex basis-full justify-end md:order-2 md:basis-auto">
-            {chooseButton ? (
-              <Button
-                variant="dark"
-                size="sm"
-                onClick={() => submitChoose()}
-                disabled={isActionPending}
-              >
-                {t("idea.choose")}
-              </Button>
-            ) : (
-              (onPlace || onView) && (
-                <StepButton
-                  isInPool={isInPool}
-                  onPlace={onPlace}
-                  onView={onView}
-                  disabled={isActionPending}
-                />
-              )
-            )}
+        </>
+      }
+      bandClassName={ideaBands[idea.type]}
+      className="flex flex-col gap-3"
+    >
+      <div className="flex items-start justify-between gap-5">
+        <div className="flex min-w-0 flex-col">
+          <Heading level={3} size="sm" className="truncate">
+            {idea.title}
+          </Heading>
+          <SecondaryInfo
+            proposerName={proposerName}
+            proposerInitials={proposerInitials}
+            color={color}
+          />
+        </div>
+        {idea.pricePerNight && (
+          <div className="flex shrink-0 flex-col items-end">
+            <Text font="mono" className="font-semibold">
+              {idea.pricePerNight} CHF
+            </Text>
+            <Text size="sm" tone="muted">
+              {t("units.perNight")}
+            </Text>
           </div>
+        )}
+      </div>
+      <Divider />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {(isInPool || stepName) && (
+          <StepLabel
+            isInPool={isInPool}
+            stepName={stepName}
+            startDate={isLodging ? idea.arrivalDate : idea.date}
+            endDate={isLodging ? idea.departureDate : null}
+          />
+        )}
+        <div className="ml-auto">
+          {chooseButton ? (
+            <Button
+              variant="dark"
+              size="xs"
+              onClick={() => submitChoose()}
+              disabled={isActionPending}
+            >
+              {t("idea.choose")}
+            </Button>
+          ) : (
+            (onPlace || onView) && (
+              <StepButton
+                isInPool={isInPool}
+                onPlace={onPlace}
+                onView={onView}
+                disabled={isActionPending}
+              />
+            )
+          )}
         </div>
       </div>
-      {deleteError && (
-        <div role="alert" className="mt-2">
-          <Text tone="accent" size="sm" className="whitespace-pre-line">
-            {deleteError}
-          </Text>
-        </div>
-      )}
-      {chooseError && (
-        <div role="alert" className="mt-2">
-          <Text tone="accent" size="sm" className="whitespace-pre-line">
-            {chooseError}
-          </Text>
-        </div>
-      )}
-      {voteError && (
-        <div role="alert" className="mt-2">
-          <Text tone="accent" size="sm" className="whitespace-pre-line">
-            {voteError}
-          </Text>
-        </div>
+
+      {[deleteError, chooseError, voteError].map(
+        (error) =>
+          error && (
+            <div key={error} role="alert">
+              <Text tone="accent" size="sm" className="whitespace-pre-line">
+                {error}
+              </Text>
+            </div>
+          ),
       )}
     </Card>
   );
 }
-
-/*
-Fonction qui gère l'ensemble d'une carte d'idée
-*/
