@@ -1,4 +1,3 @@
-
 import { useFriends } from "@/features/friendship/hooks/useFriends";
 import { addParticipant } from "@/features/travel/api/travelApi";
 import type { InvitedTraveler } from "@/features/travel/types";

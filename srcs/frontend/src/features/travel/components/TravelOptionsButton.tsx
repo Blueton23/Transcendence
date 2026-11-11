@@ -1,4 +1,3 @@
-
 import { leaveTravel } from "@/features/travel/api/travelApi";
 import { TravelEditModal } from "@/features/travel/components/modal/TravelEditModal";
 import { TravelersModal } from "@/features/travel/components/modal/TravelersModal";
