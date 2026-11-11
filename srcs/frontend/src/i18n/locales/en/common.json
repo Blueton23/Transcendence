@@ -146,7 +146,6 @@
       "titleRequired": "The title is required.",
       "voteNotFound": "Vote status not found.",
       "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
-
       "step_not_in_travel": "The stop must belong to the same trip as the idea.",
       "dates_outside_step": "The idea dates must be within the dates of the selected stop.",
       "price_only_for_lodging": "Only accommodation can have a price per night.",
@@ -507,7 +506,9 @@
     "saveChanges": "Save changes",
     "saving": "Saving…",
     "submitAdd": "Add the expense",
-    "wholeTravel": "Whole trip"
+    "wholeTravel": "Whole trip",
+    "total": "Trip total",
+    "yourShare": "your share: {{amount}} CHF"
   },
   "step": {
     "nightToChoose": "Night of the {{start}} to the {{end}} · to choose",

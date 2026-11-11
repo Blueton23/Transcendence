@@ -7,7 +7,8 @@ type CardVariant =
   | "alert"
   | "dashed"
   | "dashed-accent"
-  | "accomodation";
+  | "accomodation"
+  | "dark";
 
 interface CardProps {
   children: ReactNode;
@@ -29,6 +30,7 @@ const variantStyles = {
   "dashed-accent":
     "bg-alert-dashed-bg border-dashed border-[1.5px] border-border-alert-dashed text-error",
   accomodation: "bg-idea-lodging-bg border-transparent text-idea-lodging",
+  dark: "bg-brand-dark border-transparent text-inverse",
 };
 
 const baseStyle = "border bg-clip-padding rounded-md p-3 md:py-2";

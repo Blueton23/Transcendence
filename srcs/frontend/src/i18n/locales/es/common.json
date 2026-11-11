@@ -146,7 +146,6 @@
       "titleRequired": "El título es obligatorio.",
       "voteNotFound": "Estado del voto no encontrado.",
       "voteRefreshFailed": "Tu voto se guardó, pero no se pudo actualizar el contador. Recarga la página para sincronizarlo.",
-
       "step_not_in_travel": "La etapa debe pertenecer al mismo viaje que la idea.",
       "dates_outside_step": "Las fechas de la idea deben estar dentro de las fechas de la etapa seleccionada.",
       "price_only_for_lodging": "Solo un alojamiento puede tener un precio por noche.",
@@ -507,7 +506,9 @@
     "saveChanges": "Guardar los cambios",
     "saving": "Guardando…",
     "submitAdd": "Añadir el gasto",
-    "wholeTravel": "Viaje completo"
+    "wholeTravel": "Viaje completo",
+    "total": "Total del viaje",
+    "yourShare": "tu parte: {{amount}} CHF"
   },
   "step": {
     "nightToChoose": "Noche del {{start}} al {{end}} · por elegir",
