@@ -1,4 +1,3 @@
-import { Footer } from "@/app/Footer";
 import { NotificationSocketProvider } from "@/features/notifications/realtime/NotificationSocketProvider";
 import { TravelAccessGuard } from "@/features/travel/realtime/TravelAccessGuard";
 import { TravelSocketProvider } from "@/features/travel/realtime/TravelSocketProvider";
@@ -15,9 +14,6 @@ export function AppLayout() {
       <main className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-24 md:pb-0">
         <OfflineBanner />
         <Outlet />
-        <div className="md:hidden">
-          <Footer />
-        </div>
       </main>
     </div>
   );

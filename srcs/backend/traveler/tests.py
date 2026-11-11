@@ -1812,7 +1812,7 @@ class GoogleCallbackViewTest(APITestCase):
 
         response = self.google_callback()
 
-        self.assertRedirects(response, "/profile", fetch_redirect_response=False)
+        self.assertRedirects(response, "/travel", fetch_redirect_response=False)
         traveler = Traveler.objects.get(email="david.lf@gmail.com")
         self.assertEqual(traveler.username, "david.lf")
         self.assertEqual(traveler.first_name, "David")

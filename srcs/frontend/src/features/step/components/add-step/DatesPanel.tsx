@@ -99,6 +99,12 @@ export function DatesPanel({
                 type="checkbox"
                 checked={noOvernight}
                 onChange={(event) => onNoOvernightChange(event.target.checked)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.preventDefault();
+                    onNoOvernightChange(!noOvernight);
+                  }
+                }}
                 className="h-4 w-4 accent-brand-primary"
               />{" "}
               {t("step.noNightHere")}

@@ -1,6 +1,7 @@
 export interface Travel {
   id: number;
-  travelers: { id: number; initials: string; name: string }[];
+  travelers: TravelerSummary[];
+  invitations: InvitedTraveler[];
   title: string;
   startDate: string;
   endDate: string;
@@ -10,6 +11,17 @@ export interface Travel {
   createdAt: string;
   updatedAt: string;
 }
+
+export interface TravelerSummary {
+  id: number;
+  initials: string;
+  name: string;
+}
+
+export interface InvitedTraveler extends TravelerSummary {
+  status: "invited" | "refused";
+}
+
 export interface CreateTravelData {
   startDate: string;
   endDate: string;
@@ -18,6 +30,7 @@ export interface CreateTravelData {
 
 export interface Invitation extends Travel {
   isMember: boolean;
+  isInvited: boolean;
 }
 
 export interface TravelNotification {
@@ -25,4 +38,10 @@ export interface TravelNotification {
   travelTitle: string;
   unreadMessages: number;
   unseenIdeas: number;
+}
+
+export interface InvitationNotification {
+  travelId: number;
+  travelTitle: string;
+  inviteToken: string;
 }

@@ -29,6 +29,7 @@ export const iconNames = [
   "inbox",
   "info",
   "lock",
+  "logout",
   "map",
   "moon",
   "moon-off",

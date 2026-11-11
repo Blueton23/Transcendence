@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
 
 type TagTone = "default" | "muted" | "inverse";
+type TagSize = "sm" | "md";
 
 interface TagProps {
   children: ReactNode;
   tone?: TagTone;
+  size?: TagSize;
   icon?: ReactNode;
   className?: string;
 }
@@ -15,13 +17,26 @@ const toneStyles = {
   inverse: "bg-white/12 text-inverse border border-white/16",
 };
 
-const baseStyle =
-  "inline-flex min-w-0 shrink items-center justify-center rounded-full gap-2 px-2 md:px-4 py-1.5 font-mono text-1xs md:text-sm";
+const sizeStyles = {
+  sm: "px-2 py-1.5 text-1xs md:px-4 md:text-sm", // taille actuelle
+  md: "px-3 py-1.5 text-xs md:px-4 md:text-sm", // plus lisible sur mobile
+};
 
-function Tag({ children, tone = "default", icon, className = "" }: TagProps) {
+const baseStyle =
+  "inline-flex min-w-0 shrink items-center justify-center rounded-full gap-2 font-mono";
+
+function Tag({
+  children,
+  tone = "default",
+  size = "sm",
+  icon,
+  className = "",
+}: TagProps) {
   const tagTone = toneStyles[tone];
   return (
-    <span className={`${baseStyle} ${tagTone} ${className}`}>
+    <span
+      className={`${baseStyle} ${tagTone} ${sizeStyles[size]} ${className}`}
+    >
       {icon}
       {children}
     </span>
