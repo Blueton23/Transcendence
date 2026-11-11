@@ -4,7 +4,6 @@ const bands = [
   "bg-band-3",
   "bg-band-4",
   "bg-band-5",
-  "bg-band-6",
 ] as const;
 
 export function getTravelBandColor(travelId: number) {
