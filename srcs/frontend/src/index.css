@@ -31,20 +31,20 @@
   /* Text color tokens */
   --color-text: #2b2a47; /* encre, texte par defaut */
   --color-text-secondary: #615b6e; /* texte de phrase courante ("a voté pour...") */
-  --color-muted: #9a8f7e; /* labels, timestamps, hints */
+  --color-muted: #6b6560; /* labels, timestamps, hints */
   --color-inverse: #ffffff; /* texte sur fond dark */
 
   /* Background colors tokens */
-  --color-background: #e7decf; /* fond de l'app */
-  --color-surface: #fcfaf3; /* cartes */
-  --color-surface-container: #f3ecdd; /* chips, panneaux latéraux */
+  --color-background: #f6f1e9; /* fond de l'app */
+  --color-surface: #ffffff; /* cartes */
+  --color-surface-container: #efe7da; /* chips, panneaux latéraux */
   --color-surface-raised: #ede6d8; /*modale*/
   --color-surface-soft: #f7f1e6; /* zone pointillée "idées à placer" */
   --color-surface-control: #ffffff; /* fond des chips inactifs, inputs */
 
   /* Brand colors */
-  --color-brand-primary: #f2664a; /* corail, accent d'action */
-  --color-brand-primary-strong: #d8482d; /* corail foncé pour hover, liens */
+  --color-brand-primary: #d63f26; /* corail, accent d'action */
+  --color-brand-primary-strong: #b8452c; /* corail foncé pour hover, liens */
   --color-brand-dark: var(
     --color-text
   ); /* encre = aussi couleur structurelle (nav, hero) */
