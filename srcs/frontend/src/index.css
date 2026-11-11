@@ -77,12 +77,37 @@
   --color-info: #6c6597;
   --color-info-bg: #e4e1f0;
 
-  /* Travel bands: one color per travel, in rotation */
-  --color-band-1: #f8e6dd; /* coral */
-  --color-band-2: #e4e1f0; /* lavender */
-  --color-band-3: #f8ebd3; /* sand */
-  --color-band-4: #e4f3ea; /* mint */
-  --color-band-5: #ddeef6; /* sky */
+  /* Travel bands: avatar hues lightened (40% color, 60% white), ink excluded */
+  --color-band-1: color-mix(
+    in srgb,
+    var(--color-avatar-1) 40%,
+    white
+  ); /* coral */
+  --color-band-2: color-mix(
+    in srgb,
+    var(--color-avatar-2) 40%,
+    white
+  ); /* ochre */
+  --color-band-3: color-mix(
+    in srgb,
+    var(--color-avatar-3) 40%,
+    white
+  ); /* lavender */
+  --color-band-4: color-mix(
+    in srgb,
+    var(--color-avatar-4) 40%,
+    white
+  ); /* fir green */
+  --color-band-5: color-mix(
+    in srgb,
+    var(--color-avatar-5) 40%,
+    white
+  ); /* petrol blue */
+  --color-band-6: color-mix(
+    in srgb,
+    var(--color-avatar-6) 40%,
+    white
+  ); /* plum */
 
   /* Idea types: background + text */
   --color-idea-restaurant-bg: #f8ebd3;

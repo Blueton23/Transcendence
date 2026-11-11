@@ -1,6 +1,7 @@
 import type { Travel } from "@/features/travel/types";
 import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
 import { getStatus } from "@/features/travel/utils/getStatus";
+import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
 import Icon from "@/shared/ui/Icon";
@@ -23,18 +24,19 @@ export function TravelList({ travels, onAdd }: TravelListProps) {
       {travels.map((travel) => (
         <div key={travel.id}>
           <Card
-            variant="accent"
             className="flex cursor-pointer flex-col gap-2 p-4"
+            interactive={true}
             onClick={() => navigate(`/travel/${travel.id}/`)}
-          >
-            <div className="flex gap-2">
+            band={
               <Tag tone="muted" className="self-start text-xs! font-semibold">
                 {getStatus(travel)}
               </Tag>
-              <Tag tone="muted" className="self-start text-xs! font-semibold">
-                {t("units.nights", { count: travel.nights })}
-              </Tag>
-            </div>
+            }
+            bandClassName={getTravelBandColor(travel.id)}
+          >
+            <Tag tone="muted" className="self-start text-xs! font-semibold">
+              {t("units.nights", { count: travel.nights })}
+            </Tag>
             <Heading size="sm" className="line-clamp-1">
               {travel.title}
             </Heading>
