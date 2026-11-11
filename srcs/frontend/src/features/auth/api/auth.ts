@@ -9,6 +9,7 @@ export async function getCsrfToken(): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/auth/csrf/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   await parseResponse<void>(response);
@@ -41,6 +42,7 @@ export async function getMe(): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/me/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<AuthResponse>(response);

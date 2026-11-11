@@ -20,6 +20,7 @@ export async function fetchIdeas(travelId: number): Promise<Idea[]> {
   const response = await fetch(`/api/travels/${travelId}/ideas/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   const data = await parseResponse<IdeaApiResponse[]>(response);
@@ -34,6 +35,7 @@ export async function fetchIdea(
   const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   const data = await parseResponse<IdeaApiResponse>(response);

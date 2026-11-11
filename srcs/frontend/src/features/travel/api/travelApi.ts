@@ -9,6 +9,7 @@ export async function getTravel(travelId: number): Promise<Travel> {
   const response = await fetch(`${API_BASE_URL}/travels/${travelId}/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Travel>(response);
@@ -18,6 +19,7 @@ export async function getTravels(): Promise<Travel[]> {
   const response = await fetch(`${API_BASE_URL}/travels/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Travel[]>(response);
@@ -74,6 +76,7 @@ export async function getInvitation(
   const response = await fetch(`${API_BASE_URL}/travels/join/${token}/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Travel & { isMember: boolean }>(response);

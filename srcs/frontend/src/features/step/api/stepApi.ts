@@ -9,6 +9,7 @@ export async function getSteps(travelId: number): Promise<Step[]> {
   const response = await fetch(`${API_BASE_URL}/travels/${travelId}/steps/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Step[]>(response);
