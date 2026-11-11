@@ -546,6 +546,10 @@
     "totalRoute": "TOTAL · {{duration}} DE ROUTE · {{distance}} KM"
   },
   "travel": {
+    "emptyText": "Crée ton premier road trip et invite tes amis !",
+    "emptyTitle": "Aucun voyage pour l'instant",
+    "finished": "Terminés",
+    "upcoming": "À venir",
     "add": "Inviter",
     "added": "Invité ✓",
     "addTravel": "Ajouter un voyage",
