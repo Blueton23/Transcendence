@@ -5,7 +5,7 @@ function ModalDemo() {
   const navigate = useNavigate();
   return (
     <Modal
-      icon="bulb"
+      icon="pinplus"
       title="Placer l'étape"
       subtitle="hello i cant wait to travel with you"
       onClose={() => navigate("/design-system")}

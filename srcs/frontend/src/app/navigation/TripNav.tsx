@@ -33,7 +33,7 @@ function getTripNavItems(
     },
     {
       to: `/travel/${tripId}/ideas`,
-      iconName: "bulb",
+      iconName: "pinplus",
       label: "nav.ideas",
       badgeCount: unseenIdeasCount,
     },

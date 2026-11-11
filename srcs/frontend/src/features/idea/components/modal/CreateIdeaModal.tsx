@@ -54,7 +54,7 @@ export function CreateIdeaModal({
 
   return (
     <Modal
-      icon="bulb"
+      icon="pinplus"
       title={t("idea.pinIdea")}
       subtitle={travelTitle}
       onClose={() => {

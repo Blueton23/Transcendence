@@ -45,7 +45,7 @@ export function StepFormModal({
   const list = useListKeyboard(form.suggestions, pickPlace);
   return (
     <Modal
-      icon="bulb"
+      icon="pinplus"
       title={step ? t("step.edit") : "Ajouter une etape"}
       onClose={onClose}
       size="narrow"

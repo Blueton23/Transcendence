@@ -14,7 +14,7 @@ export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
       {/* Gère le mobile */}
       <div className="md:hidden">
         <IconButton
-          icon={<Icon name="bulb" size={28} />}
+          icon={<Icon name="pinplus" size={28} />}
           label={t("idea.pinIdea")}
           variant="primary"
           onClick={onClick}
@@ -26,7 +26,7 @@ export function PinIdeaButton({ onClick }: PinIdeaButtonProps) {
       <div className="hidden md:block">
         <Button
           variant="primary"
-          icon={<Icon name="bulb" size={18} />}
+          icon={<Icon name="pinplus" size={18} />}
           onClick={onClick}
           className="w-full"
         >
