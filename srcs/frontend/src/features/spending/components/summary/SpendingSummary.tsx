@@ -33,11 +33,13 @@ export function SpendingSummary({
           >
             {`${summary.total} CHF`}
           </Heading>
-          <Text className="text-inverse!">
-            {t("spending.yourShare", {
-              amount: Math.round(Number(myBalance.owed)),
-            })}
-          </Text>
+          {myBalance && (
+            <Text className="text-inverse!">
+              {t("spending.yourShare", {
+                amount: Math.round(Number(myBalance.owed)),
+              })}
+            </Text>
+          )}
         </Card>
         {summary.byCategory.map((c) => (
           <ByCategory
