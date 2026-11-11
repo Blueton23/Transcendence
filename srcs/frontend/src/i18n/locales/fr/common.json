@@ -508,7 +508,10 @@
     "submitAdd": "Ajouter la dépense",
     "wholeTravel": "Voyage entier",
     "total": "Total du voyage",
-    "yourShare": "ta part : {{amount}} CHF"
+    "yourShare": "ta part : {{amount}} CHF",
+    "balances": "Soldes",
+    "settlements": "Remboursements",
+    "owesTo": "doit à"
   },
   "step": {
     "nightToChoose": "Nuit du {{start}} au {{end}} · à choisir",

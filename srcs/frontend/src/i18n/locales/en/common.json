@@ -508,7 +508,10 @@
     "submitAdd": "Add the expense",
     "wholeTravel": "Whole trip",
     "total": "Trip total",
-    "yourShare": "your share: {{amount}} CHF"
+    "yourShare": "your share: {{amount}} CHF",
+    "balances": "Balances",
+    "settlements": "Settlements",
+    "owesTo": "owes"
   },
   "step": {
     "nightToChoose": "Night of the {{start}} to the {{end}} · to choose",

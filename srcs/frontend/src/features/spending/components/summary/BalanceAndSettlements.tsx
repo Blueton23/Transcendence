@@ -19,13 +19,13 @@ export function BalanceAndSettlements({
   const { t } = useTranslation();
   return (
     <Card className="grid gap-6 p-4! md:grid-cols-2">
-      <section className="gap2 flex flex-col">
-        <Heading>Soldes</Heading>
+      <section className="flex flex-col gap-2">
+        <Heading>{t("spending.balances")}</Heading>
         {summary.balances.map((b) => {
           const traveler = getPayer(travel, summary, b.travelerId);
           const amount = Number(b.balance);
           return (
-            <div key={b.travelerId} className="flex items-center gap-2">
+            <div key={b.travelerId} className={rowStyle}>
               <Avatar size="sm" color={traveler.color}>
                 {traveler.initials}
               </Avatar>
@@ -46,7 +46,7 @@ export function BalanceAndSettlements({
         })}
       </section>
       <section className="flex flex-col gap-2 md:border-l md:border-border md:pl-6">
-        <Heading>Remboursement</Heading>
+        <Heading>{t("spending.settlements")}</Heading>
         {summary.settlements.map((s) => {
           const debtor = getPayer(travel, summary, s.debtorId);
           const creditor = getPayer(travel, summary, s.creditorId);
