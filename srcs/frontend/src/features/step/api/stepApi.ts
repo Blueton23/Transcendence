@@ -30,6 +30,7 @@ export async function createStep(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -56,6 +57,7 @@ export async function updateStep(
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: JSON.stringify(data),
     },
@@ -81,6 +83,7 @@ export async function deleteStep(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
