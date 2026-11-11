@@ -4,7 +4,6 @@ import { TravelSocketProvider } from "@/features/travel/realtime/TravelSocketPro
 import { Navigation } from "./navigation/Navigation";
 import { Outlet, useParams } from "react-router";
 import { OfflineBanner } from "@/app/OfflineBanner";
-import { ErrorBanner } from "@/app/ErrorBanner";
 
 export function AppLayout() {
   const { id } = useParams();
@@ -14,7 +13,6 @@ export function AppLayout() {
       <Navigation />
       <main className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-24 md:pb-0">
         <OfflineBanner />
-        <ErrorBanner />
         <Outlet />
       </main>
     </div>

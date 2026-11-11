@@ -5,6 +5,7 @@ import Card from "@/shared/ui/Card";
 import Text from "@/shared/ui/Text";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useError } from "@/shared/context/useError";
 
 interface CreatedScreenProps {
   travel: Travel;
@@ -13,17 +14,16 @@ interface CreatedScreenProps {
 
 export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
   const [copied, setCopied] = useState(false);
-  const [copyError, setCopyError] = useState<string | null>(null);
   const { t } = useTranslation();
+  const { showError } = useError();
 
   const handleCopy = async () => {
-    setCopyError(null);
     try {
       await navigator.clipboard.writeText(link);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      setCopyError(t("travel.errors.copyFailed"));
+      showError(t("travel.errors.copyFailed"));
     }
   };
 
@@ -48,7 +48,6 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
             {copied ? t("travel.copied") : t("travel.copy")}
           </Button>
         </Card>
-        {copyError && <Text tone="accent">{copyError}</Text>}
       </div>
 
       <Button variant="ghost" className="w-full underline" onClick={onClose}>
