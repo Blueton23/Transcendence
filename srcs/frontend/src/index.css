@@ -109,13 +109,13 @@
   --color-cat-other: #5c5650;
 
   /* Avatars (white initials, all AA contrast) */
-  --color-avatar-1: #2b2a47; /* ink */
-  --color-avatar-2: #b8452c; /* coral */
-  --color-avatar-3: #8c5e12; /* ochre */
-  --color-avatar-4: #5e5791; /* lavender */
-  --color-avatar-5: #2e6b4b; /* fir green */
-  --color-avatar-6: #1f5e7a; /* petrol blue */
-  --color-avatar-7: #8a3b62; /* plum */
+  --color-avatar-1: #b8452c; /* coral */
+  --color-avatar-2: #8c5e12; /* ochre */
+  --color-avatar-3: #5e5791; /* lavender */
+  --color-avatar-4: #2e6b4b; /* fir green */
+  --color-avatar-5: #1f5e7a; /* petrol blue */
+  --color-avatar-6: #8a3b62; /* plum */
+  --color-avatar-7: #2b2a47; /* ink — also the default for your own avatar */
 
   /* Overlay */
   --color-scrim: rgba(43, 42, 71, 0.2); /* dark layer behind modals */

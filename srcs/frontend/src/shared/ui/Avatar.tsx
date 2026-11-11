@@ -8,7 +8,7 @@ import type { User } from "@/features/auth/types";
 import { useTranslation } from "react-i18next";
 
 type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
-export type AvatarColor = "1" | "2" | "3" | "4";
+export type AvatarColor = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "pending";
 
 interface AvatarProps {
   user?: User | null;
@@ -28,19 +28,24 @@ const sizeStyles = {
 };
 
 const colorStyles = {
-  "1": "bg-brand-dark text-inverse",
-  "2": "bg-brand-primary-strong text-inverse",
-  "3": "bg-warning text-text",
-  "4": "bg-info text-inverse",
+  "1": "bg-avatar-1",
+  "2": "bg-avatar-2",
+  "3": "bg-avatar-3",
+  "4": "bg-avatar-4",
+  "5": "bg-avatar-5",
+  "6": "bg-avatar-6",
+  "7": "bg-avatar-7",
+  pending:
+    "bg-surface-container text-muted! border border-dashed border-text/30",
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center overflow-hidden rounded-full font-bold";
+  "inline-flex items-center justify-center overflow-hidden rounded-full font-bold text-inverse";
 
 function Avatar({
   user,
   size = "md",
-  color = "1",
+  color = "7",
   className = "",
   profile = false,
   children,
