@@ -7,10 +7,13 @@ from rest_framework import serializers
 from .models import ParticipationStatus, Step, Travel, validate_no_dates_overlap
 
 
-def validate_date_range(instance, attrs):
+def validate_date_range(instance, attrs, allow_same_day=False):
     start = attrs.get("start_date", getattr(instance, "start_date", None))
     end = attrs.get("end_date", getattr(instance, "end_date", None))
-    if start and end and end <= start:
+    if not start or not end:
+        return attrs
+    end_invalid = end < start if allow_same_day else end <= start
+    if end_invalid:
         raise serializers.ValidationError(
             {
                 "end_date": serializers.ErrorDetail(
@@ -143,7 +146,7 @@ class StepSerializer(serializers.ModelSerializer):
         return obj.ideas.count()
 
     def validate(self, attrs):
-        validate_date_range(self.instance, attrs)
+        validate_date_range(self.instance, attrs, allow_same_day=True)
         if self.instance:
             travel = self.instance.travel
         else:
