@@ -5,17 +5,23 @@ import Icon from "@/shared/ui/Icon";
 
 interface FriendSearchResultProps {
   user: User;
+  isActive?: boolean;
   onSelect: (user: User) => void;
 }
 
-function FriendSearchResult({ user, onSelect }: FriendSearchResultProps) {
+function FriendSearchResult({
+  user,
+  isActive = false,
+  onSelect,
+}: FriendSearchResultProps) {
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ");
 
   return (
     <button
       type="button"
+      aria-selected={isActive}
       onClick={() => onSelect(user)}
-      className="flex w-full items-center gap-3 border-b border-border p-3 text-left last:border-b-0 hover:bg-surface-container focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-inset"
+      className={`focus-visible:ring-inset" flex w-full items-center gap-3 border-b border-border p-3 text-left last:border-b-0 hover:bg-surface-container focus-visible:ring-2 focus-visible:outline-none ${isActive ? "bg-surface-container" : ""}`}
     >
       <Avatar user={user} profile />
 
