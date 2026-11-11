@@ -19,7 +19,7 @@ export function VoteButton({
   return (
     <Button
       type="button"
-      variant={voted ? "primary" : "outline"}
+      variant={voted ? "vote" : "ghost"}
       size="sm"
       icon={<Icon name="heart-f" size={16} />}
       onClick={onVote}
