@@ -81,6 +81,7 @@
   "errors": {
     "csrfMissing": "Token CSRF no encontrado.",
     "generic": "Error",
+    "invalidTravelId": "ID de viaje no válido.",
     "invalidResponse": "Respuesta del servidor no válida.",
     "mapbox": "Error de Mapbox",
     "server": "Error del servidor.",

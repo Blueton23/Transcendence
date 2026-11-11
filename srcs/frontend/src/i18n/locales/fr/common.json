@@ -81,6 +81,7 @@
   "errors": {
     "csrfMissing": "Jeton CSRF introuvable.",
     "generic": "Error",
+    "invalidTravelId": "Identifiant de voyage invalide.",
     "invalidResponse": "Réponse serveur invalide.",
     "mapbox": "Erreur Mapbox",
     "server": "Erreur serveur.",

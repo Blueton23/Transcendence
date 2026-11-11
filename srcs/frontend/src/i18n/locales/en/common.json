@@ -81,6 +81,7 @@
   "errors": {
     "csrfMissing": "CSRF token not found.",
     "generic": "Error",
+    "invalidTravelId": "Invalid trip ID.",
     "invalidResponse": "Invalid server response.",
     "mapbox": "Mapbox error",
     "server": "Server error.",

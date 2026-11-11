@@ -80,7 +80,13 @@ function JoinPage() {
             {t("travel.travelersOnBoard", { count: travel.travelers.length })}
           </Text>
         </div>
-        {joinError && <Text tone="accent">{joinError}</Text>}
+        {joinError && (
+          <div role="alert">
+            <Text tone="accent" className="whitespace-pre-line">
+              {joinError}
+            </Text>
+          </div>
+        )}
       </Card>
     </div>
   );

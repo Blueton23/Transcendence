@@ -8,17 +8,23 @@ import Avatar from "@/shared/ui/Avatar";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
 import { useTranslation } from "react-i18next";
 import { Footer } from "@/app/Footer";
+import { useState } from "react";
 
 function HomePage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { t } = useTranslation();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   async function handleLogout() {
+    setLogoutError(null);
+
     try {
       await logout();
-    } catch (error) {
-      console.error("Erreur lors de la déconnexion :", error);
+    } catch (err) {
+      setLogoutError(
+        err instanceof Error ? err.message : t("auth.errors.logoutFailed"),
+      );
     }
   }
 
@@ -61,6 +67,13 @@ function HomePage() {
           <Button variant="outline" onClick={() => navigate("/profile")}>
             {t("profile.title")}
           </Button>
+          {logoutError && (
+            <div role="alert">
+              <Text tone="accent" className="whitespace-pre-line">
+                {logoutError}
+              </Text>
+            </div>
+          )}
         </div>
         <div className="pt-10">
           <Footer />
