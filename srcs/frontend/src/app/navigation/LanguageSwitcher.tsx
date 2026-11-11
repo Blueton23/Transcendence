@@ -10,13 +10,17 @@ const languages = [
 export function LanguageSwitcher() {
   const { t, i18n } = useTranslation();
   return (
-    <div className="flex gap-1" role="group" aria-label={t("actions.language")}>
+    <div
+      className="flex justify-center gap-2"
+      role="group"
+      aria-label={t("actions.language")}
+    >
       {languages.map(({ code, label }) => (
         <Chip
           key={code}
           active={i18n.resolvedLanguage === code}
           onClick={() => i18n.changeLanguage(code)}
-          className="px-3! py-1.5!"
+          className="px-2! py-1!"
         >
           {label}
         </Chip>

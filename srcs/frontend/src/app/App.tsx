@@ -1,6 +1,5 @@
 import { Routes, Route, Navigate } from "react-router";
 
-import Text from "@/shared/ui/Text";
 import { AppLayout } from "./AppLayout";
 
 import ProtectedRoute from "@/features/auth/components/ProtectedRoute";
@@ -20,10 +19,6 @@ import ChatPage from "@/pages/ChatPage";
 import LegalPage from "@/pages/LegalPage";
 import { useTranslation } from "react-i18next";
 import { SpendingPage } from "@/pages/SpendingPage";
-
-function PlaceHolder({ label }: { label: string }) {
-  return <Text className="p-4">{label} à venir</Text>;
-}
 
 function App() {
   useTranslation();
@@ -49,10 +44,6 @@ function App() {
             <Route path="ideas" element={<IdeasPage />} />
             <Route path="expenses" element={<SpendingPage />} />
             <Route path="chat" element={<ChatPage />} />
-            <Route
-              path="assistant"
-              element={<PlaceHolder label="assistant" />}
-            />
           </Route>
         </Route>
       </Route>

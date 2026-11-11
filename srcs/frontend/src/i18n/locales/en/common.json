@@ -405,14 +405,18 @@
     "searchOffline": "Search unavailable offline"
   },
   "nav": {
+    "account": "My account",
     "assistant": "AI assistant",
     "chat": "Chat",
     "expenses": "Expenses",
     "home": "Home",
     "ideas": "Ideas",
     "itinerary": "Itinerary",
+    "main": "Main navigation",
     "profile": "Profile",
-    "trips": "My trips"
+    "trip": "Trip navigation",
+    "trips": "My trips",
+    "tripsShort": "Trips"
   },
   "notifications": {
     "title": "While you were away",
@@ -601,6 +605,8 @@
     "nights_one": "{{count}} night",
     "nights_other": "{{count}} nights",
     "nights_zero": "No nights",
-    "pricePerNight": "{{price}} CHF/night"
+    "pricePerNight": "{{price}} CHF/night",
+    "steps_one": "{{count}} stop",
+    "steps_other": "{{count}} stops"
   }
 }

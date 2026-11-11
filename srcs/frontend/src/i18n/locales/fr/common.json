@@ -405,14 +405,18 @@
     "searchOffline": "Recherche indisponible hors ligne"
   },
   "nav": {
+    "account": "Mon compte",
     "assistant": "Assistant IA",
     "chat": "Discussion",
     "expenses": "Dépenses",
     "home": "Accueil",
     "ideas": "Idées",
     "itinerary": "Itinéraire",
+    "main": "Navigation principale",
     "profile": "Profil",
-    "trips": "Mes voyages"
+    "trip": "Navigation du voyage",
+    "trips": "Mes voyages",
+    "tripsShort": "Voyages"
   },
   "notifications": {
     "title": "Pendant ton absence",
@@ -601,6 +605,8 @@
     "nights_one": "{{count}} nuit",
     "nights_other": "{{count}} nuits",
     "nights_zero": "Pas de nuit",
-    "pricePerNight": "{{price}} CHF/nuit"
+    "pricePerNight": "{{price}} CHF/nuit",
+    "steps_one": "{{count}} étape",
+    "steps_other": "{{count}} étapes"
   }
 }
