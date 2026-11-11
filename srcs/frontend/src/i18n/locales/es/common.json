@@ -562,10 +562,7 @@
       "not_friend": "Esta persona no está entre tus amigos.",
       "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción.",
       "steps_before_travel_start": "Algunas etapas empiezan antes de esta fecha: muévelas primero.",
-      "steps_after_travel_end": "Algunas etapas terminan después de esta fecha: muévelas primero.",
-      "title": {
-        "max_length": "Título demasiado largo."
-      }
+      "steps_after_travel_end": "Algunas etapas terminan después de esta fecha: muévelas primero."
     },
     "haveInviteLink": "Tengo un enlace de invitación",
     "invitation": "INVITACIÓN PARA UNIRSE",

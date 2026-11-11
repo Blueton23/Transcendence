@@ -437,7 +437,7 @@
         "max_length": "Le nom du fichier image est trop long."
       },
       "username": {
-        "max_length": "Assurez-vous que ce champ comporte au plus 150 caractères.",
+        "max_length": "Assurez-vous que ce champ comporte au plus 150 caractères!.",
         "invalid": "Saisissez un nom d’utilisateur valide. Il ne peut contenir que des lettres, des nombres ou les caractères « @ », « . », « + », « - » et « _ ».",
         "unique": "Ce pseudo est déjà utilisé."
       }
@@ -562,10 +562,7 @@
       "not_friend": "Cette personne ne fait pas partie de tes amis.",
       "not_travel_participant": "Vous devez être membre du voyage pour effectuer cette action.",
       "steps_before_travel_start": "Des étapes commencent avant cette date : déplace-les d'abord.",
-      "steps_after_travel_end": "Des étapes se terminent après cette date : déplace-les d'abord.",
-      "title": {
-        "max_length": "Titre trop long."
-      }
+      "steps_after_travel_end": "Des étapes se terminent après cette date : déplace-les d'abord."
     },
     "haveInviteLink": "J'ai un lien d'invitation",
     "invitation": "INVITATION À REJOINDRE",

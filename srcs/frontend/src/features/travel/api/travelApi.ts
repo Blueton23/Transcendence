@@ -36,6 +36,7 @@ export async function createTravel(data: CreateTravelData): Promise<Travel> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -59,6 +60,7 @@ export async function updateTravel(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -90,6 +92,7 @@ export async function joinTravel(token: string): Promise<Travel> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 
@@ -114,6 +117,7 @@ export async function addParticipant(
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: JSON.stringify({ travelerId }),
     },
@@ -137,6 +141,7 @@ export async function leaveTravel(travelId: number): Promise<void> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 
