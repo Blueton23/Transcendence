@@ -1,12 +1,11 @@
 import { TravelersStack } from "@/features/travel/components/TravelersStack";
+import { TravelOptionsButton } from "@/features/travel/components/TravelOptionsButton";
 import type { Travel } from "@/features/travel/types";
 import { computeTravelDates } from "@/features/travel/utils/computeTravelDates";
 import { getStatus } from "@/features/travel/utils/getStatus";
 import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
-import Icon from "@/shared/ui/Icon";
-import IconButton from "@/shared/ui/IconButton";
 import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
@@ -14,10 +13,10 @@ import { useNavigate } from "react-router";
 
 interface TravelListProps {
   travels: Travel[];
-  onAdd: () => void;
+  onChange: () => void;
 }
 
-export function TravelList({ travels, onAdd }: TravelListProps) {
+export function TravelList({ travels, onChange }: TravelListProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   return (
@@ -29,9 +28,18 @@ export function TravelList({ travels, onAdd }: TravelListProps) {
           interactive={true}
           onClick={() => navigate(`/travel/${travel.id}/`)}
           band={
-            <Tag tone="light" className="font-semibold">
-              {getStatus(travel)}
-            </Tag>
+            <>
+              <Tag tone="light" className="font-semibold">
+                {getStatus(travel)}
+              </Tag>
+              <div className="ml-auto">
+                <TravelOptionsButton
+                  travel={travel}
+                  variant="light"
+                  onLeave={onChange}
+                />
+              </div>
+            </>
           }
           bandClassName={getTravelBandColor(travel.id)}
         >
@@ -44,21 +52,6 @@ export function TravelList({ travels, onAdd }: TravelListProps) {
           <TravelersStack travel={travel} />
         </Card>
       ))}
-      <Card
-        variant="dashed"
-        className="flex cursor-pointer flex-col items-center p-4"
-        onClick={onAdd}
-      >
-        <IconButton
-          variant="ghost"
-          icon={<Icon name="plus" size={18} />}
-          label={t("travel.addTravel")}
-          className="text-border-collection!"
-        ></IconButton>
-        <Heading size="sm" className="text-border-collection!">
-          {t("travel.addTravel")}
-        </Heading>
-      </Card>
     </div>
   );
 }

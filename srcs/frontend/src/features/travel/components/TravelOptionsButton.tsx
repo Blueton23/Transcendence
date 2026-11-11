@@ -12,7 +12,22 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
-export function TravelOptionsButton({ travel }: { travel: Travel }) {
+interface TravelOptionsButtonProps {
+  travel: Travel;
+  variant?: "dark" | "light";
+  onLeave?: () => void;
+}
+
+const buttonStyles = {
+  dark: "border-white/16! bg-white/12! text-inverse!",
+  light: "border-transparent! bg-surface-control/40! text-text!",
+};
+
+export function TravelOptionsButton({
+  travel,
+  variant = "dark",
+  onLeave,
+}: TravelOptionsButtonProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +39,9 @@ export function TravelOptionsButton({ travel }: { travel: Travel }) {
 
   const handleOnSubmit = async () => {
     const result = await submit();
-    if (result.success) navigate("/travel");
+    if (result.success) return;
+    if (onLeave) onLeave();
+    else navigate("/travel");
   };
 
   if (error) return <p>{error}</p>;
@@ -34,7 +51,7 @@ export function TravelOptionsButton({ travel }: { travel: Travel }) {
       <IconButton
         icon={<Icon name="dots" size={16} />}
         label={t("actions.options")}
-        className="border-white/16! bg-white/12! text-inverse!"
+        className={buttonStyles[variant]}
         onClick={() => setIsOpen((v) => !v)}
         onMouseDown={(e) => e.stopPropagation()}
       />
