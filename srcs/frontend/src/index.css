@@ -9,58 +9,56 @@
 @import "@fontsource/caveat/500.css";
 
 @theme {
+  /* Breakpoint: "md:" classes apply from 1024px (desktop layout) */
   --breakpoint-md: 1024px;
-  /* Typography tokens */
+
+  /* Typography */
   --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-mono:
+    "JetBrains Mono", ui-monospace, monospace; /* numbers, dates, amounts */
   --font-accent: "Caveat", cursive;
 
-  --text-2xs: 0.4375rem; /* 7px — initiales avatar xs, très compact */
-  --text-1xs: 0.6rem;
-  --text-xs: 0.75rem; /* 12px — badges, labels mono */
-  --text-sm: 0.8125rem; /* 13px - buttons*/
-  --text-md: 0.875rem; /* 14px — corps de texte*/
-  --text-lg: 1.125rem; /* 18px — sous-titres */
-  --text-xl: 1.375rem; /* 22px — titres de carte/modale ("Montreux", "Épingler une idée") */
-  --text-2xl: 2rem; /* 32px — titres de page ("Mes voyages", "Road trip Suisse") */
-  --text-3xl: 2.375rem;
+  --text-2xs: 0.4375rem; /* 7px — xs avatar initials */
+  --text-1xs: 0.6rem; /* 9.6px — small tags on mobile */
+  --text-xs: 0.75rem; /* 12px — badges, mono labels, small text on mobile */
+  --text-sm: 0.8125rem; /* 13px — buttons, secondary text */
+  --text-md: 0.875rem; /* 14px — body text */
+  --text-lg: 1.125rem; /* 18px — subtitles */
+  --text-xl: 1.375rem; /* 22px — card and modal titles */
+  --text-2xl: 2rem; /* 32px — page titles on mobile, large card titles */
+  --text-3xl: 2.375rem; /* 38px — page titles on desktop */
 
   --leading-tight: 1.2;
   --leading-normal: 1.4;
 
-  /* Text color tokens */
-  --color-text: #2b2a47; /* encre, texte par defaut */
-  --color-text-secondary: #615b6e; /* texte de phrase courante ("a voté pour...") */
+  /* Text colors */
+  --color-text: #2b2a47; /* ink, default text */
+  --color-text-secondary: #615b6e; /* running text ("voted for…"), dates */
   --color-muted: #6b6560; /* labels, timestamps, hints */
-  --color-inverse: #ffffff; /* texte sur fond dark */
+  --color-inverse: #ffffff; /* text on dark backgrounds */
 
-  /* Background colors tokens */
-  --color-background: #f6f1e9; /* fond de l'app */
-  --color-surface: #ffffff; /* cartes */
-  --color-surface-container: #efe7da; /* chips, panneaux latéraux */
-  --color-surface-raised: #ede6d8; /*modale*/
-  --color-surface-soft: #f7f1e6; /* zone pointillée "idées à placer" */
-  --color-surface-control: #ffffff; /* fond des chips inactifs, inputs */
+  /* Background colors */
+  --color-background: #f6f1e9; /* app background */
+  --color-surface: #ffffff; /* cards */
+  --color-surface-container: #efe7da; /* sidebar, chips, side panels */
+  --color-surface-raised: #ede6d8; /* modals */
+  --color-surface-soft: #f7f1e6; /* dashed "ideas to place" area */
+  --color-surface-control: #ffffff; /* inactive chips, inputs */
 
   /* Brand colors */
-  --color-brand-primary: #d63f26; /* corail, accent d'action */
-  --color-brand-primary-strong: #b8452c; /* corail foncé pour hover, liens */
+  --color-brand-primary: #d63f26; /* coral, main actions */
+  --color-brand-primary-strong: #b8452c; /* darker coral: hover, links */
   --color-brand-dark: var(
     --color-text
-  ); /* encre = aussi couleur structurelle (nav, hero) */
+  ); /* ink is also the structural color (nav, dark cards) */
 
   /* Borders */
-  --color-border: rgba(43, 42, 71, 0.08); /* défaut*/
-  --color-border-control: rgba(
-    43,
-    42,
-    71,
-    0.12
-  ); /* contour chips inactifs, inputs */
+  --color-border: rgba(43, 42, 71, 0.08); /* default */
+  --color-border-control: rgba(43, 42, 71, 0.12); /* inactive chips, inputs */
   --color-border-avatar: #2b2a47;
   --color-border-success: #b9e3cc;
-  --color-border-collection: #dbceb6; /* bordure pointillée "idées à placer" */
-  --color-border-alert-dashed: #efc2b3; /* bordure pointillée "nuit à choisir" */
+  --color-border-collection: #dbceb6; /* dashed "ideas to place" border */
+  --color-border-alert-dashed: #efc2b3; /* dashed "night to choose" border */
 
   /* Semantic colors */
   --color-success: #3fb477;
@@ -74,19 +72,59 @@
   --color-error: #c24024;
   --color-error-bg: #f8e6dd;
 
-  --color-alert-dashed-bg: #fbeee7; /* fond pointillé "nuit à choisir" */
+  --color-alert-dashed-bg: #fbeee7; /* dashed "night to choose" background */
 
   --color-info: #6c6597;
   --color-info-bg: #e4e1f0;
 
-  /* Overlay */
-  --color-scrim: rgba(43, 42, 71, 0.2);
+  /* Travel bands: one color per travel, in rotation */
+  --color-band-1: #f8e6dd; /* coral */
+  --color-band-2: #e4e1f0; /* lavender */
+  --color-band-3: #f8ebd3; /* sand */
+  --color-band-4: #e4f3ea; /* mint */
+  --color-band-5: #ddeef6; /* sky */
 
-  /* Shadow */
+  /* Idea types: background + text */
+  --color-idea-restaurant-bg: #f8ebd3;
+  --color-idea-restaurant: #7a5410;
+  --color-idea-lodging-bg: #e4e1f0;
+  --color-idea-lodging: #4a4580;
+  --color-idea-activity-bg: #e4f3ea;
+  --color-idea-activity: #2e6b4b;
+  --color-idea-sightseeing-bg: #f8e6dd;
+  --color-idea-sightseeing: #a13e22;
+
+  /* Expense categories: background + text (letter = backend code) */
+  --color-cat-lodging-bg: var(--color-idea-lodging-bg); /* l */
+  --color-cat-lodging: var(--color-idea-lodging);
+  --color-cat-meal-bg: var(--color-idea-restaurant-bg); /* m */
+  --color-cat-meal: var(--color-idea-restaurant);
+  --color-cat-activity-bg: var(--color-idea-activity-bg); /* a */
+  --color-cat-activity: var(--color-idea-activity);
+  --color-cat-fuel-bg: #ddeef6; /* f */
+  --color-cat-fuel: #1f5e7a;
+  --color-cat-toll-bg: #f3e3ec; /* t */
+  --color-cat-toll: #8a3b62;
+  --color-cat-other-bg: #ece7de; /* o */
+  --color-cat-other: #5c5650;
+
+  /* Avatars (white initials, all AA contrast) */
+  --color-avatar-1: #2b2a47; /* ink */
+  --color-avatar-2: #b8452c; /* coral */
+  --color-avatar-3: #8c5e12; /* ochre */
+  --color-avatar-4: #5e5791; /* lavender */
+  --color-avatar-5: #2e6b4b; /* fir green */
+  --color-avatar-6: #1f5e7a; /* petrol blue */
+  --color-avatar-7: #8a3b62; /* plum */
+
+  /* Overlay */
+  --color-scrim: rgba(43, 42, 71, 0.2); /* dark layer behind modals */
+
+  /* Shadows */
   --shadow-sm: 0 1px 3px rgba(43, 42, 71, 0.08);
   --shadow-md: 0 10px 24px -14px rgba(43, 42, 71, 0.35);
   --shadow-lg: 0 30px 70px -38px rgba(43, 42, 71, 0.5);
-  --shadow-brand: 0 12px 24px -10px rgba(216, 72, 45, 0.5); /* glow des boutons corail */
+  --shadow-brand: 0 12px 24px -10px rgba(214, 63, 38, 0.5); /* glow of coral buttons */
 
   /* Radius */
   --radius-sm: 10px;
