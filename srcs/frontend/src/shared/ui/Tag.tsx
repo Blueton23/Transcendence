@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type TagTone = "default" | "muted" | "inverse";
+type TagTone = "default" | "muted" | "inverse" | "light";
 type TagSize = "sm" | "md";
 
 interface TagProps {
@@ -15,6 +15,7 @@ const toneStyles = {
   default: "bg-surface-container text-text-secondary border border-border",
   muted: "bg-surface-container text-muted",
   inverse: "bg-white/12 text-inverse border border-white/16",
+  light: "bg-surface-control text-text",
 };
 
 const sizeStyles = {

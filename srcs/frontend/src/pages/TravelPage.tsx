@@ -50,14 +50,18 @@ function TravelPage() {
           {t("travel.newTravel")}
         </Button>
       </div>
-      {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
-      <NotificationsCard
-        travels={travelNotifications}
-        travelsError={notificationsError}
-        friendRequests={friendRequests}
-        invitations={invitationNotifications}
-        invitationsError={InvitationNotificationsError}
-      />
+      <div
+        className={`grid gap-4 ${nextTravel ? "md:grid-cols-[2fr_1fr]" : ""}`}
+      >
+        {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
+        <NotificationsCard
+          travels={travelNotifications}
+          travelsError={notificationsError}
+          friendRequests={friendRequests}
+          invitations={invitationNotifications}
+          invitationsError={InvitationNotificationsError}
+        />
+      </div>
       <TravelList
         travels={travels.filter((t) => t.id !== nextTravel?.id)}
         onAdd={() => setNewTravelOpen(true)}

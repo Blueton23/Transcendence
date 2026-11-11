@@ -51,7 +51,7 @@ function Card({
         >
           {band}
         </div>
-        <div className={`p-4 ${className}`}>{children}</div>
+        <div className={`px-4 pt-3 pb-4 ${className}`}>{children}</div>
       </div>
     );
   }
