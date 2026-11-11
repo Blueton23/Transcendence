@@ -42,7 +42,7 @@ export function StepFormModal({
       onClose={onClose}
       size="narrow"
     >
-      <div className="flex flex-col gap-5">C
+      <div className="flex flex-col gap-5">
         <div className="flex flex-col gap-2">
           <Text tone="secondary" className="font-semibold">
             {t("step.placeAndDates")}
