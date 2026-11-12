@@ -342,10 +342,18 @@ function DesignSystem() {
         <Specimen label='tone="accent" — action requise'>
           <Text tone="accent">À choisir · 2 propositions </Text>
         </Specimen>
-        <Specimen label='size="md" (défaut, 14px) vs size="sm" (12px, densité compacte)'>
+        <Specimen label='size="sm" (12/13px, info secondaire) | "md" (défaut, 12/14px, texte courant)'>
           <Text size="md">Pas de nuit · 2 idées épinglées</Text>
           <Text size="sm" tone="muted">
             Pas de nuit · 2 idées épinglées
+          </Text>
+        </Specimen>
+        <Specimen label='size="lg" (16/18px, montant dans une carte ou une ligne) | "xl" (18/22px, chiffre clé)'>
+          <Text size="lg" font="mono" className="font-semibold">
+            240 CHF
+          </Text>
+          <Text size="xl" font="mono" className="font-semibold">
+            1 245 CHF
           </Text>
         </Specimen>
         <Specimen label='font="sans" (défaut) vs font="mono" — pour une valeur quon scanne, pas une phrase quon lit'>

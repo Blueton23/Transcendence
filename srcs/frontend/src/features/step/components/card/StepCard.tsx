@@ -10,6 +10,7 @@ import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
 import Tag from "@/shared/ui/Tag";
 import { StepPositionBadge } from "@/features/step/components/card/StepPositionBadge";
+import { ideaBands } from "@/features/idea/utils/ideaBands";
 
 interface StepCardProps {
   step: Step;
@@ -59,7 +60,10 @@ export function StepCard({
       <div className="flex flex-wrap gap-1.5">
         {lodging && lodging.total > 0 && (
           <Tag
-            tone={lodging.lodged === lodging.total ? "lodging" : "todo"}
+            tone={lodging.lodged === lodging.total ? "plain" : "todo"}
+            className={
+              lodging.lodged === lodging.total ? ideaBands.accommodation : ""
+            }
             icon={<Icon name="tent" size={13} />}
           >
             {t("step.lodgedRatio", {

@@ -56,7 +56,7 @@ function ProfilePicture() {
 
   return (
     <div className="flex items-center gap-3">
-      <Avatar size="xl" />
+      <Avatar size="lg" />
 
       <input
         ref={fileInputRef}

@@ -12,6 +12,7 @@ import Heading from "@/shared/ui/Heading";
 import IconBadge from "@/shared/ui/IconBadge";
 import Text from "@/shared/ui/Text";
 import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
+import Dot from "@/shared/ui/Dot";
 
 interface NotificationsCardProps {
   travels: TravelNotification[];
@@ -24,7 +25,6 @@ interface NotificationsCardProps {
 // Compact row, the whole line is clickable.
 const rowStyle =
   "flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-left transition-colors hover:bg-surface-container";
-const dotStyle = "h-2.5 w-2.5 shrink-0 rounded-full";
 // Same hover as the interactive Card.
 
 export function NotificationsCard({
@@ -72,9 +72,7 @@ export function NotificationsCard({
                 className={rowStyle}
                 onClick={() => navigate(`/travel/${n.travelId}/${target}`)}
               >
-                <span
-                  className={`${dotStyle} ${getTravelBandColor(n.travelId)}`}
-                />
+                <Dot className={getTravelBandColor(n.travelId)} />
                 <Text size="sm" className="min-w-0 flex-1 truncate">
                   <span className="font-semibold">{n.travelTitle}</span> ·{" "}
                   {details}
@@ -104,9 +102,7 @@ export function NotificationsCard({
               className={rowStyle}
               onClick={() => navigate(`/join/${invitation.inviteToken}`)}
             >
-              <span
-                className={`${dotStyle} ${getTravelBandColor(invitation.travelId)}`}
-              />
+              <Dot className={getTravelBandColor(invitation.travelId)} />
               <Text size="sm" className="min-w-0 flex-1 truncate">
                 {t("notifications.invitation", {
                   title: invitation.travelTitle,

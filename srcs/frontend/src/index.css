@@ -18,8 +18,7 @@
     "JetBrains Mono", ui-monospace, monospace; /* numbers, dates, amounts */
   --font-accent: "Caveat", cursive;
 
-  --text-2xs: 0.4375rem; /* 7px — xs avatar initials */
-  --text-1xs: 0.6rem; /* 9.6px — small tags on mobile */
+  --text-2xs: 0.5625rem; /* 9px — xs avatar initials */
   --text-xs: 0.75rem; /* 12px — badges, mono labels, small text on mobile */
   --text-sm: 0.8125rem; /* 13px — buttons, secondary text */
   --text-md: 0.875rem; /* 14px — body text */
@@ -112,6 +111,13 @@
   --color-cat-toll: #8a3b62;
   --color-cat-other-bg: #ece7de; /* o */
   --color-cat-other: #5c5650;
+
+  --color-cat-lodging-dot: var(--color-idea-lodging-dot);
+  --color-cat-meal-dot: var(--color-idea-restaurant-dot);
+  --color-cat-activity-dot: var(--color-idea-activity-dot);
+  --color-cat-fuel-dot: #3c93bf;
+  --color-cat-toll-dot: #c0679a;
+  --color-cat-other-dot: #a39b90;
 
   /* Avatars (white initials, all AA contrast) */
   --color-avatar-1: #b8452c; /* coral */

@@ -134,7 +134,7 @@ export function IdeaCard({
         </div>
         {idea.pricePerNight && (
           <div className="flex shrink-0 flex-col items-end">
-            <Text font="mono" className="font-semibold">
+            <Text size="lg" font="mono" className="font-semibold">
               {idea.pricePerNight} CHF
             </Text>
             <Text size="sm" tone="muted">

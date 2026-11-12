@@ -26,7 +26,7 @@ function ProfileInfo({ user, full = false }: ProfileInfoProps) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-4">
         <div className="flex w-25 justify-center">
-          <Avatar user={profileUser} size="xl" />
+          <Avatar user={profileUser} size="lg" />
         </div>
 
         <div className="min-w-0">

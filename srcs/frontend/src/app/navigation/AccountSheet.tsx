@@ -38,7 +38,7 @@ export function AccountSheet({ onClose }: { onClose: () => void }) {
         className="flex w-full flex-col gap-1 rounded-t-3xl bg-surface-control px-4 pt-2.5 pb-6"
       >
         <div className="flex items-center gap-3 border-b border-border px-1 py-3">
-          <Avatar size="lg" />
+          <Avatar />
           <div className="flex min-w-0 flex-1 flex-col">
             <Text className="truncate font-bold">
               {currentUser.firstName} {currentUser.lastName}

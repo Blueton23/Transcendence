@@ -1,28 +1,14 @@
-import type { IdeaFilter, IdeaType } from "@/features/idea/types";
+import { ideaTypes, type IdeaFilter } from "@/features/idea/types";
+import { dotColors } from "@/shared/utils/dotColors";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
 import Chip from "@/shared/ui/Chip";
+import Dot from "@/shared/ui/Dot";
 import { useTranslation } from "react-i18next";
 
 interface IdeaTypeFilterProps {
   typeActiveFilter: IdeaFilter;
   onChange: (filter: IdeaFilter) => void;
 }
-
-const ideaTypes: IdeaType[] = [
-  "restaurant",
-  "accommodation",
-  "activity",
-  "sightseeing",
-];
-
-const dotColors: Record<IdeaType, string> = {
-  restaurant: "bg-idea-restaurant-dot",
-  accommodation: "bg-idea-lodging-dot",
-  activity: "bg-idea-activity-dot",
-  sightseeing: "bg-idea-sightseeing-dot",
-};
-
-const dotStyle = "size-2.5 shrink-0 rounded-full";
 
 export function IdeaTypeFilter({
   typeActiveFilter,
@@ -40,12 +26,7 @@ export function IdeaTypeFilter({
           key={type}
           active={typeActiveFilter === type}
           onClick={() => onChange(type)}
-          icon={
-            <span
-              aria-hidden="true"
-              className={`${dotStyle} ${dotColors[type]}`}
-            />
-          }
+          icon={<Dot className={dotColors[type]} />}
         >
           {t(ideaTypeLabels[type])}
         </Chip>

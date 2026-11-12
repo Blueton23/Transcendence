@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 import type { User } from "@/features/auth/types";
 import { useTranslation } from "react-i18next";
 
-type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
+type AvatarSize = "xs" | "sm" | "md" | "lg";
 export type AvatarColor = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "pending";
 
 interface AvatarProps {
@@ -19,12 +19,15 @@ interface AvatarProps {
   children?: ReactNode;
 }
 
+// xs: inline next to a name (idea author, notification)
+// sm: compact rows and stacks (balances, settlements, travelers stack)
+// md: lists and account (chat, friends, top bar, sidebar)
+// lg: profile
 const sizeStyles = {
-  xs: "w-4 h-4 text-2xs",
-  sm: "w-7 h-7 text-xs",
-  md: "w-8 h-8 text-sm",
-  lg: "w-9 h-9 text-md",
-  xl: "w-15 h-15 text-lg",
+  xs: "size-5 shrink-0 text-2xs",
+  sm: "size-7 shrink-0 text-xs",
+  md: "size-9 shrink-0 text-xs",
+  lg: "size-15 shrink-0 text-lg",
 };
 
 const colorStyles = {

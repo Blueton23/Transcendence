@@ -14,11 +14,11 @@ export function SecondaryInfo({
 }: SecondaryInfoProps) {
   return (
     <div className="flex min-w-0 items-center gap-2">
-      <Avatar size="xs" color={color} className="shrink-0 md:size-7 md:text-xs">
+      <Avatar size="xs" color={color}>
         {proposerInitials}
       </Avatar>
       <Text tone="muted" size="sm" className="truncate">
-        {proposerName}
+        {`payé par ${proposerName}`}
       </Text>
     </div>
   );

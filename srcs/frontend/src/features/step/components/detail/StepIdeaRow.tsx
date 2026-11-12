@@ -1,6 +1,7 @@
 import { VoteButton } from "@/features/idea/components/card/VoteButton";
 import type { Idea } from "@/features/idea/types";
 import { getProposer } from "@/features/idea/utils/getProposer";
+import { ideaBands } from "@/features/idea/utils/ideaBands";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
 import type { IdeaActions } from "@/features/step/types";
 import type { Travel } from "@/features/travel/types";
@@ -30,11 +31,7 @@ export function StepIdeaRow({
     <div className="flex items-center justify-between gap-3 rounded-md bg-surface px-3 py-2 shadow-sm">
       <div className="flex min-w-0 flex-1 flex-col gap-2 md:flex-row md:gap-3">
         {idea.type !== "accommodation" && (
-          <Tag
-            tone={idea.type}
-            shape="soft"
-            className="self-start font-semibold"
-          >
+          <Tag tone="plain" shape="soft" className={ideaBands[idea.type]}>
             {" "}
             {t(ideaTypeLabels[idea.type])}
           </Tag>
