@@ -8,6 +8,7 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { modifyProfilePicture } from "../api/profile";
 import { useAuth } from "@/features/auth/context/useAuth";
 import { useTranslation } from "react-i18next";
+import Text from "@/shared/ui/Text";
 
 function ProfilePicture() {
   const { currentUser, setCurrentUser } = useAuth();
@@ -92,7 +93,17 @@ function ProfilePicture() {
         </div>
       )}
 
-      {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+      {error && (
+        <div role="alert">
+          <Text
+            tone="accent"
+            size="sm"
+            className="font-medium whitespace-pre-line"
+          >
+            {error}
+          </Text>
+        </div>
+      )}
     </div>
   );
 }

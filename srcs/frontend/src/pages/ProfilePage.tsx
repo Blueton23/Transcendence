@@ -34,7 +34,9 @@ function ProfilePage() {
   return (
     <div className="flex w-full flex-col gap-3 p-4 md:gap-6">
       <div className="flex items-center justify-between">
-        <Heading size="lg">Profile</Heading>
+        <Heading level={1} size="xl">
+          {t("profile.title")}
+        </Heading>
         <Button
           type="button"
           size="sm"
