@@ -28,9 +28,14 @@ export function NavPill({
         `${styles.base} ${isActive ? styles.active : styles.inactive}`
       }
     >
-      <Icon name={iconName} size={variant === "mobile" ? 20 : undefined} />
+      <span className="relative">
+        <Icon name={iconName} size={variant === "mobile" ? 20 : undefined} />
+        {variant === "mobile" && (
+          <CountBadge count={badgeCount} variant="mobile" />
+        )}
+      </span>
       {label}
-      <CountBadge count={badgeCount} variant={variant} />
+      {variant === "desktop" && <CountBadge count={badgeCount} />}
     </NavLink>
   );
 }
