@@ -5,9 +5,7 @@ import type { SVGProps } from "react";
 export const iconNames = [
   "arrow",
   "back",
-  "backpack",
   "bell",
-  "binoculars",
   "cal",
   "car",
   "cash",
@@ -19,7 +17,7 @@ export const iconNames = [
   "dots",
   "edit",
   "email",
-  "fork",
+  "info",
   "heart-f",
   "lock",
   "logout",
