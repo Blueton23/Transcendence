@@ -37,10 +37,17 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      - name: Prepare env file
+      - name: Prepare env file and test certificate
         run: |
           cp .env.example .env
-          sed -i "s/^UID=.*/UID=$(id -u)/; s/^GID=.*/GID=$(id -g)/" .env
+          sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$(openssl rand -hex 32)|" .env
+          sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$(openssl rand -hex 16)|" .env
+          mkdir -p certs/live/peripl.app
+          openssl req -x509 -nodes -newkey rsa:2048 -days 1 \
+            -keyout certs/live/peripl.app/privkey.pem \
+            -out certs/live/peripl.app/fullchain.pem \
+            -subj "/CN=localhost" \
+            -addext "subjectAltName=DNS:localhost,IP:127.0.0.1"
 
       - uses: docker/setup-buildx-action@v3
 
