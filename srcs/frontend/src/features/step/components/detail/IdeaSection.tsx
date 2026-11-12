@@ -52,7 +52,7 @@ function IdeaDay({
           onClick={() => setOpen(!open)}
           className="flex items-center gap-2 text-left"
         >
-          <Heading level={2} size="sm">
+          <Heading level={2} size="sm" className="md:text-base!">
             {label}
           </Heading>
           <Icon
