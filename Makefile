@@ -26,8 +26,6 @@ env:
 		cp .env.example .env; \
 		sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$$(openssl rand -hex 32)|" .env; \
 		sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$$(openssl rand -hex 16)|" .env; \
-		sed -i "s|^UID=.*|UID=$$(id -u)|" .env; \
-		sed -i "s|^GID=.*|GID=$$(id -g)|" .env; \
 		sed -i "s|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$$GOOGLE_CLIENT_ID|" .env; \
 		sed -i "s|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$$GOOGLE_CLIENT_SECRET|" .env; \
 		sed -i "s|^VITE_MAPBOX_TOKEN=.*|VITE_MAPBOX_TOKEN=$$VITE_MAPBOX_TOKEN|" .env; \

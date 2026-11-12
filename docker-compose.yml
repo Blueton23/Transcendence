@@ -24,9 +24,6 @@ services:
   backend:
     build:
       context: ./srcs/backend
-      args:
-        UID: ${UID:-1000}
-        GID: ${GID:-1000}
     env_file:
       - ./.env
     volumes:
