@@ -264,7 +264,21 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 
 ### Sébastien (`scuthber`)
 
-<!-- TODO -->
+**Backend (Django / DRF).** Data model of every app: `Traveler` and friendships, `Travel` / `Participation` / `Step`, `Idea` and votes, `Spending` and shares, chat `Message` with unread tracking. Split and settlement services for expenses, keeping cents exact. The `common` app: base models, error format, permissions and a Faker `seed` command.
+
+**Real-time (WebSockets).** Django Channels with a Redis channel layer: a per-trip consumer and a per-user notification consumer, events sent only after the database commit; live chat, ideas, votes, steps, participants and friend requests. On the frontend, a socket provider with reconnection and `useTravelEvent` / `useNotificationEvent` hooks.
+
+**Notifications.** Travel and idea notifications, the global notification dashboard and its live "while you were away" summary.
+
+**CI/CD.** GitHub Actions for backend and frontend: Ruff lint, tests against a real Redis, missing-migration check, whole-stack smoke test.
+
+**Modules.** Real-time features, real-time collaboration, notification system, user interaction (with Sylvain), shared expenses (with Charlotte).
+
+**Challenges.**
+- *Several workers:* two travelers of the same trip can be on different processes; a Redis channel layer makes events reach all of them.
+- *Missed events:* Channels does not replay what was sent while a client was offline, so the frontend reloads over REST on every (re)connection, then applies live events.
+- *Leaving a trip:* permissions are only checked on connect; a `travel.kick` event now closes the sockets of a traveler who left (code 4403).
+- *Async tests:* consumer tests failed with "the connection is closed"; fixed with `TransactionTestCase` and a custom communicator, documented in `Websockets.md`.
 
 ### Sylvain (`sydubois`)
 
