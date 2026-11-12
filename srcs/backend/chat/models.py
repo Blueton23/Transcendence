@@ -16,6 +16,15 @@ MESSAGE_BODY_MAX_LENGTH = 2000
 class SystemMessageKey(models.TextChoices):
     PARTICIPANT_JOINED = "participant_joined", "Participant joined"
     PARTICIPANT_LEFT = "participant_left", "Participant left"
+    TRAVEL_CREATED = "travel_created", "Travel created"
+    TRAVEL_UPDATED = "travel_updated", "Travel updated"
+    STEP_CREATED = "step_created", "Step created"
+    STEP_UPDATED = "step_updated", "Step updated"
+    STEP_DELETED = "step_deleted", "Step deleted"
+    IDEA_CREATED = "idea_created", "Idea created"
+    IDEA_UPDATED = "idea_updated", "Idea updated"
+    IDEA_DELETED = "idea_deleted", "Idea deleted"
+    IDEA_CHOSEN = "idea_chosen", "Idea chosen"
 
 
 class MessageQuerySet(models.QuerySet):
