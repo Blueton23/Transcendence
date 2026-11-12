@@ -59,7 +59,7 @@ function TravelPage() {
         </Button>
       </div>
       <div
-        className={`grid gap-4 ${nextTravel ? "md:grid-cols-[2fr_1fr]" : ""}`}
+        className={`grid grid-cols-1 gap-4 ${nextTravel ? "md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]" : ""}`}
       >
         {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
         <NotificationsCard
