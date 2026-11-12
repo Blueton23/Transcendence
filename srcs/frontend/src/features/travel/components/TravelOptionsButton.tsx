@@ -8,6 +8,7 @@ import DropdownMenu from "@/shared/ui/DropdownMenu";
 import Icon from "@/shared/ui/Icon";
 import IconButton from "@/shared/ui/IconButton";
 import MenuItem from "@/shared/ui/MenuItem";
+import Text from "@/shared/ui/Text";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -26,8 +27,6 @@ export function TravelOptionsButton({ travel }: { travel: Travel }) {
     const result = await submit();
     if (result.success) navigate("/travel");
   };
-
-  if (error) return <p>{error}</p>;
 
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
@@ -90,6 +89,13 @@ export function TravelOptionsButton({ travel }: { travel: Travel }) {
           travel={travel}
           onClose={() => setIsManageOpen(false)}
         />
+      )}
+      {error && (
+        <div role="alert">
+          <Text tone="accent" className="whitespace-pre-line">
+            {error}
+          </Text>
+        </div>
       )}
     </div>
   );

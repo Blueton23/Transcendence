@@ -112,7 +112,9 @@ function JoinPage() {
           </Text>
         </div>
         {(joinError || refuseError) && (
-          <Text tone="accent">{joinError || refuseError}</Text>
+          <Text tone="accent" className="whitespace-pre-line">
+            {joinError || refuseError}
+          </Text>
         )}
       </Card>
     </div>

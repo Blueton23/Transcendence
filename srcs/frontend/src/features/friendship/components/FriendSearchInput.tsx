@@ -86,7 +86,9 @@ function FriendSearchInput({
 
           {!isSearching && error && (
             <div className="p-4">
-              <Text tone="accent">{t("friendship.errors.searchFailed")}</Text>
+              <Text tone="accent" className="whitespace-pre-line">
+                {error}
+              </Text>
             </div>
           )}
 

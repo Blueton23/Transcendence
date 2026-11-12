@@ -71,7 +71,7 @@ export function SpendingPage() {
   }
 
   if (error || errorSteps || errorTravel || errorIdeas) {
-    return <Text>{error || errorSteps || errorTravel}</Text>;
+    return <Text>{error || errorSteps || errorTravel || errorIdeas}</Text>;
   }
 
   if (!travel) {

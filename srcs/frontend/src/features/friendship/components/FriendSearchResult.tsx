@@ -23,7 +23,7 @@ function FriendSearchResult({
       onClick={() => onSelect(user)}
       className={`focus-visible:ring-inset" flex w-full items-center gap-3 border-b border-border p-3 text-left last:border-b-0 hover:bg-surface-container focus-visible:ring-2 focus-visible:outline-none ${isActive ? "bg-surface-container" : ""}`}
     >
-      <Avatar user={user} profile />
+      <Avatar user={user} />
 
       <div className="flex min-w-0 flex-1 flex-col">
         <span className="truncate font-medium">{user.username}</span>

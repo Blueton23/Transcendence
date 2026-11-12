@@ -8,19 +8,22 @@ import Avatar from "@/shared/ui/Avatar";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
 import { useTranslation } from "react-i18next";
 import { Footer } from "@/app/Footer";
-import { useError } from "@/shared/context/useError";
+import { useState } from "react";
+import { toErrorMessage } from "@/shared/api/errors";
 
 function HomePage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { t } = useTranslation();
-  const { showError } = useError();
+  const [logoutError, setLogoutError] = useState<string | null>(null);
 
   async function handleLogout() {
+    setLogoutError(null);
+
     try {
       await logout();
-    } catch {
-      showError(t("auth.errors.logoutFailed"));
+    } catch (err) {
+      setLogoutError(toErrorMessage(err));
     }
   }
 
@@ -63,6 +66,13 @@ function HomePage() {
           <Button variant="outline" onClick={() => navigate("/profile")}>
             {t("profile.title")}
           </Button>
+          {logoutError && (
+            <div role="alert">
+              <Text tone="accent" className="whitespace-pre-line">
+                {logoutError}
+              </Text>
+            </div>
+          )}
         </div>
         <div className="pt-10">
           <Footer />

@@ -10,11 +10,11 @@ import Icon from "@/shared/ui/Icon";
 
 import FriendRemove from "./FriendRemove";
 import { useTranslation } from "react-i18next";
-import i18n from "@/i18n";
 import Modal from "@/shared/ui/Modal";
 import ProfileInfo from "@/features/profile/components/ProfileInfo";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
 import { useFriendPresence } from "../hooks/useFriendPresence";
+import i18n from "@/i18n";
 
 interface FriendListProps {
   refreshKey: number;
@@ -67,7 +67,11 @@ function FriendList({ refreshKey }: FriendListProps) {
         </Text>
       </div>
 
-      {error && <Text tone="accent">{error}</Text>}
+      {error && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {error}
+        </Text>
+      )}
 
       {friendships.length === 0 ? (
         <Text tone="muted">{t("friendship.noFriends")}</Text>

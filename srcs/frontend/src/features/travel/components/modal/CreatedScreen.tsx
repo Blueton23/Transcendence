@@ -31,8 +31,7 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
   return (
     <div className="flex flex-col gap-3">
       <Text font="mono" tone="muted">
-        {" "}
-        {t("travel.inviteTravelers")} {travel.title}
+        {t("travel.inviteTravelers", { title: travel.title })}
       </Text>
       <AddFriendSearch travelId={travel.id} />
       <div className="flex flex-col items-start gap-1">

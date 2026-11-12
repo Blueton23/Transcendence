@@ -33,7 +33,7 @@ function TravelPage() {
   if (isLoading) return null;
   if (error)
     return (
-      <Text tone="accent" className="p-4">
+      <Text tone="accent" className="whitespace-pre-line">
         {error}
       </Text>
     );
