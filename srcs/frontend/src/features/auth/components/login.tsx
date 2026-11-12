@@ -134,7 +134,8 @@ function Login() {
 
             <Button
               type="button"
-              variant="primary"
+              variant="outline"
+              icon={<Icon name="google" size={18} />}
               onClick={() => {
                 window.location.href = "/api/auth/google/";
               }}
