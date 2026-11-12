@@ -18,6 +18,9 @@ class Traveler(AbstractUser, TimeStampedModel):
     )
 
     is_online = models.BooleanField(default=False)
+    # Open notification sockets (one per tab), maintained by traveler.presence.
+    # is_online is True while it is above 0.
+    online_connections = models.PositiveIntegerField(default=0, editable=False)
 
     class Meta:
         swappable = "AUTH_USER_MODEL"
