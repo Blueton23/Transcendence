@@ -192,3 +192,4 @@ https://support.google.com/cloud/answer/15549257?hl=en
 https://www.microsoft.com/fr-ch/security/business/security-101/what-is-openid-connect-oidc
 https://medium.com/@tony.infisical/guide-to-using-oauth-2-0-to-access-google-apis-dead94d6866d
 https://flowbite.com/docs/getting-started/typescript/
+
