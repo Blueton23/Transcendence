@@ -23,3 +23,12 @@ def post_system_message(travel_id, key, params=None):
     )
     broadcast_message(message)
     return message
+
+
+def announce_activity(travel_id, actor, key, params=None):
+    """Logs in the travel chat who created, changed or deleted something
+    (a step, an expense, an idea...). `params` describe the object; the
+    actor's name is added as `name`."""
+    return post_system_message(
+        travel_id, key, {"name": actor.username, **(params or {})}
+    )

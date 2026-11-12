@@ -61,10 +61,18 @@
     "send": "Send",
     "system": {
       "participant_joined": "{{name}} joined the trip.",
-      "participant_left": "{{name}} left the trip."
+      "participant_left": "{{name}} left the trip.",
+      "travel_created": "{{name}} created the trip “{{title}}”.",
+      "travel_updated": "{{name}} updated the trip details.",
+      "step_created": "{{name}} added the stop {{place}}.",
+      "step_updated": "{{name}} updated the stop {{place}}.",
+      "step_deleted": "{{name}} deleted the stop {{place}}.",
+      "idea_created": "{{name}} suggested the idea “{{title}}”.",
+      "idea_updated": "{{name}} updated the idea “{{title}}”.",
+      "idea_deleted": "{{name}} deleted the idea “{{title}}”.",
+      "idea_chosen": "{{name}} chose the accommodation “{{title}}”."
     },
     "errors": {
-      "max_length": "The message is too long.",
       "loadFailed": "Unable to load the messages.",
       "markReadFailed": "Unable to mark the messages as read.",
       "unreadCountFailed": "Unable to load the number of unread messages.",
@@ -84,7 +92,8 @@
   },
   "errors": {
     "csrfMissing": "CSRF token not found.",
-    "generic": "Error",
+    "generic": "Something went wrong.",
+    "invalidTravelId": "Invalid trip ID.",
     "invalidResponse": "Invalid server response.",
     "mapbox": "Mapbox error",
     "server": "Server error.",
@@ -92,9 +101,7 @@
     "unexpected": "An error occurred.",
     "end_not_after_start": "The end date must be after the start date.",
     "not_found": "Resource not found.",
-    "required": "This field is required.",
-    "blank": "This field cannot be blank.",
-    "invalid": "Invalid value."
+    "network": "Cannot reach the server. Check your connection and try again."
   },
   "friendship": {
     "accept": "Accept",
@@ -103,7 +110,6 @@
       "cannot_accept_own_request": "You cannot accept your own friend request.",
       "cannot_friend_yourself": "You cannot send a friend request to yourself.",
       "friendship_not_found": "Friendship not found.",
-      "invalidUserId": "Invalid user ID.",
       "loadFailed": "Could not load your friends list.",
       "requestsLoadFailed": "Could not load your friend requests.",
       "missingRequestId": "Request ID missing.",
@@ -112,8 +118,6 @@
       "not_friend_request_participant": "You are not a participant in this friend request.",
       "relationship_exists": "A friendship or friend request already exists with this user.",
       "friend_request_not_found": "Friend request not found.",
-      "searchFailed": "Unable to search for users.",
-      "userIdRequired": "User ID is required.",
       "user_not_found": "User not found."
     },
     "myFriends": "MY FRIENDS · {{count}}",
@@ -154,7 +158,6 @@
       "unseenCountFailed": "Unable to load the number of new ideas.",
       "voteNotFound": "Vote status not found.",
       "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
-
       "step_not_in_travel": "The stop must belong to the same trip as the idea.",
       "dates_outside_step": "The idea dates must be within the dates of the selected stop.",
       "price_only_for_lodging": "Only accommodation can have a price per night.",
@@ -444,9 +447,23 @@
     "email": "Email",
     "errors": {
       "email": {
-        "unique": "This email address is already in use."
+        "unique": "This email address is already in use.",
+        "max_length": "The email address cannot exceed 254 characters.",
+        "invalid": "Enter a valid email address."
       },
-      "noImage": "No image selected.",
+      "first_name": {
+        "max_length": "The first name cannot exceed 150 characters."
+      },
+      "last_name": {
+        "max_length": "The last name cannot exceed 150 characters."
+      },
+      "profile_picture": {
+        "max_size": "The profile picture must not exceed 5 MB.",
+        "invalid_image": "The selected file is not a valid image.",
+        "empty": "The selected file is empty.",
+        "invalid": "The uploaded file is invalid.",
+        "max_length": "The image filename is too long."
+      },
       "username": {
         "max_length": "Ensure this field has no more than 150 characters.",
         "invalid": "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.",
@@ -577,15 +594,12 @@
       "invitation_refused": "This person declined the invitation.",
       "not_travel_participant": "You must be a member of this trip to perform this action.",
       "steps_before_travel_start": "Some stops start before this date: move them first.",
-      "steps_after_travel_end": "Some stops end after this date: move them first.",
-      "title": {
-        "max_length": "Title too long."
-      }
+      "steps_after_travel_end": "Some stops end after this date: move them first."
     },
     "haveInviteLink": "I have an invitation link",
     "invitation": "INVITATION TO JOIN",
     "inviteLink": "Invitation link",
-    "inviteTravelers": "Invite your travellers to plan {{title}} together",
+    "inviteTravelers": "Invite your travelers to plan the trip: {{title}}",
     "joinTravel": "Join the trip",
     "pendingInvitation": "Pending",
     "refusedInvitation": "Declined",

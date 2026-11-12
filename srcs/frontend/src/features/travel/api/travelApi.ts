@@ -15,6 +15,7 @@ export async function getTravel(travelId: number): Promise<Travel> {
   const response = await fetch(`${API_BASE_URL}/travels/${travelId}/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Travel>(response);
@@ -24,6 +25,7 @@ export async function getTravels(): Promise<Travel[]> {
   const response = await fetch(`${API_BASE_URL}/travels/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Travel[]>(response);
@@ -42,6 +44,7 @@ export async function createTravel(data: CreateTravelData): Promise<Travel> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -65,6 +68,7 @@ export async function updateTravel(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -76,6 +80,7 @@ export async function getInvitation(token: string): Promise<Invitation> {
   const response = await fetch(`${API_BASE_URL}/travels/join/${token}/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Invitation>(response);
@@ -85,6 +90,7 @@ export async function getInvitations(): Promise<InvitationNotification[]> {
   const response = await fetch(`${API_BASE_URL}/travels/invitations/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<InvitationNotification[]>(response);
@@ -105,6 +111,7 @@ export async function refuseInvitation(token: string): Promise<void> {
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
@@ -127,6 +134,7 @@ export async function joinTravel(token: string): Promise<Travel> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 
@@ -151,6 +159,7 @@ export async function addParticipant(
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: JSON.stringify({ travelerId }),
     },
@@ -174,6 +183,7 @@ export async function leaveTravel(travelId: number): Promise<void> {
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 
@@ -186,6 +196,7 @@ export async function getTravelNotifications(): Promise<TravelNotification[]> {
   const response = await fetch(`${API_BASE_URL}/travels/notifications/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<TravelNotification[]>(response);

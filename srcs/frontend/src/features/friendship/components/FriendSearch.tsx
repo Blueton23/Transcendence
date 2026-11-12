@@ -72,14 +72,18 @@ function FriendSearch() {
         onSelect={handleSelect}
       />
 
-      {requestError && <Text tone="accent">{requestError}</Text>}
+      {requestError && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {requestError}
+        </Text>
+      )}
 
       {message && <Text tone="success">{message}</Text>}
 
       {traveler && (
         <div className="flex flex-col gap-4 rounded-md border border-border bg-surface-container p-4">
           <div className="flex items-center gap-3">
-            <Avatar user={traveler} profile />
+            <Avatar user={traveler} />
 
             <div className="flex min-w-0 flex-1 flex-col">
               <Text>{traveler.username}</Text>

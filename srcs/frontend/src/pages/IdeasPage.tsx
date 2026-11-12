@@ -69,7 +69,13 @@ export function IdeasPage() {
   }
 
   if (error || errorSteps || errorTravel) {
-    return <Text>{error || errorSteps || errorTravel}</Text>;
+    return (
+      <div role="alert" className="p-4">
+        <Text tone="accent" className="whitespace-pre-line">
+          {error || errorSteps || errorTravel}
+        </Text>
+      </div>
+    );
   }
 
   if (!travel) {

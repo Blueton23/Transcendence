@@ -1,4 +1,5 @@
 import { useParams } from "react-router";
+import { useTranslation } from "react-i18next";
 
 import ChatHeader from "@/features/chat/components/ChatHeader";
 import ChatTimeline from "@/features/chat/components/ChatTimeline";
@@ -9,13 +10,16 @@ import Text from "@/shared/ui/Text";
 
 export default function ChatPage() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useTranslation();
+
   const parsedId = Number(id);
-  const isValidId = Boolean(id) && Number.isInteger(parsedId) && parsedId > 0;
+  const isValidId =
+    Boolean(id) && Number.isSafeInteger(parsedId) && parsedId > 0;
 
   if (!isValidId) {
     return (
-      <div className="p-5">
-        <Text tone="accent">Identifiant de voyage invalide.</Text>
+      <div className="p-5" role="alert">
+        <Text tone="accent">{t("errors.invalidTravelId")}</Text>
       </div>
     );
   }
@@ -32,7 +36,6 @@ function ValidChatPage({ travelId }: { travelId: number }) {
   ]);
 
   async function handleSend(body: string) {
-    // Show the user's own message even if they had scrolled up.
     stick();
     await sendMessage(body);
   }

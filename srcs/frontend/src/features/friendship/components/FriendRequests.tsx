@@ -91,9 +91,11 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
           {requests.length > 0 && requests.length}
         </Text>
       </div>
-
-      {displayedError && <Text tone="accent">{displayedError}</Text>}
-
+      {displayedError && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {displayedError}
+        </Text>
+      )}
       {requests.length === 0 ? (
         <Text tone="muted">{t("friendship.noRequests")}</Text>
       ) : (
@@ -104,7 +106,7 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
               className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-4"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <Avatar user={request.traveler} profile />
+                <Avatar user={request.traveler} />
 
                 <div className="flex min-w-0 flex-col">
                   <Text>{request.traveler.username}</Text>

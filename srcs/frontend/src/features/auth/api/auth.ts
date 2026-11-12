@@ -9,11 +9,10 @@ export async function getCsrfToken(): Promise<void> {
   const response = await fetch(`${API_BASE_URL}/auth/csrf/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
-  if (!response.ok) {
-    throw new Error(i18n.t("auth.errors.csrfInit"));
-  }
+  await parseResponse<void>(response);
 }
 
 export async function login(data: LoginData): Promise<AuthResponse> {
@@ -43,6 +42,7 @@ export async function getMe(): Promise<AuthResponse> {
   const response = await fetch(`${API_BASE_URL}/auth/me/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<AuthResponse>(response);
@@ -64,9 +64,5 @@ export async function logout(): Promise<void> {
     },
   });
 
-  if (!response.ok) {
-    const result = await response.json();
-
-    throw new Error(result.detail || i18n.t("auth.errors.logoutFailed"));
-  }
+  await parseResponse<void>(response);
 }

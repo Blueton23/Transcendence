@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import type { User } from "../types";
 import { getMe, logout as logoutApi } from "../api/auth";
 import { AuthContext } from "./AuthContext";
+import { ApiHttpError } from "@/shared/api/parseResponse";
 
 const STORAGE_KEY = "peripl-user";
 
@@ -13,18 +14,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(user);
     saveUser(user);
   }
+
   async function refreshUser() {
     try {
       const response = await getMe();
+
       setUser(response.traveler);
       saveUser(response.traveler);
     } catch (err) {
-      if (err instanceof TypeError) {
-        // server offline : keep the last known user
-        setUser(loadSavedUser());
-      } else {
+      const sessionInvalid =
+        err instanceof ApiHttpError &&
+        (err.status === 401 ||
+          err.codes.includes("not_authenticated") ||
+          err.codes.includes("authentication_failed"));
+
+      if (sessionInvalid) {
         setUser(null);
         saveUser(null);
+      } else {
+        setUser(loadSavedUser());
       }
     }
   }

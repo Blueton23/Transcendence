@@ -4,7 +4,7 @@ from .models import Participation, ParticipationStatus
 
 
 class IsTravelParticipant(BasePermission):
-    message = "Vous devez être membre du voyage."
+    message = "You must be a member of the trip."
     code = "not_travel_participant"
 
     def has_permission(self, request, view):
