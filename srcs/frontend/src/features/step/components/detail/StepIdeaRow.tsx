@@ -31,7 +31,11 @@ export function StepIdeaRow({
     <div className="flex items-center justify-between gap-3 rounded-md bg-surface px-3 py-2 shadow-sm">
       <div className="flex min-w-0 flex-1 flex-col gap-2 md:flex-row md:gap-3">
         {idea.type !== "accommodation" && (
-          <Tag tone="plain" shape="soft" className={ideaBands[idea.type]}>
+          <Tag
+            tone="plain"
+            shape="soft"
+            className={`self-start ${ideaBands[idea.type]}`}
+          >
             {" "}
             {t(ideaTypeLabels[idea.type])}
           </Tag>
@@ -40,6 +44,15 @@ export function StepIdeaRow({
           <Text className="truncate font-semibold">{idea.title}</Text>
           <Text size="sm" tone="muted" className="truncate">
             {proposer.name}
+            {idea.pricePerNight !== null && (
+              <>
+                {" · "}
+                <span className="font-mono font-semibold text-text">
+                  {idea.pricePerNight} CHF
+                </span>{" "}
+                {t("units.perNight")}
+              </>
+            )}
           </Text>
         </div>
       </div>
