@@ -70,7 +70,6 @@ function Section({
   );
 }
 
-
 function AppPreview() {
   const { t } = useTranslation();
   const previewSteps = [
