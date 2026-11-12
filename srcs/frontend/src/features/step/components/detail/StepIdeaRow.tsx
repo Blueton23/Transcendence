@@ -1,12 +1,13 @@
 import { VoteButton } from "@/features/idea/components/card/VoteButton";
 import type { Idea } from "@/features/idea/types";
 import { getProposer } from "@/features/idea/utils/getProposer";
-import { ideaBands } from "@/features/idea/utils/ideaBands";
+import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
 import type { IdeaActions } from "@/features/step/types";
 import type { Travel } from "@/features/travel/types";
 import Button from "@/shared/ui/Button";
 import { OptionsMenu } from "@/shared/ui/OptionsMenu";
+import Icon from "@/shared/ui/Icon";
 import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
@@ -32,11 +33,11 @@ export function StepIdeaRow({
       <div className="flex min-w-0 flex-1 flex-col gap-2 md:flex-row md:gap-3">
         {idea.type !== "accommodation" && (
           <Tag
-            tone="plain"
+            tone="idea"
             shape="soft"
-            className={`self-start ${ideaBands[idea.type]}`}
+            icon={<Icon name={ideaIcons[idea.type]} size={14} />}
+            className="self-start md:self-center"
           >
-            {" "}
             {t(ideaTypeLabels[idea.type])}
           </Tag>
         )}

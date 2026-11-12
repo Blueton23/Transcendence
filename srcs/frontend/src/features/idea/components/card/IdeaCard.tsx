@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import type { AvatarColor } from "@/shared/ui/Avatar";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
-import { ideaBands } from "@/features/idea/utils/ideaBands";
+import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import Divider from "@/shared/ui/Divider";
 import Icon from "@/shared/ui/Icon";
 
@@ -80,9 +80,10 @@ export function IdeaCard({
     <Card
       band={
         <>
-          <span className="flex items-center gap-1 text-sm font-semibold">
-            {isChosen && <Icon name="check" size={14} />}
+          <span className="flex items-center gap-1.5 text-sm font-semibold">
+            <Icon name={ideaIcons[idea.type]} size={17} />
             {isChosen ? t("idea.chosenLodging") : t(ideaTypeLabels[idea.type])}
+            {isChosen && <Icon name="check" size={14} />}
           </span>
           <div className="ml-auto flex items-center gap-1">
             <VoteButton
@@ -100,7 +101,7 @@ export function IdeaCard({
             />
             <OptionsMenu
               disabled={isActionPending}
-              variant="ghost"
+              variant={isChosen ? "outline" : "ghost"}
               onEdit={onEdit}
               onDelete={() => void submitDelete()}
               extraActions={
@@ -118,7 +119,7 @@ export function IdeaCard({
           </div>
         </>
       }
-      bandClassName={ideaBands[idea.type]}
+      bandClassName={isChosen ? "bg-brand-dark text-inverse" : undefined}
       className="flex flex-col gap-3"
     >
       <div className="flex items-start justify-between gap-5">
