@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-type BannerVariant = "success" | "warning" | "error";
+type BannerVariant = "warning" | "error";
 
 interface BannerProps {
   children: ReactNode;
@@ -10,7 +10,6 @@ interface BannerProps {
 }
 
 const variantStyles = {
-  success: "bg-success-bg text-success-text",
   warning: "bg-warning-bg text-warning-text",
   error: "bg-error-bg text-error",
 };

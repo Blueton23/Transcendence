@@ -18,15 +18,15 @@ export function StepButton({
   const { t } = useTranslation();
   if (isInPool) {
     return (
-      <Button variant="outline" size="sm" onClick={onPlace} disabled={disabled}>
-        <span className="text-error">{t("idea.place")}</span>
-        <Icon name="arrow" size={14} className="text-error" />
+      <Button variant="outline" size="xs" onClick={onPlace} disabled={disabled}>
+        <span>{t("idea.place")}</span>
+        <Icon name="arrow" size={14} />
       </Button>
     );
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={onView}>
+    <Button variant="outline" size="xs" onClick={onView}>
       {t("idea.viewStep")}
     </Button>
   );

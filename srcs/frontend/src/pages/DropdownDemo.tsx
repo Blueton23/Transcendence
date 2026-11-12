@@ -22,7 +22,7 @@ export function DropdownDemo() {
           <MenuItem icon="search">Partager</MenuItem>
           <MenuItem icon="users">Gérer les voyageurs</MenuItem>
           <MenuItem icon="cal">Changer les dates</MenuItem>
-          <MenuItem icon="ext">Exporter vers Google Maps</MenuItem>
+          <MenuItem icon="route">Exporter vers Google Maps</MenuItem>
           <MenuItem icon="x" tone="danger">
             Quitter le voyage
           </MenuItem>

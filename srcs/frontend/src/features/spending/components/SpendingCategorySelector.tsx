@@ -1,8 +1,8 @@
 import { categories, type SpendingCategory } from "@/features/spending/types";
-import { spendingCategoryIcons } from "@/features/spending/utils/spendingCategoryIcons";
 import { spendingCategoryLabels } from "@/features/spending/utils/spendingCategoryLabels";
 import Chip from "@/shared/ui/Chip";
-import Icon from "@/shared/ui/Icon";
+import Dot from "@/shared/ui/Dot";
+import { dotColors } from "@/shared/utils/dotColors";
 import { useTranslation } from "react-i18next";
 
 interface CategorySelectorProps {
@@ -22,7 +22,7 @@ export function SpendingCategorySelector({
           key={category}
           active={value === category}
           onClick={() => onChange(category)}
-          icon={<Icon name={spendingCategoryIcons[category]} size={18} />}
+          icon={<Dot className={dotColors[category]} />}
         >
           {t(spendingCategoryLabels[category])}
         </Chip>

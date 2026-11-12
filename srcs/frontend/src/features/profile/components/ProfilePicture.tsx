@@ -8,6 +8,7 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { modifyProfilePicture } from "../api/profile";
 import { useAuth } from "@/features/auth/context/useAuth";
 import { useTranslation } from "react-i18next";
+import Text from "@/shared/ui/Text";
 
 function ProfilePicture() {
   const { currentUser, setCurrentUser } = useAuth();
@@ -54,7 +55,7 @@ function ProfilePicture() {
 
   return (
     <div className="flex items-center gap-3">
-      <Avatar size="xl" />
+      <Avatar size="lg" />
 
       <input
         ref={fileInputRef}
@@ -91,9 +92,15 @@ function ProfilePicture() {
       )}
 
       {error && (
-        <p className="text-sm font-medium whitespace-pre-line text-red-500">
-          {error}
-        </p>
+        <div role="alert">
+          <Text
+            tone="accent"
+            size="sm"
+            className="font-medium whitespace-pre-line"
+          >
+            {error}
+          </Text>
+        </div>
       )}
     </div>
   );

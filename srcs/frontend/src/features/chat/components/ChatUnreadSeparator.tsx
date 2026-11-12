@@ -1,26 +1,27 @@
-import Divider from "@/shared/ui/Divider";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
+
+const lineStyle = "h-px flex-1 bg-brand-primary";
 
 export default function UnreadSeparator() {
   const { t } = useTranslation();
 
   return (
     <div
-      className="flex items-center gap-3 py-4"
+      role="separator"
       aria-label={t("chat.unreadMessages")}
+      className="flex items-center gap-3 py-4"
     >
-      <div className="flex-1">
-        <Divider className="bg-brand-primary" />
-      </div>
-
-      <Text size="sm" tone="accent">
+      <span aria-hidden="true" className={lineStyle} />
+      <Text
+        as="span"
+        size="sm"
+        font="mono"
+        className="font-medium tracking-wider text-brand-primary-strong!"
+      >
         {t("chat.unreadSeparator")}
       </Text>
-
-      <div className="flex-1">
-        <Divider className="bg-brand-primary" />
-      </div>
+      <span aria-hidden="true" className={lineStyle} />
     </div>
   );
 }

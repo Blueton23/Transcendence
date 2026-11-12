@@ -1,7 +1,6 @@
+import Dot from "@/shared/ui/Dot";
+import Tag from "@/shared/ui/Tag";
 import { useTranslation } from "react-i18next";
-
-import Badge from "@/shared/ui/Badge";
-import Icon from "@/shared/ui/Icon";
 
 interface OnlineStatusProps {
   isOnline: boolean;
@@ -9,14 +8,18 @@ interface OnlineStatusProps {
 
 function OnlineStatus({ isOnline }: OnlineStatusProps) {
   const { t } = useTranslation();
-
+  const tagsColors = isOnline
+    ? "bg-success-bg text-success-text"
+    : "bg-surface-container text-muted";
+  const dotColor = isOnline ? "bg-success" : "bg-muted";
   return (
-    <Badge
-      variant={isOnline ? "success" : "warning"}
-      icon={<Icon name={isOnline ? "check" : "moon"} size={14} />}
+    <Tag
+      tone="plain"
+      icon={<Dot className={dotColor} />}
+      className={tagsColors}
     >
-      {isOnline ? t("friendship.online") : t("friendship.offline")}
-    </Badge>
+      {isOnline ? t("profile.online") : t("profile.offline")}
+    </Tag>
   );
 }
 

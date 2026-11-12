@@ -1,13 +1,13 @@
 import type { Idea } from "@/features/idea/types";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
-import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import type { DateRange } from "@daypicker/react";
 import { DateField } from "@/features/idea/components/forms/DateField";
 import Text from "@/shared/ui/Text";
 import Select from "@/shared/ui/Select";
 import Input from "@/shared/ui/Input";
 import Chip from "@/shared/ui/Chip";
-import Icon from "@/shared/ui/Icon";
+import Dot from "@/shared/ui/Dot";
+import { dotColors } from "@/shared/utils/dotColors";
 import type { Step } from "@/features/step/types";
 import { useTranslation } from "react-i18next";
 
@@ -77,7 +77,7 @@ export function PlaceIdeaForm({
       <Chip
         disabled
         className="mb-3"
-        icon={<Icon name={ideaIcons[idea.type]} size={14} />}
+        icon={<Dot className={dotColors[idea.type]} />}
       >
         {t(ideaTypeLabels[idea.type])}
       </Chip>

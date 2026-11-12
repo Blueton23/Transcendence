@@ -57,7 +57,7 @@ function Login() {
         <Card variant="default">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
-              <IconBadge color="purple" name="mtn" />
+              <IconBadge color="purple" name="van" />
               <Heading level={1} size="lg">
                 {t("auth.welcomeBack")}
               </Heading>
