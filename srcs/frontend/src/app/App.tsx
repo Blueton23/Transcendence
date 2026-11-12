@@ -11,6 +11,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import SignupPage from "@/pages/SignupPage";
 import LoginPage from "@/pages/LoginPage";
 import HomePage from "@/pages/HomePage";
+import NotFoundPage from "@/pages/NotFoundPage";
 import ItineraryPage from "@/pages/ItineraryPage";
 import { IdeasPage } from "@/pages/IdeasPage";
 import TravelPage from "@/pages/TravelPage";
@@ -50,6 +51,7 @@ function App() {
             </Route>
           </Route>
         </Route>
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </>
   );
