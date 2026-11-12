@@ -16,7 +16,7 @@ export function FinishedTravelList({
   const navigate = useNavigate();
 
   return (
-    <div className="grid grid-cols-1 gap-2 md:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
       {travels.map((travel) => (
         <div
           key={travel.id}
