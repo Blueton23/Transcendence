@@ -114,6 +114,8 @@
     "noFriends": "Todavía no tienes amigos.",
     "noRequests": "No hay solicitudes de amistad pendientes.",
     "noUsersFound": "No se encontraron usuarios.",
+    "offline": "Desconectado",
+    "online": "En línea",
     "receivedRequests": "SOLICITUDES RECIBIDAS",
     "remove": "Quitar",
     "removeTitle": "¿Quitar a {{username}} de tus amigos?",

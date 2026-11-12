@@ -12,6 +12,8 @@ import FriendRemove from "./FriendRemove";
 import { useTranslation } from "react-i18next";
 import Modal from "@/shared/ui/Modal";
 import ProfileInfo from "@/features/profile/components/ProfileInfo";
+import OnlineStatus from "@/shared/ui/OnlineStatus";
+import { useFriendPresence } from "../hooks/useFriendPresence";
 import i18n from "@/i18n";
 
 interface FriendListProps {
@@ -21,8 +23,7 @@ interface FriendListProps {
 function FriendList({ refreshKey }: FriendListProps) {
   const [friendships, setFriendships] = useState<Friendship[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [profileFriendship, setProfileFriendship] = useState<Friendship | null>(
+  const [profileFriendshipId, setProfileFriendshipId] = useState<number | null>(
     null,
   );
   const [selectedFriendship, setSelectedFriendship] =
@@ -41,6 +42,12 @@ function FriendList({ refreshKey }: FriendListProps) {
 
     void loadFriends();
   }, [refreshKey]);
+
+  useFriendPresence(setFriendships);
+
+  const profileFriend = friendships.find(
+    (friendship) => friendship.friendshipId === profileFriendshipId,
+  )?.friend;
 
   function handleRemoved(friendshipId: number) {
     setFriendships((current) =>
@@ -82,7 +89,10 @@ function FriendList({ refreshKey }: FriendListProps) {
                   <Avatar user={friend} profile />
 
                   <div className="flex min-w-0 flex-col">
-                    <Text>{friend.username}</Text>
+                    <div className="flex items-center gap-2">
+                      <Text>{friend.username}</Text>
+                      <OnlineStatus isOnline={friend.isOnline} />
+                    </div>
                     <Text>{friend.email}</Text>
                   </div>
 
@@ -91,10 +101,9 @@ function FriendList({ refreshKey }: FriendListProps) {
                       type="button"
                       icon={<Icon name="user" size={16} />}
                       variant="dark"
-                      onClick={() => {
-                        setProfileFriendship(friendship);
-                        setIsProfileOpen(true);
-                      }}
+                      onClick={() =>
+                        setProfileFriendshipId(friendship.friendshipId)
+                      }
                     >
                       {t("nav.profile")}
                     </Button>
@@ -115,16 +124,13 @@ function FriendList({ refreshKey }: FriendListProps) {
         </div>
       )}
 
-      {isProfileOpen && profileFriendship && (
+      {profileFriend && (
         <Modal
           title={t("profile.title")}
           icon="user"
-          onClose={() => {
-            setIsProfileOpen(false);
-            setProfileFriendship(null);
-          }}
+          onClose={() => setProfileFriendshipId(null)}
         >
-          <ProfileInfo user={profileFriendship.friend} full />
+          <ProfileInfo user={profileFriend} full />
         </Modal>
       )}
 

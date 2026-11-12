@@ -26,3 +26,8 @@ export interface Friendship {
 export interface FriendshipListResponse {
   friendships: Friendship[];
 }
+
+export interface PresenceChangedEvent {
+  travelerId: number;
+  isOnline: boolean;
+}

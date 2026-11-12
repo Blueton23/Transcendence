@@ -114,6 +114,8 @@
     "noFriends": "You don't have any friends yet.",
     "noUsersFound": "No users found.",
     "noRequests": "No pending friend requests.",
+    "offline": "Offline",
+    "online": "Online",
     "receivedRequests": "RECEIVED REQUESTS",
     "remove": "Remove",
     "removeTitle": "Remove {{username}} from your friends?",
