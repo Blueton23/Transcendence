@@ -18,8 +18,8 @@ export default defineConfig({
         name: "Peripl",
         short_name: "Peripl",
         description: "Organise vos roadtrip à plusieurs",
-        theme_color: "#f2664a",
-        background_color: "#fcfaf3",
+        theme_color: "#d63f26",
+        background_color: "#f6f1e9",
         display: "standalone",
         icons: [
           {
@@ -37,6 +37,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        disableDevLogs: true,
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         navigateFallbackDenylist: [/^\/api\//, /^\/admin\//, /^\/ws\//],
         runtimeCaching: [
