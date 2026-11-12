@@ -64,7 +64,7 @@ function Signup() {
     <div className="w-full">
       {/* Header */}
       <div className="flex flex-col items-center gap-2 text-center">
-        <IconBadge color="purple" name="van" />
+        <IconBadge color="brand" name="compass" />
 
         <Heading level={1} size="lg">
           {t("profile.signupTitle")}
