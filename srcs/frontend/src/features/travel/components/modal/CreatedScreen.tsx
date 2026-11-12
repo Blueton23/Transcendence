@@ -5,6 +5,7 @@ import Card from "@/shared/ui/Card";
 import Text from "@/shared/ui/Text";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useError } from "@/shared/context/useError";
 
 interface CreatedScreenProps {
   travel: Travel;
@@ -14,6 +15,7 @@ interface CreatedScreenProps {
 export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
   const [copied, setCopied] = useState(false);
   const { t } = useTranslation();
+  const { showError } = useError();
 
   const handleCopy = async () => {
     try {
@@ -21,7 +23,7 @@ export function CreatedScreen({ travel, onClose }: CreatedScreenProps) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      console.error("The link was not copied.");
+      showError(t("travel.errors.copyFailed"));
     }
   };
 

@@ -13,6 +13,7 @@ import {
 } from "../api/chatApi";
 import type { ApiChatMessage, ChatMessage, SocketChatMessage } from "../types";
 import i18n from "@/i18n";
+import { useError } from "@/shared/context/useError";
 
 function toChatMessage(message: ApiChatMessage): ChatMessage {
   return {
@@ -34,9 +35,9 @@ function addMessage(current: ChatMessage[], message: ChatMessage) {
   return [...current, message].sort(byDate);
 }
 
-function markAsRead(travelId: number) {
-  markMessagesAsRead(travelId).catch((error) => {
-    console.error("Unable to mark messages as read :", error);
+function markAsRead(travelId: number, showError: (message: string) => void) {
+  markMessagesAsRead(travelId).catch(() => {
+    showError(i18n.t("chat.errors.markReadFailed"));
   });
 }
 
@@ -45,6 +46,7 @@ export function useChat(travelId: number) {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { currentUser } = useAuth();
+  const { showError } = useError();
   // Set once the first list is shown: the unread separator comes from it.
   const hasLoaded = useRef(false);
 
@@ -55,7 +57,7 @@ export function useChat(travelId: number) {
       if (!hasLoaded.current) {
         hasLoaded.current = true;
         setMessages(fetched);
-        markAsRead(travelId);
+        markAsRead(travelId, showError);
       } else {
         // A reload (socket reconnection) comes after mark-read, so the
         // server says everything is read: keep the separator where it was.
@@ -70,20 +72,23 @@ export function useChat(travelId: number) {
       setError(null);
       setIsLoading(false);
     },
-    [travelId],
+    [travelId, showError],
   );
 
-  const onLoadError = useCallback((err: unknown) => {
-    console.error("Erreur lors du chargement des messages :", err);
+  const onLoadError = useCallback(
+    (err: unknown) => {
+      if (!hasLoaded.current) {
+        setError(
+          err instanceof Error ? err.message : i18n.t("errors.unexpected"),
+        );
+      } else {
+        showError(i18n.t("chat.errors.loadFailed"));
+      }
 
-    if (!hasLoaded.current) {
-      setError(
-        err instanceof Error ? err.message : i18n.t("errors.unexpected"),
-      );
-    }
-
-    setIsLoading(false);
-  }, []);
+      setIsLoading(false);
+    },
+    [showError],
+  );
 
   const loadMessages = useCallback(
     () => getMessages(travelId).then(applyMessages, onLoadError),
@@ -102,7 +107,7 @@ export function useChat(travelId: number) {
     setMessages((current) =>
       addMessage(current, toChatMessage({ ...event, isUnread: false })),
     );
-    if (event.traveler !== currentUser?.id) markAsRead(travelId);
+    if (event.traveler !== currentUser?.id) markAsRead(travelId, showError);
   });
 
   const handleSendMessage = useCallback(

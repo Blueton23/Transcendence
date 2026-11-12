@@ -21,6 +21,7 @@ import {
   useTravelSocketOpen,
 } from "@/features/travel/realtime/useTravelSocket";
 import i18n from "@/i18n";
+import { useError } from "@/shared/context/useError";
 
 // Replaces the idea if it is already listed, otherwise adds it on top (the
 // list is newest first). A reload triggered by the socket can bring the new
@@ -36,6 +37,7 @@ export function useIdeas(travelId: number) {
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { showError } = useError();
 
   useEffect(() => {
     let ignore = false;
@@ -87,8 +89,8 @@ export function useIdeas(travelId: number) {
     try {
       const result = await fetchIdeas(travelId);
       if (reload === lastReload.current) setIdeas(result);
-    } catch (err) {
-      console.error("Impossible de recharger les idées :", err);
+    } catch {
+      showError(i18n.t("idea.errors.loadFailed"));
     }
   }
 

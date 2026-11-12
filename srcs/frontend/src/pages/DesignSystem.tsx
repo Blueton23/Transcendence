@@ -284,7 +284,7 @@ function DesignSystem() {
             placeholder="17.09.2026"
             icon={<Icon name="cal" size={18} />}
             iconLabel="Ouvrir le calendrier"
-            onIconClick={() => console.log("Ouvrir le calendrier")}
+            onIconClick={() => {}}
           />
         </Specimen>
       </Section>

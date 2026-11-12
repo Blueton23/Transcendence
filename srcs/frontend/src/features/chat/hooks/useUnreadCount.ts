@@ -9,6 +9,8 @@ import {
 
 import { getUnreadCount } from "../api/chatApi";
 import type { SocketChatMessage } from "../types";
+import { useError } from "@/shared/context/useError";
+import i18n from "@/i18n";
 
 // Badge of the trip nav. The server count is the truth (loaded on each socket
 // (re)connection); live messages from others bump it in between. On the chat
@@ -17,18 +19,16 @@ export function useUnreadCount(travelId: number): number {
   const [unreadCount, setUnreadCount] = useState(0);
   const { currentUser } = useAuth();
   const isOnChat = useMatch("/travel/:id/chat") !== null;
+  const { showError } = useError();
 
   const refresh = useCallback(async () => {
     try {
       const result = await getUnreadCount(travelId);
       setUnreadCount(result.unreadCount);
-    } catch (error) {
-      console.error(
-        "Unable to retrieve the number of unread messages :",
-        error,
-      );
+    } catch {
+      showError(i18n.t("chat.errors.unreadCountFailed"));
     }
-  }, [travelId]);
+  }, [travelId, showError]);
 
   useTravelSocketOpen(() => void refresh());
 

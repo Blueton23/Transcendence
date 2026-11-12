@@ -64,6 +64,9 @@
       "participant_left": "{{name}} left the trip."
     },
     "errors": {
+      "loadFailed": "Unable to load the messages.",
+      "markReadFailed": "Unable to mark the messages as read.",
+      "unreadCountFailed": "Unable to load the number of unread messages.",
       "travel_chat_access_denied": "You do not have access to this trip.",
       "system_message_has_author": "A system message cannot have an author.",
       "message_author_required": "A message must have an author.",
@@ -98,6 +101,7 @@
       "cannot_friend_yourself": "You cannot send a friend request to yourself.",
       "friendship_not_found": "Friendship not found.",
       "loadFailed": "Could not load your friends list.",
+      "requestsLoadFailed": "Could not load your friend requests.",
       "missingRequestId": "Request ID missing.",
       "noUserSelected": "No user selected.",
       "not_friendship_participant": "You are not a participant in this friendship.",
@@ -135,9 +139,11 @@
       "invalidTravelId": "Invalid trip ID.",
       "loadFailed": "Unable to load the ideas.",
       "lodgingDatesRequired": "Check-in and check-out dates are required.",
+      "markSeenFailed": "Unable to mark the ideas as seen.",
       "notFound": "Idea not found.",
       "stepRequired": "Choose a stop for this idea.",
       "titleRequired": "The title is required.",
+      "unseenCountFailed": "Unable to load the number of new ideas.",
       "voteNotFound": "Vote status not found.",
       "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
 
@@ -530,6 +536,7 @@
     "edit": "Edit stop",
     "errors": {
       "placeNotFound": "Place not found, choose one from the list.",
+      "routeFailed": "Unable to calculate the route.",
       "step_before_travel": "The stop cannot start before the trip begins.",
       "step_after_travel": "The stop cannot end after the trip ends.",
       "step_dates_overlap": "The dates of this stop overlap with another stop.",
@@ -565,8 +572,10 @@
     "creating": "Creating...",
     "editTravel": "Edit trip",
     "errors": {
+      "copyFailed": "Unable to copy the link.",
       "datesRequired": "Select dates before confirming.",
       "invalid_invitation_link": "This invitation link is invalid.",
+      "loadFailed": "Unable to load the trip.",
       "notFound": "No trip found.",
       "sameDates": "Select an end date different from the start date.",
       "titleRequired": "Enter a title before confirming.",

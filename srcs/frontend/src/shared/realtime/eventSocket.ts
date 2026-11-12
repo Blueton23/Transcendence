@@ -80,9 +80,6 @@ export function useEventSocket(path: string | null): EventSocket {
           return;
         }
 
-        if (import.meta.env.DEV)
-          console.info("[ws]", event.type, event.payload);
-
         listeners.current.get(event.type)?.forEach((handler) => {
           handler(event.payload);
         });
