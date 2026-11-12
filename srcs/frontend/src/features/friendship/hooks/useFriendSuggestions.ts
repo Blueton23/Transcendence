@@ -32,7 +32,7 @@ export function useFriendSuggestions(query: string, enabled: boolean) {
           travelers: response.travelers,
           error: null,
         });
-      } catch {
+      } catch (err) {
         if (cancelled) return;
 
         setResult({
