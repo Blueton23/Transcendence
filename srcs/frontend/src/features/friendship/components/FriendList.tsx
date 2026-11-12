@@ -12,6 +12,7 @@ import FriendRemove from "./FriendRemove";
 import { useTranslation } from "react-i18next";
 import Modal from "@/shared/ui/Modal";
 import ProfileInfo from "@/features/profile/components/ProfileInfo";
+import i18n from "@/i18n";
 
 interface FriendListProps {
   refreshKey: number;
@@ -33,8 +34,8 @@ function FriendList({ refreshKey }: FriendListProps) {
         const response = await getFriends();
         setFriendships(response.friendships);
         setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : null);
+      } catch {
+        setError(i18n.t("friendship.errors.loadFailed"));
       }
     }
 

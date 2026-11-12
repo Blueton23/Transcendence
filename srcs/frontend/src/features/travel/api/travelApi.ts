@@ -90,6 +90,7 @@ export async function getInvitations(): Promise<InvitationNotification[]> {
   const response = await fetch(`${API_BASE_URL}/travels/invitations/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<InvitationNotification[]>(response);
@@ -110,6 +111,7 @@ export async function refuseInvitation(token: string): Promise<void> {
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
@@ -194,6 +196,7 @@ export async function getTravelNotifications(): Promise<TravelNotification[]> {
   const response = await fetch(`${API_BASE_URL}/travels/notifications/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<TravelNotification[]>(response);

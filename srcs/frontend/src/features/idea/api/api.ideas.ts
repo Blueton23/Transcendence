@@ -248,6 +248,7 @@ export async function fetchUnseenIdeasCount(travelId: number): Promise<number> {
   const response = await fetch(`/api/travels/${travelId}/ideas/unseen-count/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   const data = await parseResponse<{ unseenCount: number }>(response);
@@ -267,6 +268,7 @@ export async function markIdeasAsSeen(travelId: number): Promise<void> {
     credentials: "include",
     headers: {
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 
