@@ -120,6 +120,8 @@
     "noFriends": "Vous n'avez pas encore d'amis.",
     "noRequests": "Aucune demande d'amitié en attente.",
     "noUsersFound": "Aucun utilisateur trouvé.",
+    "offline": "Hors ligne",
+    "online": "En ligne",
     "receivedRequests": "DEMANDES REÇUES",
     "remove": "Retirer",
     "removeTitle": "Retirer {{username}} de vos amis ?",
