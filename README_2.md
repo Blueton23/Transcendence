@@ -213,123 +213,83 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 
 ---
 
-### Frontend + backend framework - Docker foundation and 5 services (Major, 2 points)
+### Framework for frontend and backend
 
-**Done by:** dle-fur (technical foundation: Docker Compose, the 5 services, Nginx, Makefile).
-
-**What it delivers.** The whole application starts with a single command (`make`) and runs the same way on every team member's machine. The backend uses **Django + Django REST Framework**, the frontend **React + TypeScript + Vite**. Nginx is the **single entry point** (port 8443 on the host, forwarded to port 443 in the container).
-
-**How it is implemented.**
-
-- `docker-compose.yml`: 5 services with pinned versions (`postgres:17-alpine`, `redis:7.4.9-alpine`, `python:3.13`, `node:22`, `nginx:1.30.3`) on a private network; only Nginx is exposed. The **health checks** + `depends_on: service_healthy` enforce the startup order: `db` and `redis` → `backend` and `frontend` → `nginx`. `restart: unless-stopped`.
-- **Backend**: Django 5.2 + DRF + Channels, served by **Uvicorn** (ASGI: HTTP and WebSockets in the same server). Non-root user (UID/GID from the `.env`). `entrypoint.sh` runs `collectstatic` then Uvicorn with `--workers 4`. Quality: Ruff and Django tests.
-- **Frontend**: React 19 + TypeScript + Tailwind, **production build** built into the image (`VITE_MAPBOX_TOKEN` is passed to the build) and served on port 3000. Dependencies with `npm ci`. Quality: ESLint and Prettier.
-- **Nginx**: `/api/`, `/admin/`, `/ws/` → backend; `/static/`, `/media/` → read directly from the volumes; the rest → frontend. A single origin: no CORS, session cookies work naturally. Forwards the real IP (`X-Forwarded-For`). HTTPS on port 443 inside the container, exposed on port 8443 of the host (`8443:443` in `docker-compose.yml`), with the certificates from the `certs/` folder.
-The certificates are requested by certbot and issued by Let's Encrypt for a period of 90 days
-- **Data**: PostgreSQL (constraints, transactions, `select_for_update`) in the `postgres_data` volume; Redis database 0 for Django Channels, database 1 for the cache (API rate limiting).
-- `Makefile`: wraps the Compose commands (`make up`, `make ps`, `make test`…).
-
-**Limits.** The source code is not mounted in the containers: each change requires rebuilding the images (`make up`, which runs `--build`).
-
-**How to test.** With the project running:
-
-| Command / action | Expected result | What it proves |
-|---|---|---|
-| `make ps` | `db`, `redis`, `backend`, `frontend` **healthy**, `nginx` **running** | The 5 services are running, in the right order |
-| `make test-db` then `make ping` | `✅ Connexion réussie à la base : …` then `PONG` | Django reaches PostgreSQL, Redis responds |
+| | |
+|---|---|
+| **Type** | Major · 2 pts |
+| **Members** | All · dle-fur (technical foundation: Docker Compose, the 5 services, Nginx, Makefile) |
+| **What it does** | The whole application starts with a single command (`make`) and runs the same way on every machine. Backend: **Django + Django REST Framework**; frontend: **React + TypeScript + Vite**; Nginx is the **single entry point** (port 8443 on the host, forwarded to 443 in the container). |
+| **How it is implemented** | • `docker-compose.yml`: 5 services with pinned versions (`postgres:17-alpine`, `redis:7.4.9-alpine`, `python:3.13`, `node:22`, `nginx:1.30.3`) on a private network; only Nginx is exposed. Health checks + `depends_on: service_healthy` enforce the startup order (`db`, `redis` → `backend`, `frontend` → `nginx`), with `restart: unless-stopped`.<br>• **Backend**: Django 5.2 + DRF + Channels, served by **Uvicorn** (ASGI: HTTP and WebSockets in one server), non-root user (UID/GID from the `.env`); `entrypoint.sh` runs `collectstatic` then Uvicorn with `--workers 4`. Quality: Ruff and Django tests.<br>• **Frontend**: React 19 + TypeScript + Tailwind, **production build** built into the image (`VITE_MAPBOX_TOKEN` passed to the build), served on port 3000, dependencies with `npm ci`. Quality: ESLint and Prettier.<br>• **Nginx**: `/api/`, `/admin/`, `/ws/` → backend; `/static/`, `/media/` read directly from the volumes; the rest → frontend. One origin: no CORS, session cookies work naturally; forwards the real IP (`X-Forwarded-For`). HTTPS with Let's Encrypt certificates (certbot, valid 90 days) from the `certs/` folder.<br>• **Data**: PostgreSQL (constraints, transactions, `select_for_update`) in the `postgres_data` volume; Redis database 0 for Django Channels, database 1 for the cache (API rate limiting).<br>• `Makefile` wraps the Compose commands (`make up`, `make ps`, `make test`…). |
+| **Limits** | The source code is not mounted in the containers: every change requires rebuilding the images (`make up` runs `--build`). |
+| **How to test** | • `make ps`: `db`, `redis`, `backend`, `frontend` are **healthy** and `nginx` is **running**, so the 5 services started in the right order.<br>• `make test-db` then `make ping`: `✅ Connexion réussie à la base : …` then `PONG`, so Django reaches PostgreSQL and Redis responds. |
 
 ---
 
-### Public API - API key, rate limiting and documentation (Major, 2 points)
+### Public API
 
-**Done by:** dle-fur.
-
-**What it delivers.** An external program (script, Postman…) can read and modify **trips**, **stages**, **ideas** and **expenses** without a browser, with an **API key**. Across several URLs (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`), with rate limiting and public Swagger documentation.
-
-**How it is implemented.**
-
-- **The key**: `rest_framework.authtoken` (a random 40-character key per user). `POST /api/auth/token/` (`ApiTokenView`) exchanges username + password for the key, which is then sent in `Authorization: Token <key>`. No CSRF needed: another site cannot add this header.
-- **Per-view access**: `PublicApiMixin` (`common/mixins.py`) adds `TokenAuthentication` (after `SessionAuthentication`) and rate limiting. Applied only to the views using `PublicApiMixin`. The others (profile, friends, votes, choosing an accommodation…) remain reserved for the website.
-- **Rate limiting** (`ScopedRateThrottle`): `public_api` = **1000 requests/minute per user**; `auth_token` = **5 attempts/minute per IP** (anti brute-force). `NUM_PROXIES: 1`: the IP is read behind Nginx and cannot be spoofed with a fake `X-Forwarded-For`.
-- **Documentation**: drf-spectacular generates the OpenAPI 3 schema (`/api/schema/`) and Swagger (`/api/docs/`), freely accessible. The `public_endpoints_only` hook shows **only** the public routes there.
-
-| Route | Methods | Note |
-|---|---|---|
-| `/api/auth/token/` | `POST` | get your key (without authentication) |
-
-**Limits.** Keys stored in plain text and without expiration (how `authtoken` works); they are revoked by deleting them in the admin.
-
-**How to test.** Go to `https://peripl.app:8443/api/docs`. Replace `<username>` / `<password>` with an existing account, then retrieve the key. Save the key in `Authorize`, with `<Token>` before the key.
+| | |
+|---|---|
+| **Type** | Major · 2 pts |
+| **Members** | dle-fur |
+| **What it does** | An external program (script, Postman…) can read and modify **trips**, **steps**, **ideas** and **expenses** without a browser, with an **API key** (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`), with rate limiting and public Swagger documentation. |
+| **How it is implemented** | • **The key**: `rest_framework.authtoken` (a random 40-character key per user). `POST /api/auth/token/` (`ApiTokenView`, no authentication needed) exchanges username + password for the key, then sent as `Authorization: Token <key>`. No CSRF needed: another site cannot add this header.<br>• **Per-view access**: `PublicApiMixin` (`common/mixins.py`) adds `TokenAuthentication` (after `SessionAuthentication`) and rate limiting, only on the views that use it. The others (profile, friends, votes, choosing an accommodation…) stay reserved for the website.<br>• **Rate limiting** (`ScopedRateThrottle`): `public_api` = **1000 requests/minute per user**; `auth_token` = **5 attempts/minute per IP** (anti brute-force). `NUM_PROXIES: 1`: the IP is read behind Nginx and cannot be spoofed with a fake `X-Forwarded-For`.<br>• **Documentation**: drf-spectacular generates the OpenAPI 3 schema (`/api/schema/`) and Swagger (`/api/docs/`), freely accessible; the `public_endpoints_only` hook shows **only** the public routes. |
+| **Limits** | Keys are stored in plain text and never expire (how `authtoken` works); they are revoked by deleting them in the admin. |
+| **How to test** | Open `https://peripl.app:8443/api/docs`, get a key with an existing account (`POST /api/auth/token/`), then click **Authorize** and enter `Token <key>`. Brute-force and rate-limiting checks: see the commands below. |
 
 ```bash
-# Test 1: brute-force
+# Test 1: brute-force (6th attempt refused)
 docker compose exec redis redis-cli -n 1 FLUSHDB
 for i in $(seq 1 6); do
   curl -s -o /dev/null -w "%{http_code}\n" -X POST https://peripl.app:8443/api/auth/token/ \
     -H "Content-Type: application/json" -d '{"username": "<username>", "password": "wrong"}'
 done
-
 docker compose exec redis redis-cli -n 1 KEYS '*'
-
 docker compose exec redis redis-cli -n 1 TTL ':1:throttle_auth_token_<ip>'
 docker compose exec backend python manage.py shell -c "from django.core.cache import cache; print(len(cache.get('throttle_auth_token_<ip>') or []))"
 
-# Test 2: rate limiting
+# Test 2: rate limiting (1001st request refused)
 TOKEN=<key>
 docker compose exec redis redis-cli -n 1 FLUSHDB
 for i in $(seq 1 1001); do
   curl -s -o /dev/null -w "%{http_code}\n" https://peripl.app:8443/api/travels/ \
     -H "Authorization: Token $TOKEN"
 done | sort | uniq -c
-
 docker compose exec redis redis-cli -n 1 KEYS '*'
-
 docker compose exec backend python manage.py shell -c "from django.core.cache import cache; print(len(cache.get('throttle_public_api_<id>') or []))"
 docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 ```
 
 ---
 
-### OAuth 2.0 - sign in with Google (Minor, 1 point)
+### Remote authentication (OAuth 2.0, Google)
 
-**Done by:** dle-fur.
+| | |
+|---|---|
+| **Type** | Minor · 1 pt |
+| **Members** | dle-fur |
+| **What it does** | A "Continue with Google" button on the login and sign-up pages. The user signs in **with Google** (the site never sees their Google password) and comes back **logged in**. Their `Traveler` account is created on the first login, then found again on the next ones. The login ends like a classic one (Django's `login()`, session cookie), so the rest of the app sees no difference. |
+| **How it is implemented** | • **Google Cloud Console**: "Web application" OAuth client, redirect URI `https://peripl.app:8443/api/auth/google/callback/`; credentials in the `.env` (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`).<br>• **Authlib handles the protocol**: `state` (anti-CSRF, single use, expires after 1 h), `nonce` (anti-replay), exchange of the `code` with the `client_secret`, verification of the `id_token` signature with Google's public keys.<br>• **Our code handles the account** (`GoogleLoginView`, `GoogleCallbackView` in `traveler/views.py`): `email_verified` required; account found by email, otherwise created **without a password** (generated username `user`, then `user1` if taken); a **classic account with the same email is refused**, since classic sign-up does not verify the email and an attacker could otherwise pre-create an account with the victim's email; any failure redirects to `/login?error=google` or `/login?error=google_email_exists`.<br>• **Frontend**: the button performs a real navigation (`window.location.href = "/api/auth/google/"`). |
+| **Limits** | The account is found by email, not by Google's stable identifier (`sub`), which would allow an extra check. |
+| **How to test** | In a **private window**, with the developer tools open on **Network** (`make logs-backend` to follow the logs): see the three steps below. |
 
-**What it delivers.** A "Continue with Google" button on `auth/components/login`. The user signs in **with Google** (the site never sees their Google password) and comes back **logged in** on their profile. Their `Traveler` account is created on the first login, then found again on the following ones. The login ends like a classic login (Django's `login()`, session cookie): the rest of the application sees no difference.
-
-**How it is implemented.**
-
-- **Google Cloud Console**: "Web application" OAuth client, redirect URI `https://peripl.app:8443/api/auth/google/callback/`. Credentials in the `.env`: `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`.
-- **Authlib handles the protocol**: `state` (anti-CSRF, single use, expires after 1 h), `nonce` (anti-replay), exchange of the `code` with the `client_secret`, verification of the `id_token` (signature with Google's public keys).
-- **Our code handles the account** (`GoogleLoginView`, `GoogleCallbackView` in `traveler/views.py`):
-  - `email_verified` required;
-  - account found by email; otherwise created **without a password** (generated username: `user`, then `user1` if taken);
-  - a **classic account (with an address associated with Google) is refused**: classic sign-up does not verify the email, otherwise an attacker could pre-create an account with the victim's email;
-  - any failure redirects to `/login?error=google` or `/login?error=google_email_exists`.
-- **Frontend** (`login.tsx`): the button performs a real navigation (`window.location.href = "/api/auth/google/"`).
-
-**Limits.** Account found by email and not by the Google identifier (`sub`). `sub` is a sequence of digits that allows an additional authentication check.
-
-**How to test.** Use a **private browsing window**, with the console open (F12) on the **Network** tab.
-
-To follow the logs: `make logs-backend`.
-
-**1.** Click **"Continue with Google"**. **Don't choose an account yet**, and run:
+**1. The start.** Click **"Continue with Google"**, **don't choose an account yet**, and run:
 
 ```bash
 docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; s = Session.objects.order_by('-expire_date').first(); print(s.get_decoded())"
 ```
 
-Expected result: in F12, the `google/` request responded `302`, and its `Location` header contains `state=AbC123…` and `nonce=xYz789…`: **the same values** as in the Django session.
+Expected: the `google/` request answered `302`, and its `Location` header contains `state=…` and `nonce=…`, **the same values** as in the Django session.
 
-**2. The login.** Choose your Google account. `302` redirect to `/profile`.
+**2. The login.** Choose your Google account: `302` redirect to `/profile`.
 
-**3. The account:** in F12 → **Application** → **Cookies** → `https://peripl.app:8443`, copy the value of `sessionid`, then run:
+**3. The account.** In **Application** → **Cookies** → `https://peripl.app:8443`, copy the value of `sessionid`, then run:
 
 ```bash
 docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; from traveler.models import Traveler; s = Session.objects.get(session_key='<sessionid>').get_decoded(); t = Traveler.objects.get(pk=s['_auth_user_id']); print(t.username, t.email, t.first_name, t.last_name, t.has_usable_password())"
 ```
 
-Expected result: for example `david.lf david.lf@gmail.com David Lf False`. The browser cookie corresponds to a Django session opened for this account, created from Google, **without a password** (`False`).
+Expected: for example `david.lf david.lf@gmail.com David Lf False`. The browser cookie belongs to a Django session opened for this account, created from Google, **without a password** (`False`).
 
 ---
 
@@ -356,25 +316,20 @@ Expected result: for example `david.lf david.lf@gmail.com David Lf False`. The b
 - *Design system:* moving every page to shared components and tokens without breaking teammates' features, while keeping desktop and mobile consistent.
 
 ### David (`dle-fur`)
-### Ideas and votes (`idea` / `reaction`)
 
-**Done by:** dle-fur for the REST API (serializers, views, URLs) and frontend.
+**Infrastructure.** Technical foundation of the project: Docker Compose with the 5 services, health checks and startup order, Nginx as single entry point (routing, static files, WebSockets, HTTPS with Let's Encrypt certificates), the `Makefile`, and the move to production.
 
-**What it delivers.** Within a trip, each participant **pins ideas** (restaurant, accommodation, activity, place to see), the group **votes** for its favorites, **places** them on the itinerary stages and **chooses** an accommodation. The status is computed by the backend: `suggested` (in the pool) → `placed` (on a stage) → `chosen` (accommodation selected).
+**Backend (Django / DRF).** Ideas and votes API under `/api/travels/{travel_id}/ideas/`: list, create, detail, choosing an accommodation (`…/choice/`) and votes (`…/reaction/`). Vote counts and "have I voted?" computed in a single SQL query (`annotate` + `Exists`); accommodation choice in a transaction with `select_for_update`; one vote per person and per idea guaranteed by a database constraint; model validation errors returned as detailed per-field `400`s. Public API (API key, per-view access, rate limiting, Swagger) and Google sign-in (Authlib).
 
-**How it is implemented.**
+**Frontend (React / TypeScript).** Ideas feature (`src/features/idea/`) in separated layers, where a component never calls `fetch`: API mapper, `useIdeas` hook (loading, errors, late responses), client-side form validation, translated backend errors, and `useSubmitAction` to prevent double submissions.
 
-- **Routes** under `/api/travels/{travel_id}/ideas/`: list / create, detail (`GET`, `PUT`, `PATCH`, `DELETE`), `…/{id}/choice/` (choose an accommodation), `…/{id}/reaction/` (`GET`, `POST`, `DELETE`: the votes).
-- `IdeaListView`: the number of votes and "have I voted?" are computed **in a single SQL query** (`annotate` + `Exists`, no N+1). The trip and the author are enforced by the server.
-- `IdeaChoiceView`: **transaction** + `select_for_update`: two simultaneous clicks cannot bypass the rules (a placed accommodation, no overlapping dates). Idempotent action.
-- `ReactionView`: **a single vote per person and per idea**, guaranteed by a unique constraint in the database (otherwise `400`).
-- `IdeaSerializer`: author, status and choice are **read-only**; model validation errors become detailed per-field `400`s, instead of a `500`.
-- **Access**: logged in + accepted participant of the trip (`IsTravelParticipant`, `ParticipantScopedMixin`); an idea from another trip returns `404`. CSRF on all writes.
-- **Frontend** (`src/features/idea/`): separated layers, a component never calls `fetch`. `ideaMapper.ts` converts the API format (`r`/`l`/`a`/`s`, decimals as text, dates); `useIdeas.ts` handles loading, errors and late responses; `validateIdeaForm.ts` validates on the client side (the backend revalidates everything); `ideaErrors.ts` translates the backend errors; `useSubmitAction` disables the button during the request (no double vote).
+**Modules.** Framework for frontend and backend (technical foundation), public API, remote authentication (OAuth 2.0, Google).
 
-**Limits.** Voting and choosing an accommodation are not part of the public API: they are site-only actions.
-
-**How to test.** Logged in, open a trip then the **Ideas** tab (`/travel/{id}/ideas`).
+**Challenges.**
+- *Concurrent choices:* two travellers choosing an accommodation at the same time could break the rules (overlapping nights); a transaction with row locking (`select_for_update`) makes the second request see the first one.
+- *Performance:* counting votes per idea one by one (N+1 queries) was replaced by a single annotated query.
+- *Account takeover with Google:* since classic sign-up does not verify the email, signing in with Google is refused when a classic account already uses the same email.
+- *Rate limiting behind Nginx:* the client IP is read from `X-Forwarded-For` with `NUM_PROXIES: 1`, so it cannot be spoofed to bypass the limits.
 
 ### Sébastien (`scuthber`)
 
