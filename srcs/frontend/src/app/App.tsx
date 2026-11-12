@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router";
 
 import { AppLayout } from "./AppLayout";
+import { ErrorBanner } from "./ErrorBanner";
 
 import ProtectedRoute from "@/features/auth/components/ProtectedRoute";
 import GuestRoute from "@/features/auth/components/GuestRoute";
@@ -23,31 +24,36 @@ import { SpendingPage } from "@/pages/SpendingPage";
 function App() {
   useTranslation();
   return (
-    <Routes>
-      <Route path="/modal" element={<ModalDemo />} />
-      <Route path="/design-system" element={<DesignSystem />} />
-      <Route path="/" element={<HomePage />} />
-      <Route element={<GuestRoute />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-      </Route>
-      <Route path="/privacy" element={<LegalPage doc="privacy" />} />
-      <Route path="/terms" element={<LegalPage doc="terms" />} />
-      <Route element={<ProtectedRoute />}>
-        <Route path="/join/:token" element={<JoinPage />} />
-        <Route element={<AppLayout />}>
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/travel" element={<TravelPage />} />
-          <Route path="/travel/:id">
-            <Route index element={<Navigate to="itinerary" replace />} />
-            <Route path="itinerary" element={<ItineraryPage />} />
-            <Route path="ideas" element={<IdeasPage />} />
-            <Route path="expenses" element={<SpendingPage />} />
-            <Route path="chat" element={<ChatPage />} />
+    <>
+      <div className="fixed inset-x-0 top-0 z-60">
+        <ErrorBanner />
+      </div>
+      <Routes>
+        <Route path="/modal" element={<ModalDemo />} />
+        <Route path="/design-system" element={<DesignSystem />} />
+        <Route path="/" element={<HomePage />} />
+        <Route element={<GuestRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+        </Route>
+        <Route path="/privacy" element={<LegalPage doc="privacy" />} />
+        <Route path="/terms" element={<LegalPage doc="terms" />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/join/:token" element={<JoinPage />} />
+          <Route element={<AppLayout />}>
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/travel" element={<TravelPage />} />
+            <Route path="/travel/:id">
+              <Route index element={<Navigate to="itinerary" replace />} />
+              <Route path="itinerary" element={<ItineraryPage />} />
+              <Route path="ideas" element={<IdeasPage />} />
+              <Route path="expenses" element={<SpendingPage />} />
+              <Route path="chat" element={<ChatPage />} />
+            </Route>
           </Route>
         </Route>
-      </Route>
-    </Routes>
+      </Routes>
+    </>
   );
 }
 

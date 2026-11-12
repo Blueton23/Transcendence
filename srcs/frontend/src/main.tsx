@@ -5,13 +5,16 @@ import "./index.css";
 import App from "./app/App.tsx";
 import { AuthProvider } from "./features/auth/context/AuthProvider";
 import "./i18n";
+import { ErrorProvider } from "./shared/context/ErrorProvider.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
-      <AuthProvider>
-        <App />
-      </AuthProvider>
+      <ErrorProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </ErrorProvider>
     </BrowserRouter>
   </StrictMode>,
 );
