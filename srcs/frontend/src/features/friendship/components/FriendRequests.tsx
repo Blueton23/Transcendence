@@ -106,7 +106,7 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
               className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-4"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <Avatar user={request.traveler} profile />
+                <Avatar user={request.traveler} />
 
                 <div className="flex min-w-0 flex-col">
                   <Text>{request.traveler.username}</Text>
