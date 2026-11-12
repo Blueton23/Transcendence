@@ -241,9 +241,15 @@ class ApiTokenView(APIView):
 
 
 class MeView(APIView):
-    permission_classes: ClassVar[list] = [IsAuthenticated]
+    permission_classes: ClassVar[list] = [AllowAny]
 
     def get(self, request: Request) -> Response:
+        if not request.user.is_authenticated:
+            return Response(
+                {"traveler": None},
+                status=status.HTTP_200_OK,
+            )
+
         return Response(
             {
                 "traveler": TravelerSerializer(
