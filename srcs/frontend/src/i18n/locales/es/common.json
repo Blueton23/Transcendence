@@ -83,7 +83,7 @@
   },
   "errors": {
     "csrfMissing": "Token CSRF no encontrado.",
-    "generic": "Error",
+    "generic": "Se ha producido un error.",
     "invalidTravelId": "ID de viaje no válido.",
     "invalidResponse": "Respuesta del servidor no válida.",
     "mapbox": "Error de Mapbox",
@@ -91,7 +91,8 @@
     "serverWithStatus": "Error del servidor ({{status}} {{statusText}})",
     "unexpected": "Ha ocurrido un error.",
     "end_not_after_start": "La fecha de fin debe ser posterior a la fecha de inicio.",
-    "not_found": "Recurso no encontrado."
+    "not_found": "Recurso no encontrado.",
+    "network": "No se puede contactar con el servidor. Comprueba tu conexión e inténtalo de nuevo."
   },
   "friendship": {
     "accept": "Aceptar",
@@ -148,7 +149,6 @@
       "unseenCountFailed": "No se pudo obtener el número de ideas nuevas.",
       "voteNotFound": "Estado del voto no encontrado.",
       "voteRefreshFailed": "Tu voto se guardó, pero no se pudo actualizar el contador. Recarga la página para sincronizarlo.",
-
       "step_not_in_travel": "La etapa debe pertenecer al mismo viaje que la idea.",
       "dates_outside_step": "Las fechas de la idea deben estar dentro de las fechas de la etapa seleccionada.",
       "price_only_for_lodging": "Solo un alojamiento puede tener un precio por noche.",

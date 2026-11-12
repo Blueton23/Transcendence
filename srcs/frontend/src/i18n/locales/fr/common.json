@@ -83,7 +83,7 @@
   },
   "errors": {
     "csrfMissing": "Jeton CSRF introuvable.",
-    "generic": "Error",
+    "generic": "Une erreur est survenue.",
     "invalidTravelId": "Identifiant de voyage invalide.",
     "invalidResponse": "Réponse serveur invalide.",
     "mapbox": "Erreur Mapbox",
@@ -91,7 +91,8 @@
     "serverWithStatus": "Erreur serveur ({{status}} {{statusText}})",
     "unexpected": "Une erreur est survenue.",
     "end_not_after_start": "La date de fin doit être après la date de début.",
-    "not_found": "Ressource introuvable."
+    "not_found": "Ressource introuvable.",
+    "network": "Impossible de joindre le serveur. Vérifie ta connexion et réessaie."
   },
   "friendship": {
     "accept": "Accepter",
@@ -148,7 +149,6 @@
       "unseenCountFailed": "Impossible de récupérer le nombre de nouvelles idées.",
       "voteNotFound": "État du vote introuvable.",
       "voteRefreshFailed": "La modification de ton vote a été enregistrée, mais le compteur n'a pas pu être actualisé. Recharge la page pour le synchroniser.",
-
       "step_not_in_travel": "Cette étape n'appartient pas au voyage de l'idée.",
       "dates_outside_step": "Les dates de l'idée doivent être comprises dans les dates de l'étape sélectionnée.",
       "price_only_for_lodging": "Seul un hébergement peut avoir un prix par nuit.",
@@ -456,7 +456,7 @@
         "max_length": "Le nom du fichier image est trop long."
       },
       "username": {
-        "max_length": "Assurez-vous que ce champ comporte au plus 150 caractères!.",
+        "max_length": "Assurez-vous que ce champ comporte au plus 150 caractères.",
         "invalid": "Saisissez un nom d’utilisateur valide. Il ne peut contenir que des lettres, des nombres ou les caractères « @ », « . », « + », « - » et « _ ».",
         "unique": "Ce pseudo est déjà utilisé."
       }

@@ -83,7 +83,7 @@
   },
   "errors": {
     "csrfMissing": "CSRF token not found.",
-    "generic": "Error",
+    "generic": "Something went wrong.",
     "invalidTravelId": "Invalid trip ID.",
     "invalidResponse": "Invalid server response.",
     "mapbox": "Mapbox error",
@@ -91,7 +91,8 @@
     "serverWithStatus": "Server error ({{status}} {{statusText}})",
     "unexpected": "An error occurred.",
     "end_not_after_start": "The end date must be after the start date.",
-    "not_found": "Resource not found."
+    "not_found": "Resource not found.",
+    "network": "Cannot reach the server. Check your connection and try again."
   },
   "friendship": {
     "accept": "Accept",
@@ -148,7 +149,6 @@
       "unseenCountFailed": "Unable to load the number of new ideas.",
       "voteNotFound": "Vote status not found.",
       "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
-
       "step_not_in_travel": "The stop must belong to the same trip as the idea.",
       "dates_outside_step": "The idea dates must be within the dates of the selected stop.",
       "price_only_for_lodging": "Only accommodation can have a price per night.",
