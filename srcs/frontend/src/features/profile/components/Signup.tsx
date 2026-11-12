@@ -207,20 +207,21 @@ function Signup() {
             {isSubmitting ? t("auth.creating") : t("auth.createAccount")}
           </Button>
         </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          icon={<Icon name="google" size={18} />}
+          onClick={() => {
+            window.location.href = "/api/auth/google/";
+          }}
+        >
+          {t("auth.continueWithGoogle")}
+        </Button>
+
         {/* Lien vers la connexion */}
         <div className="flex items-center justify-center gap-1 text-sm">
           <Text tone="muted">{t("profile.alreadyAccount")}</Text>
-
-          {/* Lien vers Google */}
-          <Button
-            type="button"
-            onClick={() => {
-              window.location.href = "/api/auth/google/";
-            }}
-            className="border-none bg-transparent font-medium text-brand-primary! shadow-none outline-none hover:bg-transparent hover:underline"
-          >
-            {t("auth.continueWithGoogle")}
-          </Button>
 
           <button
             type="button"

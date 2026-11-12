@@ -17,6 +17,7 @@ export const iconNames = [
   "dots",
   "edit",
   "email",
+  "google",
   "info",
   "heart-f",
   "lock",
