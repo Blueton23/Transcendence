@@ -7,6 +7,7 @@ import {
 } from "@/features/travel/realtime/useTravelSocket";
 import i18n from "@/i18n";
 import { useError } from "@/shared/context/useError";
+import { toErrorMessage } from "@/shared/api/errors";
 
 export function useTravel(travelId: number) {
   const [travel, setTravel] = useState<Travel>();
@@ -22,7 +23,7 @@ export function useTravel(travelId: number) {
         const result = await getTravel(travelId);
         setTravel(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
+        setError(toErrorMessage(err));
       } finally {
         setIsLoading(false);
       }
@@ -63,7 +64,7 @@ export function useTravels() {
         const result = await getTravels();
         setTravels(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
+        setError(toErrorMessage(err));
       } finally {
         setIsLoading(false);
       }

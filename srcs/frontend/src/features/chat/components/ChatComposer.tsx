@@ -4,6 +4,7 @@ import type { FormEvent, KeyboardEvent } from "react";
 import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import { useTranslation } from "react-i18next";
+import { toErrorMessage } from "@/shared/api/errors";
 import IconButton from "@/shared/ui/IconButton";
 
 interface ChatComposerProps {
@@ -34,7 +35,7 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
       // Conserver le focus pour écrire le message suivant.
       requestAnimationFrame(() => textareaRef.current?.focus());
     } catch (err) {
-      setError(err instanceof Error ? err.message : null);
+      setError(toErrorMessage(err));
     } finally {
       setIsSending(false);
     }

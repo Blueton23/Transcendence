@@ -1607,6 +1607,106 @@ class StepBroadcastTest(BroadcastListenerMixin, APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(callbacks, [])
 
+    # --- Activity messages in the chat ---
+
+    def test_create_travel_posts_travel_created(self):
+        response, _ = self.request(
+            "post",
+            reverse("travel-list"),
+            {
+                "title": "Nouveau voyage",
+                "start_date": "2026-07-01",
+                "end_date": "2026-07-10",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        travel = Travel.objects.get(pk=response.data["id"])
+        message = Message.objects.get(travel=travel, is_system=True)
+        self.assertEqual(message.system_key, SystemMessageKey.TRAVEL_CREATED)
+        self.assertEqual(
+            message.system_params, {"name": "alice", "title": "Nouveau voyage"}
+        )
+
+    def test_update_travel_posts_travel_updated(self):
+        response, _ = self.request(
+            "patch",
+            reverse("travel-detail", kwargs={"pk": self.travel.id}),
+            {"title": "Nouveau titre"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.receive_event()["type"], "travel.updated")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.TRAVEL_UPDATED,
+            {"name": "alice", "title": "Nouveau titre"},
+        )
+
+    def test_create_step_posts_step_created(self):
+        response, _ = self.request(
+            "post",
+            reverse("step-list", kwargs={"travel_id": self.travel.id}),
+            {
+                "localisation": "Annecy",
+                "start_date": "2026-06-05",
+                "end_date": "2026-06-07",
+                **COORDS,
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.receive_event()["type"], "step.created")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.STEP_CREATED,
+            {"name": "alice", "place": "Annecy"},
+        )
+
+    def test_update_step_posts_step_updated(self):
+        response, _ = self.request("patch", self.detail_url(), {"localisation": "Nice"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.receive_event()["type"], "step.updated")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.STEP_UPDATED,
+            {"name": "alice", "place": "Lyon"},
+        )
+
+    def test_delete_step_posts_step_deleted(self):
+        response, _ = self.request("delete", self.detail_url())
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.receive_event()["type"], "step.deleted")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.STEP_DELETED,
+            {"name": "alice", "place": "Lyon"},
+        )
+
+    def test_refused_step_delete_posts_nothing(self):
+        Spending.objects.create(
+            travel=self.travel,
+            traveler=self.traveler,
+            step=self.step,
+            category=SpendingCategory.MEALS,
+            amount="10.00",
+        )
+
+        response, _ = self.request("delete", self.detail_url())
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Message.objects.filter(travel=self.travel).exists())
+
+    def test_invalid_update_posts_nothing(self):
+        response, _ = self.request(
+            "patch", self.detail_url(), {"end_date": "2026-05-01"}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Message.objects.filter(travel=self.travel).exists())
+
 
 class ParticipantBroadcastTest(BroadcastListenerMixin, APITestCase):
     """Joining and leaving a travel: system message, participant event, and

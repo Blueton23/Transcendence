@@ -88,7 +88,7 @@ export function StepCard({
       </div>
       {error && (
         <div role="alert" className="mt-2">
-          <Text tone="accent" size="sm">
+          <Text tone="accent" size="sm" className="whitespace-pre-line">
             {error}
           </Text>
         </div>

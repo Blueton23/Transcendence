@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { User } from "@/features/auth/types";
 import { searchFriend } from "../api/friendship";
+import { toErrorMessage } from "@/shared/api/errors";
 
 type SearchResult = {
   query: string;
@@ -32,13 +33,13 @@ export function useFriendSuggestions(query: string, enabled: boolean) {
           travelers: response.travelers,
           error: null,
         });
-      } catch {
+      } catch (err) {
         if (cancelled) return;
 
         setResult({
           query: value,
           travelers: [],
-          error: "Failed to search for users.",
+          error: toErrorMessage(err),
         });
       }
     }, 300);

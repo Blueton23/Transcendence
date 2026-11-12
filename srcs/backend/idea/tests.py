@@ -9,6 +9,7 @@ from django.utils import timezone
 from rest_framework.serializers import ValidationError as DRFValidationError
 from rest_framework.test import APITestCase
 
+from chat.models import Message, SystemMessageKey
 from common.realtime import travel_group, user_group
 from common.testing import BroadcastListenerMixin
 from idea.models import Idea, IdeaStatus, IdeaType, Reaction
@@ -4048,6 +4049,77 @@ class IdeaBroadcastTest(BroadcastListenerMixin, APITestCase):
 
         self.assertEqual(response.status_code, 204)
         self.assertEqual(callbacks, [])
+
+    # --- Messages d'activité dans le chat ---
+
+    def test_create_posts_idea_created(self):
+        response, _ = self.request(
+            "post",
+            self.url("idea-list"),
+            {"title": "Musée", "type": IdeaType.ACTIVITY},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(self.receive_event()["type"], "idea.created")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.IDEA_CREATED,
+            {"name": "Jean", "title": "Musée"},
+        )
+
+    def test_update_posts_idea_updated(self):
+        response, _ = self.request(
+            "patch", self.url("idea-detail", pk=self.idea.id), {"title": "Sushi"}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.receive_event()["type"], "idea.updated")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.IDEA_UPDATED,
+            {"name": "Jean", "title": "Restaurant japonais"},
+        )
+
+    def test_delete_posts_idea_deleted(self):
+        response, _ = self.request("delete", self.url("idea-detail", pk=self.idea.id))
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(self.receive_event()["type"], "idea.deleted")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.IDEA_DELETED,
+            {"name": "Jean", "title": "Restaurant japonais"},
+        )
+
+    def test_choice_posts_idea_chosen_once(self):
+        step = Step.objects.create(
+            travel=self.travel,
+            localisation="Lausanne",
+            start_date=datetime.date(2026, 6, 4),
+            end_date=datetime.date(2026, 6, 6),
+            **COORDS,
+        )
+        self.idea.type = IdeaType.LODGING
+        self.idea.step = step
+        self.idea.start_date = datetime.date(2026, 6, 4)
+        self.idea.end_date = datetime.date(2026, 6, 5)
+        self.idea.save()
+
+        response, _ = self.request("post", self.url("idea-choice", pk=self.idea.id))
+        self.request("post", self.url("idea-choice", pk=self.idea.id))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(self.receive_event()["type"], "idea.updated")
+        self.assert_activity_message(
+            self.travel,
+            SystemMessageKey.IDEA_CHOSEN,
+            {"name": "Jean", "title": "Restaurant japonais"},
+        )
+
+    def test_vote_posts_nothing(self):
+        self.request("post", self.url("idea-reaction", pk=self.idea.id))
+
+        self.assertFalse(Message.objects.filter(travel=self.travel).exists())
 
 
 class IdeaUnseenTest(APITestCase):

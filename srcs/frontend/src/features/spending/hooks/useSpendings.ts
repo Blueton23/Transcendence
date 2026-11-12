@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import i18n from "@/i18n";
 import { type SpendingSummary, type Spending } from "@/features/spending/types";
 import {
   getSpendings,
@@ -9,6 +8,7 @@ import {
   useTravelEvent,
   useTravelSocketOpen,
 } from "@/features/travel/realtime/useTravelSocket";
+import { toErrorMessage } from "@/shared/api/errors";
 
 export function useSpendings(travelId: number) {
   const [spendings, setSpendings] = useState<Spending[]>([]);
@@ -35,7 +35,7 @@ export function useSpendings(travelId: number) {
         setSummary(totals);
       } catch (err) {
         if (ignore) return;
-        setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
+        setError(toErrorMessage(err));
       }
       setIsLoading(false);
     }

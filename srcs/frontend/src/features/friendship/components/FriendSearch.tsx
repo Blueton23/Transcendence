@@ -73,7 +73,11 @@ function FriendSearch() {
         onSelect={handleSelect}
       />
 
-      {requestError && <Text tone="accent">{requestError}</Text>}
+      {requestError && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {requestError}
+        </Text>
+      )}
 
       {message && <Text tone="success">{message}</Text>}
 

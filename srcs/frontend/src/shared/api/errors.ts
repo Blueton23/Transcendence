@@ -68,3 +68,9 @@ export function getApiErrorMessage(response: ApiErrorResponse): string {
 
   return [...new Set(messages)].join("\n");
 }
+
+export function toErrorMessage(err: unknown): string {
+  if (err instanceof TypeError) return i18n.t("errors.network");
+  if (err instanceof Error) return err.message;
+  return i18n.t("errors.unexpected");
+}

@@ -13,6 +13,7 @@ import Modal from "@/shared/ui/Modal";
 import Button from "@/shared/ui/Button";
 import type { Step } from "@/features/step/types";
 import { useTranslation } from "react-i18next";
+import { toErrorMessage } from "@/shared/api/errors";
 
 export interface EditIdeaModalProps {
   travelTitle: string;
@@ -121,9 +122,7 @@ export function EditIdeaModal({
             await onEdit(input);
             onClose();
           } catch (err) {
-            setSubmitError(
-              err instanceof Error ? err.message : t("idea.errors.editFailed"),
-            );
+            setSubmitError(toErrorMessage(err));
           } finally {
             setIsSubmitting(false);
           }
