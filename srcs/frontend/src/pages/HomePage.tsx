@@ -9,6 +9,7 @@ import OnlineStatus from "@/shared/ui/OnlineStatus";
 import { useTranslation } from "react-i18next";
 import { Footer } from "@/app/Footer";
 import { useState } from "react";
+import { toErrorMessage } from "@/shared/api/errors";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -22,9 +23,7 @@ function HomePage() {
     try {
       await logout();
     } catch (err) {
-      setLogoutError(
-        err instanceof Error ? err.message : t("auth.errors.logoutFailed"),
-      );
+      setLogoutError(toErrorMessage(err));
     }
   }
 

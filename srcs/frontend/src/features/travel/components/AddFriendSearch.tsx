@@ -1,6 +1,7 @@
 import { useFriends } from "@/features/friendship/hooks/useFriends";
 import { addParticipant } from "@/features/travel/api/travelApi";
 import type { InvitedTraveler } from "@/features/travel/types";
+import { toErrorMessage } from "@/shared/api/errors";
 import { useListKeyboard } from "@/shared/hooks/useListKeyboard";
 import Button from "@/shared/ui/Button";
 import Input from "@/shared/ui/Input";
@@ -43,7 +44,7 @@ export function AddFriendSearch({
       setAddedIds((ids) => [...ids, friendId]);
       setQuery("");
     } catch (err) {
-      setAddError(err instanceof Error ? err.message : t("errors.unexpected"));
+      setAddError(toErrorMessage(err));
     }
   }
 

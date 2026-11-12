@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { User } from "@/features/auth/types";
 import { searchFriend } from "../api/friendship";
+import { toErrorMessage } from "@/shared/api/errors";
 
 type SearchResult = {
   query: string;
@@ -38,7 +39,7 @@ export function useFriendSuggestions(query: string, enabled: boolean) {
         setResult({
           query: value,
           travelers: [],
-          error: err instanceof Error ? err.message : null,
+          error: toErrorMessage(err),
         });
       }
     }, 300);

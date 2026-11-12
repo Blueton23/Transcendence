@@ -22,6 +22,7 @@ import {
 } from "@/features/travel/realtime/useTravelSocket";
 import i18n from "@/i18n";
 import { useError } from "@/shared/context/useError";
+import { toErrorMessage } from "@/shared/api/errors";
 
 // Replaces the idea if it is already listed, otherwise adds it on top (the
 // list is newest first). A reload triggered by the socket can bring the new
@@ -64,9 +65,7 @@ export function useIdeas(travelId: number) {
           return;
         }
 
-        setError(
-          err instanceof Error ? err.message : i18n.t("idea.errors.loadFailed"),
-        );
+        setError(toErrorMessage(err));
       } finally {
         if (!ignore) {
           setIsLoading(false);

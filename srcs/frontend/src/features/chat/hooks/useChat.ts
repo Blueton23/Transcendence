@@ -14,6 +14,7 @@ import {
 import type { ApiChatMessage, ChatMessage, SocketChatMessage } from "../types";
 import i18n from "@/i18n";
 import { useError } from "@/shared/context/useError";
+import { toErrorMessage } from "@/shared/api/errors";
 
 function toChatMessage(message: ApiChatMessage): ChatMessage {
   return {
@@ -78,9 +79,7 @@ export function useChat(travelId: number) {
   const onLoadError = useCallback(
     (err: unknown) => {
       if (!hasLoaded.current) {
-        setError(
-          err instanceof Error ? err.message : i18n.t("errors.unexpected"),
-        );
+        setError(toErrorMessage(err));
       } else {
         showError(i18n.t("chat.errors.loadFailed"));
       }

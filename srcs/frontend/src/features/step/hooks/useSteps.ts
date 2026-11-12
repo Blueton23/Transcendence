@@ -1,11 +1,11 @@
 import type { Step } from "@/features/step/types";
 import { getSteps } from "@/features/step/api/stepApi";
 import { useState, useEffect } from "react";
-import i18n from "@/i18n";
 import {
   useTravelEvent,
   useTravelSocketOpen,
 } from "@/features/travel/realtime/useTravelSocket";
+import { toErrorMessage } from "@/shared/api/errors";
 
 export function useSteps(travelId: number) {
   const [steps, setSteps] = useState<Step[]>([]);
@@ -27,10 +27,7 @@ export function useSteps(travelId: number) {
         const result = await getSteps(travelId);
         if (!ignore) setSteps(result);
       } catch (err) {
-        if (!ignore)
-          setError(
-            err instanceof Error ? err.message : i18n.t("errors.generic"),
-          );
+        if (!ignore) setError(toErrorMessage(err));
       } finally {
         if (!ignore) setIsLoading(false);
       }
