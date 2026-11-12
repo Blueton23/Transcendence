@@ -1,23 +1,17 @@
 import i18n from "@/i18n";
 import { getApiErrorMessage, type ApiErrorResponse } from "./errors";
 
-
 export class ApiHttpError extends Error {
   readonly status: number;
   readonly codes: string[];
 
-  constructor(
-    message: string,
-    status: number,
-    codes: string[] = [],
-  ) {
+  constructor(message: string, status: number, codes: string[] = []) {
     super(message);
     this.name = "ApiHttpError";
     this.status = status;
     this.codes = codes;
   }
 }
-
 
 export async function parseResponse<T>(response: Response): Promise<T> {
   const contentType = response.headers.get("content-type");
