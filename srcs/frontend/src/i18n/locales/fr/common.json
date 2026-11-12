@@ -130,7 +130,9 @@
     "searchPlaceholder": "Ajouter un ami · pseudo",
     "sending": "Envoi…",
     "sendRequest": "Envoyer une demande",
-    "title": "Amis"
+    "title": "Amis",
+    "offline": "Hors ligne",
+    "online": "En ligne"
   },
   "idea": {
     "addVote": "Ajouter mon vote",

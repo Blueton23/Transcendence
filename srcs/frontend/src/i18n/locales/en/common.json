@@ -130,7 +130,9 @@
     "searchPlaceholder": "Add a friend · username",
     "sending": "Sending…",
     "sendRequest": "Send a request",
-    "title": "Friends"
+    "title": "Friends",
+    "offline": "Offline",
+    "online": "Online"
   },
   "idea": {
     "addVote": "Add my vote",

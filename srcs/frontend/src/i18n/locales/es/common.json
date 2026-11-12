@@ -130,7 +130,9 @@
     "searchPlaceholder": "Añadir un amigo · usuario",
     "sending": "Enviando…",
     "sendRequest": "Enviar solicitud",
-    "title": "Amigos"
+    "title": "Amigos",
+    "offline": "Desconectado",
+    "online": "En línea"
   },
   "idea": {
     "addVote": "Añadir mi voto",
