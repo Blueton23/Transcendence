@@ -251,7 +251,14 @@ class PublicApiKeyTest(APITestCase):
 
         response = self.client.get(reverse("auth-me"))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data["traveler"])
+
+    def test_me_returns_null_when_not_authenticated(self):
+        response = self.client.get(reverse("auth-me"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data["traveler"])
 
     def test_token_does_not_give_access_to_other_travels(self):
         other_travel = Travel.objects.create(

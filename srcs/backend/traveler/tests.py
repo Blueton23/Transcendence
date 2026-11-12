@@ -701,10 +701,11 @@ class TravelerApiTest(APITestCase):
             1,
         )
 
-    def test_me_requires_authentication(self):
+    def test_me_returns_null_when_unauthenticated(self):
         response = self.client.get(reverse("auth-me"))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data["traveler"])
 
     def test_me_returns_authenticated_traveler(self):
         self.client.force_authenticate(user=self.traveler)
