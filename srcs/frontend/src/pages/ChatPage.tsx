@@ -8,7 +8,6 @@ import { useChat } from "@/features/chat/hooks/useChat";
 import { useStickToBottom } from "@/features/chat/hooks/useStickToBottom";
 import Text from "@/shared/ui/Text";
 import { useTravel } from "@/features/travel/hooks/useTravel";
-import { useTranslation } from "react-i18next";
 
 export default function ChatPage() {
   const { id } = useParams<{ id: string }>();

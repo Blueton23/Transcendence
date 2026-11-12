@@ -87,8 +87,7 @@
       "step_not_in_message_travel": "Esta etapa no pertenece al viaje del mensaje.",
       "idea_not_in_message_travel": "Esta idea no pertenece al viaje del mensaje.",
       "message_empty": "El mensaje no puede estar vacío.",
-      "message_too_long": "El mensaje no puede superar los 2 000 caracteres.",
-      "invalidTravel": "Identificador de viaje no válido."
+      "message_too_long": "El mensaje no puede superar los 2 000 caracteres."
     }
   },
   "errors": {
