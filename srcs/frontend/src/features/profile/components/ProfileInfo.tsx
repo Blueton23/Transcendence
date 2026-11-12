@@ -32,7 +32,9 @@ function ProfileInfo({ user }: { user?: User }) {
     >
       <div className="-mt-10 flex items-end justify-between">
         <Avatar user={profileUser} size="lg" className="ring-3 ring-surface" />
-        <OnlineStatus isOnline={profileUser.isOnline} />
+        <OnlineStatus
+          isOnline={profileUser.id === currentUser?.id || profileUser.isOnline}
+        />
       </div>
 
       <div className="flex min-w-0 flex-col gap-0.5">
