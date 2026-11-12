@@ -54,6 +54,7 @@ export function ItineraryListPanel({
         <ItineraryTimeline
           steps={steps}
           ideas={ideas}
+          travel={travel}
           segments={segments}
           dateLabels={dateLabels}
           onDetailView={onDetailView}
