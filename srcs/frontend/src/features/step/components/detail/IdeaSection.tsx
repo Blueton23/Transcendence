@@ -41,7 +41,7 @@ function IdeaDay({
   const lineStyle = "w-0.5 flex-1 bg-border-control";
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-2 md:gap-3">
       <div className={railStyle}>
         <span className={dotStyle} />
         {!isLast && <span className={lineStyle} />}
