@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('traveler', '0009_alter_friendship_user1_alter_friendship_user2'),
+        ("traveler", "0009_alter_friendship_user1_alter_friendship_user2"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='traveler',
-            name='online_connections',
+            model_name="traveler",
+            name="online_connections",
             field=models.PositiveIntegerField(default=0, editable=False),
         ),
     ]
