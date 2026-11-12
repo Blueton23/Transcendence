@@ -1336,6 +1336,22 @@ class StepViewTest(APITestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["travel_id"], self.mon_voyage.id)
 
+    def test_create_step_without_night_succeeds(self):
+        self.client.force_authenticate(user=self.traveler)
+
+        response = self.client.post(
+            reverse("step-list", kwargs={"travel_id": self.mon_voyage.id}),
+            {
+                "start_date": "2026-06-10",
+                "end_date": "2026-06-10",
+                "localisation": "Nice",
+                "latitude": 46.5197,
+                "longitude": 6.6323,
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+
     def test_create_forbidden_if_not_participant(self):
         self.client.force_authenticate(user=self.traveler)
 
