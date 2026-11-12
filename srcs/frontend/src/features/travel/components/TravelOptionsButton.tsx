@@ -39,7 +39,7 @@ export function TravelOptionsButton({
 
   const handleOnSubmit = async () => {
     const result = await submit();
-    if (result.success) return;
+    if (!result.success) return;
     if (onLeave) onLeave();
     else navigate("/travel");
   };
