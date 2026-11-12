@@ -1059,6 +1059,17 @@ docker compose exec backend python manage.py shell -c "from traveler.models impo
 - https://docs.authlib.org/en/latest/oauth2/client/web/django.html
 - https://datatracker.ietf.org/doc/html/rfc6749#section-4.1
 - https://docs.djangoproject.com/en/5.2/topics/auth/default/#how-to-log-a-user-in
+- https://docs.djangoproject.com/fr/6.1/
+- https://docs.djangoproject.com/en/6.1/ref/
+- https://medium.com/@sibyamara95/cr%C3%A9er-votre-premier-projet-django-61f3100b2cb7
+- https://medium.com/tag/django
+- https://www.docstring.fr/blog/creer-une-api-rest-avec-django-rest-framework/
+- https://www.kienso.fr/comment-rediger-documentation-dapi-sur-django/
+- https://docs.document360.com/docs/fr/how-to-use-swagger
+- https://support.google.com/cloud/answer/15549257?hl=en
+- https://www.microsoft.com/fr-ch/security/business/security-101/what-is-openid-connect-oidc
+- https://medium.com/@tony.infisical/guide-to-using-oauth-2-0-to-access-google-apis-dead94d6866d
+- https://flowbite.com/docs/getting-started/typescript/
 
 ## Choix techniques et limites connues
 
