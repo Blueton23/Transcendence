@@ -63,7 +63,11 @@ export function FormScreen({ travel, onSuccess }: FormScreenProps) {
             ? t("actions.save")
             : t("travel.createMyTravel")}
       </Button>
-      {form.error && <Text tone="accent">{form.error}</Text>}
+      {form.error && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {form.error}
+        </Text>
+      )}
     </div>
   );
 }

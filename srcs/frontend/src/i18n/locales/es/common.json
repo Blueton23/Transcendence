@@ -62,10 +62,18 @@
     "send": "Enviar",
     "system": {
       "participant_joined": "{{name}} se ha unido al viaje.",
-      "participant_left": "{{name}} ha abandonado el viaje."
+      "participant_left": "{{name}} ha abandonado el viaje.",
+      "travel_created": "{{name}} ha creado el viaje «{{title}}».",
+      "travel_updated": "{{name}} ha modificado los datos del viaje.",
+      "step_created": "{{name}} ha añadido la etapa {{place}}.",
+      "step_updated": "{{name}} ha modificado la etapa {{place}}.",
+      "step_deleted": "{{name}} ha eliminado la etapa {{place}}.",
+      "idea_created": "{{name}} ha propuesto la idea «{{title}}».",
+      "idea_updated": "{{name}} ha modificado la idea «{{title}}».",
+      "idea_deleted": "{{name}} ha eliminado la idea «{{title}}».",
+      "idea_chosen": "{{name}} ha elegido el alojamiento «{{title}}»."
     },
     "errors": {
-      "max_length": "El mensaje es demasiado largo.",
       "loadFailed": "No se pudieron cargar los mensajes.",
       "markReadFailed": "No se pudieron marcar los mensajes como leídos.",
       "unreadCountFailed": "No se pudo obtener el número de mensajes no leídos.",
@@ -86,7 +94,8 @@
   },
   "errors": {
     "csrfMissing": "Token CSRF no encontrado.",
-    "generic": "Error",
+    "generic": "Se ha producido un error.",
+    "invalidTravelId": "ID de viaje no válido.",
     "invalidResponse": "Respuesta del servidor no válida.",
     "mapbox": "Error de Mapbox",
     "server": "Error del servidor.",
@@ -94,9 +103,7 @@
     "unexpected": "Ha ocurrido un error.",
     "end_not_after_start": "La fecha de fin debe ser posterior a la fecha de inicio.",
     "not_found": "Recurso no encontrado.",
-    "required": "Este campo es obligatorio.",
-    "blank": "Este campo no puede estar vacío.",
-    "invalid": "Valor no válido."
+    "network": "No se puede contactar con el servidor. Comprueba tu conexión e inténtalo de nuevo."
   },
   "friendship": {
     "accept": "Aceptar",
@@ -105,7 +112,6 @@
       "cannot_accept_own_request": "No puedes aceptar tu propia solicitud de amistad.",
       "cannot_friend_yourself": "No puedes enviarte una solicitud de amistad a ti mismo.",
       "friendship_not_found": "No se encontró la amistad.",
-      "invalidUserId": "El ID del usuario no es válido.",
       "loadFailed": "No se pudo cargar tu lista de amigos.",
       "requestsLoadFailed": "No se pudieron cargar tus solicitudes de amistad.",
       "missingRequestId": "Falta el identificador de la solicitud.",
@@ -114,8 +120,6 @@
       "not_friend_request_participant": "No formas parte de esta solicitud de amistad.",
       "relationship_exists": "Ya existe una amistad o solicitud de amistad con este usuario.",
       "friend_request_not_found": "No se encontró la solicitud de amistad.",
-      "searchFailed": "No se pudo buscar a los usuarios.",
-      "userIdRequired": "Se requiere el ID del usuario.",
       "user_not_found": "No se encontró al usuario."
     },
     "myFriends": "Mis amigos · {{count}}",
@@ -445,9 +449,23 @@
     "email": "Correo electrónico",
     "errors": {
       "email": {
-        "unique": "Esta dirección de correo electrónico ya está en uso."
+        "unique": "Esta dirección de correo electrónico ya está en uso.",
+        "max_length": "La dirección de correo electrónico no puede superar los 254 caracteres.",
+        "invalid": "Introduce una dirección de correo electrónico válida."
       },
-      "noImage": "Ninguna imagen seleccionada.",
+      "first_name": {
+        "max_length": "El nombre no puede superar los 150 caracteres."
+      },
+      "last_name": {
+        "max_length": "El apellido no puede superar los 150 caracteres."
+      },
+      "profile_picture": {
+        "max_size": "La foto de perfil no puede superar los 5 MB.",
+        "invalid_image": "El archivo seleccionado no es una imagen válida.",
+        "empty": "El archivo seleccionado está vacío.",
+        "invalid": "El archivo enviado no es válido.",
+        "max_length": "El nombre del archivo de imagen es demasiado largo."
+      },
       "username": {
         "max_length": "Asegúrese de que este campo no tenga más de 150 caracteres.",
         "invalid": "Introduza un nombre de usuario válido. Este valor puede contener únicamente letras, números y los caracteres @/./+/-/_ ",
@@ -593,15 +611,12 @@
       "invitation_refused": "Esta persona ha rechazado la invitación.",
       "not_travel_participant": "Debes ser miembro del viaje para realizar esta acción.",
       "steps_before_travel_start": "Algunas etapas empiezan antes de esta fecha: muévelas primero.",
-      "steps_after_travel_end": "Algunas etapas terminan después de esta fecha: muévelas primero.",
-      "title": {
-        "max_length": "Título demasiado largo."
-      }
+      "steps_after_travel_end": "Algunas etapas terminan después de esta fecha: muévelas primero."
     },
     "haveInviteLink": "Tengo un enlace de invitación",
     "invitation": "INVITACIÓN PARA UNIRSE",
     "inviteLink": "Enlace de invitación",
-    "inviteTravelers": "Invita a tus viajeros para planificar {{title}} juntos",
+    "inviteTravelers": "Invita a tus viajeros a planificar el viaje: {{title}}",
     "joinTravel": "Unirse al viaje",
     "pendingInvitation": "Pendiente",
     "refusedInvitation": "Ha rechazado",

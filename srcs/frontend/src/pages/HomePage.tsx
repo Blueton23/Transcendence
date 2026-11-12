@@ -215,6 +215,9 @@ function HomePage() {
           >
             {t("home.signup")}
           </Button>
+          <Button variant="outline" onClick={() => navigate("/profile")}>
+            {t("profile.title")}
+          </Button>
         </div>
       </header>
 

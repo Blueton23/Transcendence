@@ -20,6 +20,7 @@ export async function fetchIdeas(travelId: number): Promise<Idea[]> {
   const response = await fetch(`/api/travels/${travelId}/ideas/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   const data = await parseResponse<IdeaApiResponse[]>(response);
@@ -34,6 +35,7 @@ export async function fetchIdea(
   const response = await fetch(`/api/travels/${travelId}/ideas/${ideaId}/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   const data = await parseResponse<IdeaApiResponse>(response);
@@ -59,6 +61,7 @@ export async function postIdea(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(payload),
   });
@@ -87,6 +90,7 @@ export async function patchIdea(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(payload),
   });
@@ -111,12 +115,11 @@ export async function removeIdea(
     credentials: "include",
     headers: {
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }
 
 // Placer une idée sur le voyage
@@ -155,6 +158,7 @@ export async function patchIdeaPlacement(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(payload),
   });
@@ -181,6 +185,7 @@ export async function chooseIdea(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
@@ -207,12 +212,11 @@ export async function addIdeaReaction(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<unknown>(response);
 }
 
 // Retirer le vote sur une idée du voyage
@@ -232,12 +236,11 @@ export async function removeIdeaReaction(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }
 
 // Nombre de nouvelles idées (des autres) depuis le dernier passage sur la page
@@ -245,6 +248,7 @@ export async function fetchUnseenIdeasCount(travelId: number): Promise<number> {
   const response = await fetch(`/api/travels/${travelId}/ideas/unseen-count/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   const data = await parseResponse<{ unseenCount: number }>(response);
@@ -264,6 +268,7 @@ export async function markIdeasAsSeen(travelId: number): Promise<void> {
     credentials: "include",
     headers: {
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
   });
 

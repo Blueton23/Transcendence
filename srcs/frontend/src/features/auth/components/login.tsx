@@ -122,7 +122,11 @@ function Login() {
               </div>
             </div>
 
-            {errorMessage && <Text tone="accent">{errorMessage}</Text>}
+            {errorMessage && (
+              <Text tone="accent" className="whitespace-pre-line">
+                {errorMessage}
+              </Text>
+            )}
 
             <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? t("auth.logginIn") : t("auth.login")}

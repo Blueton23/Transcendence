@@ -16,13 +16,9 @@ function ProfilePicture() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  const { submit, isSubmitting, error } = useSubmitAction(() => {
-    if (!selectedFile) {
-      throw new Error(t("profile.errors.noImage"));
-    }
-
-    return modifyProfilePicture(selectedFile);
-  });
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    modifyProfilePicture(selectedFile!),
+  );
 
   function handleSelectPicture() {
     fileInputRef.current?.click();
@@ -39,6 +35,8 @@ function ProfilePicture() {
   }
 
   async function handleSubmit() {
+    if (!selectedFile) return;
+
     const result = await submit();
 
     if (result.success && result.data) {

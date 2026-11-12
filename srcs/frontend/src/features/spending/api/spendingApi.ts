@@ -15,6 +15,7 @@ export async function getSpendings(travelId: number): Promise<Spending[]> {
     {
       method: "GET",
       credentials: "include",
+      headers: { "Accept-Language": i18n.language },
     },
   );
 
@@ -39,6 +40,7 @@ export async function createSpending(
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: JSON.stringify(data),
     },
@@ -66,6 +68,7 @@ export async function updateSpending(
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: JSON.stringify(data),
     },
@@ -90,15 +93,13 @@ export async function deleteSpending(
       method: "DELETE",
       credentials: "include",
       headers: {
-        "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
 
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }
 
 export async function getSpendingSummary(
@@ -109,6 +110,7 @@ export async function getSpendingSummary(
     {
       method: "GET",
       credentials: "include",
+      headers: { "Accept-Language": i18n.language },
     },
   );
 

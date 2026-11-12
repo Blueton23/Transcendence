@@ -1,4 +1,4 @@
-import i18n from "@/i18n";
+import { toErrorMessage } from "@/shared/api/errors";
 import { useState } from "react";
 
 export function useSubmitAction<T>(action: () => Promise<T>) {
@@ -12,7 +12,7 @@ export function useSubmitAction<T>(action: () => Promise<T>) {
       const data = await action();
       return { success: true, data };
     } catch (err) {
-      setError(err instanceof Error ? err.message : i18n.t("errors.generic"));
+      setError(toErrorMessage(err));
       return { success: false };
     } finally {
       setIsSubmitting(false);

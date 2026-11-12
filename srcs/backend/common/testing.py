@@ -60,3 +60,15 @@ class BroadcastListenerMixin:
             )
 
         return async_to_sync(receive)()
+
+    def assert_activity_message(self, travel, key, params):
+        """The view logged the action in the travel chat: a system message
+        saved in the database and sent right after the action's own event."""
+        from chat.models import Message
+
+        message = Message.objects.get(travel=travel, is_system=True, system_key=key)
+        self.assertEqual(message.system_params, params)
+        event = self.receive_event()
+        self.assertEqual(event["type"], "chat.message")
+        self.assertEqual(event["payload"]["systemKey"], key)
+        self.assertEqual(event["payload"]["systemParams"], params)

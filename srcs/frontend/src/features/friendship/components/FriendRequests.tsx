@@ -91,9 +91,11 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
           {requests.length > 0 && ` · ${requests.length}`}
         </Text>
       </div>
-
-      {displayedError && <Text tone="accent">{displayedError}</Text>}
-
+      {displayedError && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {displayedError}
+        </Text>
+      )}
       {requests.length === 0 ? (
         <Text tone="muted">{t("friendship.noRequests")}</Text>
       ) : (
