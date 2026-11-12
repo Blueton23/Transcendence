@@ -17,6 +17,7 @@ La tuyauterie et les événements sont en place ; le catalogue complet est plus 
 | Base commune des consumers (`GroupEventConsumer`, codes de fermeture) | `srcs/backend/common/consumers.py` |
 | Socket d'un voyage (`TravelConsumer`, `ws/travels/<travel_id>/`) | `srcs/backend/travel/consumers.py` |
 | Socket personnel (`NotificationConsumer`, `ws/notifications/`) | `srcs/backend/traveler/consumers.py` |
+| Statut en ligne (`traveler_connected`, `reset_presence`) | `srcs/backend/traveler/presence.py` |
 | Messages système du chat (`post_system_message`) | `srcs/backend/chat/services.py` |
 | Tests et smoke test | `srcs/backend/config/tests.py`, `scripts/smoke.sh` |
 | `WebsocketCommunicator` pour les tests | `srcs/backend/common/testing.py` |
@@ -128,3 +129,10 @@ Envoyés aux deux personnes concernées, pour que les autres onglets de celle qu
 | `friendship.requested` | `FriendshipRequestView` | `{ friendshipId }` | `ProfilePage` recharge demandes et amis |
 | `friendship.accepted` | `FriendshipAcceptView` | `{ friendshipId }` | idem |
 | `friendship.removed` | `FriendshipRemoveView` (refus, annulation ou suppression) | `{ friendshipId }` | idem |
+| `presence.changed` | `NotificationConsumer` via `traveler/presence.py`, envoyé aux amis (`ACCEPTED`) seulement | `{ travelerId, isOnline }` | `useFriendPresence` met à jour `friend.isOnline` (`FriendList`, `useFriends`) |
+
+### Statut en ligne
+
+Le socket personnel est ouvert sur toutes les pages connectées, c'est donc lui qui définit « en ligne ». `Traveler.online_connections` compte les sockets ouverts (un par onglet) ; `is_online` passe à `True` au premier et à `False` à la fermeture du dernier, et `presence.changed` n'est envoyé qu'à ces deux moments. Le compteur est modifié sous `select_for_update` pour que deux onglets ouverts en même temps ne ratent pas la transition.
+
+Un processus qui plante ne déclenche pas les `disconnect` de ses sockets : `entrypoint.sh` lance donc `manage.py reset_presence` avant Uvicorn, qui remet tout le monde hors ligne. Les clients se reconnectent ensuite d'eux-mêmes.
