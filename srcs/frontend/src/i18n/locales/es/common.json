@@ -61,7 +61,16 @@
     "send": "Enviar",
     "system": {
       "participant_joined": "{{name}} se ha unido al viaje.",
-      "participant_left": "{{name}} ha abandonado el viaje."
+      "participant_left": "{{name}} ha abandonado el viaje.",
+      "travel_created": "{{name}} ha creado el viaje «{{title}}».",
+      "travel_updated": "{{name}} ha modificado los datos del viaje.",
+      "step_created": "{{name}} ha añadido la etapa {{place}}.",
+      "step_updated": "{{name}} ha modificado la etapa {{place}}.",
+      "step_deleted": "{{name}} ha eliminado la etapa {{place}}.",
+      "idea_created": "{{name}} ha propuesto la idea «{{title}}».",
+      "idea_updated": "{{name}} ha modificado la idea «{{title}}».",
+      "idea_deleted": "{{name}} ha eliminado la idea «{{title}}».",
+      "idea_chosen": "{{name}} ha elegido el alojamiento «{{title}}»."
     },
     "errors": {
       "loadFailed": "No se pudieron cargar los mensajes.",

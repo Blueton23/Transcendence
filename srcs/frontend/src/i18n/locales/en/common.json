@@ -61,7 +61,16 @@
     "send": "Send",
     "system": {
       "participant_joined": "{{name}} joined the trip.",
-      "participant_left": "{{name}} left the trip."
+      "participant_left": "{{name}} left the trip.",
+      "travel_created": "{{name}} created the trip “{{title}}”.",
+      "travel_updated": "{{name}} updated the trip details.",
+      "step_created": "{{name}} added the stop {{place}}.",
+      "step_updated": "{{name}} updated the stop {{place}}.",
+      "step_deleted": "{{name}} deleted the stop {{place}}.",
+      "idea_created": "{{name}} suggested the idea “{{title}}”.",
+      "idea_updated": "{{name}} updated the idea “{{title}}”.",
+      "idea_deleted": "{{name}} deleted the idea “{{title}}”.",
+      "idea_chosen": "{{name}} chose the accommodation “{{title}}”."
     },
     "errors": {
       "loadFailed": "Unable to load the messages.",
