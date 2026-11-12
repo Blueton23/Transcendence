@@ -27,9 +27,14 @@ export async function parseResponse<T>(response: Response): Promise<T> {
       throw new ApiHttpError(getApiErrorMessage(error), response.status, codes);
     }
 
-    const detail = await response.text();
+    const message =
+      response.status === 404
+        ? i18n.t("errors.not_found")
+        : response.status >= 500
+          ? i18n.t("errors.server")
+          : i18n.t("errors.unexpected");
 
-    throw new ApiHttpError(detail || i18n.t("errors.server"), response.status);
+    throw new ApiHttpError(message, response.status);
   }
 
   if (response.status === 204) {
