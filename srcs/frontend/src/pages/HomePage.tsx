@@ -199,7 +199,7 @@ function HomePage() {
         </div>
         <Button
           variant="outline"
-          size="sm"
+          size="md"
           className="ml-auto md:ml-0"
           onClick={() => navigate("/login")}
         >
@@ -212,9 +212,6 @@ function HomePage() {
             onClick={() => navigate("/signup")}
           >
             {t("home.signup")}
-          </Button>
-          <Button variant="outline" onClick={() => navigate("/profile")}>
-            {t("profile.title")}
           </Button>
         </div>
       </header>
