@@ -4,8 +4,7 @@ import Heading from "@/shared/ui/Heading";
 import Text from "@/shared/ui/Text";
 import { Footer } from "@/app/Footer";
 import { useAuth } from "@/features/auth/context/useAuth";
-import { Link } from "react-router";
-import Icon from "@/shared/ui/Icon";
+import { BackLink } from "@/app/BackLink";
 
 interface Section {
   title: string;
@@ -22,13 +21,7 @@ function LegalPage({ doc }: { doc: "privacy" | "terms" }) {
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
-      <Link
-        to={currentUser ? "/travel" : "/"}
-        className="flex items-center gap-2 text-sm font-semibold text-text-secondary"
-      >
-        <Icon name="back" size={16} />
-        {t("legal.back")}
-      </Link>
+      <BackLink to={currentUser ? "/travel" : "/"} />
       <Heading level={1} size="xl">
         {t(`legal.${doc}`)}
       </Heading>
