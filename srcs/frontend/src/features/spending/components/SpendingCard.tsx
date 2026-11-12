@@ -45,8 +45,12 @@ export function SpendingCard({
           >
             {t(spendingCategoryLabels[spending.category])}
           </Tag>
-          <div className="flex min-w-0 flex-1 flex-col">
-            <Heading level={3} size="sm" className="truncate">
+          <div className="flex w-full min-w-0 flex-1 flex-col">
+            <Heading
+              level={3}
+              size="sm"
+              className="truncate text-md! md:text-base!"
+            >
               {spending.label || t(spendingCategoryLabels[spending.category])}
             </Heading>
 
