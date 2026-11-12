@@ -88,11 +88,7 @@
     "serverWithStatus": "Server error ({{status}} {{statusText}})",
     "unexpected": "An error occurred.",
     "end_not_after_start": "The end date must be after the start date.",
-    "not_found": "Resource not found.",
-    "required": "This field is required.",
-    "blank": "This field cannot be blank.",
-    "invalid": "Invalid value.",
-    "null": "This field cannot be null."
+    "not_found": "Resource not found."
   },
   "friendship": {
     "accept": "Accept",

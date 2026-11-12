@@ -3,6 +3,7 @@ from typing import ClassVar
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import PasswordChangeForm
 from django.core.exceptions import ValidationError as DjangoValidationError
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from .models import Traveler
@@ -78,12 +79,14 @@ class TravelerCreateSerializer(serializers.ModelSerializer):
 
         if not traveler.has_usable_password():
             raise serializers.ValidationError(
-                "A Google account is already linked to this email address.",
+                _("A Google account is already linked to this email address."),
                 code="googleAccountExists",
             )
 
+        unique_error = Traveler().unique_error_message(Traveler, ["email"])
+
         raise serializers.ValidationError(
-            "Email is already in use.",
+            unique_error.messages[0],
             code="unique",
         )
 

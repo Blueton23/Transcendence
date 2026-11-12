@@ -88,11 +88,7 @@
     "serverWithStatus": "Error del servidor ({{status}} {{statusText}})",
     "unexpected": "Ha ocurrido un error.",
     "end_not_after_start": "La fecha de fin debe ser posterior a la fecha de inicio.",
-    "not_found": "Recurso no encontrado.",
-    "required": "Este campo es obligatorio.",
-    "blank": "Este campo no puede estar vacío.",
-    "invalid": "Valor no válido.",
-    "null": "Este campo no puede ser nulo."
+    "not_found": "Recurso no encontrado."
   },
   "friendship": {
     "accept": "Aceptar",

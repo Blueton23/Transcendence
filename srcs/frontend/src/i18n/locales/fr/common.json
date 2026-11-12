@@ -88,11 +88,7 @@
     "serverWithStatus": "Erreur serveur ({{status}} {{statusText}})",
     "unexpected": "Une erreur est survenue.",
     "end_not_after_start": "La date de fin doit être après la date de début.",
-    "not_found": "Ressource introuvable.",
-    "required": "Ce champ est obligatoire.",
-    "blank": "Ce champ ne peut pas être vide.",
-    "invalid": "Valeur invalide.",
-    "null": "Ce champ ne peut pas être nul."
+    "not_found": "Ressource introuvable."
   },
   "friendship": {
     "accept": "Accepter",
