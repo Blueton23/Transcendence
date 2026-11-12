@@ -59,9 +59,7 @@ Les certificats sont demandés par certbot et délivrés par Let's Encrypt pour 
 | Commande / action | Résultat attendu | Ce que ça prouve |
 |---|---|---|
 | `make ps` | `db`, `redis`, `backend`, `frontend` **healthy**, `nginx` **running** | Les 5 services tournent, dans le bon ordre |
-| `curl https://peripl.app/api/` | `{"status":"ok"}` | Nginx → Django |
 | `make test-db` puis `make ping` | `✅ Connexion réussie à la base : …` puis `PONG` | Django atteint PostgreSQL, Redis répond |
-| Ouvrir https://peripl.app/admin/ | page de connexion **mise en forme** | Fichiers statiques servis par Nginx |
 
 ---
 ### API publique - clé API, rate limiting et documentation (Major, 2 points)
