@@ -8,17 +8,19 @@ import Avatar from "@/shared/ui/Avatar";
 import OnlineStatus from "@/shared/ui/OnlineStatus";
 import { useTranslation } from "react-i18next";
 import { Footer } from "@/app/Footer";
+import { useError } from "@/shared/context/useError";
 
 function HomePage() {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
   const { t } = useTranslation();
+  const { showError } = useError();
 
   async function handleLogout() {
     try {
       await logout();
-    } catch (error) {
-      console.error("Erreur lors de la déconnexion :", error);
+    } catch {
+      showError(t("auth.errors.logoutFailed"));
     }
   }
 

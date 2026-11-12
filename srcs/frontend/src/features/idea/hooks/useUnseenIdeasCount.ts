@@ -9,23 +9,23 @@ import {
 
 import { fetchUnseenIdeasCount } from "../api/api.ideas";
 import type { IdeaApiResponse } from "../types";
+import i18n from "@/i18n";
+import { useError } from "@/shared/context/useError";
 
 // Badge of the trip nav
 export function useUnseenIdeasCount(travelId: number): number {
   const [unseenCount, setUnseenCount] = useState(0);
   const { currentUser } = useAuth();
   const isOnIdeas = useMatch("/travel/:id/ideas") !== null;
+  const { showError } = useError();
 
   const refresh = useCallback(async () => {
     try {
       setUnseenCount(await fetchUnseenIdeasCount(travelId));
-    } catch (error) {
-      console.error(
-        "Impossible de récupérer le nombre de nouvelles idées :",
-        error,
-      );
+    } catch {
+      showError(i18n.t("idea.errors.unseenCountFailed"));
     }
-  }, [travelId]);
+  }, [travelId, showError]);
 
   useTravelSocketOpen(() => void refresh());
 
