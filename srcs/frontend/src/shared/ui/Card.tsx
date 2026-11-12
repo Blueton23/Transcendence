@@ -35,7 +35,7 @@ const variantStyles = {
 
 const baseStyle = "border bg-clip-padding rounded-md p-3 md:py-2";
 const interactiveStyle =
-  "transition-all hover:border-brand-primary/25 hover:-translate-y-px cursor-pointer";
+  "relative transition-all hover:z-10 hover:border-brand-primary/25 hover:-translate-y-px focus-within:z-10 cursor-pointer";
 
 function Card({
   children,
