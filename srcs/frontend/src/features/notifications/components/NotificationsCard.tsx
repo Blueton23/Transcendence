@@ -13,6 +13,7 @@ import IconBadge from "@/shared/ui/IconBadge";
 import Text from "@/shared/ui/Text";
 import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
 import Dot from "@/shared/ui/Dot";
+import Icon from "@/shared/ui/Icon";
 
 interface NotificationsCardProps {
   travels: TravelNotification[];
@@ -25,6 +26,9 @@ interface NotificationsCardProps {
 // Compact row, the whole line is clickable.
 const rowStyle =
   "flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-left transition-colors hover:bg-surface-container";
+const chevron = (
+  <Icon name="chev-right" size={16} className="shrink-0 text-muted" />
+);
 // Same hover as the interactive Card.
 
 export function NotificationsCard({
@@ -77,6 +81,7 @@ export function NotificationsCard({
                   <span className="font-semibold">{n.travelTitle}</span> ·{" "}
                   {details}
                 </Text>
+                {chevron}
               </button>
             );
           })}
@@ -93,6 +98,7 @@ export function NotificationsCard({
                   name: request.traveler.username,
                 })}
               </Text>
+              {chevron}
             </button>
           ))}
           {invitations.map((invitation) => (
@@ -108,6 +114,7 @@ export function NotificationsCard({
                   title: invitation.travelTitle,
                 })}
               </Text>
+              {chevron}
             </button>
           ))}
         </div>
