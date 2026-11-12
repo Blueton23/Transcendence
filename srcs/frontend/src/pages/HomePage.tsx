@@ -32,12 +32,12 @@ const features: {
   {
     key: "expenses",
     icon: "cash",
-    band: "bg-idea-activity-bg text-idea-activity",
+    band: "bg-cat-activity-bg text-cat-activity",
   },
   {
     key: "chat",
     icon: "chat",
-    band: "bg-idea-restaurant-bg text-idea-restaurant",
+    band: "bg-cat-toll-bg text-cat-toll",
   },
 ];
 
