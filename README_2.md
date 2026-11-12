@@ -282,7 +282,16 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 
 ### Sylvain (`sydubois`)
 
-<!-- TODO -->
+**Backend (Django / DRF).** Authentication, profile, friendship and chat API views, following Django and DRF standards whenever possible.
+
+**Frontend (React / TypeScript).** Authentication, profile management, friendships and chat interfaces. Sébastien handled the WebSocket implementation.
+
+**Modules.** Standard user management and authentication; user interaction (with Sébastien).
+
+**Challenges.**
+
+- **Error handling:** Reviewed and harmonised error handling across all features, working on `parseResponse.ts` and `errors.ts`, using `drf-standardized-errors` and `Accept-Language` for consistent, translated API errors.
+- **Consistency:** Reusing framework standards to avoid unnecessary custom implementations and keep the code maintainable.
 
 ## Resources
 
