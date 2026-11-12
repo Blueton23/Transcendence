@@ -16,9 +16,6 @@ echo "Démarrage du serveur ASGI Uvicorn..."
 exec python -m uvicorn config.asgi:application \
     --host 0.0.0.0 \
     --port 8000 \
-<<<<<<< HEAD
     --workers 4 \
     --proxy-headers \
     --forwarded-allow-ips="*"
-=======
-
