@@ -7,16 +7,18 @@ import { useChat } from "@/features/chat/hooks/useChat";
 import { useStickToBottom } from "@/features/chat/hooks/useStickToBottom";
 import Text from "@/shared/ui/Text";
 import { useTravel } from "@/features/travel/hooks/useTravel";
+import { useTranslation } from "react-i18next";
 
 export default function ChatPage() {
   const { id } = useParams<{ id: string }>();
+  const { t } = useTranslation();
   const parsedId = Number(id);
   const isValidId = Boolean(id) && Number.isInteger(parsedId) && parsedId > 0;
 
   if (!isValidId) {
     return (
       <div className="p-5">
-        <Text tone="accent">Identifiant de voyage invalide.</Text>
+        <Text tone="accent">{t("chat.errors.invalidTravel")}</Text>
       </div>
     );
   }
