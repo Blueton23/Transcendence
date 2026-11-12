@@ -14,8 +14,6 @@ import IconBadge from "@/shared/ui/IconBadge";
 import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
 
-/* Landing page for visitors. A logged-in user goes straight to their trips. */
-
 const features: {
   key: "itinerary" | "ideas" | "expenses" | "chat";
   icon: IconName;
@@ -72,7 +70,7 @@ function Section({
   );
 }
 
-/* Decorative preview of the app, built from the real components. */
+
 function AppPreview() {
   const { t } = useTranslation();
   const previewSteps = [
