@@ -2,6 +2,7 @@ import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import { computeDurationLabel } from "@/features/step/utils/segmentDuration";
 import type { Segment } from "@/features/step/types";
+import { useTranslation } from "react-i18next";
 
 function DashedDivider() {
   return (
@@ -11,13 +12,16 @@ function DashedDivider() {
   );
 }
 
-export function SegmentRow({ segment }: { segment: Segment }) {
-  const durationHours = computeDurationLabel(segment.durationMinutes);
+export function SegmentRow({ segment }: { segment: Segment | null }) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex gap-3">
       <Icon name="car" size={16} className="text-brand-primary" />
       <Text font="mono" tone="muted" className="text-[10px] md:text-sm">
-        {durationHours} · {Math.round(segment.distanceKm)} KM
+        {segment
+          ? `${computeDurationLabel(segment.durationMinutes)} · ${Math.round(segment.distanceKm)} KM`
+          : t("step.noRoute")}
       </Text>
       <DashedDivider />
     </div>

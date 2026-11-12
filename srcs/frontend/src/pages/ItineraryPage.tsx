@@ -80,7 +80,7 @@ function ItineraryPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-4 px-4 pb-0 md:h-full md:flex-none md:pb-4">
-      <StickyHeader>
+      <StickyHeader className={detailView ? "hidden md:flex" : ""}>
         <ItineraryHeader
           travel={travel}
           steps={steps}

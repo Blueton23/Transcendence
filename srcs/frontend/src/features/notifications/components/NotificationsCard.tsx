@@ -9,10 +9,11 @@ import type {
 import Avatar from "@/shared/ui/Avatar";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
-import Icon from "@/shared/ui/Icon";
 import IconBadge from "@/shared/ui/IconBadge";
-import Tag from "@/shared/ui/Tag";
 import Text from "@/shared/ui/Text";
+import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
+import Dot from "@/shared/ui/Dot";
+import Icon from "@/shared/ui/Icon";
 
 interface NotificationsCardProps {
   travels: TravelNotification[];
@@ -22,14 +23,13 @@ interface NotificationsCardProps {
   invitationsError?: string | null;
 }
 
-// Same look as the friend requests rows on the profile page.
+// Compact row, the whole line is clickable.
 const rowStyle =
-  "flex items-center gap-3 rounded-md border border-border bg-surface p-3";
+  "flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-left transition-colors hover:bg-surface-container";
+const chevron = (
+  <Icon name="chev-right" size={16} className="shrink-0 text-muted" />
+);
 // Same hover as the interactive Card.
-const clickableStyle =
-  "cursor-pointer transition-all hover:-translate-y-px hover:border-brand-primary/50";
-const tagButtonStyle =
-  "cursor-pointer rounded-full transition-opacity hover:opacity-80";
 
 export function NotificationsCard({
   travels,
@@ -59,71 +59,62 @@ export function NotificationsCard({
       ) : (
         <div className="flex flex-col gap-2">
           {travelsError && <Text tone="accent">{travelsError}</Text>}
-          {travels.map((n) => (
-            <div key={n.travelId} className={`${rowStyle} flex-wrap`}>
-              <IconBadge name="mtn" size="sm" />
-              <Text className="min-w-0 flex-1 truncate font-semibold">
-                {n.travelTitle}
-              </Text>
-              <div className="flex flex-wrap gap-2">
-                {n.unreadMessages > 0 && (
-                  <button
-                    type="button"
-                    className={tagButtonStyle}
-                    onClick={() => navigate(`/travel/${n.travelId}/chat`)}
-                  >
-                    <Tag icon={<Icon name="chat" size={14} />}>
-                      {t("notifications.messages", {
-                        count: n.unreadMessages,
-                      })}
-                    </Tag>
-                  </button>
-                )}
-                {n.unseenIdeas > 0 && (
-                  <button
-                    type="button"
-                    className={tagButtonStyle}
-                    onClick={() => navigate(`/travel/${n.travelId}/ideas`)}
-                  >
-                    <Tag icon={<Icon name="pinplus" size={14} />}>
-                      {t("notifications.ideas", { count: n.unseenIdeas })}
-                    </Tag>
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-
+          {travels.map((n) => {
+            const details = [
+              n.unreadMessages > 0 &&
+                t("notifications.messages", { count: n.unreadMessages }),
+              n.unseenIdeas > 0 &&
+                t("notifications.ideas", { count: n.unseenIdeas }),
+            ]
+              .filter(Boolean)
+              .join(", ");
+            const target = n.unreadMessages > 0 ? "chat" : "ideas";
+            return (
+              <button
+                key={n.travelId}
+                type="button"
+                className={rowStyle}
+                onClick={() => navigate(`/travel/${n.travelId}/${target}`)}
+              >
+                <Dot className={getTravelBandColor(n.travelId)} />
+                <Text size="sm" className="min-w-0 flex-1 truncate">
+                  <span className="font-semibold">{n.travelTitle}</span> ·{" "}
+                  {details}
+                </Text>
+                {chevron}
+              </button>
+            );
+          })}
           {friendRequests.map((request) => (
             <button
               key={`friend-${request.id}`}
               type="button"
-              className={`${rowStyle} ${clickableStyle} w-full text-left`}
+              className={rowStyle}
               onClick={() => navigate("/profile")}
             >
-              <Avatar user={request.traveler} size="sm" />
-              <Text className="min-w-0 flex-1 truncate">
+              <Avatar user={request.traveler} size="xs" />
+              <Text size="sm" className="min-w-0 flex-1 truncate">
                 {t("notifications.friendRequest", {
                   name: request.traveler.username,
                 })}
               </Text>
-              <Icon name="chev-right" size={18} className="text-muted" />
+              {chevron}
             </button>
           ))}
           {invitations.map((invitation) => (
             <button
               key={`invitation-${invitation.travelId}`}
               type="button"
-              className={`${rowStyle} ${clickableStyle} w-full text-left`}
+              className={rowStyle}
               onClick={() => navigate(`/join/${invitation.inviteToken}`)}
             >
-              <IconBadge name="email" size="sm" color="purple" />
-              <Text className="min-w-0 flex-1 truncate">
+              <Dot className={getTravelBandColor(invitation.travelId)} />
+              <Text size="sm" className="min-w-0 flex-1 truncate">
                 {t("notifications.invitation", {
                   title: invitation.travelTitle,
                 })}
               </Text>
-              <Icon name="chev-right" size={18} className="text-muted" />
+              {chevron}
             </button>
           ))}
         </div>

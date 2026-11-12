@@ -7,8 +7,8 @@ import type { ReactNode } from "react";
 import type { User } from "@/features/auth/types";
 import { useTranslation } from "react-i18next";
 
-type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
-export type AvatarColor = "1" | "2" | "3" | "4";
+type AvatarSize = "xs" | "sm" | "md" | "lg";
+export type AvatarColor = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "pending";
 
 interface AvatarProps {
   user?: User | null;
@@ -19,28 +19,36 @@ interface AvatarProps {
   children?: ReactNode;
 }
 
+// xs: inline next to a name (idea author, notification)
+// sm: compact rows and stacks (balances, settlements, travelers stack)
+// md: lists and account (chat, friends, top bar, sidebar)
+// lg: profile
 const sizeStyles = {
-  xs: "w-4 h-4 text-2xs",
-  sm: "w-7 h-7 text-xs",
-  md: "w-8 h-8 text-sm",
-  lg: "w-9 h-9 text-md",
-  xl: "w-15 h-15 text-lg",
+  xs: "size-5 shrink-0 text-2xs",
+  sm: "size-7 shrink-0 text-xs",
+  md: "size-9 shrink-0 text-xs",
+  lg: "size-15 shrink-0 text-lg",
 };
 
 const colorStyles = {
-  "1": "bg-brand-dark text-inverse",
-  "2": "bg-brand-primary-strong text-inverse",
-  "3": "bg-warning text-text",
-  "4": "bg-info text-inverse",
+  "1": "bg-avatar-1",
+  "2": "bg-avatar-2",
+  "3": "bg-avatar-3",
+  "4": "bg-avatar-4",
+  "5": "bg-avatar-5",
+  "6": "bg-avatar-6",
+  "7": "bg-avatar-7",
+  pending:
+    "bg-surface-container text-muted! border border-dashed border-text/30",
 };
 
 const baseStyle =
-  "inline-flex items-center justify-center overflow-hidden rounded-full font-bold";
+  "inline-flex items-center justify-center overflow-hidden rounded-full font-bold text-inverse";
 
 function Avatar({
   user,
   size = "md",
-  color = "1",
+  color = "7",
   className = "",
   profile = false,
   children,
@@ -99,7 +107,7 @@ function Avatar({
           icon="user"
           onClose={() => setIsProfileOpen(false)}
         >
-          <ProfileInfo user={user ?? undefined} full />
+          <ProfileInfo user={user ?? undefined} />
         </Modal>
       )}
     </>

@@ -39,7 +39,7 @@ function getTripNavItems(
     },
     {
       to: `/travel/${tripId}/expenses`,
-      iconName: "wallet",
+      iconName: "cash",
       label: "nav.expenses",
     },
     {

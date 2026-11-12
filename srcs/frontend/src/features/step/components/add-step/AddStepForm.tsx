@@ -7,14 +7,21 @@ import type { Step } from "@/features/step/types";
 import { useStepForm } from "@/features/step/hooks/useStepForm";
 import type { Place } from "@/features/map/types";
 import { useListKeyboard } from "@/shared/hooks/useListKeyboard";
+import type { RefObject } from "react";
 
 interface AddStepFromProps {
   steps: Step[];
   travel: Travel;
   refetch: () => void;
+  inputRef?: RefObject<HTMLInputElement | null>;
 }
 
-export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
+export function AddStepForm({
+  steps,
+  travel,
+  refetch,
+  inputRef,
+}: AddStepFromProps) {
   const form = useStepForm({ travel, onSuccess: refetch });
 
   const pickPlace = (place: Place) => {
@@ -42,6 +49,7 @@ export function AddStepForm({ steps, travel, refetch }: AddStepFromProps) {
           );
         }}
         onKeyDown={list.handleKeyDown}
+        inputRef={inputRef}
       />
       {form.openPanel === "place" && form.query !== "" && (
         <PlaceSuggestions

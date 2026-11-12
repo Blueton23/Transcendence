@@ -48,7 +48,7 @@ function FriendSearchInput({
 
   return (
     <div ref={containerRef} className="relative">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3 sm:flex-row">
+      <form onSubmit={handleSubmit} className="relative">
         <div className="flex-1">
           <Input
             icon={<Icon name="search" size={18} className="text-muted" />}
@@ -58,6 +58,7 @@ function FriendSearchInput({
               setIsOpen(true);
               list.reset();
             }}
+            inputClassName="pr-28"
             onKeyDown={list.handleKeyDown}
             onFocus={() => {
               if (query.trim().length >= 2 && !selectedUser) {
@@ -69,7 +70,13 @@ function FriendSearchInput({
           />
         </div>
 
-        <Button type="submit" variant="dark" disabled={isSearching}>
+        <Button
+          size="sm"
+          type="submit"
+          variant="dark"
+          disabled={isSearching}
+          className="absolute top-1/2 right-2 -translate-y-1/2 md:px-3! md:py-2! md:text-xs!"
+        >
           {isSearching ? t("actions.searching") : t("friendship.search")}
         </Button>
       </form>

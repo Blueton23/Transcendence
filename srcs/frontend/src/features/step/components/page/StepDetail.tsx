@@ -28,7 +28,7 @@ export function StepDetail({
   actions,
 }: StepDetailProps) {
   return (
-    <div className="flex flex-col gap-6 md:min-h-0 md:flex-1 md:overflow-y-auto">
+    <div className="flex flex-col gap-3 md:min-h-0 md:flex-1 md:overflow-y-auto">
       <StepDetailHeader onBack={onBack} onModify={onModify} />
 
       <StepInfo step={step} dateLabel={dateLabel} />

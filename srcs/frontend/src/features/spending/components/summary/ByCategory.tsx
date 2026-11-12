@@ -1,9 +1,7 @@
 import type { SpendingCategory } from "@/features/spending/types";
-import { spendingCategoryIcons } from "@/features/spending/utils/spendingCategoryIcons";
+import { spendingCategoryBands } from "@/features/spending/utils/spendingCategoryBands";
 import { spendingCategoryLabels } from "@/features/spending/utils/spendingCategoryLabels";
 import Card from "@/shared/ui/Card";
-import Heading from "@/shared/ui/Heading";
-import IconBadge from "@/shared/ui/IconBadge";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
 
@@ -21,14 +19,20 @@ export function ByCategory({
   const { t } = useTranslation();
   const percentage = (Number(totalCategory) / Number(total)) * 100;
   return (
-    <Card className="flex flex-col gap-1">
-      <IconBadge name={spendingCategoryIcons[category]} size="sm" />
-      <Text tone="secondary" className="font-bold">
-        {t(spendingCategoryLabels[category])}
+    <Card
+      band={
+        <span className="text-xs font-semibold">
+          {t(spendingCategoryLabels[category])}
+        </span>
+      }
+      bandClassName={spendingCategoryBands[category]}
+      className="flex min-h-20 flex-col gap-0.5"
+    >
+      <Text size="lg" font="mono" className="font-semibold">
+        {`${totalCategory} CHF`}
       </Text>
-      <Heading>{`${totalCategory} CHF`}</Heading>
-      <Text font="mono" tone="muted">
-        {percentage.toFixed(1)}%
+      <Text size="sm" tone="muted">
+        {Math.round(percentage)} %
       </Text>
     </Card>
   );

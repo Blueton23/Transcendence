@@ -120,13 +120,11 @@
       "friend_request_not_found": "Friend request not found.",
       "user_not_found": "User not found."
     },
-    "myFriends": "MY FRIENDS · {{count}}",
+    "myFriends": "My friends · {{count}}",
     "noFriends": "You don't have any friends yet.",
     "noUsersFound": "No users found.",
     "noRequests": "No pending friend requests.",
-    "offline": "Offline",
-    "online": "Online",
-    "receivedRequests": "RECEIVED REQUESTS",
+    "receivedRequests": "Received requests",
     "remove": "Remove",
     "removeTitle": "Remove {{username}} from your friends?",
     "removing": "Removing…",
@@ -135,7 +133,9 @@
     "searchPlaceholder": "Add a friend · username",
     "sending": "Sending…",
     "sendRequest": "Send a request",
-    "title": "Friends"
+    "title": "Friends",
+    "offline": "Offline",
+    "online": "Online"
   },
   "idea": {
     "addVote": "Add my vote",
@@ -478,7 +478,9 @@
     "signupTitle": "Create an account",
     "title": "Profile",
     "updatedAt": "Last updated:",
-    "view": "View profile"
+    "view": "View profile",
+    "online": "Online",
+    "offline": "Offline"
   },
   "pwa": {
     "offline": "You're offline: some features are unavailable"
@@ -532,9 +534,18 @@
     "saveChanges": "Save changes",
     "saving": "Saving…",
     "submitAdd": "Add the expense",
-    "wholeTravel": "Whole trip"
+    "wholeTravel": "Whole trip",
+    "total": "Trip total",
+    "yourShare": "your share: {{amount}} CHF",
+    "balances": "Balances",
+    "settlements": "Settlements",
+    "owesTo": "owes"
   },
   "step": {
+    "nightToChoose": "Night of the {{start}} to the {{end}} · to choose",
+    "noRoute": "No route by car",
+    "unplannedNights_one": "{{count}} night without a stop",
+    "unplannedNights_other": "{{count}} nights without a stop",
     "actions": "Action",
     "add": "Add a stop",
     "addExpense": "Add an expense",
@@ -553,7 +564,7 @@
       "step_dates_overlap": "The dates of this stop overlap with another stop.",
       "step_has_spending": "This stop has expenses: move or delete them first."
     },
-    "fromTo": "from {{start}} to {{end}}",
+    "fromTo": "{{start}} → {{end}}",
     "list": "List",
     "lodgedRatio": "{{lodged}}/{{total}} accommodation",
     "map": "Map",
@@ -572,6 +583,10 @@
     "totalRoute": "TOTAL · {{duration}} DRIVING · {{distance}} KM"
   },
   "travel": {
+    "emptyText": "Create your first road trip and invite your friends!",
+    "emptyTitle": "No trips yet",
+    "finished": "Finished",
+    "upcoming": "Upcoming",
     "add": "Invite",
     "added": "Invited ✓",
     "addTravel": "Add a trip",
@@ -630,7 +645,8 @@
     "nights_one": "{{count}} night",
     "nights_other": "{{count}} nights",
     "nights_zero": "No nights",
-    "pricePerNight": "{{price}} CHF/night",
+    "perNight": "per night",
+    "pricePerNight": "{{price}} CHF per night",
     "steps_one": "{{count}} stop",
     "steps_other": "{{count}} stops"
   }

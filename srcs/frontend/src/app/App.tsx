@@ -7,7 +7,6 @@ import ProtectedRoute from "@/features/auth/components/ProtectedRoute";
 import GuestRoute from "@/features/auth/components/GuestRoute";
 
 import DesignSystem from "@/pages/DesignSystem";
-import ModalDemo from "@/pages/ModalDemo";
 import ProfilePage from "@/pages/ProfilePage";
 import SignupPage from "@/pages/SignupPage";
 import LoginPage from "@/pages/LoginPage";
@@ -29,7 +28,6 @@ function App() {
         <ErrorBanner />
       </div>
       <Routes>
-        <Route path="/modal" element={<ModalDemo />} />
         <Route path="/design-system" element={<DesignSystem />} />
         <Route path="/" element={<HomePage />} />
         <Route element={<GuestRoute />}>

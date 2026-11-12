@@ -112,3 +112,10 @@ export interface IdeaFormValues {
   pricePerNight: string;
   dateRange: DateRange | undefined;
 }
+
+export const ideaTypes: IdeaType[] = [
+  "restaurant",
+  "accommodation",
+  "activity",
+  "sightseeing",
+];

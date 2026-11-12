@@ -4,7 +4,7 @@ import type { IdeaActions } from "@/features/step/types";
 import { formatDate } from "@/features/step/utils/stepDates";
 import Card from "@/shared/ui/Card";
 import Heading from "@/shared/ui/Heading";
-import IconBadge from "@/shared/ui/IconBadge";
+import Icon from "@/shared/ui/Icon";
 import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import Text from "@/shared/ui/Text";
 import { useTranslation } from "react-i18next";
@@ -18,17 +18,15 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
   const { t } = useTranslation();
   return (
     <Card
-      variant="success"
+      variant="accommodation"
       className="flex min-w-0 flex-1 items-start justify-between md:items-center"
     >
-      <div className="flex flex-1 gap-2 md:gap-3">
-        <IconBadge color="chosen" name="bed" />
+      <div className="flex flex-1 items-center gap-2 md:gap-3">
+        <Icon name="tent" />
         <div className="flex flex-col">
-          <Heading size="xs" className="text-success-text!">
-            {night.title}
-          </Heading>
+          <Heading size="xs">{night.title}</Heading>
           <div className="flex flex-1">
-            <Text tone="success" font="mono">
+            <Text font="sans">
               {night.pricePerNight &&
                 `${t("units.pricePerNight", { price: night.pricePerNight })} · `}
               {lodgingCountNights(night)} {" · "}
@@ -42,6 +40,7 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
       <OptionsMenu
         onDelete={() => actions.onDelete(night.id)}
         onEdit={() => actions.onEdit(night.id)}
+        variant="ghost"
       />
     </Card>
   );

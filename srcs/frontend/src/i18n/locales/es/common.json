@@ -120,13 +120,11 @@
       "friend_request_not_found": "No se encontró la solicitud de amistad.",
       "user_not_found": "No se encontró al usuario."
     },
-    "myFriends": "MIS AMIGOS · {{count}}",
+    "myFriends": "Mis amigos · {{count}}",
     "noFriends": "Todavía no tienes amigos.",
     "noRequests": "No hay solicitudes de amistad pendientes.",
     "noUsersFound": "No se encontraron usuarios.",
-    "offline": "Desconectado",
-    "online": "En línea",
-    "receivedRequests": "SOLICITUDES RECIBIDAS",
+    "receivedRequests": "Solicitudes recibidas",
     "remove": "Quitar",
     "removeTitle": "¿Quitar a {{username}} de tus amigos?",
     "removing": "Eliminando…",
@@ -135,7 +133,9 @@
     "searchPlaceholder": "Añadir un amigo · usuario",
     "sending": "Enviando…",
     "sendRequest": "Enviar solicitud",
-    "title": "Amigos"
+    "title": "Amigos",
+    "offline": "Desconectado",
+    "online": "En línea"
   },
   "idea": {
     "addVote": "Añadir mi voto",
@@ -478,7 +478,9 @@
     "signupTitle": "Crear una cuenta",
     "title": "Perfil",
     "updatedAt": "Última actualización:",
-    "view": "Ver el perfil"
+    "view": "Ver el perfil",
+    "online": "En línea",
+    "offline": "Desconectado"
   },
   "pwa": {
     "offline": "Sin conexión: algunas funciones no están disponibles"
@@ -532,9 +534,18 @@
     "saveChanges": "Guardar los cambios",
     "saving": "Guardando…",
     "submitAdd": "Añadir el gasto",
-    "wholeTravel": "Viaje completo"
+    "wholeTravel": "Viaje completo",
+    "total": "Total del viaje",
+    "yourShare": "tu parte: {{amount}} CHF",
+    "balances": "Saldos",
+    "settlements": "Reembolsos",
+    "owesTo": "debe a"
   },
   "step": {
+    "nightToChoose": "Noche del {{start}} al {{end}} · por elegir",
+    "noRoute": "Sin ruta en coche",
+    "unplannedNights_one": "{{count}} noche sin etapa",
+    "unplannedNights_other": "{{count}} noches sin etapa",
     "actions": "Acción",
     "add": "Añadir una etapa",
     "addExpense": "Añadir un gasto",
@@ -553,7 +564,7 @@
       "step_dates_overlap": "Las fechas de esta etapa se solapan con las de otra etapa.",
       "step_has_spending": "Esta etapa tiene gastos: muévelos o elimínalos primero."
     },
-    "fromTo": "del {{start}} al {{end}}",
+    "fromTo": "{{start}} → {{end}}",
     "list": "Lista",
     "lodgedRatio": "{{lodged}}/{{total}} alojamiento",
     "map": "Mapa",
@@ -572,6 +583,10 @@
     "totalRoute": "TOTAL · {{duration}} DE RUTA · {{distance}} KM"
   },
   "travel": {
+    "emptyText": "¡Crea tu primer road trip e invita a tus amigos!",
+    "emptyTitle": "Aún no hay viajes",
+    "finished": "Terminados",
+    "upcoming": "Próximos",
     "add": "Invitar",
     "added": "Invitado ✓",
     "addTravel": "Añadir un viaje",
@@ -630,7 +645,8 @@
     "nights_one": "{{count}} noche",
     "nights_other": "{{count}} noches",
     "nights_zero": "Sin noches",
-    "pricePerNight": "{{price}} CHF/noche",
+    "perNight": "por noche",
+    "pricePerNight": "{{price}} CHF por noche",
     "steps_one": "{{count}} etapa",
     "steps_other": "{{count}} etapas"
   }

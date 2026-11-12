@@ -32,7 +32,7 @@ export function TravelersModal({ travel, onClose }: TravelersModalProps) {
             .filter((invitation) => invitation.status == "invited")
             .map((invitation) => (
               <div key={invitation.id} className="flex items-center gap-3">
-                <Avatar>{invitation.initials}</Avatar>
+                <Avatar color="pending">{invitation.initials}</Avatar>
                 <Text tone="muted" className="flex-1">
                   {invitation.name}
                 </Text>

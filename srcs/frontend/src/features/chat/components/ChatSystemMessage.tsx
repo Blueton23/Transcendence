@@ -1,20 +1,24 @@
 import { useTranslation } from "react-i18next";
 
-import Badge from "@/shared/ui/Badge";
+import Tag from "@/shared/ui/Tag";
 
 import type { ChatMessage } from "../types";
 
 interface ChatSystemMessageProps {
   message: ChatMessage;
 }
-// @TODO peut être changer la couleur de l'info suivant le type de message, car la tout le temps rouge
+
+// Neutral pill: joining or leaving the trip is information, not an error.
 export default function ChatSystemMessage({ message }: ChatSystemMessageProps) {
   const { t } = useTranslation();
   return (
     <div className="flex justify-center py-2">
-      <Badge variant="error">
+      <Tag
+        tone="plain"
+        className="h-auto! min-h-6 max-w-full bg-surface-container py-1 text-center whitespace-normal! text-text-secondary"
+      >
         {t(`chat.system.${message.systemKey}`, message.systemParams)}
-      </Badge>
+      </Tag>
     </div>
   );
 }

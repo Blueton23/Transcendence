@@ -19,6 +19,7 @@ interface OptionsMenuProps {
   deleteLabel?: string;
   extraActions?: ExtraAction[];
   disabled?: boolean;
+  variant?: "flat" | "ghost";
 }
 
 export function OptionsMenu({
@@ -29,6 +30,7 @@ export function OptionsMenu({
   deleteLabel,
   extraActions = [],
   disabled = false,
+  variant = "flat",
 }: OptionsMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const { t } = useTranslation();
@@ -49,7 +51,7 @@ export function OptionsMenu({
       <IconButton
         icon={<Icon name="dots" size={18} />}
         label={t("actions.options")}
-        variant="flat"
+        variant={variant}
         size="xs"
         disabled={disabled}
         onClick={() => setOpen(!menuOpen)}

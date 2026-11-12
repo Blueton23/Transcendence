@@ -10,6 +10,7 @@ import Text from "@/shared/ui/Text";
 import Avatar from "@/shared/ui/Avatar";
 import FriendSearchInput from "./FriendSearchInput";
 import { useTranslation } from "react-i18next";
+import Icon from "@/shared/ui/Icon";
 
 function FriendSearch() {
   const [query, setQuery] = useState("");
@@ -81,12 +82,14 @@ function FriendSearch() {
       {message && <Text tone="success">{message}</Text>}
 
       {traveler && (
-        <div className="flex flex-col gap-4 rounded-md border border-border bg-surface-container p-4">
+        <div className="flex flex-col gap-4 rounded-md border border-border bg-surface p-4">
           <div className="flex items-center gap-3">
-            <Avatar user={traveler} />
+            <Avatar user={traveler} size="sm" profile />
 
             <div className="flex min-w-0 flex-1 flex-col">
-              <Text>{traveler.username}</Text>
+              <Text size="sm" className="font-semibold">
+                {traveler.username}
+              </Text>
 
               {(traveler.firstName || traveler.lastName) && (
                 <Text size="sm" tone="secondary">
@@ -96,24 +99,19 @@ function FriendSearch() {
                 </Text>
               )}
             </div>
-
             <Button
               type="button"
-              variant="dark"
-              onClick={() => handleChange("")}
+              size="sm"
+              variant="primary"
+              icon={<Icon name="plus" size={16} />}
+              onClick={() => void handleSendRequest()}
+              disabled={isSending}
             >
-              {t("actions.cancel")}
+              {isSending
+                ? t("friendship.sending")
+                : t("friendship.sendRequest")}
             </Button>
           </div>
-
-          <Button
-            type="button"
-            variant="primary"
-            onClick={() => void handleSendRequest()}
-            disabled={isSending}
-          >
-            {isSending ? t("friendship.sending") : t("friendship.sendRequest")}
-          </Button>
         </div>
       )}
     </div>
