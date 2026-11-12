@@ -452,7 +452,9 @@
     "signupTitle": "Create an account",
     "title": "Profile",
     "updatedAt": "Last updated:",
-    "view": "View profile"
+    "view": "View profile",
+    "online": "Online",
+    "offline": "Offline"
   },
   "pwa": {
     "offline": "You're offline: some features are unavailable"

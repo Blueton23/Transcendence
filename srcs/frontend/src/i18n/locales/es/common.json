@@ -452,7 +452,9 @@
     "signupTitle": "Crear una cuenta",
     "title": "Perfil",
     "updatedAt": "Última actualización:",
-    "view": "Ver el perfil"
+    "view": "Ver el perfil",
+    "online": "En línea",
+    "offline": "Desconectado"
   },
   "pwa": {
     "offline": "Sin conexión: algunas funciones no están disponibles"

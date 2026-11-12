@@ -452,7 +452,9 @@
     "signupTitle": "Créer un compte",
     "title": "Profil",
     "updatedAt": "Dernière mise à jour :",
-    "view": "Voir le profil"
+    "view": "Voir le profil",
+    "online": "En ligne",
+    "offline": "Hors ligne"
   },
   "pwa": {
     "offline": "Hors ligne : certaines fonctions sont indisponibles"
