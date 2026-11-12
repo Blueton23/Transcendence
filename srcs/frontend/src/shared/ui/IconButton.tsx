@@ -1,7 +1,7 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
 type IconButtonVariant =
-  "primary" | "dark" | "flat" | "outline" | "ghost" | "success" | "danger";
+  "primary" | "dark" | "flat" | "outline" | "ghost" | "danger";
 
 type IconButtonSize = "xs" | "sm" | "md" | "lg";
 
@@ -18,7 +18,6 @@ const variantStyles = {
   flat: "bg-surface-container text-muted border-transparent",
   outline: "bg-surface border-border text-text-secondary",
   ghost: "bg-transparent border-transparent text-muted",
-  success: "bg-success/15 text-success border-transparent hover:bg-success/25",
   danger: "bg-error/15 text-error border-transparent hover:bg-error/25",
 };
 

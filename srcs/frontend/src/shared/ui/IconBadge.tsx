@@ -2,8 +2,7 @@ import Icon from "./Icon";
 import type { IconName } from "./Icon";
 import { iconColor } from "@/shared/ui/iconColor";
 
-export type IconBadgeColor =
-  "green" | "red" | "purple" | "amber" | "ink" | "brand" | "chosen";
+export type IconBadgeColor = "red" | "purple" | "ink" | "brand";
 
 type IconBadgeSize = "sm" | "md";
 
@@ -24,13 +23,10 @@ const iconSizeStyles = {
 };
 
 const colorStyles = {
-  green: "bg-success-bg text-success-text",
   red: "bg-error-bg text-error",
-  amber: "bg-warning/50 text-warning-text",
   purple: "bg-info-bg text-info",
   ink: "bg-surface-container text-text",
   brand: "bg-brand-primary/80 text-inverse",
-  chosen: "bg-surface-control text-success-text",
 };
 
 const baseStyle = "inline-flex items-center justify-center rounded-md";

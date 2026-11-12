@@ -18,7 +18,7 @@ export function ChosenNight({ night, actions }: ChosenNightProps) {
   const { t } = useTranslation();
   return (
     <Card
-      variant="accomodation"
+      variant="accommodation"
       className="flex min-w-0 flex-1 items-start justify-between md:items-center"
     >
       <div className="flex flex-1 items-center gap-2 md:gap-3">

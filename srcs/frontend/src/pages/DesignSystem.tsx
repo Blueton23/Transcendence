@@ -1,40 +1,152 @@
 import { useState } from "react";
 import type { ReactNode } from "react";
-import Button from "../shared/ui/Button";
-import Badge from "../shared/ui/Badge";
-import Avatar from "../shared/ui/Avatar";
-import Card from "../shared/ui/Card";
-import Heading from "../shared/ui/Heading";
-import Text from "../shared/ui/Text";
-import Chip from "../shared/ui/Chip";
-import IconButton from "../shared/ui/IconButton";
-import Divider from "../shared/ui/Divider";
-import Input from "../shared/ui/Input";
-import Tag from "../shared/ui/Tag";
-import Icon, { iconNames } from "../shared/ui/Icon";
-import { DatePicker } from "../shared/ui/DatePicker";
 import type { DateRange } from "@daypicker/react";
+import { useTranslation } from "react-i18next";
+
+import { ideaTypes, type IdeaFilter } from "@/features/idea/types";
+import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
+import { ideaBands } from "@/features/idea/utils/ideaBands";
+import { categories } from "@/features/spending/types";
+import { spendingCategoryBands } from "@/features/spending/utils/spendingCategoryBands";
+import { spendingCategoryLabels } from "@/features/spending/utils/spendingCategoryLabels";
+import Avatar, { type AvatarColor } from "@/shared/ui/Avatar";
+import Banner from "@/shared/ui/Banner";
+import Button from "@/shared/ui/Button";
+import Card from "@/shared/ui/Card";
+import Chip from "@/shared/ui/Chip";
+import { DatePicker } from "@/shared/ui/DatePicker";
+import Divider from "@/shared/ui/Divider";
+import Dot from "@/shared/ui/Dot";
+import Heading from "@/shared/ui/Heading";
+import Icon, { iconNames } from "@/shared/ui/Icon";
+import IconButton from "@/shared/ui/IconButton";
+import Input from "@/shared/ui/Input";
+import OnlineDot from "@/shared/ui/OnlineDot";
+import OnlineStatus from "@/shared/ui/OnlineStatus";
+import { OptionsMenu } from "@/shared/ui/OptionsMenu";
+import Tag from "@/shared/ui/Tag";
+import Text from "@/shared/ui/Text";
+import { dotColors } from "@/shared/utils/dotColors";
 import { DropdownDemo } from "./DropdownDemo";
 
-/* page de Design System */
+/* Design system page: every shared/ui component and token, with the
+   variants actually used in the app. Dev page, not translated. */
 
-/* Helper pour la page design system */
+/* ---------------------------------------------------------------- data */
+
+const nav = [
+  {
+    group: "Fondations",
+    items: [
+      { id: "couleurs", label: "Couleurs" },
+      { id: "typographie", label: "Typographie" },
+      { id: "formes", label: "Formes et ombres" },
+      { id: "icones", label: "Icônes" },
+    ],
+  },
+  {
+    group: "Composants",
+    items: [
+      { id: "button", label: "Button" },
+      { id: "iconbutton", label: "IconButton" },
+      { id: "chip", label: "Chip" },
+      { id: "tag", label: "Tag" },
+      { id: "dot", label: "Dot et statut" },
+      { id: "avatar", label: "Avatar" },
+      { id: "card", label: "Card" },
+      { id: "input", label: "Input" },
+      { id: "banner", label: "Banner" },
+      { id: "menu", label: "Menus" },
+      { id: "divider", label: "Divider" },
+      { id: "calendrier", label: "Calendrier" },
+    ],
+  },
+];
+
+interface Swatch {
+  name: string;
+  className: string;
+  hint?: string;
+}
+
+const baseColors: Swatch[] = [
+  { name: "background", className: "bg-background", hint: "fond de l'app" },
+  { name: "surface", className: "bg-surface", hint: "cartes" },
+  {
+    name: "surface-container",
+    className: "bg-surface-container",
+    hint: "sidebar, chips",
+  },
+  {
+    name: "surface-soft",
+    className: "bg-surface-soft",
+    hint: "zones en pointillés",
+  },
+  { name: "text", className: "bg-text", hint: "encre" },
+  {
+    name: "text-secondary",
+    className: "bg-text-secondary",
+    hint: "texte courant",
+  },
+  { name: "muted", className: "bg-muted", hint: "libellés, heures" },
+];
+
+const brandColors: Swatch[] = [
+  {
+    name: "brand-primary",
+    className: "bg-brand-primary",
+    hint: "action principale",
+  },
+  {
+    name: "brand-primary-strong",
+    className: "bg-brand-primary-strong",
+    hint: "liens, survol",
+  },
+  { name: "brand-dark", className: "bg-brand-dark", hint: "action secondaire" },
+];
+
+const stateColors: Swatch[] = [
+  { name: "success", className: "bg-success" },
+  { name: "success-bg", className: "bg-success-bg" },
+  { name: "warning", className: "bg-warning" },
+  { name: "warning-bg", className: "bg-warning-bg" },
+  { name: "error", className: "bg-error" },
+  { name: "error-bg", className: "bg-error-bg" },
+  { name: "info", className: "bg-info" },
+  { name: "info-bg", className: "bg-info-bg" },
+];
+
+const bandColors: Swatch[] = [
+  { name: "band-1", className: "bg-band-1", hint: "pierre" },
+  { name: "band-2", className: "bg-band-2", hint: "argile" },
+  { name: "band-3", className: "bg-band-3", hint: "sauge" },
+  { name: "band-4", className: "bg-band-4", hint: "brume" },
+  { name: "band-5", className: "bg-band-5", hint: "ardoise" },
+];
+
+const avatarColors: AvatarColor[] = ["1", "2", "3", "4", "5", "6", "7"];
+
+/* ------------------------------------------------------------- helpers */
 
 interface SectionProps {
+  id: string;
   name: string;
   role: string;
   children: ReactNode;
 }
 
-function Section({ name, role, children }: SectionProps) {
+function Section({ id, name, role, children }: SectionProps) {
   return (
-    <section className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6 shadow-sm">
+    <section
+      id={id}
+      className="flex scroll-mt-6 flex-col gap-5 rounded-lg border border-border bg-surface p-5 shadow-sm md:p-6"
+    >
       <div className="flex flex-col gap-1">
-        <h2 className="font-mono text-md font-bold text-text">{`<${name} />`}</h2>
+        <h2 className="font-mono text-md font-bold text-text">{name}</h2>
         <p className="max-w-prose text-md text-text-secondary">{role}</p>
       </div>
       <Divider />
-      <div className="flex flex-col gap-5">{children}</div>
+      <div className="flex flex-col gap-6">{children}</div>
     </section>
   );
 }
@@ -42,348 +154,711 @@ function Section({ name, role, children }: SectionProps) {
 interface SpecimenProps {
   label: string;
   children: ReactNode;
+  className?: string;
 }
 
-function Specimen({ label, children }: SpecimenProps) {
+function Specimen({ label, children, className = "" }: SpecimenProps) {
   return (
     <div className="flex flex-col gap-2">
       <span className="font-mono text-xs text-muted">{label}</span>
-      <div className="flex flex-wrap items-center gap-3">{children}</div>
+      <div
+        className={`flex flex-wrap items-center gap-3 rounded-md bg-background p-4 ${className}`}
+      >
+        {children}
+      </div>
     </div>
   );
 }
 
+function SwatchGrid({ swatches }: { swatches: Swatch[] }) {
+  return (
+    <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-3">
+      {swatches.map((swatch) => (
+        <div key={swatch.name} className="flex flex-col gap-1.5">
+          <div
+            className={`h-14 rounded-sm border border-border ${swatch.className}`}
+          />
+          <span className="font-mono text-xs text-text">{swatch.name}</span>
+          {swatch.hint && (
+            <span className="text-xs text-muted">{swatch.hint}</span>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------- page */
+
 function DesignSystem() {
-  const [cat, setCat] = useState("resto");
+  const { t } = useTranslation();
+  const [ideaFilter, setIdeaFilter] = useState<IdeaFilter>("all");
   const [selected, setSelected] = useState<DateRange>();
 
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6 p-8">
-      <header className="flex flex-col gap-2">
-        <Heading level={1} size="lg">
-          Design system
-        </Heading>
-        <Text tone="secondary">
-          Catalogue de shared/ui, avec les variantes réelles telles qu'elles
-          apparaissent dans la maquette.
-        </Text>
-      </header>
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-10 md:px-8">
+        {/* Navigation: sticky column on desktop, scrolling chips on mobile */}
+        <nav
+          aria-label="Sections du design system"
+          className="flex gap-2 overflow-x-auto md:sticky md:top-8 md:flex-col md:gap-5 md:self-start md:overflow-visible"
+        >
+          {nav.map((group) => (
+            <div key={group.group} className="flex gap-2 md:flex-col md:gap-1">
+              <span className="hidden px-2 text-xs font-semibold text-muted md:block">
+                {group.group}
+              </span>
+              {group.items.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  className="shrink-0 rounded-full border border-border-control bg-surface px-3 py-1.5 text-sm font-semibold whitespace-nowrap text-text hover:bg-surface-container md:rounded-sm md:border-0 md:bg-transparent md:py-1"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          ))}
+        </nav>
 
-      <Section
-        name="Button"
-        role="L'action principale d'un écran : épingler une idée, ajouter une étape."
-      >
-        <Specimen label='variant="primary"'>
-          <Button variant="primary">Enregister les modifications</Button>
-        </Specimen>
-        <Specimen label='variant="dark"'>
-          <Button variant="dark">Ajouter une étape</Button>
-        </Specimen>
-        <Specimen label='variant="outline"'>
-          <Button variant="outline">Ajouter une dépense</Button>
-        </Specimen>
-        <Specimen label='variant="danger"'>
-          <Button variant="danger">Confirmer</Button>
-        </Specimen>
-        <Specimen label="icon">
-          <Button variant="primary" icon={<Icon name="pinplus" size={16} />}>
-            Epingler une idee
-          </Button>
-        </Specimen>
-      </Section>
-
-      <Section
-        name="IconButton"
-        role="Comme Button mais sans texte, juste une icône dans un rond. Pour les actions évidentes : fermer, ajouter, options. label reste obligatoire pour savoir ce que c'est"
-      >
-        <Specimen label='variant="outline" (défaut) · size="sm" — 34px'>
-          <IconButton
-            icon={<Icon name="back" size={16} />}
-            label="Ajouter"
-            variant="outline"
-            size="sm"
-          />
-        </Specimen>
-        <Specimen label='variant="flat" · size="sm"'>
-          <IconButton
-            icon={<Icon name="x" size={16} />}
-            label="Fermer"
-            variant="flat"
-            size="sm"
-          />
-        </Specimen>
-        <Specimen label='variant="primary" · size="md" — 44px'>
-          <IconButton
-            icon={<Icon name="pinplus" size={20} />}
-            label="Epingler une idee"
-            variant="primary"
-            size="md"
-          />
-        </Specimen>
-        <Specimen label='variant="ghost" · size="sm" — 44px'>
-          <IconButton
-            icon={<Icon name="dots" size={16} />}
-            label="Voir les options"
-            variant="ghost"
-            size="sm"
-          />
-        </Specimen>
-      </Section>
-
-      <Section
-        name="Icon"
-        role="Pointe vers le sprite SVG extrait de la maquette (un seul defs, inséré une fois dans index.html). name = l'id du symbol sans le préfixe i-. La couleur suit le texte parent, donc on la change avec une classe text-*."
-      >
-        <Specimen label="size={20} (défaut) · la couleur suit le texte parent">
-          <Icon name="pin" />
-          <Icon name="heart-f" className="text-brand-primary" />
-          <Icon name="check" className="text-success" />
-          <Icon name="moon" className="text-muted" />
-        </Specimen>
-        <Specimen label="size — en pixels, largeur et hauteur à la fois">
-          <Icon name="backpack" size={14} />
-          <Icon name="backpack" size={20} />
-          <Icon name="backpack" size={28} />
-        </Specimen>
-        <Specimen label={`name — les ${iconNames.length} icônes du sprite`}>
-          <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(84px,1fr))] gap-3">
-            {iconNames.map((n) => (
-              <div
-                key={n}
-                className="flex flex-col items-center gap-1.5 rounded-sm border border-border bg-surface-container p-2"
-              >
-                <Icon name={n} />
-                <span className="font-mono text-2xs text-muted">{n}</span>
-              </div>
-            ))}
-          </div>
-        </Specimen>
-      </Section>
-
-      <Section
-        name="Chip"
-        role="Filtre sélectionnable. Se clique, et surtout : il a un état. Sert à choisir une catégorie parmi plusieurs."
-      >
-        <Specimen label="active={true} / active={false} — cliquez pour changer la sélection">
-          <Chip
-            active={cat === "resto"}
-            onClick={() => setCat("resto")}
-            icon={<Icon name="fork" size={16} />}
-          >
-            Resto
-          </Chip>
-          <Chip
-            active={cat === "hebergement"}
-            onClick={() => setCat("hebergement")}
-            icon={<Icon name="tent" size={16} />}
-          >
-            Hébergement
-          </Chip>
-          <Chip active={cat === "activite"} onClick={() => setCat("activite")}>
-            Tous
-          </Chip>
-          <Chip active={cat === "avoir"} onClick={() => setCat("avoir")}>
-            Sans etapes
-          </Chip>
-        </Specimen>
-      </Section>
-
-      <Section name="Badge" role="Étiquette de statut. Ne se clique pas.">
-        <Specimen label='variant="success" — validé, réservé, accepte'>
-          <Badge variant="success">Réservé</Badge>
-          <Badge icon={<Icon name="check" size={16} />} variant="success">
-            Accepte
-          </Badge>
-        </Specimen>
-        <Specimen label='variant="warning" — en attente, info neutre, en tete'>
-          <Badge variant="warning" icon={<Icon name="cal" size={16} />}>
-            En attente
-          </Badge>
-          <Badge variant="warning">Séjour · 2 nuits</Badge>
-          <Badge variant="warning">EN TETE</Badge>
-        </Specimen>
-        <Specimen label='variant="error" — action requise'>
-          <Badge variant="error">A choisir</Badge>
-        </Specimen>
-      </Section>
-
-      <Section
-        name="Tag"
-        role="repère factuel en mono (jour, date, autre). Simple texte, jamais cliquable. Avec un chevron pour faire un composant pliable, mais ce n'est pas Tag qui s'en charge."
-      >
-        <Specimen label='tone="default" (défaut) — bordé, texte secondaire'>
-          <Icon name="chev-down" size={15} className="text-muted" />
-          <Tag>JOUR 1 · dim 12</Tag>
-          <Icon name="chev-down" size={15} className="text-muted" />
-          <Tag>JOUR 2 · lun 13</Tag>
-        </Specimen>
-
-        <Specimen label='tone="muted" — sans bordure, info neutre de rattachement'>
-          <Tag tone="muted">Pool general</Tag>
-          <Tag tone="muted">→ Zermatt</Tag>
-        </Specimen>
-
-        <Specimen label='tone="inverse"  — sur fond sombre (bandeau voyage)'>
-          <div className="flex gap-3 rounded-md bg-brand-dark p-3">
-            <Tag tone="inverse">12 - 16 juil.</Tag>
-            <Tag tone="inverse">219 km</Tag>
-          </div>
-        </Specimen>
-      </Section>
-
-      <Section name="Avatar" role="Identité d’un participant, initiales.">
-        <Specimen label='size="xs" | "sm" | "md" (défaut) | "lg"'>
-          <Avatar size="xs">DL</Avatar>
-          <Avatar size="sm">SD</Avatar>
-          <Avatar size="md">SC</Avatar>
-          <Avatar size="lg">CP</Avatar>
-        </Specimen>
-        <Specimen label='color="1" (défaut) | "2" | "3" | "4"'>
-          <Avatar color="1">SD</Avatar>
-          <Avatar color="2">DL</Avatar>
-          <Avatar color="3">SC</Avatar>
-          <Avatar color="4">CP</Avatar>
-        </Specimen>
-      </Section>
-
-      <Section name="Card" role="Conteneur d’un bloc de contenu.">
-        <Specimen label='variant="default" (défaut)'>
-          <Card variant="default">Carte normale</Card>
-        </Specimen>
-        <Specimen label='variant="default avec hover" (défaut + hover)'>
-          <Card variant="default" interactive={true}>
-            Carte normale avec hover (pour les etapes)
-          </Card>
-        </Specimen>
-        <Specimen label='variant="accent" — proposition en attente de décision'>
-          <Card variant="accent">Carte à choisir</Card>
-        </Specimen>
-        <Specimen label='variant="success" — confirmé'>
-          <Card variant="success">Hébergement réservé</Card>
-        </Specimen>
-        <Specimen label='variant="alert" — problème à traiter'>
-          <Card variant="alert">2 nuits sans hébergement</Card>
-        </Specimen>
-        <Specimen label='variant="dashed" — zone à remplir'>
-          <Card variant="dashed">Idées à placer</Card>
-        </Specimen>
-        <Specimen label='variant="dashed-accent" — zone à remplir, urgente'>
-          <Card variant="dashed-accent">Nuit à choisir</Card>
-        </Specimen>
-      </Section>
-
-      <Section name="Input" role="Champ de saisie sur une ligne.">
-        <Specimen label='variant="default" (défaut) — texte courant'>
-          <Input placeholder="Nom du lieu" />
-        </Specimen>
-        <Specimen label='variant="mono" — dates, montants'>
-          <Input variant="mono" placeholder="12.08.2026" />
-        </Specimen>
-        <Specimen label="avec icône — action dans le champ">
-          <Input
-            placeholder="17.09.2026"
-            icon={<Icon name="cal" size={18} />}
-            iconLabel="Ouvrir le calendrier"
-            onIconClick={() => {}}
-          />
-        </Specimen>
-      </Section>
-
-      <Section name="Divider" role="Trait de séparation entre deux blocs.">
-        <Specimen label='orientation="horizontal" (défaut)'>
-          <div className="w-full">
-            <Divider />
-          </div>
-        </Specimen>
-        <Specimen label='orientation="vertical"'>
-          <Text tone="muted">Jour 1</Text>
-          <Divider orientation="vertical" />
-          <Text tone="muted">Montreux</Text>
-        </Specimen>
-      </Section>
-
-      <Section
-        name="Heading"
-        role="level choisit la balise HTML (h1/h2/h3), size choisit la taille visuelle. Les deux sont indépendantes — un h1 peut rester petit."
-      >
-        <Specimen label='level={1} size="lg" — titre de page'>
-          <Heading level={1} size="lg">
-            Mes voyages
-          </Heading>
-        </Specimen>
-        <Specimen label='level={2} size="md" (défaut) — titre de carte'>
-          <Heading level={2} size="md">
-            Montreux
-          </Heading>
-        </Specimen>
-        <Specimen label='level={3} size="sm" — sous-titre'>
-          <Heading level={3} size="sm">
-            Hébergement
-          </Heading>
-        </Specimen>
-      </Section>
-
-      <Section
-        name="Text"
-        role="Corps de texte. tone règle l'importance, du contenu principal au détail en retrait."
-      >
-        <Specimen label='tone="primary" (défaut) — contenu principal'>
-          <Text tone="primary">Charlotte a voté pour Chalet à Grindelwald</Text>
-        </Specimen>
-        <Specimen label='tone="secondary" — phrase courante'>
-          <Text tone="secondary">a voté pour Chalet à Grindelwald</Text>
-        </Specimen>
-        <Specimen label='tone="muted" — timestamp, hint'>
-          <Text tone="muted">à l'instant</Text>
-        </Specimen>
-        <Specimen label='tone="success" — valide, reserve'>
-          <Text tone="success">Chalet à Grindelwald · réservé</Text>
-        </Specimen>
-        <Specimen label='tone="accent" — action requise'>
-          <Text tone="accent">À choisir · 2 propositions </Text>
-        </Specimen>
-        <Specimen label='size="sm" (12/13px, info secondaire) | "md" (défaut, 12/14px, texte courant)'>
-          <Text size="md">Pas de nuit · 2 idées épinglées</Text>
-          <Text size="sm" tone="muted">
-            Pas de nuit · 2 idées épinglées
-          </Text>
-        </Specimen>
-        <Specimen label='size="lg" (16/18px, montant dans une carte ou une ligne) | "xl" (18/22px, chiffre clé)'>
-          <Text size="lg" font="mono" className="font-semibold">
-            240 CHF
-          </Text>
-          <Text size="xl" font="mono" className="font-semibold">
-            1 245 CHF
-          </Text>
-        </Specimen>
-        <Specimen label='font="sans" (défaut) vs font="mono" — pour une valeur quon scanne, pas une phrase quon lit'>
-          <Text font="mono" tone="muted">
-            95 CHF{" "}
-          </Text>
-          <Text font="sans">· réservé · PDF joint</Text>
-        </Specimen>
-        <Specimen label="composition — deux fragments, chacun sa police, pas un seul Text qui devine">
-          <span className="inline-flex items-center gap-1">
-            <Text font="mono" tone="muted">
-              48 CHF
+        <main className="flex min-w-0 flex-col gap-6">
+          <header className="flex flex-col gap-2">
+            <Heading level={1} size="xl">
+              Design system
+            </Heading>
+            <Text tone="secondary" className="max-w-prose">
+              Palette A, Archivo pour le texte et JetBrains Mono pour les
+              valeurs qu'on scanne (dates, montants). Chaque composant de{" "}
+              <code className="font-mono">shared/ui</code> avec les variantes
+              réellement utilisées dans l'app.
             </Text>
-            <Text tone="muted">· par Damien</Text>
-          </span>
-        </Specimen>
-      </Section>
+          </header>
 
-      <Section name="Calendrier" role="choix de dates">
-        <Specimen label="2 mois range">
-          <Card className="flex justify-center p-4">
-            <DatePicker selected={selected} onSelect={setSelected} />
-          </Card>
-        </Specimen>
-      </Section>
-      <Section name="DropDown" role="menu cacher avec les ...">
-        <Specimen label="menu a choix">
-          <DropdownDemo />
-        </Specimen>
-      </Section>
+          {/* ------------------------------------------------ Fondations */}
+
+          <Section
+            id="couleurs"
+            name="Couleurs"
+            role="Tokens de index.css (@theme). Chaque --color-x donne les classes bg-x, text-x, border-x. On n'utilise jamais une couleur Tailwind brute (red-500…)."
+          >
+            <Specimen label="base — fonds et textes">
+              <SwatchGrid swatches={baseColors} />
+            </Specimen>
+            <Specimen label="marque — corail et encre">
+              <SwatchGrid swatches={brandColors} />
+            </Specimen>
+            <Specimen label="états — couleur forte + fond pâle">
+              <SwatchGrid swatches={stateColors} />
+            </Specimen>
+            <Specimen label="bandes de voyage — getTravelBandColor(travel.id), en rotation">
+              <SwatchGrid swatches={bandColors} />
+            </Specimen>
+            <Specimen label='avatars — color="1" à "7" (getAvatarColor), "pending" pour une invitation'>
+              {avatarColors.map((color) => (
+                <div key={color} className="flex flex-col items-center gap-1">
+                  <Avatar color={color}>{`A${color}`}</Avatar>
+                  <span className="font-mono text-xs text-muted">{color}</span>
+                </div>
+              ))}
+              <div className="flex flex-col items-center gap-1">
+                <Avatar color="pending">IN</Avatar>
+                <span className="font-mono text-xs text-muted">pending</span>
+              </div>
+            </Specimen>
+            <Specimen label="types d'idée — ideaBands (bande + texte) et dotColors (rond)">
+              {ideaTypes.map((type) => (
+                <Tag
+                  key={type}
+                  tone="plain"
+                  shape="soft"
+                  icon={<Dot className={dotColors[type]} />}
+                  className={ideaBands[type]}
+                >
+                  {t(ideaTypeLabels[type])}
+                </Tag>
+              ))}
+            </Specimen>
+            <Specimen label="catégories de dépense — spendingCategoryBands et dotColors">
+              {categories.map((category) => (
+                <Tag
+                  key={category}
+                  tone="plain"
+                  shape="soft"
+                  icon={<Dot className={dotColors[category]} />}
+                  className={spendingCategoryBands[category]}
+                >
+                  {t(spendingCategoryLabels[category])}
+                </Tag>
+              ))}
+            </Specimen>
+          </Section>
+
+          <Section
+            id="typographie"
+            name="Heading · Text"
+            role="Heading : level choisit la balise (h1/h2/h3), size la taille visuelle, les deux sont indépendants. Text : tone règle l'importance, size la taille, font la police. Les tailles grandissent d'un cran en desktop."
+          >
+            <Specimen
+              label='Heading size="xl" (titre de page) · "lg" · "md" (défaut) · "sm" (titre de carte) · "xs"'
+              className="flex-col items-start!"
+            >
+              <Heading level={2} size="xl">
+                Mes voyages
+              </Heading>
+              <Heading level={2} size="lg">
+                Road trip Suisse
+              </Heading>
+              <Heading level={2} size="md">
+                Interlaken
+              </Heading>
+              <Heading level={3} size="sm">
+                Chalet au bord du lac
+              </Heading>
+              <Heading level={3} size="xs">
+                Hébergement
+              </Heading>
+            </Specimen>
+            <Specimen
+              label='Text size="sm" (info secondaire) · "md" (défaut) · "lg" (montant) · "xl" (chiffre clé)'
+              className="flex-col items-start!"
+            >
+              <Text size="sm" tone="muted">
+                chacha_test · Interlaken
+              </Text>
+              <Text size="md">Pas de nuit · 2 idées épinglées</Text>
+              <Text size="lg" font="mono" className="font-semibold">
+                240 CHF
+              </Text>
+              <Text size="xl" font="mono" className="font-semibold">
+                1 245 CHF
+              </Text>
+            </Specimen>
+            <Specimen
+              label='Text tone="primary" (défaut) · "secondary" · "muted" · "success" · "accent"'
+              className="flex-col items-start!"
+            >
+              <Text tone="primary">alee a voté pour le chalet</Text>
+              <Text tone="secondary">a voté pour le chalet</Text>
+              <Text tone="muted">à l'instant</Text>
+              <Text tone="success">Hébergement choisi</Text>
+              <Text tone="accent">Nuit à choisir</Text>
+            </Specimen>
+            <Specimen label='font="mono" pour une valeur qu&apos;on scanne, "sans" pour une phrase qu&apos;on lit'>
+              <span className="inline-flex items-center gap-1">
+                <Text font="mono" className="font-semibold">
+                  120 CHF
+                </Text>
+                <Text tone="muted">par nuit</Text>
+              </span>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="formes"
+            name="Formes et ombres"
+            role="Rayons --radius-* et ombres --shadow-*. rounded-full pour les pilules (boutons, chips, tags), rounded-md pour les cartes."
+          >
+            <Specimen label="rounded-sm 10px · rounded-md 14px · rounded-lg 20px · rounded-xl 26px · rounded-full">
+              {[
+                "rounded-sm",
+                "rounded-md",
+                "rounded-lg",
+                "rounded-xl",
+                "rounded-full",
+              ].map((radius) => (
+                <div key={radius} className="flex flex-col items-center gap-1">
+                  <div
+                    className={`size-14 border border-border bg-surface ${radius}`}
+                  />
+                  <span className="font-mono text-xs text-muted">{radius}</span>
+                </div>
+              ))}
+            </Specimen>
+            <Specimen label="shadow-sm · shadow-md · shadow-lg · shadow-brand (boutons corail)">
+              {["shadow-sm", "shadow-md", "shadow-lg", "shadow-brand"].map(
+                (shadow) => (
+                  <div
+                    key={shadow}
+                    className="flex flex-col items-center gap-1"
+                  >
+                    <div
+                      className={`size-14 rounded-md bg-surface ${shadow}`}
+                    />
+                    <span className="font-mono text-xs text-muted">
+                      {shadow}
+                    </span>
+                  </div>
+                ),
+              )}
+            </Specimen>
+          </Section>
+
+          <Section
+            id="icones"
+            name="Icon"
+            role="Sprite SVG unique dans index.html, style arrondi. name = l'id du symbol sans le préfixe i-. La couleur suit le texte parent (classe text-*), la taille est en pixels."
+          >
+            <Specimen label="couleur héritée · size={14} / {20} (défaut) / {28}">
+              <Icon name="pin" />
+              <Icon name="heart-f" className="text-brand-primary" />
+              <Icon name="check" className="text-success" />
+              <Icon name="moon" className="text-muted" />
+              <Divider orientation="vertical" />
+              <Icon name="van" size={14} />
+              <Icon name="van" size={20} />
+              <Icon name="van" size={28} />
+            </Specimen>
+            <Specimen label={`les ${iconNames.length} icônes du sprite`}>
+              <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(5.25rem,1fr))] gap-2">
+                {iconNames.map((name) => (
+                  <div
+                    key={name}
+                    className="flex flex-col items-center gap-1.5 rounded-sm bg-surface p-2"
+                  >
+                    <Icon name={name} />
+                    <span className="font-mono text-2xs text-muted">
+                      {name}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Specimen>
+          </Section>
+
+          {/* ----------------------------------------------- Composants */}
+
+          <Section
+            id="button"
+            name="Button"
+            role="Une action avec un texte. primary pour l'action principale d'un écran (une seule), dark pour une action importante dans une ligne, outline pour le reste."
+          >
+            <Specimen label='variant="primary" · "dark" · "outline" (défaut) · "ghost" · "danger"'>
+              <Button
+                variant="primary"
+                icon={<Icon name="pinplus" size={16} />}
+              >
+                Épingler une idée
+              </Button>
+              <Button variant="dark">Choisir</Button>
+              <Button variant="outline" icon={<Icon name="edit" size={16} />}>
+                Modifier le profil
+              </Button>
+              <Button variant="ghost" icon={<Icon name="back" size={16} />}>
+                Itinéraire
+              </Button>
+              <Button variant="danger">Supprimer</Button>
+            </Specimen>
+            <Specimen label='vote — "white" (voté, carte d&apos;idée) · "voted" (voté, ligne) · "outline" / "ghost" (pas voté)'>
+              <Button
+                variant="white"
+                size="xs"
+                icon={<Icon name="heart-f" size={14} />}
+              >
+                3
+              </Button>
+              <Button
+                variant="outline"
+                size="xs"
+                icon={<Icon name="heart-f" size={14} />}
+              >
+                0
+              </Button>
+              <Button
+                variant="voted"
+                size="xs"
+                icon={<Icon name="heart-f" size={14} />}
+              >
+                2
+              </Button>
+              <Button
+                variant="ghost"
+                size="xs"
+                icon={<Icon name="heart-f" size={14} />}
+              >
+                0
+              </Button>
+            </Specimen>
+            <Specimen label='size="xs" (dans une carte ou une ligne) · "sm" (grandit en desktop) · "md" (défaut)'>
+              <Button variant="dark" size="xs">
+                Voir l'étape
+              </Button>
+              <Button variant="dark" size="sm">
+                Rechercher
+              </Button>
+              <Button variant="dark" size="md">
+                Ajouter une étape
+              </Button>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="iconbutton"
+            name="IconButton"
+            role="Une action évidente sans texte, dans un rond : fermer, options, envoyer. label est obligatoire : c'est le nom lu par les lecteurs d'écran."
+          >
+            <Specimen label='variant="primary" · "dark" · "outline" (défaut) · "flat" · "ghost" · "danger"'>
+              <IconButton
+                variant="primary"
+                icon={<Icon name="arrow" size={16} />}
+                label="Envoyer"
+              />
+              <IconButton
+                variant="dark"
+                icon={<Icon name="check" size={16} />}
+                label="Accepter"
+              />
+              <IconButton
+                variant="outline"
+                icon={<Icon name="x" size={16} />}
+                label="Refuser"
+              />
+              <IconButton
+                variant="flat"
+                icon={<Icon name="x" size={16} />}
+                label="Fermer"
+              />
+              <IconButton
+                variant="ghost"
+                icon={<Icon name="trash" size={16} />}
+                label="Supprimer"
+              />
+              <IconButton
+                variant="danger"
+                icon={<Icon name="trash" size={16} />}
+                label="Supprimer"
+              />
+            </Specimen>
+            <Specimen label='size="xs" · "sm" (défaut) · "md" · "lg"'>
+              {(["xs", "sm", "md", "lg"] as const).map((size) => (
+                <IconButton
+                  key={size}
+                  size={size}
+                  variant="primary"
+                  icon={<Icon name="plus" size={16} />}
+                  label={`Ajouter (${size})`}
+                />
+              ))}
+            </Specimen>
+          </Section>
+
+          <Section
+            id="chip"
+            name="Chip"
+            role="Filtre ou choix sélectionnable, avec un état actif. Le rond de couleur (Dot + dotColors) rappelle le type, comme sur les cartes."
+          >
+            <Specimen label="active — cliquer pour changer la sélection">
+              <Chip
+                active={ideaFilter === "all"}
+                onClick={() => setIdeaFilter("all")}
+              >
+                Tous
+              </Chip>
+              {ideaTypes.map((type) => (
+                <Chip
+                  key={type}
+                  active={ideaFilter === type}
+                  onClick={() => setIdeaFilter(type)}
+                  icon={<Dot className={dotColors[type]} />}
+                >
+                  {t(ideaTypeLabels[type])}
+                </Chip>
+              ))}
+            </Specimen>
+          </Section>
+
+          <Section
+            id="tag"
+            name="Tag"
+            role='Repère factuel, jamais cliquable : date, nuits, statut, type. Hauteur fixe, sur une seule ligne. Les couleurs par type viennent des tableaux de bandes avec tone="plain".'
+          >
+            <Specimen label='tone="default" (défaut, dates d&apos;une invitation) · "muted" (invitation en attente) · "idea" (idées d&apos;une étape)'>
+              <Tag>20 – 27 nov.</Tag>
+              <Tag tone="muted">Invitation en attente</Tag>
+              <Tag tone="idea">2 idées</Tag>
+            </Specimen>
+            <Specimen label='hébergement d&apos;une étape — tone="todo" (nuits à trouver) puis "plain" + ideaBands.accommodation (complet)'>
+              <Tag tone="todo" icon={<Icon name="tent" size={13} />}>
+                1/2 nuits
+              </Tag>
+              <Tag
+                tone="plain"
+                className={ideaBands.accommodation}
+                icon={<Icon name="tent" size={13} />}
+              >
+                2/2 nuits
+              </Tag>
+            </Specimen>
+            <Specimen
+              label='tone="light" — sur une bande de couleur'
+              className="bg-band-2!"
+            >
+              <Tag tone="light">20 – 23 nov.</Tag>
+              <Tag tone="light">3 nuits</Tag>
+            </Specimen>
+            <Specimen
+              label='tone="inverse" — sur fond foncé'
+              className="bg-brand-dark!"
+            >
+              <Tag tone="inverse">20 – 27 nov.</Tag>
+              <Tag tone="inverse" icon={<Icon name="car" size={14} />}>
+                219 km
+              </Tag>
+            </Specimen>
+            <Specimen label='tone="plain" + className — couleur d&apos;un tableau (ideaBands, spendingCategoryBands) ou sur mesure'>
+              <Tag tone="plain" shape="soft" className={ideaBands.activity}>
+                {t(ideaTypeLabels.activity)}
+              </Tag>
+              <Tag
+                tone="plain"
+                shape="soft"
+                className={spendingCategoryBands.f}
+              >
+                {t(spendingCategoryLabels.f)}
+              </Tag>
+              <Tag tone="plain" className="bg-success-bg text-success-text">
+                Réservé
+              </Tag>
+            </Specimen>
+            <Specimen label='size="sm" (défaut, cartes et lignes) · "md" (en-têtes) — shape="pill" (défaut) · "soft"'>
+              <Tag>sm · pill</Tag>
+              <Tag size="md">md · pill</Tag>
+              <Tag shape="soft">sm · soft</Tag>
+              <Tag size="md" shape="soft">
+                md · soft
+              </Tag>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="dot"
+            name="Dot · OnlineStatus · OnlineDot"
+            role="Dot : rond de couleur décoratif (filtres, notifications), la couleur vient de className. OnlineStatus : tag en ligne / hors ligne. OnlineDot : pastille verte sur un avatar, le parent doit être relative."
+          >
+            <Specimen label="Dot — dotColors (types, catégories) ou bande de voyage">
+              <Dot className={dotColors.restaurant} />
+              <Dot className={dotColors.accommodation} />
+              <Dot className={dotColors.f} />
+              <Dot className="bg-band-3" />
+            </Specimen>
+            <Specimen label="OnlineStatus — isOnline={true} / {false}">
+              <OnlineStatus isOnline />
+              <OnlineStatus isOnline={false} />
+            </Specimen>
+            <Specimen label="OnlineDot — sur un avatar, seulement si la personne est en ligne">
+              <span className="relative">
+                <Avatar color="3">LU</Avatar>
+                <OnlineDot isOnline />
+              </span>
+              <span className="relative">
+                <Avatar color="2">TI</Avatar>
+                <OnlineDot isOnline={false} />
+              </span>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="avatar"
+            name="Avatar"
+            role="Identité d'une personne : photo si elle en a une, sinon initiales sur sa couleur. Dans un voyage, la couleur vient de getAvatarColor(travel.travelers, id) pour être la même partout."
+          >
+            <Specimen label='size="xs" 20px (à côté d&apos;un nom) · "sm" 28px (lignes, piles) · "md" 36px (défaut, listes) · "lg" 60px (profil)'>
+              <Avatar size="xs" color="1">
+                AL
+              </Avatar>
+              <Avatar size="sm" color="2">
+                TI
+              </Avatar>
+              <Avatar size="md">CH</Avatar>
+              <Avatar size="lg" color="3">
+                LU
+              </Avatar>
+            </Specimen>
+            <Specimen label="pile de voyageurs — sm + ring-2 ring-surface, -space-x-2">
+              <div className="flex -space-x-2">
+                <Avatar size="sm" className="ring-2 ring-background">
+                  CH
+                </Avatar>
+                <Avatar size="sm" color="1" className="ring-2 ring-background">
+                  AL
+                </Avatar>
+                <Avatar size="sm" color="2" className="ring-2 ring-background">
+                  TI
+                </Avatar>
+                <Avatar
+                  size="sm"
+                  color="pending"
+                  className="ring-2 ring-background"
+                >
+                  +2
+                </Avatar>
+              </div>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="card"
+            name="Card"
+            role="Conteneur d'un bloc. band ajoute une bande de couleur en haut (voyage, idée, catégorie) ; className s'applique alors au corps de la carte."
+          >
+            <Specimen label="band + bandClassName — carte d'idée, carte de voyage">
+              <div className="grid w-full gap-3 md:grid-cols-2">
+                <Card
+                  band={
+                    <span className="text-xs font-semibold">
+                      {t(ideaTypeLabels.accommodation)}
+                    </span>
+                  }
+                  bandClassName={ideaBands.accommodation}
+                  className="flex flex-col gap-1"
+                >
+                  <Heading level={3} size="sm">
+                    Chalet au bord du lac
+                  </Heading>
+                  <Text size="sm" tone="muted">
+                    chacha_test · Interlaken
+                  </Text>
+                </Card>
+                <Card
+                  interactive
+                  band={<Tag tone="light">Dans 10 jours</Tag>}
+                  bandClassName="bg-band-2"
+                  className="flex flex-col gap-1"
+                >
+                  <Heading level={3} size="sm">
+                    Road trip Suisse
+                  </Heading>
+                  <Text size="sm" tone="muted">
+                    20 – 27 nov. · 7 nuits
+                  </Text>
+                </Card>
+              </div>
+            </Specimen>
+            <Specimen
+              label='variant="default" (défaut) · interactive · "dark" · "accommodation" · "alert" · "dashed" · "dashed-accent"'
+              className="grid! grid-cols-1 md:grid-cols-2"
+            >
+              <Card>Carte normale</Card>
+              <Card interactive>Carte cliquable (survol)</Card>
+              <Card variant="dark">Total du voyage</Card>
+              <Card variant="accommodation">Hébergement choisi</Card>
+              <Card variant="alert">2 nuits sans hébergement</Card>
+              <Card variant="dashed">2 nuits sans étape</Card>
+              <Card variant="dashed-accent">Nuit à choisir</Card>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="input"
+            name="Input"
+            role='Champ d&apos;une ligne. variant="mono" pour les dates et montants, icon pour une action dans le champ.'
+          >
+            <Specimen
+              label='variant="default" · "mono" · avec icône'
+              className="flex-col items-stretch!"
+            >
+              <Input placeholder="Nom du lieu" />
+              <Input variant="mono" placeholder="12.08.2026" />
+              <Input
+                placeholder="Ajouter un ami · pseudo"
+                icon={<Icon name="search" size={18} className="text-muted" />}
+              />
+            </Specimen>
+            <Specimen
+              label="bouton dans le champ — form relative, bouton absolute, pr-28 sur le champ"
+              className="flex-col items-stretch!"
+            >
+              <form className="relative" onSubmit={(e) => e.preventDefault()}>
+                <Input
+                  placeholder="Ajouter un ami · pseudo"
+                  inputClassName="pr-28"
+                  icon={<Icon name="search" size={18} className="text-muted" />}
+                />
+                <Button
+                  type="submit"
+                  variant="dark"
+                  size="sm"
+                  className="absolute top-1/2 right-2 -translate-y-1/2 md:px-3! md:py-2! md:text-xs!"
+                >
+                  Rechercher
+                </Button>
+              </form>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="banner"
+            name="Banner"
+            role="Message pleine largeur en haut de page : hors ligne (OfflineBanner) ou erreur globale (ErrorBanner, affichée 5 s via useError)."
+          >
+            <Specimen
+              label='variant="warning" · "error"'
+              className="flex-col items-stretch!"
+            >
+              <Banner
+                variant="warning"
+                icon={<Icon name="wifi-off" size={16} />}
+              >
+                Hors ligne : certaines fonctions sont indisponibles
+              </Banner>
+              <Banner variant="error" icon={<Icon name="info" size={16} />}>
+                Impossible de charger le voyage
+              </Banner>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="menu"
+            name="OptionsMenu · DropdownMenu"
+            role="OptionsMenu : bouton ⋯ avec Modifier / Supprimer et des actions en plus (extraActions). DropdownMenu + MenuItem : pour un menu sur mesure, comme les options d'un voyage."
+          >
+            <Specimen label='OptionsMenu variant="flat" (défaut) · "ghost" (sur une bande ou dans une ligne)'>
+              <OptionsMenu onEdit={() => {}} onDelete={() => {}} />
+              <OptionsMenu
+                variant="ghost"
+                onEdit={() => {}}
+                onDelete={() => {}}
+                extraActions={[
+                  {
+                    icon: "check",
+                    label: "Choisir cet hébergement",
+                    onClick: () => {},
+                  },
+                ]}
+              />
+            </Specimen>
+            <Specimen label="DropdownMenu + MenuItem — menu sur mesure">
+              <DropdownDemo />
+            </Specimen>
+          </Section>
+
+          <Section
+            id="divider"
+            name="Divider"
+            role="Trait de séparation entre deux blocs."
+          >
+            <Specimen label='orientation="horizontal" (défaut) · "vertical"'>
+              <div className="w-full">
+                <Divider />
+              </div>
+              <Text tone="muted">Jour 1</Text>
+              <Divider orientation="vertical" />
+              <Text tone="muted">Montreux</Text>
+            </Specimen>
+          </Section>
+
+          <Section
+            id="calendrier"
+            name="DatePicker"
+            role="Choix d'une plage de dates sur deux mois (ajout d'étape, dates d'une idée)."
+          >
+            <Specimen label="mode plage">
+              <Card className="flex w-full justify-center">
+                <DatePicker selected={selected} onSelect={setSelected} />
+              </Card>
+            </Specimen>
+          </Section>
+        </main>
+      </div>
     </div>
   );
 }

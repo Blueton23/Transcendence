@@ -16,7 +16,6 @@
   --font-sans: "Archivo", ui-sans-serif, system-ui, sans-serif;
   --font-mono:
     "JetBrains Mono", ui-monospace, monospace; /* numbers, dates, amounts */
-  --font-accent: "Caveat", cursive;
 
   --text-2xs: 0.5625rem; /* 9px — xs avatar initials */
   --text-xs: 0.75rem; /* 12px — badges, mono labels, small text on mobile */
@@ -54,8 +53,6 @@
   /* Borders */
   --color-border: rgba(43, 42, 71, 0.08); /* default */
   --color-border-control: rgba(43, 42, 71, 0.12); /* inactive chips, inputs */
-  --color-border-avatar: #2b2a47;
-  --color-border-success: #b9e3cc;
   --color-border-collection: #dbceb6; /* dashed "ideas to place" border */
   --color-border-alert-dashed: #efc2b3; /* dashed "night to choose" border */
 

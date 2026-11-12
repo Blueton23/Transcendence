@@ -1,14 +1,7 @@
 import type { ReactNode } from "react";
 
 type CardVariant =
-  | "default"
-  | "accent"
-  | "success"
-  | "alert"
-  | "dashed"
-  | "dashed-accent"
-  | "accomodation"
-  | "dark";
+  "default" | "alert" | "dashed" | "dashed-accent" | "accommodation" | "dark";
 
 interface CardProps {
   children: ReactNode;
@@ -22,14 +15,12 @@ interface CardProps {
 
 const variantStyles = {
   default: "bg-surface border-transparent shadow-sm text-text",
-  accent: "bg-surface border-brand-primary/35 shadow-sm text-text",
-  success: "bg-success-bg border-border-success text-success-text",
   alert: "bg-error-bg border-transparent text-error",
   dashed:
     "bg-surface-soft border-dashed border-[1.5px] border-border-collection text-text",
   "dashed-accent":
     "bg-alert-dashed-bg border-dashed border-[1.5px] border-border-alert-dashed text-error",
-  accomodation: "bg-idea-lodging-bg border-transparent text-idea-lodging",
+  accommodation: "bg-idea-lodging-bg border-transparent text-idea-lodging",
   dark: "bg-brand-dark border-transparent text-inverse",
 };
 
