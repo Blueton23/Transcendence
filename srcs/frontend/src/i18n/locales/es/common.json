@@ -112,11 +112,11 @@
       "userIdRequired": "Se requiere el ID del usuario.",
       "user_not_found": "No se encontró al usuario."
     },
-    "myFriends": "MIS AMIGOS · {{count}}",
+    "myFriends": "Mis amigos · {{count}}",
     "noFriends": "Todavía no tienes amigos.",
     "noRequests": "No hay solicitudes de amistad pendientes.",
     "noUsersFound": "No se encontraron usuarios.",
-    "receivedRequests": "SOLICITUDES RECIBIDAS",
+    "receivedRequests": "Solicitudes recibidas",
     "remove": "Quitar",
     "removeTitle": "¿Quitar a {{username}} de tus amigos?",
     "removing": "Eliminando…",

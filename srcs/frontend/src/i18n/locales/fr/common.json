@@ -112,11 +112,11 @@
       "userIdRequired": "L'identifiant de l'utilisateur est requis.",
       "user_not_found": "Utilisateur introuvable."
     },
-    "myFriends": "MES AMIS · {{count}}",
+    "myFriends": "Mes amis · {{count}}",
     "noFriends": "Vous n'avez pas encore d'amis.",
     "noRequests": "Aucune demande d'amitié en attente.",
     "noUsersFound": "Aucun utilisateur trouvé.",
-    "receivedRequests": "DEMANDES REÇUES",
+    "receivedRequests": "Demandes reçues",
     "remove": "Retirer",
     "removeTitle": "Retirer {{username}} de vos amis ?",
     "removing": "Suppression…",

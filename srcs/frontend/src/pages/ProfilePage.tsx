@@ -13,6 +13,7 @@ import {
   useNotificationEvent,
   useNotificationSocketOpen,
 } from "../features/notifications/realtime/useNotificationSocket";
+import Heading from "@/shared/ui/Heading";
 
 function ProfilePage() {
   const [isModifyOpen, setIsModifyOpen] = useState(false);
@@ -31,37 +32,40 @@ function ProfilePage() {
   useNotificationEvent("friendship.removed", refreshFriends);
 
   return (
-    <div className="flex w-full flex-col gap-6 p-8">
-      <div className="flex w-full items-center justify-between">
-        <ProfileInfo />
-
+    <div className="flex w-full flex-col gap-3 p-4 md:gap-6">
+      <div className="flex items-center justify-between">
+        <Heading size="lg">Profile</Heading>
         <Button
           type="button"
-          variant="dark"
+          size="sm"
+          variant="outline"
           onClick={() => setIsModifyOpen(true)}
         >
           {t("profile.editProfile")}
         </Button>
       </div>
-
-      <FriendSearch />
-
-      <FriendRequests
-        refreshKey={friendsRefreshKey}
-        onFriendAccepted={refreshFriends}
-      />
-
-      <FriendList refreshKey={friendsRefreshKey} />
-
-      {isModifyOpen && (
-        <Modal
-          icon="edit"
-          title={t("profile.editProfile")}
-          onClose={() => setIsModifyOpen(false)}
-        >
-          <Modify onSuccess={() => setIsModifyOpen(false)} />
-        </Modal>
-      )}
+      <div className="flex flex-col gap-5 md:flex-row md:gap-8">
+        <div className="md:w-80 md:shrink-0">
+          <ProfileInfo />
+        </div>
+        <div className="flex min-w-0 flex-1 flex-col gap-5">
+          <FriendSearch />
+          <FriendRequests
+            refreshKey={friendsRefreshKey}
+            onFriendAccepted={refreshFriends}
+          />
+          <FriendList refreshKey={friendsRefreshKey} />
+          {isModifyOpen && (
+            <Modal
+              icon="edit"
+              title={t("profile.editProfile")}
+              onClose={() => setIsModifyOpen(false)}
+            >
+              <Modify onSuccess={() => setIsModifyOpen(false)} />
+            </Modal>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

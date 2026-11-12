@@ -112,11 +112,11 @@
       "userIdRequired": "User ID is required.",
       "user_not_found": "User not found."
     },
-    "myFriends": "MY FRIENDS · {{count}}",
+    "myFriends": "My friends · {{count}}",
     "noFriends": "You don't have any friends yet.",
     "noUsersFound": "No users found.",
     "noRequests": "No pending friend requests.",
-    "receivedRequests": "RECEIVED REQUESTS",
+    "receivedRequests": "Received requests",
     "remove": "Remove",
     "removeTitle": "Remove {{username}} from your friends?",
     "removing": "Removing…",

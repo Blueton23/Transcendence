@@ -84,11 +84,11 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-3">
-        <Text tone="muted">
-          {t("friendship.receivedRequests")} ·{" "}
-          {requests.length > 0 && requests.length}
+        <Text tone="muted" className="font-semibold">
+          {t("friendship.receivedRequests")}
+          {requests.length > 0 && ` · ${requests.length}`}
         </Text>
       </div>
 
@@ -104,10 +104,12 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
               className="flex items-center justify-between gap-4 rounded-md border border-border bg-surface p-4"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <Avatar user={request.traveler} profile />
+                <Avatar size="sm" user={request.traveler} profile />
 
                 <div className="flex min-w-0 flex-col">
-                  <Text>{request.traveler.username}</Text>
+                  <Text size="sm" className="font-semibold">
+                    {request.traveler.username}
+                  </Text>
 
                   <Text size="sm" tone="secondary">
                     {request.traveler.email}
@@ -119,7 +121,7 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
                 <IconButton
                   icon={<Icon name="check" size={16} />}
                   label={t("friendship.accept")}
-                  variant="success"
+                  variant="dark"
                   disabled={isSubmitting}
                   onClick={() => void handleAccept(request.id)}
                 />
@@ -127,7 +129,7 @@ function FriendRequests({ refreshKey, onFriendAccepted }: FriendRequestsProps) {
                 <IconButton
                   icon={<Icon name="x" size={16} />}
                   label={t("friendship.decline")}
-                  variant="danger"
+                  variant="outline"
                   disabled={isSubmitting}
                   onClick={() => void handleReject(request.id)}
                 />

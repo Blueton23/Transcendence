@@ -1,7 +1,7 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
 type IconButtonVariant =
-  "primary" | "flat" | "outline" | "ghost" | "success" | "danger";
+  "primary" | "dark" | "flat" | "outline" | "ghost" | "success" | "danger";
 
 type IconButtonSize = "xs" | "sm" | "md" | "lg";
 
@@ -14,6 +14,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles = {
   primary: "bg-brand-primary text-inverse border-transparent",
+  dark: "bg-brand-dark text-inverse border-transparent hover:bg-brand-dark/85", // main action in a row (accept)
   flat: "bg-surface-container text-muted border-transparent",
   outline: "bg-surface border-border text-text-secondary",
   ghost: "bg-transparent border-transparent text-muted",

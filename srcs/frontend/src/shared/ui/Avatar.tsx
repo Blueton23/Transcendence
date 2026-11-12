@@ -107,7 +107,7 @@ function Avatar({
           icon="user"
           onClose={() => setIsProfileOpen(false)}
         >
-          <ProfileInfo user={user ?? undefined} full />
+          <ProfileInfo user={user ?? undefined} />
         </Modal>
       )}
     </>
