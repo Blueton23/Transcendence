@@ -88,8 +88,7 @@
       "step_not_in_message_travel": "This stop does not belong to the message's trip.",
       "idea_not_in_message_travel": "This idea does not belong to the message's trip.",
       "message_empty": "The message cannot be empty.",
-      "message_too_long": "The message cannot exceed 2,000 characters.",
-      "invalidTravel": "Invalid trip ID."
+      "message_too_long": "The message cannot exceed 2,000 characters."
     }
   },
   "errors": {
