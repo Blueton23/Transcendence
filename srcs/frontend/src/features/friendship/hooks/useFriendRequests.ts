@@ -5,20 +5,23 @@ import {
 } from "@/features/notifications/realtime/useNotificationSocket";
 import { getFriendRequests } from "../api/friendship";
 import type { FriendshipRequest } from "../types";
+import i18n from "@/i18n";
+import { useError } from "@/shared/context/useError";
 
 // Friend requests received and not answered yet. Reloaded on every
 // friendship event, so the list stays live on any page.
 export function useFriendRequests() {
   const [requests, setRequests] = useState<FriendshipRequest[]>([]);
+  const { showError } = useError();
 
   const refresh = useCallback(async () => {
     try {
       const result = await getFriendRequests();
       setRequests(result.requests);
-    } catch (error) {
-      console.error("Impossible de récupérer les demandes d'amis :", error);
+    } catch {
+      showError(i18n.t("friendship.errors.requestsLoadFailed"));
     }
-  }, []);
+  }, [showError]);
 
   useNotificationSocketOpen(() => void refresh());
   useNotificationEvent("friendship.requested", () => void refresh());

@@ -3,6 +3,7 @@ import type { LongLat, Route } from "@/features/map/types";
 import type { Step } from "@/features/step/types";
 import i18n from "@/i18n";
 import { useEffect, useState } from "react";
+import { useError } from "@/shared/context/useError";
 
 function coordinates(step: Step): LongLat {
   return [Number(step.longitude), Number(step.latitude)];
@@ -11,13 +12,12 @@ function coordinates(step: Step): LongLat {
 export function useRoute(steps: Step[]) {
   const [route, setRoute] = useState<Route | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { showError } = useError();
 
   useEffect(() => {
     let cancelled = false;
     async function loadRoute() {
       setIsLoading(true);
-      setError(null);
       try {
         if (steps.length < 2) {
           if (!cancelled) setRoute(null);
@@ -60,11 +60,8 @@ export function useRoute(steps: Step[]) {
             },
           });
         }
-      } catch (err) {
-        if (!cancelled)
-          setError(
-            err instanceof Error ? err.message : i18n.t("errors.generic"),
-          );
+      } catch {
+        if (!cancelled) showError(i18n.t("step.errors.routeFailed"));
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -73,6 +70,6 @@ export function useRoute(steps: Step[]) {
     return () => {
       cancelled = true;
     };
-  }, [steps]);
-  return { route, isLoading, error };
+  }, [steps, showError]);
+  return { route, isLoading };
 }
