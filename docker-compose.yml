@@ -58,7 +58,7 @@ services:
   nginx:
     build: ./srcs/nginx
     ports:
-      - "443:443"
+      - "8443:443"
     volumes:
       - ./certs:/etc/nginx/certs:ro
       - static_data:/static:ro
