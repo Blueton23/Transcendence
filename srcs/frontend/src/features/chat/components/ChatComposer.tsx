@@ -1,10 +1,10 @@
 import { useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 
-import Button from "@/shared/ui/Button";
 import Text from "@/shared/ui/Text";
 import Icon from "@/shared/ui/Icon";
 import { useTranslation } from "react-i18next";
+import IconButton from "@/shared/ui/IconButton";
 
 interface ChatComposerProps {
   onSend: (body: string) => Promise<void>;
@@ -52,11 +52,8 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="border-t border-border bg-surface p-4"
-    >
-      <div className="flex items-center gap-3">
+    <form onSubmit={handleSubmit} className="px-4 pt-2 pb-4 md:px-5">
+      <div className="flex items-end gap-2 rounded-xl border border-border bg-surface py-1.5 pr-1.5 pl-4 shadow-sm focus-within:border-brand-primary">
         <textarea
           ref={textareaRef}
           id="chat-message"
@@ -68,19 +65,18 @@ export default function ChatComposer({ onSend }: ChatComposerProps) {
           maxLength={2000}
           disabled={isSending}
           aria-describedby={error ? "chat-message-error" : undefined}
-          className="min-h-12 min-w-0 flex-1 resize-y rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text transition-colors outline-none placeholder:text-muted focus:border-brand-primary focus:ring-1 focus:ring-brand-primary disabled:cursor-not-allowed disabled:opacity-60"
+          rows={1}
+          className="field-sizing-content max-h-40 min-w-0 flex-1 resize-none rounded-lg py-2 text-sm text-text outline-none placeholder:text-muted disabled:opacity-60"
         />
 
-        <Button
+        <IconButton
           type="submit"
           variant="primary"
+          size="md"
+          label={isSending ? t("chat.sending") : t("chat.send")}
+          icon={<Icon name="arrow" size={16} />}
           disabled={!body.trim() || isSending}
-        >
-          <span className="inline-flex items-center gap-2">
-            <Icon name="arrow" size={16} />
-            {isSending ? t("chat.sending") : t("chat.send")}
-          </span>
-        </Button>
+        />
       </div>
 
       {error && (
