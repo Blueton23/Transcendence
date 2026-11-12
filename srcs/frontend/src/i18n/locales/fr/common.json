@@ -12,7 +12,8 @@
     "options": "Options",
     "save": "Enregistrer",
     "saving": "Enregistrement...",
-    "searching": "Recherche…"
+    "searching": "Recherche…",
+    "back": "Retour"
   },
   "auth": {
     "changePassword": "Changer le mot de passe",
@@ -635,5 +636,51 @@
     "pricePerNight": "{{price}} CHF par nuit",
     "steps_one": "{{count}} étape",
     "steps_other": "{{count}} étapes"
+  },
+  "home": {
+    "tagline": "Road trip · entre amis",
+    "title": "Planifiez votre road trip,",
+    "titleHighlight": "ensemble.",
+    "subtitle": "Les étapes, les idées de chacun, les dépenses et la discussion : tout le voyage au même endroit, pour toute la bande.",
+    "signup": "Créer un compte",
+    "preview": {
+      "inDays": "Dans 10 jours",
+      "trip": "Road trip Suisse",
+      "tripInfo": "20 – 27 nov. · 7 nuits · 412 km",
+      "idea": "Chalet au bord du lac",
+      "settlement": "alee doit à chacha"
+    },
+    "featuresTitle": "Tout le voyage au même endroit",
+    "featuresSubtitle": "Fini les messages perdus, les captures d'écran et les comptes sur un bout de papier.",
+    "features": {
+      "itinerary": "Les étapes dans l'ordre de vos dates, le trajet en voiture sur la carte, et les nuits qui n'ont pas encore d'étape.",
+      "ideas": "Chacun épingle ses trouvailles, on vote d'un ❤️, puis on choisit l'hébergement de chaque nuit.",
+      "expenses": "Qui a payé quoi, la part de chacun et qui doit combien à qui, calculé pour vous.",
+      "chat": "Un fil par voyage, en direct, avec les messages non lus pour ne rien rater."
+    },
+    "stepsTitle": "Comment ça marche",
+    "steps": {
+      "create": {
+        "title": "Créez le voyage",
+        "text": "Un titre, des dates : votre road trip existe."
+      },
+      "invite": {
+        "title": "Invitez la bande",
+        "text": "Partagez le lien d'invitation, chacun rejoint en un clic."
+      },
+      "decide": {
+        "title": "Décidez ensemble",
+        "text": "Étapes, idées, votes et dépenses : tout le monde voit la même chose."
+      }
+    },
+    "ctaTitle": "Prêts à partir ?",
+    "ctaText": "Créez votre premier voyage en moins d'une minute.",
+    "project": "Projet ft_transcendence · 42"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "text": "Cette page n'existe pas ou a été déplacée.",
+    "home": "Retour à l'accueil",
+    "trips": "Retour à mes voyages"
   }
 }

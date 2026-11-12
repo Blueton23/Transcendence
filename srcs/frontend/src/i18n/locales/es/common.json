@@ -12,7 +12,8 @@
     "options": "Opciones",
     "save": "Guardar",
     "saving": "Guardando…",
-    "searching": "Buscando…"
+    "searching": "Buscando…",
+    "back": "Volver"
   },
   "auth": {
     "changePassword": "Cambiar contraseña",
@@ -635,5 +636,51 @@
     "pricePerNight": "{{price}} CHF por noche",
     "steps_one": "{{count}} etapa",
     "steps_other": "{{count}} etapas"
+  },
+  "home": {
+    "tagline": "Road trip · entre amigos",
+    "title": "Planead vuestro road trip,",
+    "titleHighlight": "juntos.",
+    "subtitle": "Las etapas, las ideas de cada uno, los gastos y el chat: todo el viaje en un mismo lugar, para todo el grupo.",
+    "signup": "Crear una cuenta",
+    "preview": {
+      "inDays": "En 10 días",
+      "trip": "Road trip por Suiza",
+      "tripInfo": "20 – 27 nov. · 7 noches · 412 km",
+      "idea": "Chalé junto al lago",
+      "settlement": "alee le debe a chacha"
+    },
+    "featuresTitle": "Todo el viaje en un mismo lugar",
+    "featuresSubtitle": "Se acabaron los mensajes perdidos, las capturas de pantalla y las cuentas en un papel.",
+    "features": {
+      "itinerary": "Las etapas en el orden de vuestras fechas, la ruta en coche en el mapa y las noches que aún no tienen etapa.",
+      "ideas": "Cada uno fija sus hallazgos, se vota con un ❤️ y luego se elige el alojamiento de cada noche.",
+      "expenses": "Quién pagó qué, la parte de cada uno y quién debe cuánto a quién, calculado por vosotros.",
+      "chat": "Un chat por viaje, en directo, con los mensajes no leídos para no perderse nada."
+    },
+    "stepsTitle": "Cómo funciona",
+    "steps": {
+      "create": {
+        "title": "Cread el viaje",
+        "text": "Un título, unas fechas: vuestro road trip ya existe."
+      },
+      "invite": {
+        "title": "Invitad al grupo",
+        "text": "Compartid el enlace de invitación, cada uno se une con un clic."
+      },
+      "decide": {
+        "title": "Decidid juntos",
+        "text": "Etapas, ideas, votos y gastos: todos ven lo mismo."
+      }
+    },
+    "ctaTitle": "¿Listos para salir?",
+    "ctaText": "Cread vuestro primer viaje en menos de un minuto.",
+    "project": "Proyecto ft_transcendence · 42"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "text": "Esta página no existe o se ha movido.",
+    "home": "Volver al inicio",
+    "trips": "Volver a mis viajes"
   }
 }
