@@ -149,7 +149,8 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 | Chat | Real-time chat per trip, unread messages | sydubois (serializers, views, frontend), scuthber (models, WebSockets, seeds); tests: both |
 | Notifications | "While you were away": unread messages, new ideas, invitations, friend requests | scuthber |
 | Profile and friends | Profile, avatar upload, friends, online status | sydubois (serializers, views, frontend), scuthber (models, seeds); tests: both |
-| Authentication | Sign up, log in, Google OAuth | dle-fur |
+| Authentication | Google OAuth | dle-fur |
+| Authentication | Sign up, log in | sydubois |
 | Public API | Secured, rate-limited, documented API | dle-fur |
 | Design system | Mockups, shared UI components and tokens, every page redesigned for desktop and mobile | chpasqui |
 | i18n | French, English, Spanish | chpasqui |
@@ -251,15 +252,13 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 
 ### Standard user management and authentication
 
-<!-- TODO(sydubois): check and complete -->
-
 | | |
 |---|---|
 | **Type** | Major · 2 pts |
 | **Members** | sydubois |
 | **Why this module** | Every trip is shared between real people: accounts, profiles and friends are the base for inviting someone and knowing who proposed or paid what. |
 | **What it does** | Sign up, log in and log out; edit the profile and the password; upload an avatar (a default one otherwise); add friends and see whether they are online; a profile page for each user. |
-| **How it is implemented** | • Django session authentication with CSRF protection (`auth/login/`, `auth/logout/`, `auth/me/`); passwords hashed by Django.<br>• Profile endpoints: `travelers/update/`, `travelers/update-password/`, `travelers/update-profile-picture/` (image stored in the media volume, served by Nginx).<br>• Friendship endpoints: search, request, accept, remove; online status shown on friends' avatars. |
+| **How it is implemented** | • Django session authentication with CSRF protection (`auth/csrf/`, `auth/login/`, `auth/logout/`, `auth/me/`); passwords hashed by Django.<br>• Profile endpoints: `travelers/create/`,`travelers/update/`, `travelers/update-password/`, `travelers/update-profile-picture/` (image stored in the media volume, served by Nginx).<br>• Friendship endpoints: `friendships/search/`,`friendships/request/`, `friendships/requests/`, `friendships/<int:friendship_id>/accept/`,`friendships/<int:friendship_id>/remove/`, `friendships/`; online status shown on friends' avatars. |
 | **How to test** | Create an account, change the avatar and the username, add a second account as a friend and log it in elsewhere: it appears online. |
 
 ---
@@ -279,8 +278,6 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 ---
 
 ### Allow users to interact (chat, profile, friends)
-
-<!-- TODO(sydubois): check and complete -->
 
 | | |
 |---|---|
@@ -467,8 +464,6 @@ done | sort | uniq -c
 
 ### Sylvain (`sydubois`)
 
-<!-- TODO(sydubois): check and complete -->
-
 **Project Manager:** followed where each member stood and organised team meetings.
 
 **Backend:** authentication and user management API, following Django and DRF standards whenever possible:
@@ -515,6 +510,7 @@ More specifically:
 - **Charlotte (chpasqui):** used Claude to explore design directions and build the mockups, to get explanations of concepts (React, Tailwind, Django), and to review code. At the very end of the project, it also generated the landing page for visitors, helped update the `/design-system` catalogue page to the final components, and sped up a few repetitive changes (translations, renaming, style harmonisation).
 - **David (dle-fur):** used AI to understand technical concepts and research information. Wrote and understood the first tests himself, then used AI to write the remaining tests following the same pattern. Also used AI to assist with code reviews.
 - **Sébastien (scuthber):** used Claude to understand concepts like websockets, help on some complex algorithms like the spending split and to help create and make sure all the tests needed were present. Also helped during code reviews.
+- **Sylvain (sydubois):** Used ChatGPT to understand technical concepts, assist with programming, debugging and testing, review code, improve translations and write documentation. All AI-assisted code was reviewed and tested before integration.
 - **Documentation:** AI helped write and structure the documentation, including this README and the files in `docs/readme/`, starting from the team's notes and the code. Each member is responsible for checking the parts that describe their own work.
 
 ---
@@ -530,3 +526,5 @@ More specifically:
 - **Steps**: a deleted step goes to the trash, but there is no screen to restore it yet.
 - **Expenses**: one currency (CHF), and a settlement is shown but cannot be marked as paid.
 - **Offline**: read-only, and the map is not available offline (Mapbox tiles cannot be cached).
+- **Error handling:** Error handling is not fully unified across all features, as different approaches were implemented during development.
+- **Profile:** Users can upload or replace their profile picture, but cannot remove it without uploading a new one.
