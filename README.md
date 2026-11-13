@@ -1,15 +1,5 @@
 _This project has been created as part of the 42 curriculum by chpasqui, dle-fur, scuthber, sydubois._
 
-<!--
-HOW TO FILL THIS FILE (delete this comment at the end)
-- Everything must be in English (subject, chapter VI).
-- Replace every `<login>` / `<...>` placeholder and every "TODO" comment.
-- Each member fills: their row in "Team Information", their features in "Features List",
-  their modules in "Modules", and their own section in "Individual Contributions".
-- Keep it short: one or two sentences per item. Long technical write-ups go in docs/readme/
-  and are linked from here.
--->
-
 # Peripl
 
 Plan a road trip with friends, all in one place.
@@ -525,6 +515,7 @@ More specifically:
 
 - **Charlotte (chpasqui):** used Claude to explore design directions and build the mockups, to get explanations of concepts (React, Tailwind, Django), and to review code. At the very end of the project, it also generated the landing page for visitors, helped update the `/design-system` catalogue page to the final components, and sped up a few repetitive changes (translations, renaming, style harmonisation).
 - **David (dle-fur):** wrote and understood the first tests himself, then used AI to write the remaining tests following the same pattern.
+- **Documentation:** AI helped write and structure the documentation, including this README and the files in `docs/readme/`, starting from the team's notes and the code. Each member is responsible for checking the parts that describe their own work.
 
 ---
 
