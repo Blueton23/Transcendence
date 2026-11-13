@@ -13,6 +13,7 @@ import Button from "@/shared/ui/Button";
 import type { Step } from "@/features/step/types";
 import type { DateRange } from "@daypicker/react";
 import { useTranslation } from "react-i18next";
+import { toErrorMessage } from "@/shared/api/errors";
 
 export interface CreateIdeaModalProps {
   travelTitle: string;
@@ -85,11 +86,8 @@ export function CreateIdeaModal({
             await onCreate(input);
             onClose();
           } catch (err) {
-            setSubmitError(
-              err instanceof Error
-                ? err.message
-                : t("idea.errors.createFailed"),
-            );
+              setSubmitError(toErrorMessage(err))
+            ;
           } finally {
             setIsSubmitting(false);
           }
