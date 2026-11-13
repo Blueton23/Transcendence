@@ -1,5 +1,5 @@
 import Heading from "@/shared/ui/Heading";
-import Badge from "@/shared/ui/Badge";
+import Tag from "@/shared/ui/Tag";
 import { useTranslation } from "react-i18next";
 
 interface ChatHeaderProps {
@@ -16,9 +16,9 @@ export default function ChatHeader({ unreadCount }: ChatHeaderProps) {
       </Heading>
 
       {unreadCount > 0 && (
-        <Badge variant="warning">
+        <Tag tone="plain" className="bg-warning-bg text-warning-text">
           {t("chat.unreadCount", { count: unreadCount })}
-        </Badge>
+        </Tag>
       )}
     </header>
   );

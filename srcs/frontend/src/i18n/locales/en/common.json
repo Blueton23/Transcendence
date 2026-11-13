@@ -12,7 +12,8 @@
     "options": "Options",
     "save": "Save",
     "saving": "Saving...",
-    "searching": "Searching…"
+    "searching": "Searching…",
+    "back": "Back"
   },
   "auth": {
     "changePassword": "Change password",
@@ -61,10 +62,18 @@
     "send": "Send",
     "system": {
       "participant_joined": "{{name}} joined the trip.",
-      "participant_left": "{{name}} left the trip."
+      "participant_left": "{{name}} left the trip.",
+      "travel_created": "{{name}} created the trip “{{title}}”.",
+      "travel_updated": "{{name}} updated the trip details.",
+      "step_created": "{{name}} added the stop {{place}}.",
+      "step_updated": "{{name}} updated the stop {{place}}.",
+      "step_deleted": "{{name}} deleted the stop {{place}}.",
+      "idea_created": "{{name}} suggested the idea “{{title}}”.",
+      "idea_updated": "{{name}} updated the idea “{{title}}”.",
+      "idea_deleted": "{{name}} deleted the idea “{{title}}”.",
+      "idea_chosen": "{{name}} chose the accommodation “{{title}}”."
     },
     "errors": {
-      "max_length": "The message is too long.",
       "loadFailed": "Unable to load the messages.",
       "markReadFailed": "Unable to mark the messages as read.",
       "unreadCountFailed": "Unable to load the number of unread messages.",
@@ -84,7 +93,8 @@
   },
   "errors": {
     "csrfMissing": "CSRF token not found.",
-    "generic": "Error",
+    "generic": "Something went wrong.",
+    "invalidTravelId": "Invalid trip ID.",
     "invalidResponse": "Invalid server response.",
     "mapbox": "Mapbox error",
     "server": "Server error.",
@@ -92,9 +102,7 @@
     "unexpected": "An error occurred.",
     "end_not_after_start": "The end date must be after the start date.",
     "not_found": "Resource not found.",
-    "required": "This field is required.",
-    "blank": "This field cannot be blank.",
-    "invalid": "Invalid value."
+    "network": "Cannot reach the server. Check your connection and try again."
   },
   "friendship": {
     "accept": "Accept",
@@ -103,7 +111,6 @@
       "cannot_accept_own_request": "You cannot accept your own friend request.",
       "cannot_friend_yourself": "You cannot send a friend request to yourself.",
       "friendship_not_found": "Friendship not found.",
-      "invalidUserId": "Invalid user ID.",
       "loadFailed": "Could not load your friends list.",
       "requestsLoadFailed": "Could not load your friend requests.",
       "missingRequestId": "Request ID missing.",
@@ -112,15 +119,13 @@
       "not_friend_request_participant": "You are not a participant in this friend request.",
       "relationship_exists": "A friendship or friend request already exists with this user.",
       "friend_request_not_found": "Friend request not found.",
-      "searchFailed": "Unable to search for users.",
-      "userIdRequired": "User ID is required.",
       "user_not_found": "User not found."
     },
-    "myFriends": "MY FRIENDS · {{count}}",
+    "myFriends": "My friends · {{count}}",
     "noFriends": "You don't have any friends yet.",
     "noUsersFound": "No users found.",
     "noRequests": "No pending friend requests.",
-    "receivedRequests": "RECEIVED REQUESTS",
+    "receivedRequests": "Received requests",
     "remove": "Remove",
     "removeTitle": "Remove {{username}} from your friends?",
     "removing": "Removing…",
@@ -129,7 +134,9 @@
     "searchPlaceholder": "Add a friend · username",
     "sending": "Sending…",
     "sendRequest": "Send a request",
-    "title": "Friends"
+    "title": "Friends",
+    "offline": "Offline",
+    "online": "Online"
   },
   "idea": {
     "addVote": "Add my vote",
@@ -152,7 +159,6 @@
       "unseenCountFailed": "Unable to load the number of new ideas.",
       "voteNotFound": "Vote status not found.",
       "voteRefreshFailed": "Your vote was saved, but the counter could not be refreshed. Reload the page to sync it.",
-
       "step_not_in_travel": "The stop must belong to the same trip as the idea.",
       "dates_outside_step": "The idea dates must be within the dates of the selected stop.",
       "price_only_for_lodging": "Only accommodation can have a price per night.",
@@ -442,9 +448,23 @@
     "email": "Email",
     "errors": {
       "email": {
-        "unique": "This email address is already in use."
+        "unique": "This email address is already in use.",
+        "max_length": "The email address cannot exceed 254 characters.",
+        "invalid": "Enter a valid email address."
       },
-      "noImage": "No image selected.",
+      "first_name": {
+        "max_length": "The first name cannot exceed 150 characters."
+      },
+      "last_name": {
+        "max_length": "The last name cannot exceed 150 characters."
+      },
+      "profile_picture": {
+        "max_size": "The profile picture must not exceed 5 MB.",
+        "invalid_image": "The selected file is not a valid image.",
+        "empty": "The selected file is empty.",
+        "invalid": "The uploaded file is invalid.",
+        "max_length": "The image filename is too long."
+      },
       "username": {
         "max_length": "Ensure this field has no more than 150 characters.",
         "invalid": "Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.",
@@ -459,7 +479,9 @@
     "signupTitle": "Create an account",
     "title": "Profile",
     "updatedAt": "Last updated:",
-    "view": "View profile"
+    "view": "View profile",
+    "online": "Online",
+    "offline": "Offline"
   },
   "pwa": {
     "offline": "You're offline: some features are unavailable"
@@ -513,9 +535,18 @@
     "saveChanges": "Save changes",
     "saving": "Saving…",
     "submitAdd": "Add the expense",
-    "wholeTravel": "Whole trip"
+    "wholeTravel": "Whole trip",
+    "total": "Trip total",
+    "yourShare": "your share: {{amount}} CHF",
+    "balances": "Balances",
+    "settlements": "Settlements",
+    "owesTo": "owes"
   },
   "step": {
+    "nightToChoose": "Night of the {{start}} to the {{end}} · to choose",
+    "noRoute": "No route by car",
+    "unplannedNights_one": "{{count}} night without a stop",
+    "unplannedNights_other": "{{count}} nights without a stop",
     "actions": "Action",
     "add": "Add a stop",
     "addExpense": "Add an expense",
@@ -534,7 +565,7 @@
       "step_dates_overlap": "The dates of this stop overlap with another stop.",
       "step_has_spending": "This stop has expenses: move or delete them first."
     },
-    "fromTo": "from {{start}} to {{end}}",
+    "fromTo": "{{start}} → {{end}}",
     "list": "List",
     "lodgedRatio": "{{lodged}}/{{total}} accommodation",
     "map": "Map",
@@ -553,6 +584,10 @@
     "totalRoute": "TOTAL · {{duration}} DRIVING · {{distance}} KM"
   },
   "travel": {
+    "emptyText": "Create your first road trip and invite your friends!",
+    "emptyTitle": "No trips yet",
+    "finished": "Finished",
+    "upcoming": "Upcoming",
     "add": "Invite",
     "added": "Invited ✓",
     "addTravel": "Add a trip",
@@ -575,15 +610,12 @@
       "invitation_refused": "This person declined the invitation.",
       "not_travel_participant": "You must be a member of this trip to perform this action.",
       "steps_before_travel_start": "Some stops start before this date: move them first.",
-      "steps_after_travel_end": "Some stops end after this date: move them first.",
-      "title": {
-        "max_length": "Title too long."
-      }
+      "steps_after_travel_end": "Some stops end after this date: move them first."
     },
     "haveInviteLink": "I have an invitation link",
     "invitation": "INVITATION TO JOIN",
     "inviteLink": "Invitation link",
-    "inviteTravelers": "Invite your travellers to plan {{title}} together",
+    "inviteTravelers": "Invite your travelers to plan the trip: {{title}}",
     "joinTravel": "Join the trip",
     "pendingInvitation": "Pending",
     "refusedInvitation": "Declined",
@@ -614,8 +646,55 @@
     "nights_one": "{{count}} night",
     "nights_other": "{{count}} nights",
     "nights_zero": "No nights",
-    "pricePerNight": "{{price}} CHF/night",
+    "perNight": "per night",
+    "pricePerNight": "{{price}} CHF per night",
     "steps_one": "{{count}} stop",
     "steps_other": "{{count}} stops"
+  },
+  "home": {
+    "tagline": "Road trip · with friends",
+    "title": "Plan your road trip,",
+    "titleHighlight": "together.",
+    "subtitle": "Steps, everyone's ideas, expenses and the chat: the whole trip in one place, for the whole group.",
+    "signup": "Create an account",
+    "preview": {
+      "inDays": "In 10 days",
+      "trip": "Swiss road trip",
+      "tripInfo": "Nov 20 – 27 · 7 nights · 412 km",
+      "idea": "Lakeside chalet",
+      "settlement": "alee owes chacha"
+    },
+    "featuresTitle": "The whole trip in one place",
+    "featuresSubtitle": "No more lost messages, screenshots and sums on a scrap of paper.",
+    "features": {
+      "itinerary": "Steps in the order of your dates, the driving route on the map, and the nights that still have no step.",
+      "ideas": "Everyone pins their finds, you vote with a ❤️, then choose the accommodation for each night.",
+      "expenses": "Who paid what, everyone's share and who owes how much to whom, worked out for you.",
+      "chat": "One live chat per trip, with unread messages so you miss nothing."
+    },
+    "stepsTitle": "How it works",
+    "steps": {
+      "create": {
+        "title": "Create the trip",
+        "text": "A title, some dates: your road trip exists."
+      },
+      "invite": {
+        "title": "Invite the group",
+        "text": "Share the invitation link, everyone joins in one click."
+      },
+      "decide": {
+        "title": "Decide together",
+        "text": "Steps, ideas, votes and expenses: everyone sees the same thing."
+      }
+    },
+    "ctaTitle": "Ready to go?",
+    "ctaText": "Create your first trip in less than a minute.",
+    "project": "ft_transcendence project · 42"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "text": "This page does not exist or has been moved.",
+    "home": "Back to the home page",
+    "trips": "Back to my trips"
   }
 }

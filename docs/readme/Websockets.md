@@ -17,7 +17,8 @@ La tuyauterie et les événements sont en place ; le catalogue complet est plus 
 | Base commune des consumers (`GroupEventConsumer`, codes de fermeture) | `srcs/backend/common/consumers.py` |
 | Socket d'un voyage (`TravelConsumer`, `ws/travels/<travel_id>/`) | `srcs/backend/travel/consumers.py` |
 | Socket personnel (`NotificationConsumer`, `ws/notifications/`) | `srcs/backend/traveler/consumers.py` |
-| Messages système du chat (`post_system_message`) | `srcs/backend/chat/services.py` |
+| Statut en ligne (`traveler_connected`, `reset_presence`) | `srcs/backend/traveler/presence.py` |
+| Messages système du chat (`post_system_message`, `announce_activity`) | `srcs/backend/chat/services.py` |
 | Tests et smoke test | `srcs/backend/config/tests.py`, `scripts/smoke.sh` |
 | `WebsocketCommunicator` pour les tests | `srcs/backend/common/testing.py` |
 | Helpers de diffusion (`broadcast`, `send_on_commit`, `travel_group`, `user_group`) | `srcs/backend/common/realtime.py` |
@@ -98,7 +99,7 @@ Deux règles qui piègent tout le monde :
 | | Gérer proprement connexion et déconnexion | Reconnexion avec backoff, rechargement à la reconnexion, retrait du groupe |
 | | Diffusion efficace des messages | Groupes via Redis, pas de boucle sur les utilisateurs |
 | Collaborative features (mineur) | Espace partagé, édition en direct | Événements idées, étapes et votes sur le socket du voyage |
-| Notification system (mineur) | Actions de création, modification et suppression | Socket personnel `user_<id>` (amitiés), messages système du chat |
+| Notification system (mineur) | Actions de création, modification et suppression | Socket personnel `user_<id>` (amitiés) ; dans le voyage, chaque création, modification et suppression (voyage, étape, idée) poste un message système dans le chat (voir « Messages d'activité ») |
 | Multi-utilisateur (obligatoire) | Pas de race conditions | Écritures REST avec contraintes en base, diffusion après commit |
 
 ## Catalogue des événements
@@ -128,3 +129,23 @@ Envoyés aux deux personnes concernées, pour que les autres onglets de celle qu
 | `friendship.requested` | `FriendshipRequestView` | `{ friendshipId }` | `ProfilePage` recharge demandes et amis |
 | `friendship.accepted` | `FriendshipAcceptView` | `{ friendshipId }` | idem |
 | `friendship.removed` | `FriendshipRemoveView` (refus, annulation ou suppression) | `{ friendshipId }` | idem |
+| `presence.changed` | `NotificationConsumer` via `traveler/presence.py`, envoyé aux amis (`ACCEPTED`) seulement | `{ travelerId, isOnline }` | `useFriendPresence` met à jour `friend.isOnline` (`FriendList`, `useFriends`) |
+
+### Statut en ligne
+
+Le socket personnel est ouvert sur toutes les pages connectées, c'est donc lui qui définit « en ligne ». `Traveler.online_connections` compte les sockets ouverts (un par onglet) ; `is_online` passe à `True` au premier et à `False` à la fermeture du dernier, et `presence.changed` n'est envoyé qu'à ces deux moments. Le compteur est modifié sous `select_for_update` pour que deux onglets ouverts en même temps ne ratent pas la transition.
+
+Un processus qui plante ne déclenche pas les `disconnect` de ses sockets : `entrypoint.sh` lance donc `manage.py reset_presence` avant Uvicorn, qui remet tout le monde hors ligne. Les clients se reconnectent ensuite d'eux-mêmes.
+
+### Messages d'activité dans le chat
+
+Chaque création, modification et suppression faite dans un voyage est notée dans son chat par `announce_activity(travel_id, user, key, params)` (`chat/services.py`). C'est un message système (`is_system=True`, sans auteur) : il est enregistré, donc visible par ceux qui n'étaient pas connectés, et diffusé en `chat.message` juste après l'événement de l'action. `params` contient toujours `name` (qui a fait l'action), plus de quoi décrire l'objet. Le texte est traduit côté frontend depuis `chat.system.<key>` (`ChatSystemMessage`).
+
+| `system_key` | Envoyé par | `params` en plus de `name` |
+|---|---|---|
+| `participant_joined` / `participant_left` | `TravelJoinView`, `LeaveTravelView` | aucun |
+| `travel_created` / `travel_updated` | `TravelListView`, `TravelDetailView` | `title` |
+| `step_created` / `step_updated` / `step_deleted` | `StepListView`, `StepDetailView` | `place` (pour `step_updated`, le nom d'avant la modification) |
+| `idea_created` / `idea_updated` / `idea_deleted` / `idea_chosen` | `IdeaListView`, `IdeaDetailView`, `IdeaChoiceView` | `title` (pour `idea_updated`, le titre d'avant la modification) |
+
+Les dépenses et les votes (`reaction.*`) ne postent rien : choix de l'équipe, ce serait du bruit dans le chat. Pour ajouter une action : une valeur dans `SystemMessageKey` (puis `make makemigrations`), un appel à `announce_activity` après le `broadcast` de la vue, et la traduction dans les trois `common.json`.

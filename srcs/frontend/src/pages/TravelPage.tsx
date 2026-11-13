@@ -15,6 +15,9 @@ import Text from "@/shared/ui/Text";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useInvitationNotifications } from "@/features/travel/hooks/useInvitationNotifications";
+import { toApiDateString } from "@/shared/utils/dates";
+import { FinishedTravelList } from "@/features/travel/components/FinishedTravelList";
+import Card from "@/shared/ui/Card";
 
 function TravelPage() {
   const { travels, isLoading, error, refetch } = useTravels();
@@ -33,10 +36,15 @@ function TravelPage() {
   if (isLoading) return null;
   if (error)
     return (
-      <Text tone="accent" className="p-4">
+      <Text tone="accent" className="whitespace-pre-line">
         {error}
       </Text>
     );
+
+  const today = toApiDateString(new Date());
+  const others = travels.filter((travel) => travel.id !== nextTravel?.id);
+  const upcoming = others.filter((travel) => travel.endDate >= today);
+  const finished = others.filter((travel) => travel.endDate < today);
 
   return (
     <div className="flex flex-col gap-4 p-4 md:p-8">
@@ -50,23 +58,48 @@ function TravelPage() {
           {t("travel.newTravel")}
         </Button>
       </div>
-      {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
-      <NotificationsCard
-        travels={travelNotifications}
-        travelsError={notificationsError}
-        friendRequests={friendRequests}
-        invitations={invitationNotifications}
-        invitationsError={InvitationNotificationsError}
-      />
-      <TravelList
-        travels={travels.filter((t) => t.id !== nextTravel?.id)}
-        onAdd={() => setNewTravelOpen(true)}
-      />
+      <div
+        className={`grid grid-cols-1 gap-4 ${nextTravel ? "md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]" : ""}`}
+      >
+        {nextTravel && <CurrentTripCard travel={nextTravel} route={route} />}
+        <NotificationsCard
+          travels={travelNotifications}
+          travelsError={notificationsError}
+          friendRequests={friendRequests}
+          invitations={invitationNotifications}
+          invitationsError={InvitationNotificationsError}
+        />
+      </div>
+      {upcoming.length > 0 && (
+        <Heading size="sm">{t("travel.upcoming")}</Heading>
+      )}
+      <TravelList travels={upcoming} onChange={refetch} />
+
+      {finished.length > 0 && (
+        <>
+          <Heading size="sm" className="text-text-secondary!">
+            {t("travel.finished")}
+          </Heading>
+          <FinishedTravelList travels={finished} onChange={refetch} />
+        </>
+      )}
       {newTravelOpen && (
         <NewTravelModal
           onClose={() => setNewTravelOpen(false)}
           refetch={refetch}
         />
+      )}
+      {travels.length === 0 && (
+        <Card
+          variant="dashed"
+          interactive
+          onClick={() => setNewTravelOpen(true)}
+          className="flex flex-col items-center gap-2 py-10 text-center"
+        >
+          <Icon name="van" size={28} className="text-muted" />
+          <Heading size="sm">{t("travel.emptyTitle")}</Heading>
+          <Text tone="secondary">{t("travel.emptyText")}</Text>
+        </Card>
       )}
     </div>
   );

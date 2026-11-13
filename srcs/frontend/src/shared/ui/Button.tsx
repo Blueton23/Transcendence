@@ -1,9 +1,9 @@
 import type { ReactNode, ButtonHTMLAttributes } from "react";
 
 type ButtonVariant =
-  "primary" | "dark" | "outline" | "danger" | "ghost" | "success";
+  "primary" | "dark" | "outline" | "danger" | "ghost" | "white" | "voted";
 
-type ButtonSize = "sm" | "md";
+type ButtonSize = "xs" | "sm" | "md";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
@@ -18,10 +18,12 @@ const variantStyles = {
   outline: "bg-surface border border-border text-text",
   danger: "bg-error text-inverse border-transparent",
   ghost: "bg-transparent text-text",
-  success: "bg-success text-inverse border-transparent",
+  voted: "text-brand-primary", // voted heart in a step detail row
+  white: "bg-surface border border-border text-brand-primary", // voted heart on an idea card
 };
 
 const sizeStyles = {
+  xs: "text-xs px-3 py-1.5",
   sm: "text-xs px-3 py-2 md:px-5 md:py-3 md:text-sm",
   md: "px-5 py-3 text-sm",
 };

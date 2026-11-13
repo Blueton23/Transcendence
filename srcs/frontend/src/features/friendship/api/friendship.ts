@@ -19,6 +19,7 @@ export async function searchFriend(
     {
       method: "GET",
       credentials: "include",
+      headers: { "Accept-Language": i18n.language },
     },
   );
 
@@ -53,6 +54,7 @@ export async function getFriendRequests(): Promise<FriendshipRequestsResponse> {
   const response = await fetch(`${API_BASE_URL}/friendships/requests/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<FriendshipRequestsResponse>(response);
@@ -104,6 +106,7 @@ export async function getFriends(): Promise<FriendshipListResponse> {
   const response = await fetch(`${API_BASE_URL}/friendships/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<FriendshipListResponse>(response);

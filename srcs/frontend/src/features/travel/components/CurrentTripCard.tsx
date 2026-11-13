@@ -22,7 +22,7 @@ export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
   const { t } = useTranslation();
   return (
     <>
-      <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-8">
+      <div className="relative flex flex-col gap-3 rounded-md bg-linear-to-br from-[#3A3760] via-[#2B2A47] to-[#211F3A] p-5 md:p-8">
         <Tag
           tone="inverse"
           className="self-start bg-brand-primary! font-semibold"
@@ -32,7 +32,7 @@ export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
         <Heading size="lg" className="text-inverse!">
           {travel.title}
         </Heading>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Tag icon={<Icon name="cal" size={14} />} tone="inverse">
             {dateLabels}
           </Tag>

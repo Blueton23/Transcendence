@@ -69,7 +69,13 @@ export function IdeasPage() {
   }
 
   if (error || errorSteps || errorTravel) {
-    return <Text>{error || errorSteps || errorTravel}</Text>;
+    return (
+      <div role="alert" className="p-4">
+        <Text tone="accent" className="whitespace-pre-line">
+          {error || errorSteps || errorTravel}
+        </Text>
+      </div>
+    );
   }
 
   if (!travel) {
@@ -100,9 +106,9 @@ export function IdeasPage() {
           onChange={setStepActiveFilter}
         />
       </div>
-      <div className="flex flex-col gap-3">
+      <div className="mt-6 grid gap-4 md:grid-cols-[repeat(auto-fill,minmax(18rem,1fr))]">
         {filteredIdeas.length === 0 && (
-          <Text tone="muted">
+          <Text tone="muted" className="col-span-full">
             {ideas.length === 0 ? t("idea.page.empty") : t("idea.page.noMatch")}
           </Text>
         )}

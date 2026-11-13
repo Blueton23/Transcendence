@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 type TextTone = "primary" | "secondary" | "muted" | "success" | "accent";
-type TextSize = "sm" | "md";
+type TextSize = "sm" | "md" | "lg" | "xl";
 type TextFont = "sans" | "mono";
 
 interface TextProps {
@@ -21,9 +21,13 @@ const toneStyles = {
   accent: "text-error",
 };
 
+// sm: secondary info (author, step, percentage) · md: body text
+// lg: amounts in cards and rows · xl: key figure (trip total)
 const sizeStyles = {
   sm: "text-xs md:text-sm",
   md: "text-xs md:text-md",
+  lg: "text-md md:text-base",
+  xl: "text-lg md:text-xl",
 };
 
 const fontStyles = {

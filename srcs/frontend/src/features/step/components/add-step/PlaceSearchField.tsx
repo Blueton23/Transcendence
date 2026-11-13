@@ -4,6 +4,7 @@ import {
   type ChangeEventHandler,
   type FocusEventHandler,
   type KeyboardEventHandler,
+  type RefObject,
 } from "react";
 import IconButton from "@/shared/ui/IconButton";
 import { useTranslation } from "react-i18next";
@@ -17,6 +18,7 @@ interface PlaceSearchFieldProps {
   onFocus: FocusEventHandler<HTMLInputElement>;
   onCalendarClick?: () => void;
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
+  inputRef?: RefObject<HTMLInputElement | null>;
 }
 
 const variantStyle = {
@@ -33,6 +35,7 @@ export function PlaceSearchField({
   onFocus,
   onCalendarClick,
   onKeyDown,
+  inputRef,
 }: PlaceSearchFieldProps) {
   const { t } = useTranslation();
   return (
@@ -48,6 +51,7 @@ export function PlaceSearchField({
         className="flex-1 text-sm text-text outline-none placeholder:text-muted"
         placeholder={t("step.placePlaceholder")}
         onKeyDown={onKeyDown}
+        ref={inputRef}
       ></input>
       {onCalendarClick && (
         <>

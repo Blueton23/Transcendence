@@ -10,6 +10,7 @@ import { useAuth } from "@/features/auth/context/useAuth";
 import ModifyPassword from "./ModifyPassword";
 import ProfilePicture from "./ProfilePicture";
 import { useTranslation } from "react-i18next";
+import Text from "@/shared/ui/Text";
 
 interface ModifyProps {
   onSuccess: () => void;
@@ -130,9 +131,15 @@ function Modify({ onSuccess }: ModifyProps) {
 
         {/* Erreur */}
         {error && (
-          <p className="text-sm font-medium whitespace-pre-line text-red-500">
-            {error}
-          </p>
+          <div role="alert">
+            <Text
+              tone="accent"
+              size="sm"
+              className="font-medium whitespace-pre-line"
+            >
+              {error}
+            </Text>
+          </div>
         )}
       </form>
 

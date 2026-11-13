@@ -1,8 +1,9 @@
-import IconBadge from "@/shared/ui/IconBadge";
 import Heading from "@/shared/ui/Heading";
-import Text from "@/shared/ui/Text";
 import type { Step } from "@/features/step/types";
 import { useTranslation } from "react-i18next";
+import Card from "@/shared/ui/Card";
+import Tag from "@/shared/ui/Tag";
+import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
 
 interface StepInfoProps {
   step: Step;
@@ -12,21 +13,18 @@ interface StepInfoProps {
 export function StepInfo({ step, dateLabel }: StepInfoProps) {
   const { t } = useTranslation();
   return (
-    <div>
-      <div className="flex items-center gap-4">
-        <IconBadge name="pin" />
-        <div className="flex flex-col">
-          <Heading level={1} size="sm">
-            {step.localisation}
-          </Heading>
-          <Text font="mono" tone="muted" size="sm">
-            {dateLabel} ·{" "}
-            <span className="uppercase">
-              {t("units.nights", { count: step.nights })}
-            </span>
-          </Text>
-        </div>
-      </div>
-    </div>
+    <Card
+      band={
+        <>
+          <Tag tone="light">{dateLabel}</Tag>
+          <Tag tone="light">{t("units.nights", { count: step.nights })}</Tag>
+        </>
+      }
+      bandClassName={getTravelBandColor(step.travelId)}
+    >
+      <Heading level={1} size="lg">
+        {step.localisation}
+      </Heading>
+    </Card>
   );
 }

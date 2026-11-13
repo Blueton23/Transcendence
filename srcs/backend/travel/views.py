@@ -17,7 +17,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from chat.models import Message, SystemMessageKey
-from chat.services import post_system_message
+from chat.services import announce_activity, post_system_message
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group, user_group
 from idea.models import Idea
@@ -182,6 +182,12 @@ class TravelListView(PublicApiMixin, ParticipantScopedMixin, ListCreateAPIView):
                 travel=travel,
                 status=ParticipationStatus.ACCEPTED,
             )
+            announce_activity(
+                travel.id,
+                self.request.user,
+                SystemMessageKey.TRAVEL_CREATED,
+                {"title": travel.title},
+            )
 
 
 @extend_schema(tags=["Travels"])
@@ -195,10 +201,20 @@ class TravelDetailView(PublicApiMixin, ParticipantScopedMixin, RetrieveUpdateAPI
         broadcast(
             travel_group(travel.id), "travel.updated", TravelSerializer(travel).data
         )
+        announce_activity(
+            travel.id,
+            self.request.user,
+            SystemMessageKey.TRAVEL_UPDATED,
+            {"title": travel.title},
+        )
 
 
 def broadcast_step(event_type, step):
     broadcast(travel_group(step.travel_id), event_type, StepSerializer(step).data)
+
+
+def announce_step(user, key, step):
+    announce_activity(step.travel_id, user, key, {"place": step.localisation})
 
 
 @extend_schema(tags=["Steps"])
@@ -212,9 +228,9 @@ class StepListView(PublicApiMixin, ListCreateAPIView):
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
     def perform_create(self, serializer):
-        broadcast_step(
-            "step.created", serializer.save(travel_id=self.kwargs["travel_id"])
-        )
+        step = serializer.save(travel_id=self.kwargs["travel_id"])
+        broadcast_step("step.created", step)
+        announce_step(self.request.user, SystemMessageKey.STEP_CREATED, step)
 
 
 @extend_schema(tags=["Steps"])
@@ -230,7 +246,15 @@ class StepDetailView(
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
     def perform_update(self, serializer):
-        broadcast_step("step.updated", serializer.save())
+        previous_place = serializer.instance.localisation
+        step = serializer.save()
+        broadcast_step("step.updated", step)
+        announce_activity(
+            step.travel_id,
+            self.request.user,
+            SystemMessageKey.STEP_UPDATED,
+            {"place": previous_place},
+        )
 
     def perform_destroy(self, instance):
         if instance.spendings.exists():
@@ -241,6 +265,7 @@ class StepDetailView(
         instance.soft_delete()
         # Ideas placed on this step go back to the pool: clients refetch them.
         broadcast(travel_group(instance.travel_id), "step.deleted", {"id": instance.id})
+        announce_step(self.request.user, SystemMessageKey.STEP_DELETED, instance)
         # TODO: message system a rajouter dans la chat + bouton "restaurer"une fois l-app chat prete
 
 

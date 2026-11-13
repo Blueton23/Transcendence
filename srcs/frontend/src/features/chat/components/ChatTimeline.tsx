@@ -9,11 +9,14 @@ import ChatUserMessage from "./ChatUserMessage";
 import ChatSystemMessage from "./ChatSystemMessage";
 import UnreadSeparator from "./ChatUnreadSeparator";
 import { useTranslation } from "react-i18next";
+import type { TravelerSummary } from "@/features/travel/types";
+import { getAvatarColor } from "@/shared/utils/getAvatarColors";
 
 interface ChatTimelineProps {
   messages: ChatMessage[];
   isLoading: boolean;
   error: string | null;
+  travelers: TravelerSummary[];
 }
 
 function getDayKey(date: string) {
@@ -25,6 +28,7 @@ export default function ChatTimeline({
   messages,
   isLoading,
   error,
+  travelers,
 }: ChatTimelineProps) {
   const { currentUser } = useAuth();
   const { t } = useTranslation();
@@ -74,6 +78,11 @@ export default function ChatTimeline({
               <ChatUserMessage
                 message={message}
                 currentUserId={currentUser?.id ?? null}
+                color={
+                  message.traveler === null
+                    ? "pending"
+                    : getAvatarColor(travelers, message.traveler)
+                }
               />
             )}
           </Fragment>

@@ -1,6 +1,8 @@
-import type { IdeaFilter } from "@/features/idea/types";
+import { ideaTypes, type IdeaFilter } from "@/features/idea/types";
+import { dotColors } from "@/shared/utils/dotColors";
+import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
 import Chip from "@/shared/ui/Chip";
-import Icon from "@/shared/ui/Icon";
+import Dot from "@/shared/ui/Dot";
 import { useTranslation } from "react-i18next";
 
 interface IdeaTypeFilterProps {
@@ -19,37 +21,16 @@ export function IdeaTypeFilter({
         {t("idea.filters.allTypes")}
       </Chip>
 
-      <Chip
-        active={typeActiveFilter === "restaurant"}
-        onClick={() => onChange("restaurant")}
-        icon={<Icon name="fork" size={18} />}
-      >
-        {t("idea.types.restaurant")}
-      </Chip>
-
-      <Chip
-        active={typeActiveFilter === "accommodation"}
-        onClick={() => onChange("accommodation")}
-        icon={<Icon name="bed" size={18} />}
-      >
-        {t("idea.types.accommodation")}
-      </Chip>
-
-      <Chip
-        active={typeActiveFilter === "activity"}
-        onClick={() => onChange("activity")}
-        icon={<Icon name="mtn" size={18} />}
-      >
-        {t("idea.types.activity")}
-      </Chip>
-
-      <Chip
-        active={typeActiveFilter === "sightseeing"}
-        onClick={() => onChange("sightseeing")}
-        icon={<Icon name="pin" size={18} />}
-      >
-        {t("idea.types.sightseeing")}
-      </Chip>
+      {ideaTypes.map((type) => (
+        <Chip
+          key={type}
+          active={typeActiveFilter === type}
+          onClick={() => onChange(type)}
+          icon={<Dot className={dotColors[type]} />}
+        >
+          {t(ideaTypeLabels[type])}
+        </Chip>
+      ))}
     </div>
   );
 }

@@ -64,7 +64,7 @@ function Signup() {
     <div className="w-full">
       {/* Header */}
       <div className="flex flex-col items-center gap-2 text-center">
-        <IconBadge color="purple" name="mtn" />
+        <IconBadge color="purple" name="van" />
 
         <Heading level={1} size="lg">
           {t("profile.signupTitle")}
@@ -184,7 +184,17 @@ function Signup() {
         </label>
 
         {/* Erreur */}
-        {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+        {error && (
+          <div role="alert">
+            <Text
+              tone="accent"
+              size="sm"
+              className="font-medium whitespace-pre-line"
+            >
+              {error}
+            </Text>
+          </div>
+        )}
 
         {/* Bouton */}
         <div className="mt-3">
@@ -197,20 +207,21 @@ function Signup() {
             {isSubmitting ? t("auth.creating") : t("auth.createAccount")}
           </Button>
         </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          icon={<Icon name="google" size={18} />}
+          onClick={() => {
+            window.location.href = "/api/auth/google/";
+          }}
+        >
+          {t("auth.continueWithGoogle")}
+        </Button>
+
         {/* Lien vers la connexion */}
         <div className="flex items-center justify-center gap-1 text-sm">
           <Text tone="muted">{t("profile.alreadyAccount")}</Text>
-
-          {/* Lien vers Google */}
-          <Button
-            type="button"
-            onClick={() => {
-              window.location.href = "/api/auth/google/";
-            }}
-            className="border-none bg-transparent font-medium text-brand-primary! shadow-none outline-none hover:bg-transparent hover:underline"
-          >
-            {t("auth.continueWithGoogle")}
-          </Button>
 
           <button
             type="button"

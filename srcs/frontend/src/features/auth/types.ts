@@ -16,5 +16,5 @@ export interface LoginData {
 }
 
 export interface AuthResponse {
-  traveler: User;
+  traveler: User | null;
 }

@@ -9,6 +9,7 @@ export async function getSteps(travelId: number): Promise<Step[]> {
   const response = await fetch(`${API_BASE_URL}/travels/${travelId}/steps/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<Step[]>(response);
@@ -30,6 +31,7 @@ export async function createStep(
     headers: {
       "Content-Type": "application/json",
       "X-CSRFToken": csrfToken,
+      "Accept-Language": i18n.language,
     },
     body: JSON.stringify(data),
   });
@@ -56,6 +58,7 @@ export async function updateStep(
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
       body: JSON.stringify(data),
     },
@@ -81,11 +84,10 @@ export async function deleteStep(
       credentials: "include",
       headers: {
         "X-CSRFToken": csrfToken,
+        "Accept-Language": i18n.language,
       },
     },
   );
 
-  if (!response.ok) {
-    await parseResponse<unknown>(response);
-  }
+  await parseResponse<void>(response);
 }

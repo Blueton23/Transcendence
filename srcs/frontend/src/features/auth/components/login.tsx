@@ -57,7 +57,7 @@ function Login() {
         <Card variant="default">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
-              <IconBadge color="purple" name="mtn" />
+              <IconBadge color="purple" name="van" />
               <Heading level={1} size="lg">
                 {t("auth.welcomeBack")}
               </Heading>
@@ -122,7 +122,11 @@ function Login() {
               </div>
             </div>
 
-            {errorMessage && <Text tone="accent">{errorMessage}</Text>}
+            {errorMessage && (
+              <Text tone="accent" className="whitespace-pre-line">
+                {errorMessage}
+              </Text>
+            )}
 
             <Button type="submit" variant="primary" disabled={isSubmitting}>
               {isSubmitting ? t("auth.logginIn") : t("auth.login")}
@@ -130,7 +134,8 @@ function Login() {
 
             <Button
               type="button"
-              variant="primary"
+              variant="outline"
+              icon={<Icon name="google" size={18} />}
               onClick={() => {
                 window.location.href = "/api/auth/google/";
               }}

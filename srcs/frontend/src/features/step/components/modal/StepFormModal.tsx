@@ -46,7 +46,7 @@ export function StepFormModal({
   return (
     <Modal
       icon="pinplus"
-      title={step ? t("step.edit") : "Ajouter une etape"}
+      title={step ? t("step.edit") : t("step.add")}
       onClose={onClose}
       size="narrow"
     >
@@ -115,7 +115,11 @@ export function StepFormModal({
               ? t("step.saveChanges")
               : t("step.addStep")}
         </Button>
-        {form.error && <Text tone="accent">{form.error}</Text>}
+        {form.error && (
+          <Text tone="accent" className="whitespace-pre-line">
+            {form.error}
+          </Text>
+        )}
       </div>
     </Modal>
   );

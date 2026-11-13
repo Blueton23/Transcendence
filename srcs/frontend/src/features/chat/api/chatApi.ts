@@ -13,6 +13,7 @@ export async function getMessages(travelId: number): Promise<ApiChatMessage[]> {
   const response = await fetch(`${API_BASE_URL}/${travelId}/messages/`, {
     method: "GET",
     credentials: "include",
+    headers: { "Accept-Language": i18n.language },
   });
 
   return parseResponse<ApiChatMessage[]>(response);
@@ -50,6 +51,7 @@ export async function getUnreadCount(
     {
       method: "GET",
       credentials: "include",
+      headers: { "Accept-Language": i18n.language },
     },
   );
 

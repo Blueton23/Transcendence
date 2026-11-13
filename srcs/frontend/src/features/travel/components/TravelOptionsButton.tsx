@@ -8,11 +8,27 @@ import DropdownMenu from "@/shared/ui/DropdownMenu";
 import Icon from "@/shared/ui/Icon";
 import IconButton from "@/shared/ui/IconButton";
 import MenuItem from "@/shared/ui/MenuItem";
+import Text from "@/shared/ui/Text";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
-export function TravelOptionsButton({ travel }: { travel: Travel }) {
+interface TravelOptionsButtonProps {
+  travel: Travel;
+  variant?: "dark" | "light";
+  onLeave?: () => void;
+}
+
+const buttonStyles = {
+  dark: "border-white/16! bg-white/12! text-inverse!",
+  light: "border-transparent! bg-surface-control/40! text-text!",
+};
+
+export function TravelOptionsButton({
+  travel,
+  variant = "dark",
+  onLeave,
+}: TravelOptionsButtonProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
@@ -24,17 +40,17 @@ export function TravelOptionsButton({ travel }: { travel: Travel }) {
 
   const handleOnSubmit = async () => {
     const result = await submit();
-    if (result.success) navigate("/travel");
+    if (!result.success) return;
+    if (onLeave) onLeave();
+    else navigate("/travel");
   };
-
-  if (error) return <p>{error}</p>;
 
   return (
     <div className="relative" onClick={(e) => e.stopPropagation()}>
       <IconButton
         icon={<Icon name="dots" size={16} />}
         label={t("actions.options")}
-        className="border-white/16! bg-white/12! text-inverse!"
+        className={buttonStyles[variant]}
         onClick={() => setIsOpen((v) => !v)}
         onMouseDown={(e) => e.stopPropagation()}
       />
@@ -90,6 +106,13 @@ export function TravelOptionsButton({ travel }: { travel: Travel }) {
           travel={travel}
           onClose={() => setIsManageOpen(false)}
         />
+      )}
+      {error && (
+        <div role="alert">
+          <Text tone="accent" className="whitespace-pre-line">
+            {error}
+          </Text>
+        </div>
       )}
     </div>
   );

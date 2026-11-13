@@ -15,6 +15,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from chat.models import SystemMessageKey
+from chat.services import announce_activity
 from common.mixins import PublicApiMixin
 from common.realtime import broadcast, travel_group
 from idea.models import Idea, Reaction
@@ -34,6 +36,10 @@ def broadcast_idea(event_type, idea):
     # "voted" depends on who reads it: each client keeps its own value.
     del payload["voted"]
     broadcast(travel_group(idea.travel_id), event_type, payload)
+
+
+def announce_idea(user, key, idea):
+    announce_activity(idea.travel_id, user, key, {"title": idea.title})
 
 
 # Liste plusieurs objets (GET, POST)
@@ -70,6 +76,7 @@ class IdeaListView(PublicApiMixin, ListCreateAPIView):
             traveler=self.request.user,
         )
         broadcast_idea("idea.created", idea)
+        announce_idea(self.request.user, SystemMessageKey.IDEA_CREATED, idea)
         notify_travel_activity(idea.travel_id, self.request.user.id)
 
 
@@ -90,13 +97,22 @@ class IdeaDetailView(
         return super().get_queryset().filter(travel_id=self.kwargs["travel_id"])
 
     def perform_update(self, serializer):
-        broadcast_idea("idea.updated", serializer.save())
+        previous_title = serializer.instance.title
+        idea = serializer.save()
+        broadcast_idea("idea.updated", idea)
+        announce_activity(
+            idea.travel_id,
+            self.request.user,
+            SystemMessageKey.IDEA_UPDATED,
+            {"title": previous_title},
+        )
 
     def perform_destroy(self, instance):
         payload = {"id": instance.id}
         travel_id = instance.travel_id
         instance.delete()
         broadcast(travel_group(travel_id), "idea.deleted", payload)
+        announce_idea(self.request.user, SystemMessageKey.IDEA_DELETED, instance)
         # An unseen idea may be gone: the others' counts have to reload.
         notify_travel_activity(travel_id, self.request.user.id)
 
@@ -140,6 +156,7 @@ class IdeaChoiceView(ParticipantScopedMixin, GenericAPIView):
                 chosen_at=timezone.now(),
             )
             broadcast_idea("idea.updated", idea)
+            announce_idea(request.user, SystemMessageKey.IDEA_CHOSEN, idea)
 
         return Response(
             self.get_serializer(idea).data,

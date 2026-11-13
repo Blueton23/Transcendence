@@ -26,6 +26,11 @@ from common.testing import BroadcastListenerMixin, WebsocketCommunicator
 from config.asgi import application
 from traveler.consumers import NotificationConsumer
 from traveler.models import Friendship, Status, Traveler
+from traveler.presence import (
+    reset_presence,
+    traveler_connected,
+    traveler_disconnected,
+)
 from traveler.serializers import (
     TravelerCreateSerializer,
     TravelerSerializer,
@@ -696,10 +701,11 @@ class TravelerApiTest(APITestCase):
             1,
         )
 
-    def test_me_requires_authentication(self):
+    def test_me_returns_null_when_unauthenticated(self):
         response = self.client.get(reverse("auth-me"))
 
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data["traveler"])
 
     def test_me_returns_authenticated_traveler(self):
         self.client.force_authenticate(user=self.traveler)
@@ -1708,6 +1714,164 @@ class NotificationConsumerTest(TransactionTestCase):
         self.assertTrue(connected)
         self.assertTrue(await communicator.receive_nothing(timeout=0.2))
         await communicator.disconnect()
+
+
+class PresenceTest(BroadcastListenerMixin, TestCase):
+    def setUp(self):
+        self.alice = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="Password123!"
+        )
+        self.bob = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="Password123!"
+        )
+        self.carol = Traveler.objects.create_user(
+            username="carol", email="carol@example.com", password="Password123!"
+        )
+        Friendship.objects.create(
+            user1=self.alice,
+            user2=self.bob,
+            requested_by=self.alice,
+            status=Status.ACCEPTED,
+        )
+        # Pending: carol is not a friend yet and must not be told.
+        Friendship.objects.create(
+            user1=self.alice,
+            user2=self.carol,
+            requested_by=self.carol,
+            status=Status.PENDING,
+        )
+
+    def run_presence(self, action):
+        with self.captureOnCommitCallbacks(execute=True) as callbacks:
+            action(self.alice.pk)
+        self.alice.refresh_from_db()
+        return callbacks
+
+    def test_first_connection_sets_online_and_notifies_friends(self):
+        self.listen_to(user_group(self.bob.pk))
+
+        self.run_presence(traveler_connected)
+
+        self.assertTrue(self.alice.is_online)
+        self.assertEqual(self.alice.online_connections, 1)
+        self.assertEqual(
+            self.receive_event(),
+            {
+                "type": "presence.changed",
+                "payload": {"travelerId": self.alice.pk, "isOnline": True},
+            },
+        )
+
+    def test_pending_friend_is_not_notified(self):
+        self.listen_to(user_group(self.carol.pk))
+
+        callbacks = self.run_presence(traveler_connected)
+
+        self.assertEqual(len(callbacks), 1)  # bob only
+
+    def test_second_tab_does_not_notify(self):
+        self.run_presence(traveler_connected)
+
+        callbacks = self.run_presence(traveler_connected)
+
+        self.assertEqual(self.alice.online_connections, 2)
+        self.assertTrue(self.alice.is_online)
+        self.assertEqual(callbacks, [])
+
+    def test_stays_online_until_last_tab_closes(self):
+        self.run_presence(traveler_connected)
+        self.run_presence(traveler_connected)
+
+        callbacks = self.run_presence(traveler_disconnected)
+        self.assertTrue(self.alice.is_online)
+        self.assertEqual(callbacks, [])
+
+        self.listen_to(user_group(self.bob.pk))
+        self.run_presence(traveler_disconnected)
+        self.assertFalse(self.alice.is_online)
+        self.assertEqual(self.alice.online_connections, 0)
+        self.assertEqual(
+            self.receive_event()["payload"],
+            {"travelerId": self.alice.pk, "isOnline": False},
+        )
+
+    def test_disconnect_never_goes_below_zero(self):
+        callbacks = self.run_presence(traveler_disconnected)
+
+        self.assertEqual(self.alice.online_connections, 0)
+        self.assertFalse(self.alice.is_online)
+        self.assertEqual(callbacks, [])
+
+    def test_reset_marks_everyone_offline(self):
+        Traveler.objects.filter(pk=self.alice.pk).update(
+            is_online=True, online_connections=3
+        )
+
+        self.assertEqual(reset_presence(), 1)
+
+        self.alice.refresh_from_db()
+        self.assertFalse(self.alice.is_online)
+        self.assertEqual(self.alice.online_connections, 0)
+
+
+class PresenceConsumerTest(TransactionTestCase):
+    """The notification socket drives presence."""
+
+    def setUp(self):
+        self.alice = Traveler.objects.create_user(
+            username="alice", email="alice@example.com", password="Password123!"
+        )
+        self.bob = Traveler.objects.create_user(
+            username="bob", email="bob@example.com", password="Password123!"
+        )
+        Friendship.objects.create(
+            user1=self.alice,
+            user2=self.bob,
+            requested_by=self.alice,
+            status=Status.ACCEPTED,
+        )
+
+    def communicator(self, user):
+        return WebsocketCommunicator(
+            NotificationConsumer.as_asgi(), "/ws/notifications/", scope={"user": user}
+        )
+
+    async def refreshed_alice(self):
+        await sync_to_async(self.alice.refresh_from_db)()
+        return self.alice
+
+    async def test_friend_sees_traveler_come_online_and_leave(self):
+        bob_socket = self.communicator(self.bob)
+        await bob_socket.connect()
+
+        alice_socket = self.communicator(self.alice)
+        await alice_socket.connect()
+        self.assertTrue((await self.refreshed_alice()).is_online)
+        self.assertEqual(
+            await bob_socket.receive_json_from(),
+            {
+                "type": "presence.changed",
+                "payload": {"travelerId": self.alice.pk, "isOnline": True},
+            },
+        )
+
+        await alice_socket.disconnect()
+        self.assertFalse((await self.refreshed_alice()).is_online)
+        self.assertEqual(
+            (await bob_socket.receive_json_from())["payload"],
+            {"travelerId": self.alice.pk, "isOnline": False},
+        )
+        await bob_socket.disconnect()
+
+    async def test_anonymous_socket_changes_nothing(self):
+        communicator = self.communicator(AnonymousUser())
+        await communicator.connect()
+        await communicator.receive_output(timeout=2)  # the 4401 close
+        await communicator.disconnect()
+
+        alice = await self.refreshed_alice()
+        self.assertFalse(alice.is_online)
+        self.assertEqual(alice.online_connections, 0)
 
 
 # ===================================================================#

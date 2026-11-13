@@ -48,7 +48,7 @@ export function SpendingModal({
 
   return (
     <Modal
-      icon="pinplus"
+      icon="cash"
       title={spending ? t("spending.edit") : t("spending.add")}
       onClose={onClose}
       size="narrow"
@@ -182,7 +182,11 @@ export function SpendingModal({
                 ? t("spending.saveChanges")
                 : t("spending.submitAdd")}
           </Button>
-          {form.error && <Text tone="accent">{form.error}</Text>}
+          {form.error && (
+            <Text tone="accent" className="whitespace-pre-line">
+              {form.error}
+            </Text>
+          )}
         </div>
       </div>
     </Modal>

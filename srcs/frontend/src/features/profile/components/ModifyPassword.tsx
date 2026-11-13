@@ -8,6 +8,7 @@ import Input from "@/shared/ui/Input";
 import { modifyPassword } from "../api/profile";
 import type { ModifyPasswordData } from "../types";
 import { useTranslation } from "react-i18next";
+import Text from "@/shared/ui/Text";
 
 const INITIAL_FORM: ModifyPasswordData = {
   oldPassword: "",
@@ -66,7 +67,7 @@ export function ModifyPassword() {
           <button
             type="button"
             onClick={handleEdit}
-            className="text-sm font-semibold text-red-500"
+            className="text-sm font-semibold text-brand-primary-strong"
           >
             {t("actions.change")}
           </button>
@@ -147,9 +148,15 @@ export function ModifyPassword() {
           </div>
 
           {error && (
-            <p className="text-sm font-medium whitespace-pre-line text-red-500">
-              {error}
-            </p>
+            <div role="alert">
+              <Text
+                tone="accent"
+                size="sm"
+                className="font-medium whitespace-pre-line"
+              >
+                {error}
+              </Text>
+            </div>
           )}
         </form>
       )}

@@ -8,6 +8,7 @@ import { useSubmitAction } from "@/shared/hooks/useSubmitAction";
 import { modifyProfilePicture } from "../api/profile";
 import { useAuth } from "@/features/auth/context/useAuth";
 import { useTranslation } from "react-i18next";
+import Text from "@/shared/ui/Text";
 
 function ProfilePicture() {
   const { currentUser, setCurrentUser } = useAuth();
@@ -15,13 +16,9 @@ function ProfilePicture() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  const { submit, isSubmitting, error } = useSubmitAction(() => {
-    if (!selectedFile) {
-      throw new Error(t("profile.errors.noImage"));
-    }
-
-    return modifyProfilePicture(selectedFile);
-  });
+  const { submit, isSubmitting, error } = useSubmitAction(() =>
+    modifyProfilePicture(selectedFile!),
+  );
 
   function handleSelectPicture() {
     fileInputRef.current?.click();
@@ -38,6 +35,8 @@ function ProfilePicture() {
   }
 
   async function handleSubmit() {
+    if (!selectedFile) return;
+
     const result = await submit();
 
     if (result.success && result.data) {
@@ -56,7 +55,7 @@ function ProfilePicture() {
 
   return (
     <div className="flex items-center gap-3">
-      <Avatar size="xl" />
+      <Avatar size="lg" />
 
       <input
         ref={fileInputRef}
@@ -92,7 +91,17 @@ function ProfilePicture() {
         </div>
       )}
 
-      {error && <p className="text-sm font-medium text-red-500">{error}</p>}
+      {error && (
+        <div role="alert">
+          <Text
+            tone="accent"
+            size="sm"
+            className="font-medium whitespace-pre-line"
+          >
+            {error}
+          </Text>
+        </div>
+      )}
     </div>
   );
 }

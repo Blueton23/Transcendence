@@ -66,7 +66,11 @@ export function ChoiceScreen({ onCreate, onJoin }: ChoiceScreenProps) {
           {t("actions.continue")}
         </Button>
       </div>
-      {error && <Text tone="accent">{error}</Text>}
+      {error && (
+        <Text tone="accent" className="whitespace-pre-line">
+          {error}
+        </Text>
+      )}
     </div>
   );
 }
