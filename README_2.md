@@ -12,6 +12,39 @@ HOW TO FILL THIS FILE (delete this comment at the end)
 
 # Peripl
 
+Plan a road trip with friends, all in one place.
+
+## Table of contents
+
+1. [Description](#description)
+2. [Instructions](#instructions)
+3. [Team Information](#team-information)
+4. [Project Management](#project-management)
+5. [Technical Stack](#technical-stack)
+6. [Database Schema](#database-schema)
+7. [Features List](#features-list)
+8. [Modules](#modules): [points summary](#points-summary), then one section per module:
+   - [Framework for frontend and backend](#framework-for-frontend-and-backend)
+   - [ORM for the database](#orm-for-the-database)
+   - [Real-time features (WebSockets)](#real-time-features-websockets)
+   - [Real-time collaborative features](#real-time-collaborative-features)
+   - [Notification system](#notification-system)
+   - [Standard user management and authentication](#standard-user-management-and-authentication)
+   - [Remote authentication (OAuth 2.0, Google)](#remote-authentication-oauth-20-google)
+   - [Allow users to interact (chat, profile, friends)](#allow-users-to-interact-chat-profile-friends)
+   - [Public API](#public-api)
+   - [Progressive Web App](#progressive-web-app)
+   - [Custom-made design system](#custom-made-design-system)
+   - [Multiple languages support](#multiple-languages-support)
+   - [Support for additional browsers](#support-for-additional-browsers)
+   - [Module of choice: map and itinerary routing](#module-of-choice-map-and-itinerary-routing)
+   - [Module of choice: shared expenses](#module-of-choice-shared-expenses)
+9. [Individual Contributions](#individual-contributions): [Charlotte](#charlotte-chpasqui), [David](#david-dle-fur), [Sébastien](#sébastien-scuthber), [Sylvain](#sylvain-sydubois)
+10. [Resources](#resources) and [Use of AI](#use-of-ai)
+11. [Known limitations](#known-limitations)
+
+---
+
 ## Description
 
 **Peripl** is a web application to plan a **road trip with friends**. Usually, either one person organises everything and carries all the responsibility, or everyone keeps their own notes, screenshots and saved Instagram posts. Peripl puts the whole trip in one place: everybody contributes, decides together and sees the same thing.
@@ -30,19 +63,18 @@ HOW TO FILL THIS FILE (delete this comment at the end)
 
 ## Instructions
 
-## 1. Set up the environment
+### Prerequisites
 
-Place the kit.tgz file at the root
+- Docker with Docker Compose, and `make`.
+- The `kit.tgz` file (HTTPS certificates and secrets), placed at the root of the repository.
 
-Run the command:
+### Run
 
 ```bash
 make
 ```
 
-The command sets up:
-- The certificates
-- Generates a .env and fills it in
+This single command installs the certificates, generates and fills the `.env`, then builds and starts every service.
 
 Only on the first launch:
 
@@ -50,6 +82,8 @@ Only on the first launch:
 make seed             # (optional) fills the database with test data
 make createsuperuser  # (optional) creates an admin account for /admin/
 ```
+
+### Access
 
 The application is then available at **https://peripl.app:8443**.
 
@@ -67,10 +101,12 @@ The application is then available at **https://peripl.app:8443**.
 
 | Member | Login | Role(s) | Responsibilities |
 |---|---|---|---|
-| Charlotte | `chpasqui` | Product Owner, Developer | Product Owner: defines and prioritises the features and the modules, writes and orders the GitHub issues, checks that deliveries match the mockups and the subject. Developer: design and frontend lead, full-stack on trips, itinerary, map and expenses. |
-| David | `dle-fur` | Technical Lead / Architect, Developer | Technical Lead: infrastructure choices, Docker Compose stack, Nginx, HTTPS and production deployment. Developer: ideas and votes (API and frontend), public API, Google sign-in. |
-| Sébastien | `scuthber` | Technical Lead, Developer | Technical Lead (with David): data model and backend architecture, real-time layer (WebSockets), CI (GitHub Actions). Developer: seeds, notifications, expense split and settlement services. |
-| Sylvain | `sydubois` | Project Manager, Developer | Project Manager: followed where everyone stood and set up team meetings. Developer: authentication and user management, profile and friends, chat (API and frontend), consistent error handling across the app. |
+| Charlotte | `chpasqui` | Product Owner, Developer | **Product Owner**: defines and prioritises the features and the modules, writes and orders the GitHub issues, checks that deliveries match the mockups and the subject. **Developer**: design and frontend lead, full-stack on trips, itinerary, map and expenses. |
+| David | `dle-fur` | Technical Lead / Architect, Developer | **Co-Technical Lead**: infrastructure choices, Docker Compose stack, Nginx, HTTPS and production deployment. **Developer**: ideas and votes (API and frontend), public API, Google sign-in. |
+| Sébastien | `scuthber` | Technical Lead, Developer | **Co-Technical Lead**: data model and backend architecture, real-time layer (WebSockets), CI (GitHub Actions). **Developer: seeds**, notifications, expense split and settlement services. |
+| Sylvain | `sydubois` | Project Manager, Developer | **Project Manager**: followed where everyone stood and set up team meetings. **Developer**: authentication and user management, profile and friends, chat (API and frontend), consistent error handling across the app. |
+
+---
 
 ## Project Management
 
@@ -80,6 +116,8 @@ The application is then available at **https://peripl.app:8443**.
 - **Tasks**: GitHub Issues, one branch per issue (`<name>/<issue>-<title>`), pull requests reviewed by at least one other member before merging into `main`.
 - **Design**: mockups made before coding (`docs/mockups/`), then a shared design system (`/design-system`).
 - **Communication**: Discord for day-to-day questions, reviews and decisions, plus the weekly meeting at 42.
+
+---
 
 ## Technical Stack
 
@@ -95,6 +133,8 @@ The application is then available at **https://peripl.app:8443**.
 
 More details: [docs/readme/Architecture.md](docs/readme/Architecture.md), [Backend-DRF.md](docs/readme/Backend-DRF.md), [Frontend.md](docs/readme/Frontend.md), [Websockets.md](docs/readme/Websockets.md).
 
+---
+
 ## Database Schema
 
 ![Data model](docs/data-model/model_v5.svg)
@@ -102,6 +142,8 @@ More details: [docs/readme/Architecture.md](docs/readme/Architecture.md), [Backe
 Full description of every table, field, constraint and deletion rule: [docs/data-model/model_v5.md](docs/data-model/model_v5.md).
 
 Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in which trip), `Step`, `Idea`, `Reaction` (❤️), `Friendship`, `Message`, `Spending` and `SpendingShare` (who owes what).
+
+---
 
 ## Features List
 
@@ -124,9 +166,11 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 | PWA | Installable, usable offline in read-only mode | chpasqui |
 | Error handling | Translated error messages, global error banner | sydubois |
 
+---
+
 ## Modules
 
-<!-- TODO(team): add a block for each of your modules, same table format as below: Type, Members, What it does, Why this module (modules of choice only), How it is implemented, Limits, How to test. -->
+### Points summary
 
 | Module | Type | Points | Member(s) |
 |---|---|---|---|
@@ -142,9 +186,10 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 | Progressive Web App | Minor | 1 | chpasqui |
 | Custom-made design system | Minor | 1 | chpasqui |
 | Multiple languages support (i18n) | Minor | 1 | chpasqui |
+| Support for additional browsers (Firefox, Safari) | Minor | 1 | chpasqui |
 | **Module of choice: map and itinerary routing** | Major | 2 | chpasqui |
 | **Module of choice: shared expenses** | Minor | 1 | chpasqui, scuthber |
-| **Total** | | **20** | |
+| **Total** | | **21** | |
 
 ---
 
@@ -154,10 +199,11 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 |---|---|
 | **Type** | Major · 2 pts |
 | **Members** | dle-fur (technical foundation: Docker Compose, the 5 services, Nginx, Makefile); the framework itself is used by everyone |
-| **What it does** | The whole application starts with a single command (`make`) and runs the same way on every machine. Backend: **Django + Django REST Framework**; frontend: **React + TypeScript + Vite**; Nginx is the **single entry point** (port 8443 on the host, forwarded to 443 in the container). |
-| **How it is implemented** | • `docker-compose.yml`: 5 services with pinned versions (`postgres:17-alpine`, `redis:7.4.9-alpine`, `python:3.13`, `node:22`, `nginx:1.30.3`) on a private network; only Nginx is exposed. Health checks + `depends_on: service_healthy` enforce the startup order (`db`, `redis` → `backend`, `frontend` → `nginx`), with `restart: unless-stopped`.<br>• **Backend**: Django 5.2 + DRF + Channels, served by **Uvicorn** (ASGI: HTTP and WebSockets in one server), non-root user (UID/GID from the `.env`); `entrypoint.sh` runs `collectstatic` then Uvicorn with `--workers 4`. Quality: Ruff and Django tests.<br>• **Frontend**: React 19 + TypeScript + Tailwind, **production build** built into the image (`VITE_MAPBOX_TOKEN` passed to the build), served on port 3000, dependencies with `npm ci`. Quality: ESLint and Prettier.<br>• **Nginx**: `/api/`, `/admin/`, `/ws/` → backend; `/static/`, `/media/` read directly from the volumes; the rest → frontend. One origin: no CORS, session cookies work naturally; forwards the real IP (`X-Forwarded-For`). HTTPS with Let's Encrypt certificates (certbot, valid 90 days) from the `certs/` folder.<br>• **Data**: PostgreSQL (constraints, transactions, `select_for_update`) in the `postgres_data` volume; Redis database 0 for Django Channels, database 1 for the cache (API rate limiting).<br>• `Makefile` wraps the Compose commands (`make up`, `make ps`, `make test`…). |
+| **Why this module** | A trip planner has many screens sharing the same data and an API with authentication and validation. React and Django give a proven structure for both, instead of rebuilding routing, forms, database access and security by hand. |
+| **What it does** | Backend in **Django + Django REST Framework**, frontend in **React + TypeScript + Vite**; the whole application starts with a single command (`make`) and runs the same way on every machine. |
+| **How it is implemented** | • **Backend**: Django 5.2, DRF for the REST API, Channels for WebSockets, served by Uvicorn (ASGI).<br>• **Frontend**: React 19, TypeScript and Tailwind, built for production inside its image.<br>• **Docker Compose**: 5 services (PostgreSQL, Redis, backend, frontend, Nginx), started in the right order thanks to health checks.<br>• **Nginx**: single entry point over HTTPS; routes `/api/`, `/admin/`, `/ws/` to the backend and the rest to the frontend, so everything shares one origin (no CORS).<br>Details: [docs/readme/Infrastructure.md](docs/readme/Infrastructure.md). |
 | **Limits** | The source code is not mounted in the containers: every change requires rebuilding the images (`make up` runs `--build`). |
-| **How to test** | • `make ps`: `db`, `redis`, `backend`, `frontend` are **healthy** and `nginx` is **running**, so the 5 services started in the right order.<br>• `make test-db` then `make ping`: `✅ Connexion réussie à la base : …` then `PONG`, so Django reaches PostgreSQL and Redis responds. |
+| **How to test** | `make ps`: `db`, `redis`, `backend`, `frontend` are **healthy** and `nginx` is **running**, so the 5 services started in the right order. |
 
 ---
 
@@ -167,6 +213,7 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 |---|---|
 | **Type** | Minor · 1 pt |
 | **Members** | scuthber (most models, migrations and constraints); each member then used it in the serializers and views of their features |
+| **Why this module** | Trips, steps, ideas and expenses are tightly related. An ORM keeps relations, constraints and migrations in Python code reviewed in Git, and protects every query against SQL injection. |
 | **What it does** | Every table is described in Python and created by migrations: no handwritten SQL, and the business rules are enforced as close to the data as possible. |
 | **How it is implemented** | • Django ORM on PostgreSQL 17: one `models.py` per app (`traveler`, `travel`, `idea`, `spending`, `chat`), migrations versioned in Git.<br>• Rules in the database: `CheckConstraint` (an idea ends after it starts, a system message has no author…), `UniqueConstraint` (one vote per person and per idea), deliberate `on_delete` choices (`CASCADE`, `SET_NULL`, `PROTECT` for the payer of an expense).<br>• Rules in the models: `clean()` methods (two chosen accommodations of a step cannot overlap…), run on every save by a shared `ValidatedModel`.<br>• Queries: `annotate` + `Exists` (vote counts in one query), `select_for_update` inside transactions, custom querysets (`Message.objects.unread_for(…)`). |
 | **How to test** | `docker compose exec backend python manage.py showmigrations`: every migration is applied. `/admin/` shows the tables. `make test` runs the model tests (constraints and validation). |
@@ -180,9 +227,10 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 | | |
 |---|---|
 | **Type** | Major · 2 pts |
-| **Members** | scuthber |
+| **Members** | scuthber (consumers, events, frontend socket layer), dle-fur (Channels, Uvicorn and Redis set-up) |
+| **Why this module** | Planning together only works if everyone sees changes as they happen; without it, friends would plan on outdated data. |
 | **What it does** | Changes made by one traveller appear instantly for everyone else on the trip, without reloading the page. |
-| **How it is implemented** | • Django Channels served by Uvicorn (ASGI), with a Redis channel layer so that events reach every worker.<br>• Two consumers: one per trip (`ws/travels/<id>/`) and one per user for notifications (`ws/notifications/`); access checked on connect.<br>• Events are sent only after the database commit (`transaction.on_commit`), so nobody receives a change that was rolled back.<br>• Frontend: a socket provider with automatic reconnection and `useTravelEvent` / `useNotificationEvent` hooks; on every (re)connection the data is reloaded over REST, then live events are applied.<br>• A traveller who leaves a trip has their sockets closed (`travel.kick`, code 4403). |
+| **How it is implemented** | • Django Channels served by Uvicorn (ASGI), with a Redis channel layer so that events reach every worker (set up by dle-fur).<br>• Two consumers: one per trip (`ws/travels/<id>/`) and one per user for notifications (`ws/notifications/`); access checked on connect.<br>• Events are sent only after the database commit (`transaction.on_commit`), so nobody receives a change that was rolled back.<br>• Frontend: a socket provider with automatic reconnection and `useTravelEvent` / `useNotificationEvent` hooks; on every (re)connection the data is reloaded over REST, then live events are applied.<br>• A traveller who leaves a trip has their sockets closed (`travel.kick`, code 4403). |
 | **How to test** | Open the same trip in two browsers with two accounts, then send a message or add an idea: it appears in the other window immediately. |
 
 ---
@@ -195,6 +243,7 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 |---|---|
 | **Type** | Minor · 1 pt |
 | **Members** | scuthber |
+| **Why this module** | Several friends edit the same trip at the same time: votes, chosen accommodations and expenses must stay consistent for all of them. |
 | **What it does** | Several travellers can work on the same trip at the same time: steps, ideas, votes, chosen accommodations, expenses and participants stay in sync on every open page. |
 | **How it is implemented** | • Each change in the API sends a trip event (`step.created`, `idea.updated`, `reaction.created`, `participant.joined`…) through the WebSocket layer.<br>• The pages listen to these events and reload only the data concerned.<br>• Conflicting actions are resolved on the server (transactions and row locking), so two people choosing an accommodation at the same time cannot break the rules. |
 | **How to test** | Two accounts on the same trip: one votes for an idea or adds an expense, the other sees the counter or the balances change without reloading. |
@@ -209,7 +258,8 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 |---|---|
 | **Type** | Minor · 1 pt |
 | **Members** | scuthber |
-| **What it does** | A "while you were away" card on the trips page lists unread messages, new ideas, trip invitations and friend requests; badges on the navigation show the unread counts. |
+| **Why this module** | Friends do not plan at the same time. When someone comes back, they need to see at a glance what changed while they were away. |
+| **What it does** | Every creation, update and deletion in a trip is announced as a system message in the trip chat ("Alice added the step Lausanne"). The most important ones are also gathered in a "while you were away" card on the trips page (unread messages, new ideas, trip invitations, friend requests), and badges on the navigation show the unread counts. |
 | **How it is implemented** | • Unread messages and unseen ideas are computed from the last time each participant opened the chat or the ideas page.<br>• A per-user WebSocket (`ws/notifications/`) refreshes the card and the badges live.<br>• Each line links to the right page (chat, ideas, profile, invitation). |
 | **How to test** | With a second account, send a message and add an idea on a shared trip: the first account sees the card and the badges update. |
 
@@ -223,6 +273,7 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 |---|---|
 | **Type** | Major · 2 pts |
 | **Members** | sydubois |
+| **Why this module** | Every trip is shared between real people: accounts, profiles and friends are the base for inviting someone and knowing who proposed or paid what. |
 | **What it does** | Sign up, log in and log out; edit the profile and the password; upload an avatar (a default one otherwise); add friends and see whether they are online; a profile page for each user. |
 | **How it is implemented** | • Django session authentication with CSRF protection (`auth/login/`, `auth/logout/`, `auth/me/`); passwords hashed by Django.<br>• Profile endpoints: `travelers/update/`, `travelers/update-password/`, `travelers/update-profile-picture/` (image stored in the media volume, served by Nginx).<br>• Friendship endpoints: search, request, accept, remove; online status shown on friends' avatars. |
 | **How to test** | Create an account, change the avatar and the username, add a second account as a friend and log it in elsewhere: it appears online. |
@@ -235,28 +286,11 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 |---|---|
 | **Type** | Minor · 1 pt |
 | **Members** | dle-fur |
-| **What it does** | A "Continue with Google" button on the login and sign-up pages. The user signs in **with Google** (the site never sees their Google password) and comes back **logged in**. Their `Traveler` account is created on the first login, then found again on the next ones. The login ends like a classic one (Django's `login()`, session cookie), so the rest of the app sees no difference. |
-| **How it is implemented** | • **Google Cloud Console**: "Web application" OAuth client, redirect URI `https://peripl.app:8443/api/auth/google/callback/`; credentials in the `.env` (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`).<br>• **Authlib handles the protocol**: `state` (anti-CSRF, single use, expires after 1 h), `nonce` (anti-replay), exchange of the `code` with the `client_secret`, verification of the `id_token` signature with Google's public keys.<br>• **Our code handles the account** (`GoogleLoginView`, `GoogleCallbackView` in `traveler/views.py`): `email_verified` required; account found by email, otherwise created **without a password** (generated username `user`, then `user1` if taken); a **classic account with the same email is refused**, since classic sign-up does not verify the email and an attacker could otherwise pre-create an account with the victim's email; any failure redirects to `/login?error=google` or `/login?error=google_email_exists`.<br>• **Frontend**: the button performs a real navigation (`window.location.href = "/api/auth/google/"`). |
+| **Why this module** | Friends often join from an invitation link: signing in with an account they already have removes the step of creating a new password. |
+| **What it does** | A "Continue with Google" button on the login and sign-up pages. The user signs in with Google (the site never sees their Google password) and comes back logged in; their account is created on the first login, then found again on the next ones. |
+| **How it is implemented** | • **Authlib** handles the OAuth 2.0 / OpenID Connect protocol: `state` against CSRF, `nonce` against replay, verification of Google's signature.<br>• **Our code** (`traveler/views.py`) finds the account by email or creates it **without a password**, and requires an email verified by Google.<br>• A **classic account with the same email is refused**: classic sign-up does not verify the email, so this blocks an attacker who would have pre-created an account with someone else's email.<br>Details and step-by-step checks: [docs/readme/OAuth.md](docs/readme/OAuth.md). |
 | **Limits** | The account is found by email, not by Google's stable identifier (`sub`), which would allow an extra check. |
-| **How to test** | In a **private window**, with the developer tools open on **Network** (`make logs-backend` to follow the logs): see the three steps below. |
-
-**1. The start.** Click **"Continue with Google"**, **don't choose an account yet**, and run:
-
-```bash
-docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; s = Session.objects.order_by('-expire_date').first(); print(s.get_decoded())"
-```
-
-Expected: the `google/` request answered `302`, and its `Location` header contains `state=…` and `nonce=…`, **the same values** as in the Django session.
-
-**2. The login.** Choose your Google account: `302` redirect to `/profile`.
-
-**3. The account.** In **Application** → **Cookies** → `https://peripl.app:8443`, copy the value of `sessionid`, then run:
-
-```bash
-docker compose exec backend python manage.py shell -c "from django.contrib.sessions.models import Session; from traveler.models import Traveler; s = Session.objects.get(session_key='<sessionid>').get_decoded(); t = Traveler.objects.get(pk=s['_auth_user_id']); print(t.username, t.email, t.first_name, t.last_name, t.has_usable_password())"
-```
-
-Expected: for example `david.lf david.lf@gmail.com David Lf False`. The browser cookie belongs to a Django session opened for this account, created from Google, **without a password** (`False`).
+| **How to test** | • In a private window, click **Continue with Google** and choose an account: you arrive logged in.<br>• In `/admin/` → Travelers, the new account has no usable password.<br>• Try again with the email of an existing classic account: the login is refused with a message. |
 
 ---
 
@@ -268,6 +302,7 @@ Expected: for example `david.lf david.lf@gmail.com David Lf False`. The browser 
 |---|---|
 | **Type** | Major · 2 pts |
 | **Members** | sydubois (API, frontend), scuthber (models, WebSockets) |
+| **Why this module** | A road trip is decided together: discussing in the trip chat and finding friends to invite are part of planning it. |
 | **What it does** | A real-time chat for each trip, a profile page for each user and a friends system (requests, list, removal). |
 | **How it is implemented** | • Chat: `Message` model (user and system messages, e.g. someone joined or left), API to list and send messages and to mark them as read, live delivery over the trip WebSocket, an unread separator.<br>• Profile and friends: see "Standard user management and authentication". |
 | **How to test** | Two accounts on the same trip: send messages both ways, leave the chat and come back to see the unread separator; send a friend request and accept it from the other account. |
@@ -280,32 +315,25 @@ Expected: for example `david.lf david.lf@gmail.com David Lf False`. The browser 
 |---|---|
 | **Type** | Major · 2 pts |
 | **Members** | dle-fur |
-| **What it does** | An external program (script, Postman…) can read and modify **trips**, **steps**, **ideas** and **expenses** without a browser, with an **API key** (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`), with rate limiting and public Swagger documentation. |
-| **How it is implemented** | • **The key**: `rest_framework.authtoken` (a random 40-character key per user). `POST /api/auth/token/` (`ApiTokenView`, no authentication needed) exchanges username + password for the key, then sent as `Authorization: Token <key>`. No CSRF needed: another site cannot add this header.<br>• **Per-view access**: `PublicApiMixin` (`common/mixins.py`) adds `TokenAuthentication` (after `SessionAuthentication`) and rate limiting, only on the views that use it. The others (profile, friends, votes, choosing an accommodation…) stay reserved for the website.<br>• **Rate limiting** (`ScopedRateThrottle`): `public_api` = **1000 requests/minute per user**; `auth_token` = **5 attempts/minute per IP** (anti brute-force). `NUM_PROXIES: 1`: the IP is read behind Nginx and cannot be spoofed with a fake `X-Forwarded-For`.<br>• **Documentation**: drf-spectacular generates the OpenAPI 3 schema (`/api/schema/`) and Swagger (`/api/docs/`), freely accessible; the `public_endpoints_only` hook shows **only** the public routes. |
+| **Why this module** | Lets the trip data be used outside the website (scripts, other tools), and made us secure and document our API properly. |
+| **What it does** | An external program (script, Postman…) can read and modify **trips**, **steps**, **ideas** and **expenses** with an **API key** (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`), with rate limiting and public Swagger documentation. |
+| **How it is implemented** | • **API key**: `POST /api/auth/token/` exchanges username and password for a key (`rest_framework.authtoken`), then sent as `Authorization: Token <key>`.<br>• **Only some routes are public**: a shared `PublicApiMixin` (`common/mixins.py`) enables the key and the rate limiting on them; the others stay reserved for the website.<br>• **Rate limiting**: 1000 requests per minute per user, and 5 key requests per minute per IP against brute force.<br>• **Documentation**: Swagger generated from the code (drf-spectacular) at `/api/docs/`, showing only the public routes.<br>Details: [docs/readme/Public-API.md](docs/readme/Public-API.md). |
 | **Limits** | Keys are stored in plain text and never expire (how `authtoken` works); they are revoked by deleting them in the admin. |
-| **How to test** | Open `https://peripl.app:8443/api/docs`, get a key with an existing account (`POST /api/auth/token/`), then click **Authorize** and enter `Token <key>`. Brute-force and rate-limiting checks: see the commands below. |
+| **How to test** | Open `https://peripl.app:8443/api/docs/`, get a key with an existing account (`POST /api/auth/token/`), click **Authorize** and enter `Token <key>`. Then check the limits with the commands below. |
 
 ```bash
-# Test 1: brute-force (6th attempt refused)
-docker compose exec redis redis-cli -n 1 FLUSHDB
+# Brute force: 5 wrong passwords answer 400, the 6th answers 429
 for i in $(seq 1 6); do
   curl -s -o /dev/null -w "%{http_code}\n" -X POST https://peripl.app:8443/api/auth/token/ \
     -H "Content-Type: application/json" -d '{"username": "<username>", "password": "wrong"}'
 done
-docker compose exec redis redis-cli -n 1 KEYS '*'
-docker compose exec redis redis-cli -n 1 TTL ':1:throttle_auth_token_<ip>'
-docker compose exec backend python manage.py shell -c "from django.core.cache import cache; print(len(cache.get('throttle_auth_token_<ip>') or []))"
 
-# Test 2: rate limiting (1001st request refused)
+# Rate limiting: 1000 requests answer 200, the 1001st answers 429
 TOKEN=<key>
-docker compose exec redis redis-cli -n 1 FLUSHDB
 for i in $(seq 1 1001); do
   curl -s -o /dev/null -w "%{http_code}\n" https://peripl.app:8443/api/travels/ \
     -H "Authorization: Token $TOKEN"
 done | sort | uniq -c
-docker compose exec redis redis-cli -n 1 KEYS '*'
-docker compose exec backend python manage.py shell -c "from django.core.cache import cache; print(len(cache.get('throttle_public_api_<id>') or []))"
-docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 ```
 
 ---
@@ -316,8 +344,9 @@ docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 |---|---|
 | **Type** | Minor · 1 pt |
 | **Members** | chpasqui |
+| **Why this module** | A road trip happens on the road, often with a poor connection: the trips and the itinerary must stay readable on a phone without network, and the app should open like a native one. |
 | **What it does** | Peripl can be installed as an app and stays usable offline in read-only mode: the user stays logged in, finds the trips already visited and sees a clear message when a feature needs the network. |
-| **How it is implemented** | • `vite-plugin-pwa` (Workbox) generates the manifest and the service worker; app files are precached, `GET /api/travels…` is network-first.<br>• `AuthProvider` tells a lost network (`TypeError`: keep the user) from an expired session (401: log out); logout clears the saved user and the trips cache.<br>• A `useOnlineNetworkStatus` hook drives an "Offline" banner and placeholders for the map and the place search. |
+| **How it is implemented** | • Caching (`vite.config.ts`): `vite-plugin-pwa` (Workbox) generates the manifest and the service worker; app files are precached, `GET /api/travels…` is network-first.<br>• Session (`features/auth/context/AuthProvider.tsx`): a lost network (`TypeError`) keeps the user logged in, an expired session (401) logs them out.<br>• Online status (`shared/hooks/useOnlineNetworkStatus.ts`): drives the "Offline" banner (`app/OfflineBanner.tsx`) and the placeholders for the map and the place search. |
 | **Limits** | Read-only offline. Map unavailable offline. Production needs HTTPS. Firefox desktop cannot install PWAs. |
 | **How to test** | `cd srcs/frontend && npx vite build && npx vite preview`, log in, tick "Offline" in the developer tools and reload. |
 
@@ -329,6 +358,7 @@ docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 |---|---|
 | **Type** | Minor · 1 pt |
 | **Members** | chpasqui |
+| **Why this module** | Four people built different pages. Shared components and tokens keep the app consistent and make every new page faster to build. |
 | **What it does** | One consistent look on every page, desktop and mobile, built from reusable components. |
 | **How it is implemented** | • Mockups first (`docs/mockups/`), then palette, typography, radii and shadows as Tailwind tokens, with colours per trip, idea type and expense category, checked for contrast.<br>• Components in `shared/ui`: `Button`, `IconButton`, `Card` (with a colour band), `Tag`, `Chip`, `Dot`, `Avatar`, `OnlineStatus`, `Text`, `Heading`, `Input`, `Select`, `Modal`, `OptionsMenu`, `DropdownMenu`, `DatePicker`, `Banner`…<br>• A rounded icon sprite used through `<Icon name="…" />`, and a living catalogue at `/design-system`. |
 | **Limits** | No dark mode. |
@@ -342,9 +372,24 @@ docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 |---|---|
 | **Type** | Minor · 1 pt |
 | **Members** | chpasqui |
+| **Why this module** | Road trips cross borders, and a group of friends does not always share the same language. |
 | **What it does** | The whole app in French, English and Spanish, with a language switcher remembered between visits. |
 | **How it is implemented** | • i18next with one `common.json` per language; every text goes through `t()`, with plurals and interpolation.<br>• Language read from `localStorage`, then the browser, then French; dates, calendar and map labels follow it.<br>• The backend returns error codes, translated by the frontend, so API errors appear in the user's language. |
 | **How to test** | Switch the language in the sidebar (desktop) or the account menu (mobile). |
+
+---
+
+### Support for additional browsers
+
+| | |
+|---|---|
+| **Type** | Minor · 1 pt |
+| **Members** | chpasqui |
+| **Why this module** | Friends use different devices and browsers (Safari on iPhone, Firefox, Chrome): the app must work the same for everyone in the group. |
+| **What it does** | Every feature works with the same look on Chrome (required), **Firefox** and **Safari**, on desktop and mobile. |
+| **How it is implemented** | • Every page and feature tested in the three browsers, desktop and mobile (responsive mode). <!-- TODO(chpasqui): mention real phones if you tested on them --><br>• Only standard web APIs; Tailwind adds vendor prefixes where needed.<br>• Dates formatted through `Intl` / i18next rather than browser-specific parsing. |
+| **Limits** | Firefox desktop cannot install PWAs (the app still works in the browser). <!-- TODO(chpasqui): add any other browser-specific difference found while testing --> |
+| **How to test** | Open the app in Firefox and Safari and go through the main flows: create a trip, add steps, pin and vote for an idea, add an expense, send a chat message. |
 
 ---
 
@@ -356,7 +401,7 @@ docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 | **Members** | chpasqui |
 | **What it does** | An interactive map of the trip with a marker per step, a place search to add a step, and the driving route between steps with its duration and distance. |
 | **Why this module** | A road trip is first a route, and no module of the subject covers maps or routing. It is worth a Major because it combines an external API and its limits, asynchronous computation with caching, a map rendering library and backend validation, and the whole itinerary is built on it. |
-| **How it is implemented** | • Mapbox Geocoding for the place search, Directions API for the route, Mapbox GL JS for the map.<br>• One Directions request per pair of consecutive steps, all in parallel, with a cache per pair so unchanged legs are never requested again.<br>• A place that cannot be reached by road gives "no route" for its leg only; the rest of the route is still drawn.<br>• The map frames all the steps automatically and its labels follow the app language.<br>• Steps store mandatory coordinates, validated by the backend. |
+| **How it is implemented** | • Place search: Mapbox Geocoding, with a short delay while the user types (`features/map/api/mapboxApi.ts`, `hooks/usePlaceSuggestions.ts`).<br>• Route: one Directions request per pair of consecutive steps, all in parallel, with a cache per pair so unchanged legs are never requested again (`api/routingApi.ts`, `hooks/useRoute.ts`). A result that arrives after the steps changed is ignored.<br>• A place that cannot be reached by road gives "no route" for its leg only; the rest of the route is still drawn.<br>• Map: Mapbox GL JS, framing all the steps automatically, labels in the app language (`components/ItineraryMap.tsx`, `hooks/useMapFraming.ts`).<br>• Steps store mandatory coordinates, validated by the backend (`travel/models.py`). |
 | **Limits** | Driving only. Needs a Mapbox token. Not available offline. |
 | **How to test** | Create a trip with steps in several cities, then add one that cannot be reached by car: only that leg is missing. |
 
@@ -374,79 +419,97 @@ docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 | **Limits** | One currency (CHF). A settlement is shown but not recorded as paid. |
 | **How to test** | Add an expense shared with others and watch the balances update, also in a second window. |
 
+---
 
 ## Individual Contributions
 
-<!-- TODO(each member): your own section, same structure: role, what you built (backend / frontend / modules), challenges and how you solved them. -->
-
 ### Charlotte (`chpasqui`)
 
-**Product Owner.** Defined the product and its scope: which features, which modules, in which order. Wrote and prioritised most of the GitHub issues, reviewed teammates' pull requests, and checked each delivery against the mockups and the subject.
+**Product Owner:** defined the product and its scope: which features, which modules, in which order. Wrote and prioritised most of the GitHub issues, reviewed teammates' pull requests, and checked each delivery against the mockups and the subject.
 
-**Core of the application (not counted as modules).** Trips, itinerary and steps, built full-stack:
-- *Backend (Django / DRF):* `Travel`, `Step` and `Spending` API (serializers, views filtered by participation, permissions, soft delete of steps, leaving a trip, expense summary, real-time events); business rules and validation (step dates inside the trip, no overlapping steps, lodging rules); camelCase API responses; tests, with Sébastien. The models, seeds and the split / settlement services of these features are Sébastien's.
-- *Frontend (React / TypeScript):* My trips, new trip and invitation flow; itinerary page with step cards, the day-by-day step detail (ideas under their date, one row per night: chosen, to choose, or none) and the nights still without a step; add / edit step with a calendar limited to the trip dates; expenses page; the app navigation (desktop sidebar, mobile top bar, bottom tabs and account menu); the 404 page.
+**Core of the application (not counted as modules):** trips, itinerary, steps and expenses, full-stack.
+- **Backend:** `Travel`, `Step` and `Spending` API: serializers, views, permissions, business rules (dates, overlaps, lodging), real-time events, tests (with Sébastien, who wrote the models, seeds and expense services).
+- **Frontend:** trips and invitations, itinerary and day-by-day step detail, step form with its calendar, expenses page, app navigation (desktop and mobile), 404 page.
 
-**Design.** Mockups of every screen on desktop and mobile, the colour palette and tokens (checked for contrast), the icon set, and the shared components. Then the redesign of **every page** with them, including the features built by teammates (ideas, profile, friends, chat), without breaking their logic.
+**Design:** mockups of every screen on desktop and mobile, the colour palette and tokens (checked for contrast), the icon set, and the shared components. Then the redesign of **every page** with them, including the features built by teammates (ideas, profile, friends, chat), without breaking their logic.
 
-**Modules.** Map and itinerary routing, shared expenses (with Sébastien), design system, i18n, PWA.
+**Modules:** map and itinerary routing, shared expenses (with Sébastien), design system, i18n, PWA.
 
-**Challenges.**
+**Challenges:**
 - *Routing:* Mapbox answers "no route" for a place that cannot be reached by road, and one such step used to erase the whole route. Each leg is now requested, cached and drawn separately, so only the unreachable leg is missing.
 - *Dates:* the same rules (stay inside the trip, no overlap, a stay may end the day the next one starts) had to hold in three places: the calendar, the API and the models. The models are the reference, and the calendar only offers the dates the API will accept, so the user is stopped before sending an invalid step.
 - *Offline session:* when the network is lost, every request fails and the app used to log the user out. The app now tells a lost network (`TypeError`) from an expired session (401), so the user stays logged in and keeps reading their trips offline.
 - *Design system on a shared codebase:* moving every page to shared components and tokens while teammates kept working on the same files, keeping desktop and mobile consistent and each feature working.
 
+---
+
 ### David (`dle-fur`)
 
-**Infrastructure.** Technical foundation of the project: Docker Compose with the 5 services, health checks and startup order, Nginx as single entry point (routing, static files, WebSockets, HTTPS with Let's Encrypt certificates), the `Makefile`, and the move to production.
+**Infrastructure:** technical foundation of the project: Docker Compose with the 5 services, health checks and startup order, Nginx as single entry point (routing, static files, WebSockets, HTTPS with Let's Encrypt certificates), the `Makefile`, and the move to production.
 
-**Backend (Django / DRF).** Ideas and votes API under `/api/travels/{travel_id}/ideas/`: list, create, detail, choosing an accommodation (`…/choice/`) and votes (`…/reaction/`). Vote counts and "have I voted?" computed in a single SQL query (`annotate` + `Exists`); accommodation choice in a transaction with `select_for_update`; one vote per person and per idea guaranteed by a database constraint; model validation errors returned as detailed per-field `400`s. Public API (API key, per-view access, rate limiting, Swagger) and Google sign-in (Authlib).
+**Backend:** `Idea` and `Reaction` (votes) API: ideas, votes and the choice of an accommodation, with vote counts in a single query, a choice protected against simultaneous requests, and one vote per person guaranteed by the database. Public API and Google sign-in.
 
-**Frontend (React / TypeScript).** Ideas feature (`src/features/idea/`) in separated layers, where a component never calls `fetch`: API mapper, `useIdeas` hook (loading, errors, late responses), client-side form validation, translated backend errors, and `useSubmitAction` to prevent double submissions.
+**Frontend:** ideas feature (`src/features/idea/`) in separated layers, where a component never calls `fetch`: API mapper, `useIdeas` hook (loading, errors, late responses), client-side form validation, translated backend errors, and `useSubmitAction` to prevent double submissions.
 
-**Modules.** Framework for frontend and backend (technical foundation), public API, remote authentication (OAuth 2.0, Google).
+**Modules:** framework for frontend and backend (technical foundation), public API, remote authentication (OAuth 2.0, Google).
 
-**Challenges.**
+**Challenges:**
 - *Concurrent choices:* two travellers choosing an accommodation at the same time could break the rules (overlapping nights); a transaction with row locking (`select_for_update`) makes the second request see the first one.
 - *Performance:* counting votes per idea one by one (N+1 queries) was replaced by a single annotated query.
 - *Account takeover with Google:* since classic sign-up does not verify the email, signing in with Google is refused when a classic account already uses the same email.
 - *Rate limiting behind Nginx:* the client IP is read from `X-Forwarded-For` with `NUM_PROXIES: 1`, so it cannot be spoofed to bypass the limits.
 
+---
+
 ### Sébastien (`scuthber`)
 
-**Backend (Django / DRF).** Data model of every app: `Traveler` and friendships, `Travel` / `Participation` / `Step`, `Idea` and votes, `Spending` and shares, chat `Message` with unread tracking. Split and settlement services for expenses, keeping cents exact. The `common` app: base models, error format, permissions and a Faker `seed` command.
+**Backend:** data model of every app: `Traveler` and friendships, `Travel` / `Participation` / `Step`, `Idea` and votes, `Spending` and shares, chat `Message` with unread tracking. Split and settlement services for expenses, keeping cents exact. The `common` app: base models, error format, permissions and a Faker `seed` command.
 
-**Real-time (WebSockets).** Django Channels with a Redis channel layer: a per-trip consumer and a per-user notification consumer, events sent only after the database commit; live chat, ideas, votes, steps, participants and friend requests. On the frontend, a socket provider with reconnection and `useTravelEvent` / `useNotificationEvent` hooks.
+**Real-time:** Django Channels with a Redis channel layer: a per-trip consumer and a per-user notification consumer, events sent only after the database commit; live chat, ideas, votes, steps, participants and friend requests. On the frontend, a socket provider with reconnection and `useTravelEvent` / `useNotificationEvent` hooks.
 
-**Notifications.** Travel and idea notifications, the global notification dashboard and its live "while you were away" summary.
+**Notifications:** travel and idea notifications, the global notification dashboard and its live "while you were away" summary.
 
-**CI/CD.** GitHub Actions for backend and frontend: Ruff lint, tests against a real Redis, missing-migration check, whole-stack smoke test.
+**CI:** GitHub Actions for backend and frontend: Ruff lint, tests against a real Redis, missing-migration check, whole-stack smoke test.
 
-**Modules.** Real-time features, real-time collaboration, notification system, user interaction (with Sylvain), shared expenses (with Charlotte).
+**Modules:** real-time features, real-time collaboration, notification system, user interaction (with Sylvain), shared expenses (with Charlotte).
 
-**Challenges.**
+**Challenges:**
 - *Several workers:* two travelers of the same trip can be on different processes; a Redis channel layer makes events reach all of them.
 - *Missed events:* Channels does not replay what was sent while a client was offline, so the frontend reloads over REST on every (re)connection, then applies live events.
 - *Leaving a trip:* permissions are only checked on connect; a `travel.kick` event now closes the sockets of a traveler who left (code 4403).
 - *Async tests:* consumer tests failed with "the connection is closed"; fixed with `TransactionTestCase` and a custom communicator, documented in `Websockets.md`.
 
+---
+
 ### Sylvain (`sydubois`)
 
-**Backend (Django / DRF).** Authentication, profile, friendship and chat API views, following Django and DRF standards whenever possible.
+<!-- TODO(sydubois): check and complete -->
 
-**Frontend (React / TypeScript).** Authentication, profile management, friendships and chat interfaces. Sébastien handled the WebSocket implementation.
+**Project Manager:** followed where each member stood and organised team meetings.
 
-**Modules.** Standard user management and authentication; user interaction (with Sébastien).
+**Backend:** authentication and user management API, following Django and DRF standards whenever possible:
+- sign up, log in, log out, current user and CSRF token (`auth/…`), passwords hashed by Django;
+- profile update, password change and avatar upload (`travelers/update/`, `update-password/`, `update-profile-picture/`);
+- friendships: search, send, accept and remove (`friendships/…`);
+- chat: list and send messages, mark them as read, unread count.
 
-**Challenges.**
+**Frontend:** login and sign-up pages, profile page and its edit form, friends (search, requests, list), chat page. Sébastien handled the WebSocket layer.
 
-- **Error handling:** Reviewed and harmonised error handling across all features, working on `parseResponse.ts` and `errors.ts`, using `drf-standardized-errors` and `Accept-Language` for consistent, translated API errors.
-- **Consistency:** Reusing framework standards to avoid unnecessary custom implementations and keep the code maintainable.
+**Error handling:** made errors consistent across the whole app: `drf-standardized-errors` on the backend, the `Accept-Language` header so the API answers in the user's language, and a shared parsing of API errors on the frontend (`parseResponse.ts`, `errors.ts`).
+
+**Modules:** standard user management and authentication; user interaction (with Sébastien).
+
+**Challenges:**
+- *Error handling:* each feature returned and displayed errors its own way; one format on the backend and one parser on the frontend now give the same translated messages everywhere.
+- *Consistency:* reusing framework standards instead of custom implementations, to keep the code maintainable.
+
+---
 
 ## Resources
 
 <!-- TODO(team): add the references you actually used. -->
+
+### References
 
 - [Django](https://docs.djangoproject.com/en/5.2/), [Django REST Framework](https://www.django-rest-framework.org/), [Django Channels](https://channels.readthedocs.io/)
 - [React](https://react.dev/), [TypeScript](https://www.typescriptlang.org/docs/), [Vite](https://vite.dev/), [Tailwind CSS](https://tailwindcss.com/docs)
@@ -456,12 +519,14 @@ docker compose exec redis redis-cli -n 1 TTL ':1:throttle_public_api_<id>'
 
 ### Use of AI
 
-AI assistants were used by the team as a support tool, not to build the project in our place: to get concepts and error messages explained, to compare approaches before choosing one, and to review code. The team followed one rule: nothing was committed without being read, understood and tested by the member who committed it, and every pull request was still reviewed by another member.
+AI assistants were used by the team as a learning and support tool: to get concepts and error messages explained, to compare approaches before choosing one, and to review code. The code was written by the team members themselves; the few parts where AI produced code are listed below, and they went through the same tests and pull request reviews as the rest.
 
 More specifically:
 
 - **Charlotte (chpasqui):** used Claude to explore design directions and build the mockups, to get explanations of concepts (React, Tailwind, Django), and to review code. At the very end of the project, it also generated the landing page for visitors, helped update the `/design-system` catalogue page to the final components, and sped up a few repetitive changes (translations, renaming, style harmonisation).
 - **David (dle-fur):** wrote and understood the first tests himself, then used AI to write the remaining tests following the same pattern.
+
+---
 
 ## Known limitations
 
