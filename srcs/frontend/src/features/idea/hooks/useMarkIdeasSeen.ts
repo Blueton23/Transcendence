@@ -9,7 +9,8 @@ import i18n from "@/i18n";
 import { useError } from "@/shared/context/useError";
 
 function markAsSeen(travelId: number, showError: (message: string) => void) {
-  markIdeasAsSeen(travelId).catch(() => {
+  markIdeasAsSeen(travelId).catch((err) => {
+    if (err instanceof TypeError) return;
     showError(i18n.t("idea.errors.markSeenFailed"));
   });
 }

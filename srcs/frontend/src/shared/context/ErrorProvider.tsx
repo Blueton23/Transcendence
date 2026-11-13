@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { ErrorContext } from "@/shared/context/ErrorContext";
 
 const DISPLAY_MS = 5000;
@@ -12,8 +12,13 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timer);
   }, [message]);
 
+  const showError = useCallback((newMessage: string) => {
+    if (!navigator.onLine) return;
+    setMessage(newMessage);
+  }, []);
+
   return (
-    <ErrorContext.Provider value={{ message, showError: setMessage }}>
+    <ErrorContext.Provider value={{ message, showError}}>
       {children}
     </ErrorContext.Provider>
   );
