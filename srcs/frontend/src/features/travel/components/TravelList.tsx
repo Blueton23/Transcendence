@@ -20,7 +20,7 @@ export function TravelList({ travels, onChange }: TravelListProps) {
   const navigate = useNavigate();
   const { t } = useTranslation();
   return (
-    <div className="grid auto-rows-fr grid-cols-1 gap-2 md:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
+    <div className="grid auto-rows-fr grid-cols-1 gap-2 sm:grid-cols-[repeat(auto-fill,minmax(16rem,1fr))]">
       {travels.map((travel) => (
         <Card
           key={travel.id}

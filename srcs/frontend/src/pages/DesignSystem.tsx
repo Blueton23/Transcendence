@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 
 import { ideaTypes, type IdeaFilter } from "@/features/idea/types";
 import { ideaTypeLabels } from "@/features/idea/utils/ideaTypeLabels";
-import { ideaBands } from "@/features/idea/utils/ideaBands";
+import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import { categories } from "@/features/spending/types";
 import { spendingCategoryBands } from "@/features/spending/utils/spendingCategoryBands";
 import { spendingCategoryLabels } from "@/features/spending/utils/spendingCategoryLabels";
@@ -265,14 +265,13 @@ function DesignSystem() {
                 <span className="font-mono text-xs text-muted">pending</span>
               </div>
             </Specimen>
-            <Specimen label="types d'idée — ideaBands (bande + texte) et dotColors (rond)">
+            <Specimen label="types d'idée — pas de couleur, une icône par type (ideaIcons)">
               {ideaTypes.map((type) => (
                 <Tag
                   key={type}
-                  tone="plain"
+                  tone="idea"
                   shape="soft"
-                  icon={<Dot className={dotColors[type]} />}
-                  className={ideaBands[type]}
+                  icon={<Icon name={ideaIcons[type]} size={14} />}
                 >
                   {t(ideaTypeLabels[type])}
                 </Tag>
@@ -544,7 +543,7 @@ function DesignSystem() {
           <Section
             id="chip"
             name="Chip"
-            role="Filtre ou choix sélectionnable, avec un état actif. Le rond de couleur (Dot + dotColors) rappelle le type, comme sur les cartes."
+            role="Filtre ou choix sélectionnable, avec un état actif. Une icône (ideaIcons) ou un rond de couleur (Dot + dotColors pour les dépenses) rappelle le type, comme sur les cartes."
           >
             <Specimen label="active — cliquer pour changer la sélection">
               <Chip
@@ -558,7 +557,7 @@ function DesignSystem() {
                   key={type}
                   active={ideaFilter === type}
                   onClick={() => setIdeaFilter(type)}
-                  icon={<Dot className={dotColors[type]} />}
+                  icon={<Icon name={ideaIcons[type]} size={16} />}
                 >
                   {t(ideaTypeLabels[type])}
                 </Chip>
@@ -569,20 +568,20 @@ function DesignSystem() {
           <Section
             id="tag"
             name="Tag"
-            role='Repère factuel, jamais cliquable : date, nuits, statut, type. Hauteur fixe, sur une seule ligne. Les couleurs par type viennent des tableaux de bandes avec tone="plain".'
+            role='Repère factuel, jamais cliquable : date, nuits, statut, type. Hauteur fixe, sur une seule ligne. Les couleurs des catégories de dépense viennent de spendingCategoryBands avec tone="plain".'
           >
             <Specimen label='tone="default" (défaut, dates d&apos;une invitation) · "muted" (invitation en attente) · "idea" (idées d&apos;une étape)'>
               <Tag>20 – 27 nov.</Tag>
               <Tag tone="muted">Invitation en attente</Tag>
               <Tag tone="idea">2 idées</Tag>
             </Specimen>
-            <Specimen label='hébergement d&apos;une étape — tone="todo" (nuits à trouver) puis "plain" + ideaBands.accommodation (complet)'>
+            <Specimen label='hébergement d&apos;une étape — tone="todo" (nuits à trouver) puis "plain" + bg-idea-lodging-bg (complet)'>
               <Tag tone="todo" icon={<Icon name="tent" size={13} />}>
                 1/2 nuits
               </Tag>
               <Tag
                 tone="plain"
-                className={ideaBands.accommodation}
+                className="bg-idea-lodging-bg text-idea-lodging"
                 icon={<Icon name="tent" size={13} />}
               >
                 2/2 nuits
@@ -604,10 +603,7 @@ function DesignSystem() {
                 219 km
               </Tag>
             </Specimen>
-            <Specimen label='tone="plain" + className — couleur d&apos;un tableau (ideaBands, spendingCategoryBands) ou sur mesure'>
-              <Tag tone="plain" shape="soft" className={ideaBands.activity}>
-                {t(ideaTypeLabels.activity)}
-              </Tag>
+            <Specimen label='tone="plain" + className — couleur d&apos;un tableau (spendingCategoryBands) ou sur mesure'>
               <Tag
                 tone="plain"
                 shape="soft"
@@ -634,9 +630,9 @@ function DesignSystem() {
             name="Dot · OnlineStatus · OnlineDot"
             role="Dot : rond de couleur décoratif (filtres, notifications), la couleur vient de className. OnlineStatus : tag en ligne / hors ligne. OnlineDot : pastille verte sur un avatar, le parent doit être relative."
           >
-            <Specimen label="Dot — dotColors (types, catégories) ou bande de voyage">
-              <Dot className={dotColors.restaurant} />
-              <Dot className={dotColors.accommodation} />
+            <Specimen label="Dot — dotColors (catégories de dépense) ou bande de voyage">
+              <Dot className={dotColors.m} />
+              <Dot className={dotColors.l} />
               <Dot className={dotColors.f} />
               <Dot className="bg-band-3" />
             </Specimen>
@@ -700,15 +696,17 @@ function DesignSystem() {
             name="Card"
             role="Conteneur d'un bloc. band ajoute une bande de couleur en haut (voyage, idée, catégorie) ; className s'applique alors au corps de la carte."
           >
-            <Specimen label="band + bandClassName — carte d'idée, carte de voyage">
+            <Specimen label="band + bandClassName — carte d'idée (neutre, foncée si choisie), carte de voyage">
               <div className="grid w-full gap-3 md:grid-cols-2">
                 <Card
                   band={
-                    <span className="text-xs font-semibold">
-                      {t(ideaTypeLabels.accommodation)}
+                    <span className="flex items-center gap-1.5 text-xs font-semibold">
+                      <Icon name="tent" size={14} />
+                      {t("idea.chosenLodging")}
+                      <Icon name="check" size={13} />
                     </span>
                   }
-                  bandClassName={ideaBands.accommodation}
+                  bandClassName="bg-brand-dark text-inverse"
                   className="flex flex-col gap-1"
                 >
                   <Heading level={3} size="sm">

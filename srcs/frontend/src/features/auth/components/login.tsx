@@ -52,12 +52,12 @@ function Login() {
   }
 
   return (
-    <div className="flex items-center justify-center p-6">
-      <div className="w-full max-w-3xl">
-        <Card variant="default">
+    <div className="flex w-full items-center justify-center p-6">
+      <div className="w-full max-w-104">
+        <Card variant="default" className="p-6! md:p-8!">
           <form onSubmit={handleSubmit} className="flex flex-col gap-6">
             <div className="flex flex-col items-center gap-2 text-center">
-              <IconBadge color="purple" name="van" />
+              <IconBadge color="brand" name="compass" />
               <Heading level={1} size="lg">
                 {t("auth.welcomeBack")}
               </Heading>

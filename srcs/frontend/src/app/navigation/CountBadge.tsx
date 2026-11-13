@@ -8,7 +8,7 @@ const base =
 
 const variantStyles = {
   desktop: "flex h-5 w-5 text-sm",
-  mobile: "absolute top-1 right-1.25 h-3.75 w-3.75 text-[10px]",
+  mobile: "absolute -top-1.5 -right-2 h-3.75 w-3.75 text-[10px]",
 };
 
 function CountBadge({ count, variant = "desktop" }: CountBadgeProps) {

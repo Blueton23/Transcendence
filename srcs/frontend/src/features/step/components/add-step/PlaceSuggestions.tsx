@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 interface PlaceSuggestionsProps {
   items: Place[];
   isLoading: boolean;
+  failed: boolean;
   onSelect: (place: Place) => void;
   activeIndex: number;
 }
@@ -14,6 +15,7 @@ interface PlaceSuggestionsProps {
 export function PlaceSuggestions({
   items,
   isLoading,
+  failed,
   onSelect,
   activeIndex,
 }: PlaceSuggestionsProps) {
@@ -28,6 +30,10 @@ export function PlaceSuggestions({
       ) : isLoading ? (
         <Text tone="muted" size="sm" className="px-3 py-2">
           {t("actions.searching")}
+        </Text>
+      ) : failed ? (
+        <Text tone="muted" size="sm" className="px-3 py-2">
+          {t("map.searchFailed")}
         </Text>
       ) : items.length > 0 ? (
         items.map((place, index) => (

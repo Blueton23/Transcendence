@@ -6,8 +6,8 @@ import Text from "@/shared/ui/Text";
 import Select from "@/shared/ui/Select";
 import Input from "@/shared/ui/Input";
 import Chip from "@/shared/ui/Chip";
-import Dot from "@/shared/ui/Dot";
-import { dotColors } from "@/shared/utils/dotColors";
+import Icon from "@/shared/ui/Icon";
+import { ideaIcons } from "@/features/idea/utils/ideaIcons";
 import type { Step } from "@/features/step/types";
 import { useTranslation } from "react-i18next";
 
@@ -77,7 +77,7 @@ export function PlaceIdeaForm({
       <Chip
         disabled
         className="mb-3"
-        icon={<Dot className={dotColors[idea.type]} />}
+        icon={<Icon name={ideaIcons[idea.type]} size={16} />}
       >
         {t(ideaTypeLabels[idea.type])}
       </Chip>
