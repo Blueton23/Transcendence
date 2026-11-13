@@ -338,7 +338,7 @@ done | sort | uniq -c
 | **What it does** | Peripl can be installed as an app and stays usable offline in read-only mode: the user stays logged in, finds the trips already visited and sees a clear message when a feature needs the network. |
 | **How it is implemented** | • Caching (`vite.config.ts`): `vite-plugin-pwa` (Workbox) generates the manifest and the service worker; app files are precached, `GET /api/travels…` is network-first.<br>• Session (`features/auth/context/AuthProvider.tsx`): a lost network (`TypeError`) keeps the user logged in, an expired session (401) logs them out.<br>• Online status (`shared/hooks/useOnlineNetworkStatus.ts`): drives the "Offline" banner (`app/OfflineBanner.tsx`) and the placeholders for the map and the place search. |
 | **Limits** | Read-only offline. Map unavailable offline. Production needs HTTPS. Firefox desktop cannot install PWAs. |
-| **How to test** | `cd srcs/frontend && npx vite build && npx vite preview`, log in, tick "Offline" in the developer tools and reload. |
+| **How to test** | • Open `https://peripl.app:8443` (not `localhost`: the service worker needs a valid certificate), log in and open a trip.<br>• Developer tools → **Application**: the manifest and its icons, the service worker *activated and running*, the `api-travels` cache filling up.<br>• **Network** → tick **Offline** and reload: the user stays logged in, the trips stay readable and the "Offline" banner appears; a vote or an expense shows a network error message. |
 
 ---
 
