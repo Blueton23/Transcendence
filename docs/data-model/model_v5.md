@@ -1,40 +1,40 @@
-# Modèle de données
+# Data model
 
-**Aligné sur le code (`srcs/backend/*/models.py`) au 11/11/2026.** Les noms de champs sont ceux des modèles Django.
+**Aligned with the code (`srcs/backend/*/models.py`) as of 11/11/2026.** Field names are those of the Django models.
 
-## Principes produit
+## Product principles
 
-- **Planifier, pas naviguer.** Sur la route, c'est Google Maps. L'app rassemble les idées et définit le trajet ensemble. L'ordre des étapes découle de leurs dates, fixées par l'utilisateur, pas optimisé.
-- **L'étape est le trajet, l'idée est ce qu'on y fait.** L'étape dessine la ligne sur la carte. L'idée est une proposition rattachée à une étape ou au voyage : où dormir, manger, quoi voir.
-- **Le ❤️ est un signal, pas une décision.** On en met sur autant d'idées qu'on veut, il ne déclenche rien. Choisir un hébergement est une action explicite.
+- **Plan, don't navigate.** On the road, that's Google Maps' job. The app gathers ideas and defines the route together. The order of steps follows from their dates, set by the user, not optimized.
+- **The step is the route, the idea is what you do there.** The step draws the line on the map. The idea is a proposal attached to a step or to the trip: where to sleep, eat, what to see.
+- **The ❤️ is a signal, not a decision.** You can put as many as you like on ideas, it triggers nothing. Choosing an accommodation is an explicit action.
 
-## Schéma
+## Schema
 
 ```mermaid
 erDiagram
-    TRAVELER ||--o{ IDEA : "propose (0,N)"
-    TRAVELER ||--o{ PARTICIPATION : "participe (0,N)"
-    TRAVELER ||--o{ REACTION : "réagit (0,N)"
-    TRAVELER ||--o{ MESSAGE : "écrit (0,N)"
-    TRAVELER ||--o{ SPENDING : "paie (0,N)"
-    TRAVELER ||--o{ SPENDING_SHARE : "doit (0,N)"
-    TRAVELER ||--o{ FRIENDSHIP : "est ami (0,N)"
+    TRAVELER ||--o{ IDEA : "proposes (0,N)"
+    TRAVELER ||--o{ PARTICIPATION : "participates (0,N)"
+    TRAVELER ||--o{ REACTION : "reacts (0,N)"
+    TRAVELER ||--o{ MESSAGE : "writes (0,N)"
+    TRAVELER ||--o{ SPENDING : "pays (0,N)"
+    TRAVELER ||--o{ SPENDING_SHARE : "owes (0,N)"
+    TRAVELER ||--o{ FRIENDSHIP : "is friend (0,N)"
 
-    TRAVEL ||--o{ STEP : "contient (0,N)"
-    TRAVEL ||--o{ IDEA : "contient (0,N)"
-    TRAVEL ||--o{ PARTICIPATION : "réunit (1,N)"
-    TRAVEL ||--o{ MESSAGE : "contient (0,N)"
-    TRAVEL ||--o{ SPENDING : "contient (0,N)"
+    TRAVEL ||--o{ STEP : "contains (0,N)"
+    TRAVEL ||--o{ IDEA : "contains (0,N)"
+    TRAVEL ||--o{ PARTICIPATION : "gathers (1,N)"
+    TRAVEL ||--o{ MESSAGE : "contains (0,N)"
+    TRAVEL ||--o{ SPENDING : "contains (0,N)"
 
-    STEP ||--o{ IDEA : "regroupe (0,N)"
-    STEP ||--o{ MESSAGE : "commente (0,N)"
-    STEP ||--o{ SPENDING : "génère (0,N)"
+    STEP ||--o{ IDEA : "groups (0,N)"
+    STEP ||--o{ MESSAGE : "comments (0,N)"
+    STEP ||--o{ SPENDING : "generates (0,N)"
 
-    IDEA ||--o{ REACTION : "reçoit (0,N)"
-    IDEA ||--o{ MESSAGE : "commente (0,N)"
-    IDEA ||--o{ SPENDING : "génère (0,N)"
+    IDEA ||--o{ REACTION : "receives (0,N)"
+    IDEA ||--o{ MESSAGE : "comments (0,N)"
+    IDEA ||--o{ SPENDING : "generates (0,N)"
 
-    SPENDING ||--o{ SPENDING_SHARE : "se répartit en (0,N)"
+    SPENDING ||--o{ SPENDING_SHARE : "splits into (0,N)"
 
     TRAVELER {
         int id PK
@@ -43,10 +43,10 @@ erDiagram
         string last_name
         string email UK
         string password "hash"
-        image profile_picture "optionnel"
+        image profile_picture "optional"
         bool is_online
-        bool is_active "désactivation du compte"
-        datetime last_login "optionnel"
+        bool is_active "account deactivation"
+        datetime last_login "optional"
         datetime date_joined
         datetime created_at
         datetime updated_at
@@ -54,11 +54,11 @@ erDiagram
 
     TRAVEL {
         int id PK
-        string title "50 caractères max"
+        string title "50 characters max"
         date start_date
         date end_date ">= start_date"
-        string invite_token UK "lien de partage pour rejoindre"
-        enum status "en cours / terminé"
+        string invite_token UK "share link to join"
+        enum status "ongoing / finished"
         datetime created_at
         datetime updated_at
     }
@@ -66,13 +66,13 @@ erDiagram
     STEP {
         int id PK
         int travel_id FK
-        int priority "optionnel - départage deux étapes aux mêmes dates"
+        int priority "optional - breaks ties between two steps with the same dates"
         date start_date
         date end_date ">= start_date"
         string localisation
-        decimal latitude "-90 à 90"
-        decimal longitude "-180 à 180"
-        datetime deleted_at "optionnel - corbeille"
+        decimal latitude "-90 to 90"
+        decimal longitude "-180 to 180"
+        datetime deleted_at "optional - trash"
         datetime created_at
         datetime updated_at
     }
@@ -80,62 +80,62 @@ erDiagram
     IDEA {
         int id PK
         int travel_id FK
-        int traveler_id FK "qui propose"
-        int step_id FK "optionnel - pool si vide"
-        int chosen_by_id FK "optionnel - qui a choisi l'hébergement"
+        int traveler_id FK "who proposes"
+        int step_id FK "optional - pool if empty"
+        int chosen_by_id FK "optional - who chose the accommodation"
         string title
-        enum type "resto / hébergement / activité / à voir"
-        string localisation "optionnel"
-        text note "optionnel"
-        string url "optionnel"
-        decimal latitude "optionnel"
-        decimal longitude "optionnel"
-        decimal price_per_night "optionnel - hébergement seulement"
-        date start_date "optionnel"
-        date end_date "optionnel"
-        datetime chosen_at "optionnel - hébergement seulement"
+        enum type "restaurant / accommodation / activity / sight"
+        string localisation "optional"
+        text note "optional"
+        string url "optional"
+        decimal latitude "optional"
+        decimal longitude "optional"
+        decimal price_per_night "optional - accommodation only"
+        date start_date "optional"
+        date end_date "optional"
+        datetime chosen_at "optional - accommodation only"
         datetime created_at
         datetime updated_at
     }
 
     REACTION {
         int id PK
-        int traveler_id FK "unique avec idea_id"
+        int traveler_id FK "unique with idea_id"
         int idea_id FK
         datetime created_at
     }
 
     FRIENDSHIP {
         int id PK
-        int user1_id FK "toujours le plus petit id"
-        int user2_id FK "unique avec user1_id"
-        int requested_by_id FK "user1 ou user2"
-        enum status "en attente / acceptée"
+        int user1_id FK "always the smaller id"
+        int user2_id FK "unique with user1_id"
+        int requested_by_id FK "user1 or user2"
+        enum status "pending / accepted"
         datetime created_at
         datetime updated_at
     }
 
     PARTICIPATION {
         int id PK
-        int traveler_id FK "unique avec travel_id"
+        int traveler_id FK "unique with travel_id"
         int travel_id FK
-        enum status "invité / accepté / refusé / parti"
-        datetime left_at "optionnel"
-        datetime last_read_at "optionnel - dernier passage dans le chat"
-        datetime ideas_seen_at "optionnel - dernier passage sur les idées"
+        enum status "invited / accepted / declined / left"
+        datetime left_at "optional"
+        datetime last_read_at "optional - last visit to the chat"
+        datetime ideas_seen_at "optional - last visit to the ideas"
         datetime created_at
     }
 
     MESSAGE {
         int id PK
         int travel_id FK
-        int traveler_id FK "vide si système ou compte supprimé"
-        int step_id FK "optionnel - jamais avec idea_id"
-        int idea_id FK "optionnel - jamais avec step_id"
+        int traveler_id FK "empty if system or deleted account"
+        int step_id FK "optional - never with idea_id"
+        int idea_id FK "optional - never with step_id"
         bool is_system
-        text body "2000 caractères max - vide si système"
-        string system_key "optionnel - type de message système"
-        json system_params "optionnel - paramètres du message système"
+        text body "2000 characters max - empty if system"
+        string system_key "optional - system message type"
+        json system_params "optional - system message parameters"
         datetime created_at
         datetime updated_at
     }
@@ -143,13 +143,13 @@ erDiagram
     SPENDING {
         int id PK
         int travel_id FK
-        int traveler_id FK "qui paie"
-        int step_id FK "optionnel"
-        int idea_id FK "optionnel"
-        enum category "logement / carburant / activités / repas / péages / autres"
-        string label "optionnel - 100 caractères max"
+        int traveler_id FK "who pays"
+        int step_id FK "optional"
+        int idea_id FK "optional"
+        enum category "lodging / fuel / activities / meals / tolls / other"
+        string label "optional - 100 characters max"
         decimal amount ">= 0"
-        date paid_date "optionnel"
+        date paid_date "optional"
         datetime created_at
         datetime updated_at
     }
@@ -157,8 +157,8 @@ erDiagram
     SPENDING_SHARE {
         int id PK
         int spending_id FK
-        int traveler_id FK "unique avec spending_id"
-        decimal amount "part due, >= 0"
+        int traveler_id FK "unique with spending_id"
+        decimal amount "share owed, >= 0"
         datetime created_at
         datetime updated_at
     }
@@ -166,99 +166,99 @@ erDiagram
 
 ## Notation
 
-- `PK` clé primaire, `FK` clé étrangère, `UK` valeur unique
-- `||--o{` : un vers plusieurs — la cardinalité est aussi écrite en clair sur chaque relation
-- Toutes les tables ont un `id` auto. Les tables de liaison (`Reaction`, `Participation`, `Friendship`, `SpendingShare`) imposent l'unicité du couple par une `UniqueConstraint`, pas par une clé primaire composée.
-- `created_at` / `updated_at` viennent de `common.models.TimeStampedModel` (`auto_now_add` / `auto_now`). `Reaction` et `Participation` n'ont pas d'`updated_at` : un ❤️ ne se modifie pas, et `left_at` porte déjà le changement d'état d'une participation.
-- Les énumérations sont des `TextChoices` Django stockées sur un caractère (ex. `Travel.status` : `c` / `f`).
-- `Idea`, `Message`, `Spending` et `SpendingShare` héritent aussi de `ValidatedModel` : `full_clean()` est appelé à chaque `save()`, donc les règles de `clean()` décrites plus bas s'appliquent partout, pas seulement via l'API.
+- `PK` primary key, `FK` foreign key, `UK` unique value
+- `||--o{`: one to many — the cardinality is also written out on each relation
+- Every table has an auto `id`. Join tables (`Reaction`, `Participation`, `Friendship`, `SpendingShare`) enforce pair uniqueness with a `UniqueConstraint`, not a composite primary key.
+- `created_at` / `updated_at` come from `common.models.TimeStampedModel` (`auto_now_add` / `auto_now`). `Reaction` and `Participation` have no `updated_at`: a ❤️ is never modified, and `left_at` already records a participation's change of state.
+- Enumerations are Django `TextChoices` stored as a single character (e.g. `Travel.status`: `c` / `f`).
+- `Idea`, `Message`, `Spending` and `SpendingShare` also inherit from `ValidatedModel`: `full_clean()` is called on every `save()`, so the `clean()` rules described below apply everywhere, not only through the API.
 
-## Détails des tables
+## Table details
 
-- **Traveler** : un compte, basé sur `AbstractUser` de Django (d'où `username`, `password`, `is_active`, `is_staff`, `last_login`…). `email` est unique. `profile_picture` est un fichier uploadé dans `profile_pictures/`. `is_online` sert au statut en ligne des amis. Désactivable (`is_active`) plutôt que supprimé.
-- **Travel** : un voyage, avec ses dates de début et de fin (`end_date >= start_date`, contrainte en base ; l'API est plus stricte et exige `end_date > start_date` : un voyage dure au moins une nuit, code `end_not_after_start`). `invite_token` est généré à la création et permet à quiconque le possède de rejoindre. Aucun propriétaire : tous les participants ont les mêmes droits. Le créateur reçoit une participation acceptée.
-- **Participation** : qui participe à quel voyage et où en est son invitation. Une personne partie garde sa ligne (`status` parti + `left_at`), pour que les soldes restent justes. `last_read_at` et `ideas_seen_at` retiennent le dernier passage dans le chat et sur la page des idées : les non-lus sont ce que les autres ont créé après, aucun compteur n'est stocké. Accepter une invitation remplit ces deux dates, pour que l'historique ne s'affiche pas comme nouveau.
-- **Step** : un arrêt du trajet, défini par `start_date` / `end_date`. Le nombre de nuits n'est pas stocké : l'API le calcule (`end_date − start_date`, 0 pour une halte). Contrairement au voyage, l'API accepte `end_date = start_date` pour une étape (halte sans nuit). Deux étapes vivantes d'un même voyage ne peuvent pas se chevaucher (une étape peut commencer le jour où la précédente finit). `priority` sert seulement à ordonner deux étapes aux mêmes dates, et est unique par voyage + dates parmi les étapes vivantes. Les étapes sont triées par `start_date`, `end_date`, `priority`, `created_at`. `latitude` / `longitude` sont obligatoires.
-- **Idea** : une proposition faite pour un voyage. Rattachée à une étape, ou libre dans le pool (étape vide ou à la corbeille). Son statut n'est **pas stocké**, il se déduit (voir plus bas). Règles vérifiées par `clean()` :
-  - l'étape doit appartenir au même voyage ;
-  - `start_date` et `end_date` sont remplies ensemble ou pas du tout, et restent dans les dates de l'étape ;
-  - un hébergement a toujours des dates, au moins une nuit, et s'il est dans le pool ses dates restent dans celles du voyage ;
-  - une autre idée placée sur une étape a des dates, sur un seul jour ; dans le pool elle n'en a pas ;
-  - `price_per_night` est réservé aux hébergements ;
-  - seul un hébergement placé sur une étape peut être choisi (`chosen_at`), et deux hébergements choisis d'une même étape ne peuvent pas se chevaucher.
-- **Reaction** : un ❤️ d'une personne sur une idée, un seul par personne et par idée. Purement indicatif.
-- **Friendship** : un lien d'amitié entre deux comptes, indépendant des voyages. `user1 < user2` et `requested_by` {user1, user2} sont des contraintes en base. Un refus ou un retrait supprime la ligne.
-- **Message** : un message du chat, rattachable au voyage, à une étape ou à une idée (pas les deux, contrainte en base). L'auteur doit être un participant (accepté ou parti) à la création. Un message système (`is_system`) n'a pas d'auteur, pas de `body` mais un `system_key` (ex. `participant_joined`, `participant_left`) et des `system_params` : le texte est construit par le front.
-- **Spending** : une dépense, rattachable au voyage seul (carburant), à une étape (péage) ou à une idée (le resto qu'on a fait). Étape et idée doivent appartenir au même voyage, et si l'idée est sur une étape, l'étape de la dépense doit être la même. `amount` est `>= 0` en base, mais l'API exige au moins `0.01` (pas de dépense à 0). `category` sert aux regroupements de l'écran budget, `label` précise de quoi il s'agit. Le payeur doit être un participant du voyage (statut accepté ou parti).
-- **SpendingShare** : la part d'une dépense due par un voyageur. Un voyageur a au plus une part par dépense, et doit lui aussi être un participant accepté ou parti. Les parts sont figées à la création : quelqu'un qui quitte le voyage reste redevable des dépenses faites avant son départ. Sans parts fournies, la dépense est partagée à parts égales entre les participants acceptés. La somme des parts doit égaler `Spending.amount`, vérifiée par `spending/services.py` (plusieurs lignes, donc pas dans `clean()`).
+- **Traveler**: an account, based on Django's `AbstractUser` (hence `username`, `password`, `is_active`, `is_staff`, `last_login`…). `email` is unique. `profile_picture` is a file uploaded to `profile_pictures/`. `is_online` powers friends' online status. Deactivatable (`is_active`) rather than deleted.
+- **Travel**: a trip, with its start and end dates (`end_date >= start_date`, database constraint; the API is stricter and requires `end_date > start_date`: a trip lasts at least one night, code `end_not_after_start`). `invite_token` is generated on creation and lets anyone who has it join. No owner: all participants have the same rights. The creator gets an accepted participation.
+- **Participation**: who takes part in which trip and where their invitation stands. Someone who left keeps their row (`status` left + `left_at`), so balances stay correct. `last_read_at` and `ideas_seen_at` record the last visit to the chat and to the ideas page: unread items are whatever others created after that, no counter is stored. Accepting an invitation fills both dates, so the history doesn't show up as new.
+- **Step**: a stop on the route, defined by `start_date` / `end_date`. The number of nights is not stored: the API computes it (`end_date − start_date`, 0 for a stopover). Unlike the trip, the API accepts `end_date = start_date` for a step (stopover with no night). Two live steps of the same trip cannot overlap (a step may start on the day the previous one ends). `priority` is only used to order two steps with the same dates, and is unique per trip + dates among live steps. Steps are sorted by `start_date`, `end_date`, `priority`, `created_at`. `latitude` / `longitude` are required.
+- **Idea**: a proposal made for a trip. Attached to a step, or free in the pool (empty step or step in the trash). Its status is **not stored**, it is derived (see below). Rules checked by `clean()`:
+  - the step must belong to the same trip;
+  - `start_date` and `end_date` are filled together or not at all, and stay within the step's dates;
+  - an accommodation always has dates, at least one night, and if it is in the pool its dates stay within the trip's;
+  - any other idea placed on a step has dates, on a single day; in the pool it has none;
+  - `price_per_night` is reserved for accommodations;
+  - only an accommodation placed on a step can be chosen (`chosen_at`), and two chosen accommodations of the same step cannot overlap.
+- **Reaction**: a ❤️ from one person on an idea, only one per person and per idea. Purely indicative.
+- **Friendship**: a friendship link between two accounts, independent of trips. `user1 < user2` and `requested_by` ∈ {user1, user2} are database constraints. A refusal or removal deletes the row.
+- **Message**: a chat message, attachable to the trip, a step or an idea (not both, database constraint). The author must be a participant (accepted or left) at creation. A system message (`is_system`) has no author, no `body` but a `system_key` (e.g. `participant_joined`, `participant_left`) and `system_params`: the text is built by the front end.
+- **Spending**: an expense, attachable to the trip alone (fuel), a step (toll) or an idea (the restaurant we went to). Step and idea must belong to the same trip, and if the idea is on a step, the expense's step must be the same. `amount` is `>= 0` in the database, but the API requires at least `0.01` (no zero-amount expense). `category` drives the groupings on the budget screen, `label` specifies what it is. The payer must be a participant of the trip (status accepted or left).
+- **SpendingShare**: the share of an expense owed by a traveler. A traveler has at most one share per expense, and must also be an accepted or left participant. Shares are frozen at creation: someone who leaves the trip still owes the expenses made before they left. Without provided shares, the expense is split equally among accepted participants. The sum of the shares must equal `Spending.amount`, checked by `spending/services.py` (multiple rows, so not in `clean()`).
 
-## Statut d'une idée (calculé)
+## Idea status (computed)
 
-`Idea.status` est une propriété, pas une colonne :
+`Idea.status` is a property, not a column:
 
-- **proposée** (`s`) : dans le pool (pas d'étape, ou étape à la corbeille) ;
-- **choisie** (`c`) : hébergement placé sur une étape avec `chosen_at` rempli ;
-- **placée** (`p`) : sinon, idée rattachée à une étape vivante.
+- **proposed** (`s`): in the pool (no step, or step in the trash);
+- **chosen** (`c`): accommodation placed on a step with `chosen_at` filled;
+- **placed** (`p`): otherwise, idea attached to a live step.
 
-Choisir un hébergement passe par `POST /travels/<id>/ideas/<id>/choice/`, qui remplit `chosen_at` et `chosen_by`. Il n'y a pas encore d'action pour annuler un choix.
+Choosing an accommodation goes through `POST /travels/<id>/ideas/<id>/choice/`, which fills `chosen_at` and `chosen_by`. There is no action yet to undo a choice.
 
-## Comportements en cas de suppression
+## Deletion behavior
 
-- **Voyage** : on ne le supprime pas, on le quitte (comme un groupe WhatsApp). Il sort de sa liste, rien ne bouge pour les autres, et sa participation reste en base (statut parti) pour que les soldes restent justes.
-- **Étape** : corbeille (`deleted_at`). Impossible tant qu'elle a des dépenses (« déplacez-les ou supprimez-les d'abord »). Ses idées repassent dans le pool sans être modifiées. Pas encore d'endpoint de restauration (le modèle a `restore()`). Si une étape est supprimée définitivement, ses idées passent à `step = NULL`, perdent leur choix et, hors hébergement, leurs dates.
-- **Idée** : suppression définitive. Ses réactions partent avec elle (`CASCADE`), ses dépenses et messages restent au voyage (`SET NULL`).
-- **Message** : pas de suppression côté API. Si le compte de son auteur est supprimé, le message reste dans le fil sans auteur (`SET NULL`).
-- **Dépense** : suppression définitive, ses parts partent avec elle (`CASCADE`). Si son étape ou son idée disparaît, elle perd juste son rattachement (`SET NULL`).
-- **Voyageur** : un voyageur qui a payé une dépense ou qui doit une part ne peut pas être supprimé (`PROTECT`), sinon les soldes des autres seraient faussés sans bruit. Ses idées, réactions, participations et amitiés partent avec lui (`CASCADE`). Si une idée qu'il a choisie reste, `chosen_by` passe à vide.
+- **Trip**: it isn't deleted, you leave it (like a WhatsApp group). It disappears from your list, nothing changes for the others, and your participation stays in the database (status left) so balances stay correct.
+- **Step**: trash (`deleted_at`). Impossible while it has expenses ("move or delete them first"). Its ideas go back to the pool unchanged. No restore endpoint yet (the model has `restore()`). If a step is permanently deleted, its ideas get `step = NULL`, lose their choice and, except for accommodations, their dates.
+- **Idea**: permanent deletion. Its reactions go with it (`CASCADE`), its expenses and messages stay on the trip (`SET NULL`).
+- **Message**: no deletion through the API. If its author's account is deleted, the message stays in the thread without an author (`SET NULL`).
+- **Expense**: permanent deletion, its shares go with it (`CASCADE`). If its step or idea disappears, it just loses its attachment (`SET NULL`).
+- **Traveler**: a traveler who paid an expense or owes a share cannot be deleted (`PROTECT`), otherwise others' balances would be silently wrong. Their ideas, reactions, participations and friendships go with them (`CASCADE`). If an idea they chose remains, `chosen_by` becomes empty.
 
-`price_per_night` est descriptif (« ce camping coûte 24 CHF/nuit »), `Spending` est de l'argent réellement sorti. Rien ne passe automatiquement de l'un à l'autre.
+`price_per_night` is descriptive ("this campsite costs 24 CHF/night"), `Spending` is money actually spent. Nothing moves automatically from one to the other.
 
-## Changer les dates du voyage
+## Changing the trip's dates
 
-`start_date` et `end_date` restent modifiables après création :
+`start_date` and `end_date` remain editable after creation:
 
-- **Agrandir la période** : mise à jour immédiate.
-- **Réduire la période** : refusé si des étapes vivantes sortent des nouvelles bornes (« déplacez-les d'abord »). Rien n'est mis à la corbeille automatiquement.
-- **Créer ou modifier une étape** : via l'API, ses dates doivent rester dans celles du voyage. Le modèle sait élargir le voyage pour englober une étape (`Step.extend_travel_dates_to_fit`, appelé au `save()`), mais la validation de l'API empêche aujourd'hui d'en arriver là.
+- **Extending the period**: immediate update.
+- **Shortening the period**: refused if live steps fall outside the new bounds ("move them first"). Nothing is moved to the trash automatically.
+- **Creating or editing a step**: through the API, its dates must stay within the trip's. The model can widen the trip to include a step (`Step.extend_travel_dates_to_fit`, called on `save()`), but API validation currently prevents this from happening.
 
-## Historique des changements
+## Change history
 
-| # | Changement | Pourquoi | Source |
+| # | Change | Why | Source |
 |---|-----------|----------|--------|
-| 1 | `Step` : `start_date` / `end_date` + `priority` optionnel | Remplace l'idée `Position` + `Nights` du PV : les dates sont stockées, les nuits calculées. `priority` départage deux étapes aux mêmes dates. | PV 18/07, puis code |
-| 2 | `Choice` + `Vote` → `Reaction` | La v2 imposait un vote exclusif. Le ❤️ est un signal : on en met sur autant d'idées qu'on veut. | PV 18/07 |
-| 3 | `chosen_by` / `chosen_at` sur `Idea` | Trace l'acte de choisir un hébergement. Le statut n'est plus stocké : il se déduit de l'étape et de `chosen_at`. | PV 18/07, puis code |
-| 4 | Pas de table hébergement séparée | Sa seule spécificité est l'exclusivité, vérifiée dans `Idea.clean()` (pas de chevauchement entre hébergements choisis d'une étape). | PV 18/07 |
-| 5 | Valeurs de statuts fixées | Voir « Statuts » ci-dessous. | PV 18/07 |
-| 6 | Tables de statut → énumérations Django | Listes courtes et figées : `TextChoices` protège autant, sans table ni jointure. https://docs.djangoproject.com/en/5.2/ref/models/fields/#enumeration-types | |
-| 7 | `TravelerRole` supprimé, aucun propriétaire | Mêmes droits pour tous. On quitte un voyage, on ne le supprime pas, et la ligne reste pour les soldes. | Maquette |
-| 8 | `Spending` : un seul champ `amount` | Aucun écran ne compare prévu et réel. | Maquette |
-| 9 | `Spending` : ajout de `category` | L'écran budget repose entièrement dessus. | Maquette |
-| 10 | `step` / `idea` optionnels sur `Spending` et `Message` | Une dépense relève du voyage (carburant), d'une étape (péage) ou d'une idée (le resto). | Maquette |
-| 11 | `Idea` : dates optionnelles selon le type | Un hébergement a toujours des dates, une autre idée seulement une fois placée sur une étape, sur un seul jour. | Code |
-| 12 | `deleted_at` sur `Step` uniquement | La corbeille prévue pour `Idea` n'a pas été implémentée : une idée est supprimée définitivement. | Code |
-| 13 | Promotion idée → étape | Pas implémentée. | |
-| 14 | `price_per_night` sur `Idea` | Affiché dans la maquette (« 95 CHF/nuit »), réservé aux hébergements. | Maquette |
-| 15 | Table `Friendship` | Exigée par le module « standard user management » : ajouter des amis et voir leur statut en ligne (`Traveler.is_online`). | Sujet + maquette |
-| 16 | `Travel.invite_token` | Rejoindre un voyage passe par un lien généré à la création. | Maquette |
-| 17 | `Travel.end_date` obligatoire, `>= start_date` en base, `> start_date` dans l'API | Un voyage a une durée connue dès sa création. Réduire la période est refusé si des étapes en sortent. | Maquette, puis code |
-| 18 | `Step.latitude` / `longitude` obligatoires | La carte a besoin de vraies coordonnées. | Maquette |
-| 19 | `Idea.latitude` / `longitude` | Une idée a son propre emplacement, pas forcément celui de son étape. Optionnel. | Maquette |
-| 20 | `Spending.label` | `category` dit le type de dépense, pas laquelle. | |
-| 21 | Payeur d'une dépense = participant du voyage | Une dépense payée par quelqu'un d'extérieur fausserait les soldes. « Parti » reste accepté. | |
-| 22 | Table `SpendingShare` | Répartir une dépense entre les participants présents au moment où elle est faite. Montant exact par part plutôt qu'un poids. | |
-| 23 | `Message` : ni `Enabled` ni `deleted_at` | Les messages ne se suppriment pas via l'API. | Code |
-| 24 | `Participation.last_read_at` | Non-lus du chat, calculés à partir de la date. | Code |
-| 25 | `Message` : une étape ou une idée, pas les deux | Contrainte en base. | Code |
-| 26 | `Participation.ideas_seen_at` | Même principe que `last_read_at`, pour le badge des nouvelles idées. | Code |
-| 27 | `Message.system_key` / `system_params` | Les messages système (arrivée, départ d'un participant) sont traduits côté front plutôt que stockés en texte. | Code |
-| 28 | `Idea.note` / `Idea.url` | Commentaire libre et lien (site, réservation) sur une idée. | Code |
-| 29 | `Traveler` basé sur `AbstractUser` | Réutilise l'authentification Django : `first_name`, `password`, `is_active`… viennent de là. `profile_picture` est un fichier, pas une URL. | Code |
-| 30 | Étape avec dépenses non supprimable | Évite de perdre le rattachement des dépenses sans le vouloir. | Code |
+| 1 | `Step`: `start_date` / `end_date` + optional `priority` | Replaces the `Position` + `Nights` idea from the meeting minutes: dates are stored, nights computed. `priority` breaks ties between two steps with the same dates. | Minutes 18/07, then code |
+| 2 | `Choice` + `Vote` → `Reaction` | v2 required an exclusive vote. The ❤️ is a signal: you can put as many as you like on ideas. | Minutes 18/07 |
+| 3 | `chosen_by` / `chosen_at` on `Idea` | Records the act of choosing an accommodation. Status is no longer stored: it is derived from the step and `chosen_at`. | Minutes 18/07, then code |
+| 4 | No separate accommodation table | Its only specificity is exclusivity, checked in `Idea.clean()` (no overlap between chosen accommodations of a step). | Minutes 18/07 |
+| 5 | Status values defined | See "Statuses" below. | Minutes 18/07 |
+| 6 | Status tables → Django enumerations | Short, fixed lists: `TextChoices` protects just as well, without a table or join. https://docs.djangoproject.com/en/5.2/ref/models/fields/#enumeration-types | |
+| 7 | `TravelerRole` removed, no owner | Same rights for everyone. You leave a trip, you don't delete it, and the row stays for balances. | Mockup |
+| 8 | `Spending`: single `amount` field | No screen compares planned vs. actual. | Mockup |
+| 9 | `Spending`: `category` added | The budget screen relies entirely on it. | Mockup |
+| 10 | Optional `step` / `idea` on `Spending` and `Message` | An expense belongs to the trip (fuel), a step (toll) or an idea (the restaurant). | Mockup |
+| 11 | `Idea`: optional dates depending on type | An accommodation always has dates, other ideas only once placed on a step, on a single day. | Code |
+| 12 | `deleted_at` on `Step` only | The trash planned for `Idea` was not implemented: an idea is permanently deleted. | Code |
+| 13 | Idea → step promotion | Not implemented. | |
+| 14 | `price_per_night` on `Idea` | Shown in the mockup ("95 CHF/night"), reserved for accommodations. | Mockup |
+| 15 | `Friendship` table | Required by the "standard user management" module: add friends and see their online status (`Traveler.is_online`). | Subject + mockup |
+| 16 | `Travel.invite_token` | Joining a trip goes through a link generated at creation. | Mockup |
+| 17 | `Travel.end_date` required, `>= start_date` in the database, `> start_date` in the API | A trip has a known duration from its creation. Shortening the period is refused if steps fall outside it. | Mockup, then code |
+| 18 | `Step.latitude` / `longitude` required | The map needs real coordinates. | Mockup |
+| 19 | `Idea.latitude` / `longitude` | An idea has its own location, not necessarily its step's. Optional. | Mockup |
+| 20 | `Spending.label` | `category` says the type of expense, not which one. | |
+| 21 | Expense payer = trip participant | An expense paid by an outsider would skew balances. "Left" is still accepted. | |
+| 22 | `SpendingShare` table | Split an expense among the participants present when it is made. Exact amount per share rather than a weight. | |
+| 23 | `Message`: neither `Enabled` nor `deleted_at` | Messages cannot be deleted through the API. | Code |
+| 24 | `Participation.last_read_at` | Chat unread count, computed from the date. | Code |
+| 25 | `Message`: a step or an idea, not both | Database constraint. | Code |
+| 26 | `Participation.ideas_seen_at` | Same principle as `last_read_at`, for the new-ideas badge. | Code |
+| 27 | `Message.system_key` / `system_params` | System messages (participant joining, leaving) are translated on the front end rather than stored as text. | Code |
+| 28 | `Idea.note` / `Idea.url` | Free comment and link (website, booking) on an idea. | Code |
+| 29 | `Traveler` based on `AbstractUser` | Reuses Django authentication: `first_name`, `password`, `is_active`… come from there. `profile_picture` is a file, not a URL. | Code |
+| 30 | Step with expenses cannot be deleted | Avoids losing expenses' attachment by accident. | Code |
 
-### Statuts (point 5)
+### Statuses (item 5)
 
-- **`Travel`** : en cours (`c`) → terminé (`f`). Pas de statut « annulé » : un voyage qui ne se fera jamais, on le quitte.
-- **`Idea`** : proposée → placée → choisie, calculé (voir plus haut). Une idée non placée reste dans le pool indéfiniment : elle ne disparaît jamais faute de ❤️.
-- **`Participation`** : invité → accepté / refusé, puis accepté → parti.
-- **`Friendship`** : en attente → acceptée. Un refus supprime la ligne.
+- **`Travel`**: ongoing (`c`) → finished (`f`). No "cancelled" status: a trip that will never happen, you leave it.
+- **`Idea`**: proposed → placed → chosen, computed (see above). An unplaced idea stays in the pool indefinitely: it never disappears for lack of ❤️.
+- **`Participation`**: invited → accepted / declined, then accepted → left.
+- **`Friendship`**: pending → accepted. A refusal deletes the row.
