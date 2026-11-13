@@ -9,6 +9,7 @@ import { useOnClickOutside } from "../hooks/useOnClickOutside";
 import { useRef } from "react";
 import { useEscapeKey } from "../hooks/useEscapeKey";
 import { useTranslation } from "react-i18next";
+import { createPortal } from "react-dom";
 
 interface ModalProps {
   children: ReactNode;
@@ -71,7 +72,7 @@ function Modal({
   useOnClickOutside(cardRef, onClose);
   useEscapeKey(onClose);
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim">
       <div
         ref={cardRef}
@@ -85,7 +86,8 @@ function Modal({
         />
         <div className="flex-1 overflow-y-auto px-8 pb-8">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
