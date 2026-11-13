@@ -86,8 +86,7 @@ export function CreateIdeaModal({
             await onCreate(input);
             onClose();
           } catch (err) {
-              setSubmitError(toErrorMessage(err))
-            ;
+            setSubmitError(toErrorMessage(err));
           } finally {
             setIsSubmitting(false);
           }

@@ -18,7 +18,7 @@ export function ErrorProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <ErrorContext.Provider value={{ message, showError}}>
+    <ErrorContext.Provider value={{ message, showError }}>
       {children}
     </ErrorContext.Provider>
   );
