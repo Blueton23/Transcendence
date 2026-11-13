@@ -24,7 +24,13 @@ export async function parseResponse<T>(response: Response): Promise<T> {
         .map((item) => item.code)
         .filter((code): code is string => typeof code === "string");
 
-      throw new ApiHttpError(getApiErrorMessage(error), response.status, codes);
+      // A 5xx is a crash: its detail is a technical English sentence, never shown as is
+      const message =
+        response.status >= 500
+          ? i18n.t("errors.server")
+          : getApiErrorMessage(error);
+
+      throw new ApiHttpError(message, response.status, codes);
     }
 
     const message =
