@@ -1,4 +1,4 @@
-include .env
+-include .env
 export
 
 #######################################
@@ -8,7 +8,31 @@ COMPOSE = docker compose
 #######################################
 
 # Commandes compose
-up:
+all: up
+
+env:
+	@if [ ! -f kit.tgz ] && { [ ! -f .env ] || [ ! -d certs/live/peripl.app ]; }; then \
+		echo "kit.tgz manquant : déposez-le à la racine du projet."; \
+		exit 1; \
+	fi
+	@if [ ! -d certs/live/peripl.app ]; then \
+		echo "Installation des certificats..."; \
+		tar xzf kit.tgz certs; \
+	fi
+	@if [ ! -f .env ]; then \
+		echo "Création du .env..."; \
+		tar xzf kit.tgz secrets.env; \
+		. ./secrets.env; \
+		cp .env.example .env; \
+		sed -i "s|^DJANGO_SECRET_KEY=.*|DJANGO_SECRET_KEY=$$(openssl rand -hex 32)|" .env; \
+		sed -i "s|^POSTGRES_PASSWORD=.*|POSTGRES_PASSWORD=$$(openssl rand -hex 16)|" .env; \
+		sed -i "s|^GOOGLE_CLIENT_ID=.*|GOOGLE_CLIENT_ID=$$GOOGLE_CLIENT_ID|" .env; \
+		sed -i "s|^GOOGLE_CLIENT_SECRET=.*|GOOGLE_CLIENT_SECRET=$$GOOGLE_CLIENT_SECRET|" .env; \
+		sed -i "s|^VITE_MAPBOX_TOKEN=.*|VITE_MAPBOX_TOKEN=$$VITE_MAPBOX_TOKEN|" .env; \
+		rm -f secrets.env; \
+	fi
+
+up: env
 	$(COMPOSE) up --build
 
 down:
@@ -142,7 +166,7 @@ lint:
 
 #######################################
 
-.PHONY: up down start stop restart build ps images volumes logs clean fclean re smoke \
+.PHONY: all env up down start stop restart build ps images volumes logs clean fclean re smoke \
 	psql test-db \
 	makemigrations check-migrations migrate startapp createsuperuser seed unseed shell check test format-back format-check-back \
 	lint-back lint-fix-back check-back fix-back format-front format-check-front front-install

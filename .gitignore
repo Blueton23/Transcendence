@@ -64,3 +64,10 @@ Thumbs.db
 
 # Fichiers
 srcs/frontend/public/mockup.html
+
+# Nginx
+certs/
+
+# Secrets
+kit.tgz
+secrets.env

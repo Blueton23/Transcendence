@@ -9,18 +9,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Utilise la key par defaut dans le env, a changer en prod par une vrai
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "unsafe-default-key")
+SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Mettre "True" et "false" pour la production
 DEBUG = os.environ.get("DJANGO_DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
         "DJANGO_ALLOWED_HOSTS",
-        "localhost,127.0.0.1",
+        "peripl.app,localhost",
     ).split(",")
     if host.strip()
 ]
@@ -29,7 +27,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.environ.get(
         "DJANGO_CSRF_TRUSTED_ORIGINS",
-        "http://localhost:8080",
+        "https://peripl.app",
     ).split(",")
     if origin.strip()
 ]
@@ -71,10 +69,10 @@ MIDDLEWARE = [
 
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
-# A AJOUTER EN PROD SDU
-# SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # OAuth 2.0 Google
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
@@ -153,7 +151,7 @@ REST_FRAMEWORK = {
     ],
     # Rate limiting : limites par "scope", appliquées vue par vue
     "DEFAULT_THROTTLE_RATES": {
-        "public_api": "100/minute",
+        "public_api": "1000/minute",
         "auth_token": "5/minute",
     },
     # 1 proxy (nginx) devant Django : l'IP réelle du client est la dernière (non falsifiable)

@@ -11,13 +11,13 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
       includeAssets: ["favicon.ico", "apple-touch-icon-180x180.png"],
       manifest: {
         name: "Peripl",
         short_name: "Peripl",
-        description: "Organise vos roadtrip à plusieurs",
+        description: "Plan a road trip with friends, all in one place",
         theme_color: "#d63f26",
         background_color: "#f6f1e9",
         display: "standalone",
@@ -70,11 +70,5 @@ export default defineConfig({
     host: "0.0.0.0",
     port: 5173,
     strictPort: true,
-  },
-  preview: {
-    proxy: {
-      "/api": "http://localhost:8080",
-      "/media": "http://localhost:8080",
-    },
   },
 });

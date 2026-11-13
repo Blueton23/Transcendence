@@ -4,7 +4,7 @@
 
 set -eu
 
-BASE_URL="${BASE_URL:-http://localhost:8080}"
+BASE_URL="${BASE_URL:-https://localhost:8443}"
 COMPOSE="docker compose"
 USERNAME="smoke-$(date +%s)"
 PASSWORD="Smoke-test-$(date +%s)!"
@@ -22,15 +22,15 @@ step() { printf '→ %s... ' "$1"; }
 ok() { echo "ok"; }
 
 step "frontend is served"
-curl -fsS "$BASE_URL/" | grep -q 'id="root"'
+curl -kfsS "$BASE_URL/" | grep -q 'id="root"'
 ok
 
 step "API answers"
-curl -fsS "$BASE_URL/api/" | grep -q '"status":"ok"'
+curl -kfsS "$BASE_URL/api/" | grep -q '"status":"ok"'
 ok
 
 step "static files are served by nginx"
-curl -fsS -o /dev/null "$BASE_URL/static/admin/css/base.css"
+curl -kfsS -o /dev/null "$BASE_URL/static/admin/css/base.css"
 ok
 
 step "database migrations are applied"
@@ -38,22 +38,26 @@ $COMPOSE exec -T backend python manage.py migrate --check >/dev/null
 ok
 
 step "signup writes to the database"
-curl -fsS -o /dev/null -X POST "$BASE_URL/api/travelers/create/" \
+curl -kfsS -o /dev/null -X POST "$BASE_URL/api/travelers/create/" \
     -H 'Content-Type: application/json' \
     -d "{\"username\":\"$USERNAME\",\"firstName\":\"Smoke\",\"lastName\":\"Test\",\"email\":\"$USERNAME@example.com\",\"password\":\"$PASSWORD\",\"passwordConfirmation\":\"$PASSWORD\"}"
 ok
 
 step "login opens a session"
-curl -fsS -o /dev/null -c "$JAR" -X POST "$BASE_URL/api/auth/login/" \
+curl -kfsS -o /dev/null -c "$JAR" -X POST "$BASE_URL/api/auth/login/" \
     -H 'Content-Type: application/json' \
     -d "{\"username\":\"$USERNAME\",\"password\":\"$PASSWORD\"}"
-curl -fsS -b "$JAR" "$BASE_URL/api/auth/me/" | grep -q "\"$USERNAME\""
+curl -kfsS -b "$JAR" "$BASE_URL/api/auth/me/" | grep -q "\"$USERNAME\""
 ok
 
 step "websocket goes through nginx and uvicorn"
 $COMPOSE exec -T backend python -c "
+import ssl
 from websockets.sync.client import connect
-with connect('ws://nginx/ws/ping/', origin='http://localhost') as ws:
+ctx = ssl.create_default_context()
+ctx.check_hostname = False
+ctx.verify_mode = ssl.CERT_NONE
+with connect('wss://nginx/ws/ping/', origin='https://localhost', ssl=ctx) as ws:
     ws.send('{\"message\": \"smoke\"}')
     assert ws.recv(timeout=5) == '{\"message\": \"pong: smoke\"}'
 " >/dev/null
