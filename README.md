@@ -87,8 +87,6 @@ The application is then available at **https://peripl.app:8443**.
 
 ## Team Information
 
-<!-- TODO(each member): one row each. Roles from the subject: PO, PM, Tech Lead, Developers. -->
-
 | Member | Login | Role(s) | Responsibilities |
 |---|---|---|---|
 | Charlotte | `chpasqui` | Product Owner, Developer | **Product Owner**: defines and prioritises the features and the modules, writes and orders the GitHub issues, checks that deliveries match the mockups and the subject. **Developer**: design and frontend lead, full-stack on trips, itinerary, map and expenses. |
@@ -99,8 +97,6 @@ The application is then available at **https://peripl.app:8443**.
 ---
 
 ## Project Management
-
-<!-- TODO(team): check and complete together. -->
 
 - **Organisation**: one in-person meeting per week at 42 to review progress, agree on priorities and split the next tasks. Each member owns one or more domains (see Features List); the Product Owner writes and orders the issues.
 - **Tasks**: GitHub Issues, one branch per issue (`<name>/<issue>-<title>`), pull requests reviewed by at least one other member before merging into `main`.
@@ -136,8 +132,6 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 ---
 
 ## Features List
-
-<!-- TODO(each member): add your features and your name. Keep one line per feature. -->
 
 | Feature | Description | Member(s) |
 |---|---|---|
@@ -368,8 +362,8 @@ done | sort | uniq -c
 | **Members** | chpasqui |
 | **Why this module** | Friends use different devices and browsers (Safari on iPhone, Firefox, Chrome): the app must work the same for everyone in the group. |
 | **What it does** | Every feature works with the same look on Chrome (required), **Firefox** and **Safari**, on desktop and mobile. |
-| **How it is implemented** | • Every page and feature tested in the three browsers, desktop and mobile (responsive mode). <!-- TODO(chpasqui): mention real phones if you tested on them --><br>• Only standard web APIs; Tailwind adds vendor prefixes where needed.<br>• Dates formatted through `Intl` / i18next rather than browser-specific parsing. |
-| **Limits** | Firefox desktop cannot install PWAs (the app still works in the browser). <!-- TODO(chpasqui): add any other browser-specific difference found while testing --> |
+| **How it is implemented** | • Every page and feature tested in the three browsers, desktop and mobile (responsive mode). Only standard web APIs; Tailwind adds vendor prefixes where needed.<br>• Dates formatted through `Intl` / i18next rather than browser-specific parsing. |
+| **Limits** | Firefox desktop cannot install PWAs (the app still works in the browser). Safari: specific design needs for the map with Mapbox |
 | **How to test** | Open the app in Firefox and Safari and go through the main flows: create a trip, add steps, pin and vote for an idea, add an expense, send a chat message. |
 
 ---
@@ -491,7 +485,6 @@ https://drlee.io/how-to-setup-google-authentication-step-by-step-3707d0dffc77
 https://swagger.io/docs/
 https://coddy.tech/docs/typescript
 
-<!-- TODO(team): add the references you actually used. -->
 
 ### References
 
@@ -516,8 +509,6 @@ More specifically:
 ---
 
 ## Known limitations
-
-<!-- TODO(team) -->
 
 - **Itinerary**: two steps on the same dates are ordered by creation; the API supports a manual order (`priority`) but the interface does not offer it yet.
 - **Itinerary**: a step must stay within the trip dates; to add a step outside them, the trip dates have to be changed first (the trip is not extended automatically).
