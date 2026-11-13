@@ -496,6 +496,11 @@ done | sort | uniq -c
 ---
 
 ## Resources
+https://docs.djangoproject.com/fr/6.1/
+https://developers.google.com/identity/protocols/oauth2?hl=fr
+https://drlee.io/how-to-setup-google-authentication-step-by-step-3707d0dffc77
+https://swagger.io/docs/
+https://coddy.tech/docs/typescript
 
 <!-- TODO(team): add the references you actually used. -->
 
@@ -514,7 +519,7 @@ AI assistants were used by the team as a learning and support tool: to get conce
 More specifically:
 
 - **Charlotte (chpasqui):** used Claude to explore design directions and build the mockups, to get explanations of concepts (React, Tailwind, Django), and to review code. At the very end of the project, it also generated the landing page for visitors, helped update the `/design-system` catalogue page to the final components, and sped up a few repetitive changes (translations, renaming, style harmonisation).
-- **David (dle-fur):** wrote and understood the first tests himself, then used AI to write the remaining tests following the same pattern.
+- **David (dle-fur):** used AI to understand technical concepts and research information. Wrote and understood the first tests himself, then used AI to write the remaining tests following the same pattern. Also used AI to assist with code reviews.
 - **Documentation:** AI helped write and structure the documentation, including this README and the files in `docs/readme/`, starting from the team's notes and the code. Each member is responsible for checking the parts that describe their own work.
 
 ---

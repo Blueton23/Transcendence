@@ -5,68 +5,70 @@ Ce projet a été créé dans le cadre du cursus 42 par <dle-fur[Technical Lead 
 ```
 FT_TRANSCENDENCE/                    # Racine générale du projet
 │
-├── backend/                         # Backend Python : API, logique métier et accès à PostgreSQL
-│   │
-│   ├── config/                      # Configuration principale du projet Django
-│   │   ├── __init__.py              # Indique à Python que config est un paquet importable
-│   │   ├── asgi.py                  # Point d’entrée Django pour les serveurs ASGI
-│   │   ├── settings.py              # Paramètres Django : DB, applications, sécurité, langue, etc.
-│   │   ├── urls.py                  # Routes principales du backend : /admin/, /api/, etc.
-│   │   └── wsgi.py                  # Point d’entrée Django pour les serveurs WSGI
-│   │
-│   ├── .dockerignore                # Fichiers du backend exclus du contexte de build Docker
-│   ├── Dockerfile                   # Instructions pour construire l’image Docker Django
-│   ├── manage.py                    # Utilitaire en ligne de commande de Django
-│   └── requirements.txt             # Liste des dépendances Python du backend
+├── .github/                         # Intégration continue GitHub Actions
+│   ├── docker-compose.ci.yml        # Surcharge compose pour la CI (cache des images Docker)
+│   └── workflows/                   # smoke.yml, backend-ci.yml, frontend-ci.yml, automatisations du Project
 │
 ├── docs/                            # Documentation du projet : architecture, API, installation, choix techniques
 │
-├── frontend/                        # Frontend React chargé de l’interface utilisateur
-│   │
-│   ├── node_modules/                # Dépendances JavaScript installées par npm, non versionnées
-│   │
-│   ├── public/                      # Fichiers publics copiés tels quels et accessibles par URL
-│   │   ├── favicon.svg              # Icône affichée dans l’onglet du navigateur
-│   │   └── icons.svg                # Fichier contenant des icônes SVG publiques
-│   │
-│   ├── src/                         # Code source principal de l’application React
-│   │   ├── assets/                  # Images, icônes et autres ressources importées par React
-│   │   ├── App.css                  # Styles spécifiques au composant principal App
-│   │   ├── App.jsx                  # Composant React principal de l’application
-│   │   ├── index.css                # Styles CSS globaux de l’application
-│   │   └── main.jsx                 # Point d’entrée JavaScript qui monte React dans la page HTML
-│   │
-│   ├── .dockerignore                # Fichiers du frontend exclus du contexte de build Docker
-│   ├── .gitignore                   # Fichiers du frontend exclus du dépôt Git
-│   ├── .oxlintrc.json               # Configuration d’Oxlint pour analyser la qualité du code JS/React
-│   ├── Dockerfile                   # Instructions pour construire l’image React/Vite
-│   ├── index.html                   # Page HTML de base dans laquelle React est chargé
-│   ├── package-lock.json            # Versions exactes des dépendances npm installées
-│   ├── package.json                 # Dépendances, scripts et informations du projet frontend
-│   ├── README.md                    # Documentation propre au frontend, générée initialement par Vite
-│   └── vite.config.js               # Configuration du serveur et du build Vite
+├── scripts/
+│   └── smoke.sh                     # Test de bout en bout de la stack lancée, en HTTPS via nginx (make smoke)
 │
-├── nginx/                           # Configuration du reverse proxy et serveur web Nginx
-│   ├── .dockerignore                # Fichiers Nginx exclus de son contexte de build
-│   ├── Dockerfile                   # Instructions pour construire l’image Nginx
-│   └── nginx.conf                   # Routage des requêtes vers React ou Django
+├── srcs/
+│   │
+│   ├── backend/                     # Backend Python : API, logique métier et accès à PostgreSQL
+│   │   ├── config/                  # Configuration principale du projet Django
+│   │   │   ├── __init__.py          # Indique à Python que config est un paquet importable
+│   │   │   ├── asgi.py              # Point d’entrée ASGI : HTTP + WebSockets (utilisé par Uvicorn)
+│   │   │   ├── settings.py          # Paramètres Django : DB, applications, sécurité, langue, etc.
+│   │   │   ├── urls.py              # Routes principales du backend : /admin/, /api/, etc.
+│   │   │   ├── websocket_urls.py    # Routes WebSocket : /ws/...
+│   │   │   └── wsgi.py              # Point d’entrée WSGI (non utilisé en production)
+│   │   ├── common/ traveler/ travel/ idea/ chat/ spending/   # Applications Django
+│   │   ├── .dockerignore            # Fichiers du backend exclus du contexte de build Docker
+│   │   ├── Dockerfile               # Construction de l’image Django (non-root)
+│   │   ├── entrypoint.sh            # Démarrage : migrations, collectstatic, reset_presence, Uvicorn
+│   │   ├── manage.py                # Utilitaire en ligne de commande de Django
+│   │   └── requirements.txt         # Liste des dépendances Python du backend
+│   │
+│   ├── frontend/                    # Frontend React + TypeScript chargé de l’interface utilisateur
+│   │   ├── public/                  # Fichiers publics copiés tels quels (favicons, icônes PWA)
+│   │   ├── src/                     # Code source : app/, features/, shared/, main.tsx, index.css
+│   │   ├── .dockerignore            # Exclut node_modules, dist, .env du build Docker
+│   │   ├── Dockerfile               # npm ci → npm run build → dist/ servi par serve
+│   │   ├── eslint.config.js         # Configuration ESLint
+│   │   ├── .prettierrc              # Configuration Prettier
+│   │   ├── index.html               # Page HTML de base dans laquelle React est chargé
+│   │   ├── package-lock.json        # Versions exactes des dépendances npm (fait foi pour le build)
+│   │   ├── package.json             # Dépendances, scripts et informations du projet frontend
+│   │   ├── tsconfig*.json           # Configuration TypeScript
+│   │   └── vite.config.ts           # Configuration Vite (React, Tailwind, PWA)
+│   │
+│   └── nginx/                       # Reverse proxy HTTPS, unique porte d’entrée
+│       ├── .dockerignore            # Fichiers Nginx exclus de son contexte de build
+│       ├── Dockerfile               # Construction de l’image Nginx
+│       └── nginx.conf               # TLS + routage des requêtes vers React ou Django
 │
-├── .env                             # Variables d’environnement réelles et secrètes, non versionnées
+├── certs/                           # Certificat Let's Encrypt (fullchain.pem, privkey.pem) - NON versionné
+├── kit.tgz                          # Kit de déploiement : certs/ + secrets.env - NON versionné
+├── .env                             # Variables d’environnement réelles et secrètes - NON versionné, généré par make
 ├── .env.example                     # Modèle public des variables nécessaires, sans valeurs secrètes
-├── .gitignore                       # Fichiers et dossiers exclus du dépôt Git pour tout le projet
-├── docker-compose.yml               # Décrit et relie PostgreSQL, Django, React/Vite et Nginx
-└── Makefile                         # Raccourcis pour construire, démarrer et gérer les conteneurs
+├── .gitignore                       # Exclut .env, certs/, kit.tgz, secrets.env, node_modules, dist…
+├── docker-compose.yml               # Décrit et relie PostgreSQL, Redis, Django, React et Nginx
+└── Makefile                         # Prépare l’environnement, construit, démarre et gère les conteneurs
 ```
 
 ```
 Navigateur
-    │
+    │  https://peripl.app:8443   (HTTPS, TLS 1.2 / 1.3)
     ▼
-Nginx
-    ├── /api/     → Uvicorn → Django HTTP
-    ├── /admin/   → Uvicorn → Django HTTP
-    ├── /ws/      → Uvicorn → Django Channels
-    └── /         → Vite
+Nginx  (port 443 dans le conteneur, publié sur 8443 de la machine)
+    ├── /api/     → backend:8000  → Uvicorn → Django HTTP
+    ├── /admin/   → backend:8000  → Uvicorn → Django HTTP
+    ├── /ws/      → backend:8000  → Uvicorn → Django Channels (wss://)
+    ├── /static/  → servi directement par Nginx (volume static_data)
+    ├── /media/   → servi directement par Nginx (volume media_data)
+    └── /         → frontend:3000 → serve → dist/ (build React)
 
 Django Channels
     │
@@ -79,17 +81,22 @@ Django ORM
 PostgreSQL
 ```
 
+- Seul Nginx est exposé sur la machine. Backend (8000), frontend (3000), PostgreSQL (5432) et Redis (6379) ne sont joignables qu’à l’intérieur du réseau Docker.
+- Le trafic navigateur → Nginx est chiffré (HTTPS). Le trafic interne Nginx → services est en HTTP, ce que le sujet autorise.
+
 Les volumes :
 ```
 postgres_data
 └── données PostgreSQL importantes et persistantes
 
-frontend_node_modules
-└── dépendances npm du frontend
-
 static_data
-└── CSS, JavaScript et images statiques de Django
+└── CSS, JavaScript et images statiques de Django (collectstatic), servis par Nginx sur /static/
+
+media_data
+└── fichiers uploadés par les utilisateurs (photos de profil), servis par Nginx sur /media/
 ```
+
+- Il n’y a plus de volume de code : en production, le code est copié dans les images au build (`COPY . .`). Une modification du code demande donc un rebuild (`make down` puis `make`).
 
 ====================================================================================================
 
@@ -99,10 +106,11 @@ static_data
 - PostgreSQL est un système de gestion de base de données qui permet de stocker, organiser et retrouver des données
 - C'est le premier service a mettre en place dans le compose
 - La base de données reçoit  des ordres comme : SELECT, INSERT, UPDATE, DELETE
-- En developpement le mot passe peut etre simple, pour la production chaque personne doit créer un mot de passe complexe et l'inclure dans son .env
-- Lors du premier build, make migrate pour migrer les tables crées par Django
-- Lors de chaque changement dans une tables, appliquez les commandes danns l'ordre : make makemigrations / make migrate
-- Creer un superuser au départ pour accéder a http://localhost/admin/
+- Le mot de passe (`POSTGRES_PASSWORD`) est généré aléatoirement par `make` à la création du `.env`
+- Postgres n'enregistre le mot de passe qu'à la création du volume : si le `.env` est supprimé et régénéré, il faut aussi supprimer la base (`make fclean`), sinon le backend échoue avec `password authentication failed`
+- Les migrations sont appliquées automatiquement au démarrage du backend (`entrypoint.sh`)
+- Lors de chaque changement dans une table : `make makemigrations` en mode dev, puis rebuild (`make`) pour qu'elles s'appliquent
+- Creer un superuser au départ (`make createsuperuser`) pour accéder a https://peripl.app:8443/admin/
 - Admin va permettre de gerér la base sans passer par le shell
 - L'ORM est directement intégrée dans Django, cela permet de créer des requetes sql en python sans écrire de code SQL
 
@@ -170,6 +178,15 @@ Le backend installe les dependances via un fichier requirements.txt mis dans doc
 | `channels-redis==4.3.0` | Backend de communication utilisé par Channels pour faire circuler les messages entre plusieurs connexions |
 | `uvicorn[standard]==0.51.0` | Serveur ASGI qui fait tourner l'application |
 | `Faker==40.37.0` | Génère des fausses données réalistes (noms, emails, etc.) pour la commande `seed` |
+| `ruff==0.16.3` | Linter et formateur du code Python (`make lint-back`, `make format-back`) |
+| `djangorestframework-camel-case==1.4.2` | Convertit automatiquement les champs JSON entre `snake_case` (Python) et `camelCase` (frontend) |
+| `ipython==9.17.1` | Shell Python interactif amélioré, utilisé par `make shell` |
+| `Pillow==12.0.0` | Traitement et validation des images uploadées (photos de profil) |
+| `redis==8.1.0` | Client Python pour Redis, utilisé par le cache Django (compteurs du rate limiting) |
+| `drf-spectacular==0.30.0` | Génère le schéma OpenAPI et la documentation de l'API publique (`/api/docs/`) |
+| `drf-standardized-errors==0.16.0` | Renvoie toutes les erreurs de l'API dans un format JSON uniforme |
+| `requests==2.32.5` | Effectue des requêtes HTTP vers des services externes (ex : Google OAuth) |
+| `Authlib==1.8.0` | Client OAuth 2.0 / OpenID Connect pour la connexion avec Google (vérifie le jeton d'identité signé par Google) |
 
 Deux concepts principaux avec Django :
 - un Projet
@@ -182,18 +199,27 @@ Le projet Django est créer une seule fois et va contenir (renommé config) :
 - les paramètres
 - le démarrage
 
-Corriger les droits après config si besoin ->  sudo chown -R "$USER":"$USER" backend
+En dev (code monté en volume), corriger les droits après config si besoin ->  sudo chown -R "$USER":"$USER" srcs/backend
 
 Le projet va créer plusieurs fichier .py
 
 Dans config/settings.py :
 - Va permettre de configurer l app, la base de données, la langue et d'enregistrer des application
-- par defauts le mode debug est active (desactiver en prod)
-- Plusieurs choses seront a modifier pour la production
-- La secret key sera a modifiée
+- Toutes les valeurs sensibles viennent du `.env`
+
+Réglages de production dans settings.py :
+| Réglage | Rôle |
+|---|---|
+| `SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]` | Obligatoire, sans valeur par défaut : le backend refuse de démarrer si elle manque |
+| `DEBUG` | `False` par défaut (pas de page d'erreur détaillée exposée) |
+| `ALLOWED_HOSTS` | `peripl.app,localhost` (`localhost` est nécessaire au healthcheck) |
+| `CSRF_TRUSTED_ORIGINS` | `https://peripl.app:8443,https://localhost:8443` (schéma et port inclus) |
+| `SESSION_COOKIE_SECURE` / `CSRF_COOKIE_SECURE` | Les cookies ne circulent qu'en HTTPS |
+| `SESSION_COOKIE_HTTPONLY` | Le cookie de session n'est pas lisible en JavaScript |
+| `SECURE_PROXY_SSL_HEADER` | Django sait que la requête d'origine était en HTTPS grâce à l'en-tête `X-Forwarded-Proto` envoyé par Nginx |
 
 Dans config/urls :
-- Va permettre de definir les routes. Une route est un chemin pour acceder a une ressource, exemple http://localhost/admin/, admin est une route
+- Va permettre de definir les routes. Une route est un chemin pour acceder a une ressource, exemple https://peripl.app:8443/admin/, admin est une route
 - Sera ajouter les api/user etc.
 
 Les autres fichiers reste généralement intact sauf settings.py
@@ -311,9 +337,16 @@ ASGI peut traiter :
 
 Requirements a installer :
 - Django Channels : pour ajouter la gestion des WebSockets à Django
-- Uvicorn comme serveur ASGI en développement
-- Redis : comme couche de communication entre les connexions WebSocket
-- Gunicorn + uvicorn-worker : pour superviser plusieurs workers ASGI en production
+- Uvicorn comme serveur ASGI, en développement comme en production
+- Redis : comme couche de communication entre les connexions WebSocket (et entre les workers)
+
+En production, Uvicorn est lancé par `entrypoint.sh` avec :
+| Option | Rôle |
+|---|---|
+| `--host 0.0.0.0 --port 8000` | Écoute dans le conteneur, joignable par Nginx uniquement (port non publié) |
+| `--workers 4` | 4 processus en parallèle pour le multi-utilisateur. Redis synchronise les WebSockets entre eux |
+| `--proxy-headers` | Lit les en-têtes `X-Forwarded-Proto` / `X-Forwarded-For` envoyés par Nginx |
+| `--forwarded-allow-ips="*"` | Accepte ces en-têtes depuis le conteneur Nginx. Sans danger car seul Nginx peut joindre le port 8000 |
 
 ### Volumes :
 staticfiles
@@ -333,7 +366,7 @@ DRF ajoute par-dessus Django :
 Explication dockerfile backend :
 | Nom | Description |
 |---|---|
-| `ARG UID/GID` | Pour les permissions non-root |
+| `ARG UID/GID` | Utilisateur non-root fixe (1000). Ne vient pas du `.env` : les UID des postes de l'école sont trop grands pour Docker rootless |
 | `ENV PYTHONDONTWRITEBYTECODE=1/PYTHONUNBUFFERED=1` | Evite la création de fichiers Python __pycache__ et .pyc dans le projet |
 | `WORKDIR /app` | Définit /app comme dossier de travail dans le conteneur |
 | `RUN curl` | Installe curl pour les checks dans compose |
@@ -346,6 +379,15 @@ Explication dockerfile backend :
 | `EXPOSE 8000` | port backend |
 | `USER appuser` | permssion sur appuser |
 | `CMD ["/entrypoint.sh"]` | Commande du point d'entré |
+
+Explication entrypoint.sh backend :
+| Étape | Description |
+|---|---|
+| `set -e` | Arrêt à la première erreur (le serveur ne démarre pas sur une base incohérente) |
+| `manage.py migrate --noinput` | Crée / met à jour les tables automatiquement à chaque démarrage |
+| `manage.py collectstatic --noinput` | Copie les fichiers statiques Django dans le volume `static_data` |
+| `manage.py reset_presence` | Remet tous les utilisateurs hors ligne (cas d'un crash serveur) |
+| `exec uvicorn ...` | Lance le serveur ASGI comme processus principal du conteneur |
 
 ====================================================================================================
 
@@ -412,15 +454,27 @@ Django renvoie du JSON
 React affiche les résultats
 ```
 
+En production, Vite ne sert plus le site : il construit les fichiers finaux, puis `serve` les distribue.
+```
+package-lock.json → npm ci → node_modules (dans l'image) → npm run build → dist/ → serve
+```
+- `npm run build` lance `tsc -b` (vérification TypeScript, le build échoue en cas d'erreur) puis `vite build` (compilation dans `dist/`)
+- `dist/` contient : `index.html`, `assets/` (JS et CSS minifiés, polices), les fichiers de `public/`, `manifest.webmanifest` et le service worker de la PWA
+- `node_modules` n'est utilisé que pour construire le site. Le `node_modules` local (sur le disque) ne sert qu'à l'éditeur et est exclu du build par `.dockerignore`
+
 Explication dockerfile frontend :
 | Nom | Description |
 |---|---|
+| `FROM node:22-alpine` | Node 22, quelle que soit la version installée sur la machine |
 | `WORKDIR /app` | Définit /app comme dossier de travail dans le conteneur |
-| `COPY package.json package-lock.json ./` | Installe les versions enregistrées dans package-lock.json |
-| `RUN npm ci` | installation propre des dépendances du projet |
-| `COPY . .` | Copie le code React dans l’image |
-| `--host 0.0.0.0` | Permet aux autres conteneurs d’accéder au serveur Vite |
-| `--strictPort` | Vite doit obligatoirement utiliser le port demandé |
+| `RUN npm install -g serve` | Installe `serve`, serveur de fichiers statiques |
+| `COPY package.json package-lock.json ./` | Copie la liste des dépendances (mise en cache si elle ne change pas) |
+| `RUN npm ci` | Installation propre des versions exactes de package-lock.json |
+| `COPY . .` | Copie le code React dans l’image (sans node_modules, dist, .env) |
+| `ARG VITE_MAPBOX_TOKEN` | Reçoit le token Mapbox depuis le `.env` racine (via docker-compose), il est intégré au JS au moment du build |
+| `RUN npm run build` | Construit le site dans `dist/` |
+| `EXPOSE 3000` | Port de `serve`, joignable par Nginx uniquement |
+| `CMD ["serve", "-s", "dist", "-l", "3000"]` | Sert `dist/`. `-s` renvoie `index.html` pour toute URL inconnue (routes React) |
 
 ====================================================================================================
 
@@ -430,26 +484,30 @@ NGINX (unique porte d’entrée) :
 - reçoit les requêtes HTTP/HTTPS (navigateur → serveur)
 - renvoie des fichiers statiques (HTML/CSS/JS/images)
 - gère SSL/TLS, redirections, cache, reverse proxy, etc.
-- port 80 en dev, port 443 en production
-
-Lors de la mise en production, le fichier conf sera a modifier pour mettre le port 443 et les certificats
-Le dockerfile sera a modifie avec le port 443
+- écoute en HTTPS sur le port 443 dans le conteneur, publié sur le port 8443 de la machine (`"8443:443"`)
+- le port 80 affiché par `docker ps` (`80/tcp`, sans flèche) est hérité de l'image officielle : il n'est ni publié ni écouté
 
 Explication nginx.conf :
 | Nom | Description |
 |---|---|
 | `events` | connexions simultanées |
 | `client_max_body_size` | Taille max des fichiers uploadés (ex: media Django) |
-| `map` | Gestion des WebSockets Vite |
-| `upstream backend` | Serveur backend vers lequel Nginx peut transmettre des requêtes |
-| `upstream frontend` | Serveur frontend vers lequel Nginx peut transmettre des requêtes |
-| `server` | Server HTTP (en prod, HTTPS et certificat TLS) |
-| `location /api/` | Intercepte les URLs qui commencent par /api/ : http://localhost/api/users/, Transmets les requetes au backend Django |
-| `location /admin/` | Intercepte les URLs qui commencent par /admin/ : http://localhost/admin/, Permet d’accéder à l’administration Django |
-| `location /static/` | Route pour les fichiers statiques Django : /static/admin/css/base.css |
-| `location /media/` | Route pour les fichiers media Django (uploads utilisateurs): /media/avatars/photo.jpg |
-| `location /ws/` | location /ws/ : WebSockets Django applicatifs |
-| `location` | Route principale, envoyer au server Vite, Sert à récupérer les fichiers visuels et techniques de Django (hors python), WebSocket Vite pour le rechargement en développement |
+| `map` | Transmet correctement la demande de passage en WebSocket (`Upgrade` / `Connection`) à Django Channels |
+| `upstream backend` | `backend:8000` : conteneur Django/Uvicorn (nom du service compose résolu par le DNS Docker) |
+| `upstream frontend` | `frontend:3000` : conteneur `serve` qui distribue `dist/` |
+| `listen 443 ssl` / `http2 on` | HTTPS uniquement, HTTP/2 activé |
+| `server_name peripl.app` | Domaine servi, identique au certificat |
+| `ssl_certificate` / `ssl_certificate_key` | Certificat Let's Encrypt monté depuis `./certs` (lecture seule) |
+| `ssl_protocols TLSv1.2 TLSv1.3` | Versions de TLS autorisées (les anciennes sont refusées) |
+| `proxy_set_header Host $http_host` | Transmet le domaine **avec le port** (`peripl.app:8443`), pour que Django génère des URL correctes |
+| `proxy_set_header X-Real-IP / X-Forwarded-For` | Transmet la vraie IP du client (logs, rate limiting) |
+| `proxy_set_header X-Forwarded-Proto` | Indique à Django que la requête d'origine était en HTTPS |
+| `location /api/` | Transmet au backend Django : https://peripl.app:8443/api/... |
+| `location /admin/` | Transmet au backend : administration Django |
+| `location /static/` | Servi directement par Nginx depuis le volume `static_data` : /static/admin/css/base.css |
+| `location /media/` | Servi directement par Nginx depuis le volume `media_data` (uploads utilisateurs) |
+| `location /ws/` | WebSockets Django (`wss://`), HTTP/1.1 obligatoire et délai porté à 1 h |
+| `location /` | Tout le reste part vers le frontend (`serve`) |
 
 ====================================================================================================
 
@@ -458,7 +516,9 @@ Explication nginx.conf :
 
 | Commande compose | Description |
 |---|---|
-| `make up` | Construit les images si nécessaire et démarre les conteneurs au premier plan |
+| `make` | Identique à `make up` |
+| `make env` | Prépare l'environnement si besoin : extrait `certs/` depuis `kit.tgz`, crée le `.env` depuis `.env.example` avec une clé Django et un mot de passe Postgres générés, et les identifiants Google/Mapbox du kit. Ne touche à rien si `.env` et `certs/` existent déjà |
+| `make up` | Lance `make env`, puis construit les images et démarre les conteneurs au premier plan |
 | `make down` | Arrête et supprime les conteneurs et le réseau du projet. Les volumes et les données PostgreSQL sont conservés |
 | `make start` | Démarre les conteneurs en arrière-plan |
 | `make stop` | Arrête les conteneurs sans les supprimer |
@@ -471,7 +531,9 @@ Explication nginx.conf :
 | `make clean` | Supprime les conteneurs et les services. Les volumes et les données PostgreSQL sont conservés |
 | `make fclean` |Supprime les conteneurs, les services et les volumes. Attention : les données PostgreSQL sont définitivement supprimées |
 | `make re` | Supprime complètement le projet puis le reconstruit et le redémarre |
-| `make front-install` | Réinstalle les dépendances npm du frontend dans le conteneur puis le redémarre. À lancer après un `git pull` qui modifie `package.json` (ex : ajout de react-router). Nécessite que le conteneur frontend tourne (`make start`) |
+| `make smoke` | Test de bout en bout de la stack lancée (front, API, statiques, migrations, inscription, connexion, WebSocket, Redis) |
+
+Attention : en production, le code n'est plus monté en volume. Les commandes qui modifient des fichiers (`make format-back`, `make lint-fix-back`, `make format-front`, `make makemigrations`, `make startapp`, `make front-install`) agissent sur la copie du code dans le conteneur, pas sur les fichiers du disque. Les commandes de vérification portent sur le code du dernier build.
 
 -------
 
@@ -500,27 +562,75 @@ Explication nginx.conf :
 
 | Commande Frontend | Description |
 |---|---|
-| `make format` | Corrige le format au niveau du code frontend dans les fichiers, utilise prettierrc |
-| `make format-check` | Check (ne corrige pas) le format au niveau du code frontend dans les fichiers, utilise prettierrc |
+| `make format-front` | Corrige le format au niveau du code frontend dans les fichiers, utilise prettierrc |
+| `make format-check-front` | Check (ne corrige pas) le format au niveau du code frontend dans les fichiers, utilise prettierrc |
 | `make lint` | Check les dossiers/fichiers/variable inutilisé |
 
 ====================================================================================================
 
-### Rappel :
+### Mise en production (HTTPS) :
+
+#### Domaine et certificat :
+- Le domaine `peripl.app` (Infomaniak) a un enregistrement DNS **A → `127.0.0.1`** : sur chaque machine, `peripl.app` désigne la machine elle-même. Rien n'est hébergé : le projet tourne en local sur la machine de correction
+- Le certificat est un vrai certificat **Let's Encrypt**, obtenu par challenge DNS (enregistrement TXT `_acme-challenge`), ce qui fonctionne même avec un domaine pointant vers `127.0.0.1`
+- Les domaines `.app` sont en HSTS préchargé : un certificat auto-signé y serait bloqué par les navigateurs, sans possibilité de continuer. Un certificat reconnu est aussi nécessaire au service worker de la PWA (sinon erreur en console)
+- Le certificat est valable **90 jours** : le régénérer (certbot) avant la soutenance si besoin
+
+#### Pourquoi le port 8443 :
+- Sur les postes de l'école, Docker tourne en mode **rootless** (sans droits root) : les ports inférieurs à 1024, dont 443, ne peuvent pas être ouverts
+- Le HTTPS est donc publié sur **8443**, port HTTPS alternatif conventionnel. Le sujet exige le HTTPS, pas le port 443
+- Le port doit être identique dans : `docker-compose.yml`, `.env.example` (`DJANGO_CSRF_TRUSTED_ORIGINS`, `GOOGLE_REDIRECT_URI`) et l'URI de redirection déclarée dans Google Cloud Console
+
+#### Secrets et kit de déploiement :
+- Aucun secret n'est dans Git : `.env`, `certs/`, `kit.tgz` et `secrets.env` sont dans le `.gitignore`
+- `kit.tgz` contient `certs/` et `secrets.env` (`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `VITE_MAPBOX_TOKEN`), c'est-à-dire tout ce qui ne peut pas être généré
+- Création du kit (une fois, après génération du certificat) :
+```
+sudo tar czf kit.tgz certs secrets.env
+sudo chown $USER kit.tgz
+```
+- À conserver hors du dépôt (clé USB, espace privé) et à recréer si le certificat ou un secret change
+
+#### Google OAuth :
+- URI de redirection autorisée dans Google Cloud Console : `https://peripl.app:8443/api/auth/google/callback/`
+- Application publiée **en production** (sinon seuls les comptes testeurs peuvent se connecter)
+
+#### DNS du réseau :
+- Certains réseaux (dont celui de l'école) bloquent les réponses DNS en `127.0.0.1`. Vérification : `dig +short peripl.app` doit répondre `127.0.0.1`
+- Si rien ne s'affiche : activer le **DNS sécurisé** du navigateur (Chrome : Paramètres → Confidentialité et sécurité → Sécurité → Utiliser un DNS sécurisé → Cloudflare), ou ajouter `127.0.0.1 peripl.app` dans `/etc/hosts` si `sudo` est disponible
+
+#### CI (GitHub Actions) :
+- Le workflow `smoke.yml` génère un `.env` de test (clé Django et mot de passe Postgres aléatoires) et un certificat auto-signé jetable, lance la stack puis `make smoke`
+- `scripts/smoke.sh` teste en `https://localhost:8443` avec `curl -k` et le WebSocket en `wss://`
+
+====================================================================================================
+
+### Rappel - lancer le projet :
 - git clone le projet
-- cp .env.example .env
-- make up et controler si les containers sont up
-- sudo chown -R "$USER":"$USER" backend - pour les permission manage.py
-- make migrate
-- make createsuperuser
-- make migrate
+- déposer `kit.tgz` à la racine (à côté de `docker-compose.yml`)
+- `make` : extrait les certificats, génère le `.env`, construit et démarre tout (migrations automatiques)
+- `make ps` : tous les services doivent être `healthy` (nginx `Up`)
+- `make createsuperuser` (dans un second terminal) pour l'administration
+- `make seed` si besoin de données de test
 - ouvrir et tester la page
 
-http://localhost/           -> React
-http://localhost:8080/
+https://peripl.app:8443/         -> React
+https://peripl.app:8443/admin/   -> Django Admin
+https://peripl.app:8443/api/     -> API Django
+https://peripl.app:8443/api/docs/ -> Documentation de l'API publique
 
-http://localhost/admin/     -> Django Admin
-http://localhost:8080/admin/
+Rebuild après une modification du code (données conservées) :
+```
+make down
+make
+```
 
-http://localhost/api/       -> API Django
-http://localhost:8080/api/
+Problèmes fréquents :
+| Symptôme | Cause / solution |
+|---|---|
+| `kit.tgz manquant` | Déposer `kit.tgz` à la racine du projet |
+| `tar: ... Permission non accordée` | Un dossier `certs/` vide créé par Docker existe : `sudo rm -rf certs` puis `make` |
+| nginx `Restarting` / `cannot load certificate` | `certs/` absent ou incomplet : même solution |
+| backend unhealthy, `password authentication failed` | Le `.env` a été régénéré sur une base existante : `make fclean` puis `make` |
+| `cannot expose privileged port 443` | Docker rootless : utiliser le port 8443 (config actuelle) |
+| `peripl.app` ne répond pas | Vérifier le port `:8443` dans l'URL, puis le DNS (`dig +short peripl.app`) |
