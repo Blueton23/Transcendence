@@ -212,8 +212,6 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 
 ### Real-time features (WebSockets)
 
-<!-- TODO(scuthber): check and complete -->
-
 | | |
 |---|---|
 | **Type** | Major · 2 pts |
@@ -227,8 +225,6 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 
 ### Real-time collaborative features
 
-<!-- TODO(scuthber): check and complete -->
-
 | | |
 |---|---|
 | **Type** | Minor · 1 pt |
@@ -241,8 +237,6 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 ---
 
 ### Notification system
-
-<!-- TODO(scuthber): check and complete -->
 
 | | |
 |---|---|
@@ -286,7 +280,7 @@ Main tables: `Traveler` (account), `Travel` (trip), `Participation` (who is in w
 
 ### Allow users to interact (chat, profile, friends)
 
-<!-- TODO(sydubois, scuthber): check and complete -->
+<!-- TODO(sydubois): check and complete -->
 
 | | |
 |---|---|
@@ -520,6 +514,7 @@ More specifically:
 
 - **Charlotte (chpasqui):** used Claude to explore design directions and build the mockups, to get explanations of concepts (React, Tailwind, Django), and to review code. At the very end of the project, it also generated the landing page for visitors, helped update the `/design-system` catalogue page to the final components, and sped up a few repetitive changes (translations, renaming, style harmonisation).
 - **David (dle-fur):** used AI to understand technical concepts and research information. Wrote and understood the first tests himself, then used AI to write the remaining tests following the same pattern. Also used AI to assist with code reviews.
+- **Sébastien (scuthber):** used Claude to understand concepts like websockets, help on some complex algorithms like the spending split and to help create and make sure all the tests needed were present. Also helped during code reviews.
 - **Documentation:** AI helped write and structure the documentation, including this README and the files in `docs/readme/`, starting from the team's notes and the code. Each member is responsible for checking the parts that describe their own work.
 
 ---
