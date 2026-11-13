@@ -40,6 +40,7 @@ from .serializers import (
     LoginSerializer,
     TravelerCreateSerializer,
     TravelerSerializer,
+    TravelerSerializerPublic,
     TravelerUpdatePasswordSerializer,
     TravelerUpdateProfilePictureSerializer,
 )
@@ -304,7 +305,7 @@ class FriendshipSearchView(APIView):
 
         return Response(
             {
-                "travelers": TravelerSerializer(
+                "travelers": TravelerSerializerPublic(
                     travelers,
                     many=True,
                     context={"request": request},

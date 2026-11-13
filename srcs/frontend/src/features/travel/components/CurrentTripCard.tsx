@@ -42,7 +42,7 @@ export function CurrentTripCard({ travel, route }: CurrentTripCardProps) {
         </div>
         <Button
           variant="outline"
-          className="self-end"
+          className="mt-auto self-end"
           onClick={() => navigate(`/travel/${travel.id}/`)}
         >
           {t("travel.openTravel")}
