@@ -414,7 +414,8 @@
   },
   "map": {
     "offline": "Carte indisponible hors ligne",
-    "searchOffline": "Recherche indisponible hors ligne"
+    "searchOffline": "Recherche indisponible hors ligne",
+    "searchFailed": "Recherche de lieux indisponible, réessaie plus tard"
   },
   "nav": {
     "account": "Mon compte",

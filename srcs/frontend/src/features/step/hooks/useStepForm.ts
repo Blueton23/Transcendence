@@ -40,7 +40,7 @@ export function useStepForm({ step, travel, onSuccess }: UseStepFormProps) {
   const [noOvernight, setNoOvernight] = useState(
     step ? step.startDate === step.endDate : false,
   );
-  const { suggestions, isLoading } = usePlaceSuggestions(query);
+  const { suggestions, isLoading, failed } = usePlaceSuggestions(query);
   const { submit, isSubmitting, error } = useSubmitAction(async () => {
     if (!selected?.from || !selected?.to) {
       throw new Error(t("travel.errors.datesRequired"));
@@ -101,6 +101,7 @@ export function useStepForm({ step, travel, onSuccess }: UseStepFormProps) {
     changeQuery,
     suggestions,
     isLoading,
+    searchFailed: failed,
     selectPlace,
     selected,
     setSelected,

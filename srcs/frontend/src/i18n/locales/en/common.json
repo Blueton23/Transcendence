@@ -414,7 +414,8 @@
   },
   "map": {
     "offline": "Map unavailable offline",
-    "searchOffline": "Search unavailable offline"
+    "searchOffline": "Search unavailable offline",
+    "searchFailed": "Place search unavailable, please try again later"
   },
   "nav": {
     "account": "My account",

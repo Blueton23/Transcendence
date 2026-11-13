@@ -414,7 +414,8 @@
   },
   "map": {
     "offline": "Mapa no disponible sin conexión",
-    "searchOffline": "Búsqueda no disponible sin conexión"
+    "searchOffline": "Búsqueda no disponible sin conexión",
+    "searchFailed": "Búsqueda de lugares no disponible, inténtalo más tarde"
   },
   "nav": {
     "account": "Mi cuenta",

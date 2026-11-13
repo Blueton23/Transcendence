@@ -55,6 +55,7 @@ export function AddStepForm({
         <PlaceSuggestions
           items={form.suggestions}
           isLoading={form.isLoading}
+          failed={form.searchFailed}
           onSelect={pickPlace}
           activeIndex={list.activeIndex}
         />
