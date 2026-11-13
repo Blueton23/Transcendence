@@ -24,6 +24,20 @@ def password_error_details(
     return [django_error_detail(error) for error in exc.error_list]
 
 
+class TravelerSerializerPublic(serializers.ModelSerializer):
+    class Meta:
+        model = Traveler
+
+        fields: ClassVar[list[str]] = [
+            "id",
+            "username",
+            "first_name",
+            "last_name",
+            "profile_picture",
+            "is_online",
+        ]
+
+
 class TravelerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Traveler
