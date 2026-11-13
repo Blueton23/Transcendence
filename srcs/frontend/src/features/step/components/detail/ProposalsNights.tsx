@@ -25,7 +25,10 @@ export function ProposalsNights({
   const end = new Date(start);
   end.setUTCDate(start.getUTCDate() + 1);
   return (
-    <Card variant="dashed-accent" className="flex flex-col gap-2 md:gap-3">
+    <Card
+      variant="dashed-accent"
+      className="flex flex-col gap-2 p-2! md:gap-3 md:px-3! md:py-2!"
+    >
       <div className="flex items-center gap-2">
         <Icon name="moon" size={16} className="text-error" />
         <Text className="font-semibold text-error!">

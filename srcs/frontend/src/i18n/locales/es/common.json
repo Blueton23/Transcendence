@@ -414,7 +414,8 @@
   },
   "map": {
     "offline": "Mapa no disponible sin conexión",
-    "searchOffline": "Búsqueda no disponible sin conexión"
+    "searchOffline": "Búsqueda no disponible sin conexión",
+    "searchFailed": "Búsqueda de lugares no disponible, inténtalo más tarde"
   },
   "nav": {
     "account": "Mi cuenta",
@@ -647,7 +648,7 @@
     "nights_other": "{{count}} noches",
     "nights_zero": "Sin noches",
     "perNight": "por noche",
-    "pricePerNight": "{{price}} CHF por noche",
+    "pricePerNight": "{{price}} CHF/noche",
     "steps_one": "{{count}} etapa",
     "steps_other": "{{count}} etapas"
   },

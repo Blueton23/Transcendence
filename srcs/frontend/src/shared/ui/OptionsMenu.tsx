@@ -19,7 +19,7 @@ interface OptionsMenuProps {
   deleteLabel?: string;
   extraActions?: ExtraAction[];
   disabled?: boolean;
-  variant?: "flat" | "ghost";
+  variant?: "flat" | "ghost" | "outline";
 }
 
 export function OptionsMenu({

@@ -80,41 +80,30 @@
   --color-band-4: #cdd7dd; /* mist */
   --color-band-5: #d2d1da; /* slate, derived from ink */
 
-  --color-idea-restaurant-dot: #e7a23c;
-  --color-idea-lodging-dot: #6c6597;
-  --color-idea-activity-dot: #3fb477;
-  --color-idea-sightseeing-dot: #e2704f;
-
-  /* Idea types: background + text */
-  --color-idea-restaurant-bg: #f8ebd3;
-  --color-idea-restaurant: #7a5410;
+  /* Lodging (step detail: chosen night, complete lodging tag) */
   --color-idea-lodging-bg: #e4e1f0;
   --color-idea-lodging: #4a4580;
-  --color-idea-activity-bg: #e4f3ea;
-  --color-idea-activity: #2e6b4b;
-  --color-idea-sightseeing-bg: #f8e6dd;
-  --color-idea-sightseeing: #a13e22;
 
-  /* Expense categories: background + text (letter = backend code) */
-  --color-cat-lodging-bg: var(--color-idea-lodging-bg); /* l */
-  --color-cat-lodging: var(--color-idea-lodging);
-  --color-cat-meal-bg: var(--color-idea-restaurant-bg); /* m */
-  --color-cat-meal: var(--color-idea-restaurant);
-  --color-cat-activity-bg: var(--color-idea-activity-bg); /* a */
-  --color-cat-activity: var(--color-idea-activity);
-  --color-cat-fuel-bg: #ddeef6; /* f */
-  --color-cat-fuel: #1f5e7a;
-  --color-cat-toll-bg: #f3e3ec; /* t */
-  --color-cat-toll: #8a3b62;
-  --color-cat-other-bg: #ece7de; /* o */
-  --color-cat-other: #5c5650;
+  /* Expense categories, inspired by Swiss banknotes: background + text (letter = backend code) */
+  --color-cat-toll-bg: #f3e6c4; /* t — 10, yellow */
+  --color-cat-toll: #6b4f06;
+  --color-cat-meal-bg: #f2dcda; /* m — 20, red */
+  --color-cat-meal: #8c2430;
+  --color-cat-activity-bg: #dceadf; /* a — 50, green */
+  --color-cat-activity: #2e6b4b;
+  --color-cat-fuel-bg: #d9e4ef; /* f — 100, blue */
+  --color-cat-fuel: #1f4f7a;
+  --color-cat-lodging-bg: #e2ddee; /* l — 200, violet */
+  --color-cat-lodging: #4a4580;
+  --color-cat-other-bg: #eae0d3; /* o — 1000, brown */
+  --color-cat-other: #5b4430;
 
-  --color-cat-lodging-dot: var(--color-idea-lodging-dot);
-  --color-cat-meal-dot: var(--color-idea-restaurant-dot);
-  --color-cat-activity-dot: var(--color-idea-activity-dot);
-  --color-cat-fuel-dot: #3c93bf;
-  --color-cat-toll-dot: #c0679a;
-  --color-cat-other-dot: #a39b90;
+  --color-cat-toll-dot: #d19a12;
+  --color-cat-meal-dot: #b5323c;
+  --color-cat-activity-dot: #3e8c58;
+  --color-cat-fuel-dot: #2f6fa8;
+  --color-cat-lodging-dot: #6c5a9c;
+  --color-cat-other-dot: #8a6a4a;
 
   /* Avatars (white initials, all AA contrast) */
   --color-avatar-1: #b8452c; /* coral */

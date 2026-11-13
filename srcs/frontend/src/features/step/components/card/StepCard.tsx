@@ -10,7 +10,6 @@ import { OptionsMenu } from "@/shared/ui/OptionsMenu";
 import { getTravelBandColor } from "@/features/travel/utils/getTravelBandColor";
 import Tag from "@/shared/ui/Tag";
 import { StepPositionBadge } from "@/features/step/components/card/StepPositionBadge";
-import { ideaBands } from "@/features/idea/utils/ideaBands";
 
 interface StepCardProps {
   step: Step;
@@ -62,7 +61,9 @@ export function StepCard({
           <Tag
             tone={lodging.lodged === lodging.total ? "plain" : "todo"}
             className={
-              lodging.lodged === lodging.total ? ideaBands.accommodation : ""
+              lodging.lodged === lodging.total
+                ? "bg-idea-lodging-bg text-idea-lodging"
+                : ""
             }
             icon={<Icon name="tent" size={13} />}
           >

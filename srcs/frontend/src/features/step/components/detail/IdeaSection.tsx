@@ -41,7 +41,7 @@ function IdeaDay({
   const lineStyle = "w-0.5 flex-1 bg-border-control";
 
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-2 md:gap-3">
       <div className={railStyle}>
         <span className={dotStyle} />
         {!isLast && <span className={lineStyle} />}
@@ -52,7 +52,7 @@ function IdeaDay({
           onClick={() => setOpen(!open)}
           className="flex items-center gap-2 text-left"
         >
-          <Heading level={2} size="sm">
+          <Heading level={2} size="sm" className="md:text-base!">
             {label}
           </Heading>
           <Icon

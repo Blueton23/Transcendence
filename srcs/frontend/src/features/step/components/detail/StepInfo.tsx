@@ -22,7 +22,7 @@ export function StepInfo({ step, dateLabel }: StepInfoProps) {
       }
       bandClassName={getTravelBandColor(step.travelId)}
     >
-      <Heading level={1} size="lg">
+      <Heading level={1} size="lg" className="md:text-xl!">
         {step.localisation}
       </Heading>
     </Card>

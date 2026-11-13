@@ -32,12 +32,12 @@ const features: {
   {
     key: "expenses",
     icon: "cash",
-    band: "bg-idea-activity-bg text-idea-activity",
+    band: "bg-cat-activity-bg text-cat-activity",
   },
   {
     key: "chat",
     icon: "chat",
-    band: "bg-idea-restaurant-bg text-idea-restaurant",
+    band: "bg-cat-toll-bg text-cat-toll",
   },
 ];
 
@@ -140,12 +140,13 @@ function AppPreview() {
       <div className="absolute -top-6 right-0 w-60 rotate-3 shadow-lg md:-right-4">
         <Card
           band={
-            <span className="flex items-center gap-1 text-xs font-semibold">
-              <Icon name="check" size={13} />
+            <span className="flex items-center gap-1.5 text-xs font-semibold">
+              <Icon name="tent" size={14} />
               {t("idea.chosenLodging")}
+              <Icon name="check" size={13} />
             </span>
           }
-          bandClassName="bg-idea-lodging-bg text-idea-lodging"
+          bandClassName="bg-brand-dark text-inverse"
           className="flex items-start justify-between gap-2"
         >
           <Text className="font-bold">{t("home.preview.idea")}</Text>
@@ -198,7 +199,7 @@ function HomePage() {
         </div>
         <Button
           variant="outline"
-          size="sm"
+          size="md"
           className="ml-auto md:ml-0"
           onClick={() => navigate("/login")}
         >
@@ -211,9 +212,6 @@ function HomePage() {
             onClick={() => navigate("/signup")}
           >
             {t("home.signup")}
-          </Button>
-          <Button variant="outline" onClick={() => navigate("/profile")}>
-            {t("profile.title")}
           </Button>
         </div>
       </header>

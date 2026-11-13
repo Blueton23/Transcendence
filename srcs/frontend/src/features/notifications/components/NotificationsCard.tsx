@@ -25,7 +25,7 @@ interface NotificationsCardProps {
 
 // Compact row, the whole line is clickable.
 const rowStyle =
-  "flex w-full items-center gap-2.5 rounded-sm px-2 py-2 text-left transition-colors hover:bg-surface-container";
+  "flex w-full cursor-pointer items-center gap-2.5 rounded-sm px-2 py-2 text-left transition-colors hover:bg-surface-container";
 const chevron = (
   <Icon name="chev-right" size={16} className="shrink-0 text-muted" />
 );

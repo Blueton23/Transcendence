@@ -414,7 +414,8 @@
   },
   "map": {
     "offline": "Map unavailable offline",
-    "searchOffline": "Search unavailable offline"
+    "searchOffline": "Search unavailable offline",
+    "searchFailed": "Place search unavailable, please try again later"
   },
   "nav": {
     "account": "My account",
@@ -647,7 +648,7 @@
     "nights_other": "{{count}} nights",
     "nights_zero": "No nights",
     "perNight": "per night",
-    "pricePerNight": "{{price}} CHF per night",
+    "pricePerNight": "{{price}} CHF/night",
     "steps_one": "{{count}} stop",
     "steps_other": "{{count}} stops"
   },
